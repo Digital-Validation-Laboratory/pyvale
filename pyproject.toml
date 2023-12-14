@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyCAVE"
+version = "0.0.1"
+description = "A python computer aided validation engine (CAVE)"
+authors = [
+  { name = "thescepticalrabbit", email = "thescepticalrabbit@gmail.com" },
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: GNU LGPL",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.9"
+dependencies = [
+  "numpy>=1.26.0",
+  "netCDF4>=1.6.5"
+]
+
+[project.urls]
+"Repository" = "https://github.com/ScepticalRabbit/mooseherder"
+"Issue Tracker" = "https://github.com/ScepticalRabbit/mooseherder/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
