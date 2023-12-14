@@ -23,8 +23,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Repository" = "https://github.com/ScepticalRabbit/mooseherder"
-"Issue Tracker" = "https://github.com/ScepticalRabbit/mooseherder/issues"
+"Repository" = "https://github.com/ScepticalRabbit/pycave"
+"Issue Tracker" = "https://github.com/ScepticalRabbit/pycave/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
