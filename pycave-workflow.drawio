@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2024-02-17T06:59:45.183Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" etag="KXxo6ajBeq6NMJQ7J6aK" version="23.1.4" type="github">
+<mxfile host="app.diagrams.net" modified="2024-02-17T07:03:53.483Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" etag="ksiyaIiO8yGYIgHLGk9x" version="23.1.4" type="github">
   <diagram name="Page-1" id="WF9kIqmSJEB_mRzXMbXp">
     <mxGraphModel dx="1604" dy="759" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -21,6 +21,9 @@
         </mxCell>
         <mxCell id="mfDL4ABtgR5ySR-21lg9-6" value="Experiment" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="340" y="240" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mfDL4ABtgR5ySR-21lg9-7" value="Simuation Output File" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="210" y="120" width="120" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
