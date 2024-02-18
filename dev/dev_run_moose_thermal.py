@@ -21,7 +21,7 @@ def main() -> None:
 
     moose_runner.set_run_opts(n_tasks = 1, n_threads = 4, redirect_out = False)
 
-    input_path = Path('scripts/moose_thermal_volumetric.i')
+    input_path = Path('sdata/moose_thermal_volumetric.i')
     moose_runner.run(input_path)
 
 if __name__ == '__main__':
