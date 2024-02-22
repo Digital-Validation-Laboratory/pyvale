@@ -5,6 +5,7 @@ pycave: dev_run_moose_thermal
 authors: thescepticalrabbit
 -------------------------------------------------------------------------------
 '''
+import os
 from pathlib import Path
 from mooseherder.mooseconfig import MooseConfig
 from mooseherder.mooserunner import MooseRunner
@@ -21,8 +22,15 @@ def main() -> None:
 
     moose_runner.set_run_opts(n_tasks = 1, n_threads = 4, redirect_out = False)
 
-    input_path = Path('sdata/moose_thermal_volumetric.i')
-    moose_runner.run(input_path)
+    base_path = Path('data/')
+    all_files = os.listdir(base_path)
+    input_files = list([])
+    for ff in all_files:
+        if '.i' in ff:
+            input_files.append(base_path / ff)
+
+    for ii in input_files:
+        moose_runner.run(ii)
 
 if __name__ == '__main__':
     main()
