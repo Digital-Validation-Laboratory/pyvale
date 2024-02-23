@@ -16,10 +16,11 @@ classifiers = [
     "License :: GNU LGPL",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = [
   "numpy>=1.26.0",
-  "netCDF4>=1.6.5"
+  "netCDF4>=1.6.5",
+  "pyvista>=0.43.3"
 ]
 
 [project.urls]
