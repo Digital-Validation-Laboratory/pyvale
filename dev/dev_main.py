@@ -73,11 +73,22 @@ class Sensor:
         return self._position
 
     def get_measurement(self,field) -> np.ndarray:
-        pass
+        return self.get_truth() + \
+            self.get_systematic_err() + \
+            self.get_random_err()
 
-    def get_truth(self,field) -> np.ndarray:
-        pass
+    def get_truth(self) -> np.ndarray:
+        return np.array([])
 
+    def get_systematic_err(self) -> np.ndarray:
+        return np.array([])
+
+    def get_random_err(self) -> np.ndarray:
+        return np.array([])
+
+#-------------------------------------------------------------------------------
+def build_sensor(position: np.ndarray) -> np.ndarray:
+    return np.array((Sensor(position)))
 
 #-------------------------------------------------------------------------------
 def main() -> None:
@@ -87,7 +98,7 @@ def main() -> None:
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
-    pv_grid = convert_simdata_to_pyvista(sim_data)
+    pv_simdata = convert_simdata_to_pyvista(sim_data)
 
     # Create sensors
     x_sens = 3
@@ -99,19 +110,32 @@ def main() -> None:
 
     sens_pos_x = np.linspace(x_min,x_max,x_sens+2)[1:-1]
     sens_pos_y = np.linspace(y_min,y_max,y_sens+2)[1:-1]
-
-    print(sens_pos_x)
-    print(sens_pos_y)
     (sens_grid_x,sens_grid_y) = np.meshgrid(sens_pos_x,sens_pos_y)
-    pprint(sens_grid_x)
-    pprint(sens_grid_y)
-    # Plot sensors on the mesh
 
-    return
-    print(pv_grid)
-    pv_grid.plot(scalars=pv_grid['T'][:,1],
-                 cpos='xy',
-                 show_edges=True)
+    sens_pos_x = sens_grid_x.flatten()
+    sens_pos_y = sens_grid_y.flatten()
+    sens_pos_z = np.zeros(sens_pos_x.shape)
+    sens_pos = np.vstack((sens_pos_x,sens_pos_y,sens_pos_z)).T
+
+    sensor_array = np.apply_along_axis(build_sensor,1,sens_pos)
+
+    pv_sensdata = pv.PolyData(sens_pos)
+
+    pv.set_plot_theme('dark')
+    pv_plot = pv.Plotter(window_size=[1000, 1000])
+    pv_plot.add_mesh(pv_sensdata,
+                     label='sensors',
+                     color='red',
+                     render_points_as_spheres=True,
+                     point_size=20
+                     )
+
+    pv_plot.add_mesh(pv_simdata,
+                     scalars=pv_simdata['T'][:,-1],
+                     label='sim data',
+                     show_edges=True)
+    pv_plot.camera_position = 'xy'
+    pv_plot.show()
 
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
