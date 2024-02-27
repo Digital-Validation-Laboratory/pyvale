@@ -124,11 +124,11 @@ def main() -> None:
     x_min = 11.5e-3
     x_max = 11.5e-3
 
-    y_sens = 3
+    y_sens = 4
     y_min = -11.5e-3
     y_max = 19.5e-3
 
-    z_sens = 2
+    z_sens = 3
     z_min = 0
     z_max = 12e-3
 
@@ -151,9 +151,14 @@ def main() -> None:
 
     pprint(sens_vals)
     for nn in sim_data.node_vars:
+        pprint(nn)
         pprint(sens_vals[nn])
+        pprint(sens_vals[nn].shape)
 
-    plot_sensors(pv_simdata,pv_sensdata)
+
+
+    #plot_sensors(pv_simdata,pv_sensdata)
+
 
 
 

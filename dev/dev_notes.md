@@ -2,12 +2,49 @@
 
 ## Notes: architecture
 
+## Notes: thermocouples
+
+https://www.mstarlabs.com/sensors/thermocouple-calibration.html
+T  =  -0.01897 + 25.41881 V - 0.42456 V^2 + 0.04365 V^3
+where V is voltage in units of millivolts
+and   T is temperature in degrees C
+
+## Notes: sensors
+
+A sensor should have:
+- A spatial measurement geometry: point, line, area, volume
+- A measurement position, centroid of the measurement geometry
+- A measurement point/area/line/volume
+- A measurement frequency in time
+- A calibration curve
+- A digitisation
+
+
+### Systematic errors
+
+Comes from many sources:
+- Positioning error
+- Averaging over time (integration time)
+- Averaging over space (integration space)
+- Digistisation error
+- Calibration error
+- Temporal lag of the signal
+- Drift
+
+
+### Random errors
+
+Comes from sensors noise, need a way to specify a probability distribution to sample from.
+
 ## Notes: numpy
+
 Avoiding loops by applying a function along an array dimension:
 
 ## Notes: pyvista
 
+
 ### Mesh structure in pyvista
+
 NOTE: pyvista element numbers are 0 indexed so need to -1 from whole element connectivity table to correct it.
 
 The most general mesh structure in `pyvista` is the `pyvista.UnstructuredGrid`. This requires 3 types of information to construct. Here we assume we have a mesh with `N` nodes and `E` elements with `n_per_e` nodes per element which:
@@ -63,7 +100,9 @@ pl.show()
 ```
 
 ### Plotting in pyvista
+
 Adding multiple meshes to one plot:
+
 ```python
 import pyvista as pv
 
@@ -85,7 +124,9 @@ pv_plot.show()
 ```
 
 ### Interpolating using an FE mesh
+
 Syntax is:
+
 ```python
 sampled_values = points_to_sample.sample(fe_field_data_to_sample)
 ```
