@@ -7,14 +7,16 @@ authors: thescepticalrabbit
 '''
 from pprint import pprint
 from pathlib import Path
+from abc import ABC, abstractmethod
 import mooseherder as mh
 import numpy as np
 import pyvista as pv
 from pyvista import CellType
 
 #-------------------------------------------------------------------------------
-def convert_simdata_to_pyvista(sim_data: mh.SimData,dim: int = 3
+def convert_simdata_to_pyvista(sim_data: mh.SimData, dim: int = 3
                                ) -> pv.UnstructuredGrid:
+
     flat_connect = np.array([],dtype=np.int64)
     cell_types = np.array([],dtype=np.int64)
 
@@ -48,9 +50,6 @@ def get_cell_type(nodes_per_elem: int, dim: int = 3) -> int:
         if nodes_per_elem == 8:
             cell_type =  CellType.HEXAHEDRON
         elif nodes_per_elem == 4:
-            cell_type = CellType.TETRA
-    elif dim == 2:
-        if nodes_per_elem == 4:
             cell_type = CellType.QUAD
         elif nodes_per_elem == 3:
             cell_type = CellType.TRIANGLE
@@ -58,36 +57,64 @@ def get_cell_type(nodes_per_elem: int, dim: int = 3) -> int:
 
 #-------------------------------------------------------------------------------
 # Use pyvista.sample to use the FE mesh to do interpolation of a field
-
 class Field:
-    def __init__(self) -> None:
+    def __init__(self, sim_data: mh.SimData, name: str, dim: int = 3) -> None:
+        self._name = name
+        self._data_grid = convert_simdata_to_pyvista(sim_data,dim)
+
+    def sample(self, sample_points: np.ndarray) -> np.ndarray:
+        pv_points = pv.PolyData(sample_points)
+        return pv_points.sample(self._data_grid)
+
+
+#-------------------------------------------------------------------------------
+class Sensor(ABC):
+    @abstractmethod
+    def get_positions(self) -> np.ndarray:
+        pass
+
+    @abstractmethod
+    def get_measurements(self) -> np.ndarray:
+        pass
+
+    @abstractmethod
+    def get_truth(self) -> np.ndarray:
+        pass
+
+    @abstractmethod
+    def get_systematic_errs(self) -> np.ndarray:
+        pass
+
+    @abstractmethod
+    def get_random_errs(self) -> np.ndarray:
         pass
 
 #-------------------------------------------------------------------------------
-class Sensor:
+class Thermocouple(Sensor):
     def __init__(self, position: np.ndarray) -> None:
         self._position = position
 
-    def get_position(self) -> np.ndarray:
+    def get_positions(self) -> np.ndarray:
         return self._position
 
-    def get_measurement(self) -> np.ndarray:
+    def get_measurements(self) -> np.ndarray:
         return self.get_truth() + \
-            self.get_systematic_err() + \
-            self.get_random_err()
+            self.get_systematic_errs() + \
+            self.get_random_errs()
 
     def get_truth(self) -> np.ndarray:
         return np.array([])
 
-    def get_systematic_err(self) -> np.ndarray:
+    def get_systematic_errs(self) -> np.ndarray:
         return np.array([])
 
-    def get_random_err(self) -> np.ndarray:
+    def get_random_errs(self) -> np.ndarray:
         return np.array([])
+
 
 #-------------------------------------------------------------------------------
-def build_sensor(position: np.ndarray) -> np.ndarray:
-    return np.array((Sensor(position)))
+def build_thermocouples(position: np.ndarray) -> np.ndarray:
+    return np.array((Thermocouple(position)))
 
 #-------------------------------------------------------------------------------
 def plot_sensors(pv_simdata: pv.UnstructuredGrid,
@@ -143,11 +170,11 @@ def main() -> None:
     sens_pos_z = sens_grid_z.flatten()
     sens_pos = np.vstack((sens_pos_x,sens_pos_y,sens_pos_z)).T
 
-    sensor_array = np.apply_along_axis(build_sensor,1,sens_pos)
+    sensor_array = np.apply_along_axis(build_thermocouples,1,sens_pos)
+    t_field = Field(sim_data,'')
 
-    pv_sensdata = pv.PolyData(sens_pos)
-
-    sens_vals = pv_sensdata.sample(pv_simdata)
+    #pv_sensdata = pv.PolyData(sens_pos)
+    #sens_vals = pv_sensdata.sample(pv_simdata)
 
     pprint(sens_vals)
     for nn in sim_data.node_vars:
@@ -155,11 +182,7 @@ def main() -> None:
         pprint(sens_vals[nn])
         pprint(sens_vals[nn].shape)
 
-
-
     #plot_sensors(pv_simdata,pv_sensdata)
-
-
 
 
 #-------------------------------------------------------------------------------
