@@ -11,10 +11,12 @@ from functools import partial
 from dataclasses import asdict
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 import mooseherder as mh
 
 import pycave
+from pycave.plotprops import PlotProps
 
 def main() -> None:
     data_path = Path('data/thermal_2d_basic_out.e')
@@ -24,11 +26,11 @@ def main() -> None:
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
-    x_sens = 3
+    x_sens = 4
     x_min = 0
     x_max = 2
 
-    y_sens = 2
+    y_sens = 1
     y_min = 0
     y_max = 1
 
@@ -51,12 +53,13 @@ def main() -> None:
     t_field = pycave.Field(sim_data,field_name,dim)
     tc_array = pycave.ThermocoupleArray(sens_pos,t_field)
 
+    err_range = 2.0
     rand_err_func = partial(np.random.default_rng().normal,
                             loc=0.0,
-                            scale=20.0)
+                            scale=err_range)
     sys_err_func = partial(np.random.default_rng().uniform,
-                            low=-20.0,
-                            high=20.0)
+                            low=-err_range,
+                            high=err_range)
 
     tc_array.set_random_err_func(rand_err_func)
     tc_array.set_systematic_err_func(sys_err_func)
@@ -71,8 +74,9 @@ def main() -> None:
 
     pv_sens = tc_array.get_visualiser()
     pv_sim = t_field.get_visualiser()
-    pycave.plot_sensors(pv_sim,pv_sens,field_name)
+    #pycave.plot_sensors(pv_sim,pv_sens,field_name)
 
+    tc_array.plot_time_traces()
 
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':

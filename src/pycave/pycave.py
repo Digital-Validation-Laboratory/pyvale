@@ -11,10 +11,13 @@ from functools import partial
 from dataclasses import dataclass
 
 import numpy as np
+import matplotlib.pyplot as plt
 import pyvista as pv
 from pyvista import CellType
 
 import mooseherder as mh
+
+from pycave.plotprops import PlotProps
 
 
 #===============================================================================
@@ -216,7 +219,30 @@ class ThermocoupleArray(SensorArray):
 
 
     def plot_time_traces(self) -> None:
-        pass
+        pp = PlotProps()
+        prop_cycle = plt.rcParams['axes.prop_cycle']
+        colors = prop_cycle.by_key()['color']
+
+        fig, ax = plt.subplots(figsize=pp.single_fig_size,layout='constrained')
+        fig.set_dpi(pp.resolution)
+
+        p_time = self._field.get_time_steps()
+        for ii in range(self.get_num_sensors()):
+            measurements = self.get_measurements()
+            ax.plot(p_time,measurements[ii,:],
+                '-',label=f'TC{ii}',
+                lw=pp.lw,ms=pp.ms,color=colors[ii])
+
+        ax.set_xlabel('Time, $t$ [s]',
+                    fontsize=pp.font_ax_size, fontname=pp.font_name)
+        ax.set_ylabel('Temperature, $T$ [K]',
+                    fontsize=pp.font_ax_size, fontname=pp.font_name)
+
+        plt.grid(True)
+        ax.legend()
+        ax.legend(prop={"size":pp.font_leg_size},loc='upper left')
+        plt.show()
+
 
 
 #===============================================================================
