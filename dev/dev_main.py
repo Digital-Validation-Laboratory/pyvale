@@ -40,18 +40,19 @@ def main() -> None:
     sens_pos_y = sens_grid_y.flatten()
     sens_pos_z = sens_grid_z.flatten()
     sens_pos = np.vstack((sens_pos_x,sens_pos_y,sens_pos_z)).T
+    pprint(sens_pos.shape)
 
-    t_field = pycave.Field(sim_data, 'temperature', 3)
-    tc_array = pycave.ThermocoupleArray(sens_pos)
+    t_field = pycave.Field(sim_data,'temperature',3)
+    tc_array = pycave.ThermocoupleArray(sens_pos,t_field)
 
-    sens_vals = t_field.sample(sens_pos)
+    sens_vals = tc_array.get_random_errs()
     pprint(sens_vals)
     pprint(type(sens_vals))
     pprint(sens_vals.shape)
 
     pv_sens = tc_array.get_visualiser()
     pv_sim = t_field.get_visualiser()
-    pycave.plot_sensors(pv_sim,pv_sens)
+    #pycave.plot_sensors(pv_sim,pv_sens)
 
 
 #-------------------------------------------------------------------------------

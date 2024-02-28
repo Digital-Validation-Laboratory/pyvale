@@ -1,18 +1,24 @@
 '''
--------------------------------------------------------------------------------
+================================================================================
 pycave: mono repo
 
 authors: thescepticalrabbit
--------------------------------------------------------------------------------
+================================================================================
 '''
-
 from abc import ABC, abstractmethod
-import mooseherder as mh
+from typing import Callable
+from functools import partial
+
 import numpy as np
 import pyvista as pv
 from pyvista import CellType
 
-#-------------------------------------------------------------------------------
+import mooseherder as mh
+
+
+'''
+================================================================================
+'''
 def convert_simdata_to_pyvista(sim_data: mh.SimData, dim: int = 3
                                ) -> pv.UnstructuredGrid:
 
@@ -42,13 +48,19 @@ def convert_simdata_to_pyvista(sim_data: mh.SimData, dim: int = 3
 
     return pv_grid
 
+'''
+================================================================================
+'''
 def attach_field_to_pyvista(pv_grid: pv.UnstructuredGrid,
                                  node_field: np.ndarray,
                                  name: str) -> pv.UnstructuredGrid:
     pv_grid[name] = node_field
     return pv_grid
 
-#-------------------------------------------------------------------------------
+
+'''
+================================================================================
+'''
 def get_cell_type(nodes_per_elem: int, dim: int = 3) -> int:
     cell_type = 0
     if dim == 3:
@@ -60,8 +72,10 @@ def get_cell_type(nodes_per_elem: int, dim: int = 3) -> int:
             cell_type = CellType.TRIANGLE
     return cell_type
 
-#-------------------------------------------------------------------------------
-# Use pyvista.sample to use the FE mesh to do interpolation of a field
+
+'''
+================================================================================
+'''
 class Field:
     def __init__(self, sim_data: mh.SimData, name: str, dim: int = 3) -> None:
         self._name = name
@@ -69,6 +83,10 @@ class Field:
         self._data_grid = attach_field_to_pyvista(self._data_grid,
                                                   sim_data.node_vars[name], # type: ignore
                                                   name)
+        self._time_steps = sim_data.time
+
+    def get_time_steps(self) -> np.ndarray:
+        return self._time_steps
 
     def sample(self, sample_points: np.ndarray) -> np.ndarray:
         pv_points = pv.PolyData(sample_points)
@@ -78,7 +96,10 @@ class Field:
     def get_visualiser(self) -> pv.UnstructuredGrid:
         return self._data_grid
 
-#-------------------------------------------------------------------------------
+
+'''
+================================================================================
+'''
 class SensorArray(ABC):
     @abstractmethod
     def get_positions(self) -> np.ndarray:
@@ -100,33 +121,77 @@ class SensorArray(ABC):
     def get_random_errs(self) -> np.ndarray:
         pass
 
-#-------------------------------------------------------------------------------
+
+'''
+================================================================================
+'''
 class ThermocoupleArray(SensorArray):
-    def __init__(self, positions: np.ndarray) -> None:
+    def __init__(self,
+                 positions: np.ndarray,
+                 field: Field) -> None:
+
         self._positions = positions
+        self._field = field
+
+        self._rand_err_func = None
+        self._sys_err_func = None
+        '''
+        self._rand_err_func = partial(np.random.default_rng().normal,
+                                      loc=0.0,
+                                      scale=1.0)
+        self._sys_err_func = partial(np.random.default_rng().uniform,
+                                     low=-1.0,
+                                     high=1.0)
+        '''
 
     def get_positions(self) -> np.ndarray:
         return self._positions
+
+
+    def get_num_sensors(self) -> int:
+        return self._positions.shape[0]
+
+
+    def get_measurement_shape(self) -> tuple[int,int]:
+        return (self.get_num_sensors(),
+                self._field.get_time_steps().shape[0])
+
 
     def get_measurements(self) -> np.ndarray:
         return self.get_truth_values() + \
             self.get_systematic_errs() + \
             self.get_random_errs()
 
+
     def get_truth_values(self) -> np.ndarray:
-        return np.array([])
+        return self._field.sample(self._positions)
+
 
     def get_systematic_errs(self) -> np.ndarray:
-        return np.array([])
+        if self._sys_err_func is None:
+            return np.zeros(self.get_measurement_shape())
+
+        return self._sys_err_func(size=self.get_measurement_shape())
+
+
+    def set_random_err_func(self, rand_fun: Callable | None) -> None:
+        pass
+
 
     def get_random_errs(self) -> np.ndarray:
-        return np.array([])
+        if self._rand_err_func is None:
+            return np.zeros(self.get_measurement_shape())
+
+        return self._rand_err_func(size=self.get_measurement_shape())
+
 
     def get_visualiser(self) -> pv.PolyData:
         return pv.PolyData(self._positions)
 
 
-#-------------------------------------------------------------------------------
+'''
+================================================================================
+'''
 def plot_sensors(pv_simdata: pv.UnstructuredGrid,
                  pv_sensdata: pv.PolyData) -> None:
     #pv.set_plot_theme('dark') # type: ignore
@@ -146,5 +211,3 @@ def plot_sensors(pv_simdata: pv.UnstructuredGrid,
     pv_plot.add_axes_at_origin(labels_off=True)
     pv_plot.set_scale(xscale = 100, yscale = 100, zscale = 100)
     pv_plot.show()
-
-#-------------------------------------------------------------------------------
