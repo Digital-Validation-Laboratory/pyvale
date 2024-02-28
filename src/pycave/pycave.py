@@ -8,6 +8,7 @@ authors: thescepticalrabbit
 from abc import ABC, abstractmethod
 from typing import Callable
 from functools import partial
+from dataclasses import dataclass
 
 import numpy as np
 import pyvista as pv
@@ -16,9 +17,7 @@ from pyvista import CellType
 import mooseherder as mh
 
 
-'''
-================================================================================
-'''
+#===============================================================================
 def convert_simdata_to_pyvista(sim_data: mh.SimData, dim: int = 3
                                ) -> pv.UnstructuredGrid:
 
@@ -48,9 +47,7 @@ def convert_simdata_to_pyvista(sim_data: mh.SimData, dim: int = 3
 
     return pv_grid
 
-'''
-================================================================================
-'''
+#===============================================================================
 def attach_field_to_pyvista(pv_grid: pv.UnstructuredGrid,
                                  node_field: np.ndarray,
                                  name: str) -> pv.UnstructuredGrid:
@@ -58,24 +55,29 @@ def attach_field_to_pyvista(pv_grid: pv.UnstructuredGrid,
     return pv_grid
 
 
-'''
-================================================================================
-'''
+#===============================================================================
 def get_cell_type(nodes_per_elem: int, dim: int = 3) -> int:
     cell_type = 0
-    if dim == 3:
-        if nodes_per_elem == 8:
-            cell_type =  CellType.HEXAHEDRON
-        elif nodes_per_elem == 4:
+
+    if dim == 2:
+        if nodes_per_elem == 4:
             cell_type = CellType.QUAD
         elif nodes_per_elem == 3:
             cell_type = CellType.TRIANGLE
+        else:
+            cell_type = CellType.QUAD
+    else:
+        if nodes_per_elem == 8:
+            cell_type =  CellType.HEXAHEDRON
+        elif nodes_per_elem == 4:
+            cell_type = CellType.TETRA
+        else:
+            cell_type = CellType.HEXAHEDRON
+
     return cell_type
 
 
-'''
-================================================================================
-'''
+#===============================================================================
 class Field:
     def __init__(self, sim_data: mh.SimData, name: str, dim: int = 3) -> None:
         self._name = name
@@ -86,7 +88,7 @@ class Field:
         self._time_steps = sim_data.time
 
     def get_time_steps(self) -> np.ndarray:
-        return self._time_steps
+        return self._time_steps # type: ignore
 
     def sample(self, sample_points: np.ndarray) -> np.ndarray:
         pv_points = pv.PolyData(sample_points)
@@ -97,9 +99,16 @@ class Field:
         return self._data_grid
 
 
-'''
-================================================================================
-'''
+#===============================================================================
+@dataclass
+class MeasurementData():
+    measurements: np.ndarray | None =  None
+    random_errs: np.ndarray | None  = None
+    systematic_errs: np.ndarray | None = None
+    truth_values: np.ndarray | None = None
+
+
+#===============================================================================
 class SensorArray(ABC):
     @abstractmethod
     def get_positions(self) -> np.ndarray:
@@ -121,10 +130,12 @@ class SensorArray(ABC):
     def get_random_errs(self) -> np.ndarray:
         pass
 
+    @abstractmethod
+    def get_measurement_data(self) -> MeasurementData:
+        pass
 
-'''
-================================================================================
-'''
+
+#===============================================================================
 class ThermocoupleArray(SensorArray):
     def __init__(self,
                  positions: np.ndarray,
@@ -135,14 +146,7 @@ class ThermocoupleArray(SensorArray):
 
         self._rand_err_func = None
         self._sys_err_func = None
-        '''
-        self._rand_err_func = partial(np.random.default_rng().normal,
-                                      loc=0.0,
-                                      scale=1.0)
-        self._sys_err_func = partial(np.random.default_rng().uniform,
-                                     low=-1.0,
-                                     high=1.0)
-        '''
+
 
     def get_positions(self) -> np.ndarray:
         return self._positions
@@ -158,29 +162,42 @@ class ThermocoupleArray(SensorArray):
 
 
     def get_measurements(self) -> np.ndarray:
-        return self.get_truth_values() + \
-            self.get_systematic_errs() + \
-            self.get_random_errs()
+
+        measurements = self.get_truth_values()
+        sys_errs = self.get_systematic_errs()
+        rand_errs = self.get_random_errs()
+
+        if sys_errs is not None:
+            measurements = measurements + sys_errs
+
+        if rand_errs is not None:
+            measurements = measurements + rand_errs
+
+        return measurements
 
 
     def get_truth_values(self) -> np.ndarray:
         return self._field.sample(self._positions)
 
 
-    def get_systematic_errs(self) -> np.ndarray:
+    def set_systematic_err_func(self, sys_fun: Callable | None = None) -> None:
+        self._sys_err_func = sys_fun
+
+
+    def get_systematic_errs(self) -> np.ndarray | None:
         if self._sys_err_func is None:
-            return np.zeros(self.get_measurement_shape())
+            return None
 
         return self._sys_err_func(size=self.get_measurement_shape())
 
 
-    def set_random_err_func(self, rand_fun: Callable | None) -> None:
-        pass
+    def set_random_err_func(self, rand_fun: Callable | None = None) -> None:
+        self._rand_err_func = rand_fun
 
 
-    def get_random_errs(self) -> np.ndarray:
+    def get_random_errs(self) -> np.ndarray | None:
         if self._rand_err_func is None:
-            return np.zeros(self.get_measurement_shape())
+            return None
 
         return self._rand_err_func(size=self.get_measurement_shape())
 
@@ -189,11 +206,23 @@ class ThermocoupleArray(SensorArray):
         return pv.PolyData(self._positions)
 
 
-'''
-================================================================================
-'''
+    def get_measurement_data(self) -> MeasurementData:
+        measurement_data = MeasurementData()
+        measurement_data.measurements = self.get_measurements()
+        measurement_data.systematic_errs = self.get_systematic_errs()
+        measurement_data.random_errs = self.get_random_errs()
+        measurement_data.truth_values = self.get_truth_values()
+        return measurement_data
+
+
+    def plot_time_traces(self) -> None:
+        pass
+
+
+#===============================================================================
 def plot_sensors(pv_simdata: pv.UnstructuredGrid,
-                 pv_sensdata: pv.PolyData) -> None:
+                 pv_sensdata: pv.PolyData,
+                 field_name: str) -> None:
     #pv.set_plot_theme('dark') # type: ignore
     pv_plot = pv.Plotter(window_size=[1000, 1000]) # type: ignore
     pv_plot.add_mesh(pv_sensdata,
@@ -204,10 +233,10 @@ def plot_sensors(pv_simdata: pv.UnstructuredGrid,
                      )
 
     pv_plot.add_mesh(pv_simdata,
-                     scalars=pv_simdata['temperature'][:,-1],
+                     scalars=pv_simdata[field_name][:,-1],
                      label='sim data',
                      show_edges=True)
-    #pv_plot.camera_position = 'zy'
-    pv_plot.add_axes_at_origin(labels_off=True)
+    pv_plot.camera_position = 'xy'
+    pv_plot.add_axes_at_origin(labels_off=False)
     pv_plot.set_scale(xscale = 100, yscale = 100, zscale = 100)
     pv_plot.show()

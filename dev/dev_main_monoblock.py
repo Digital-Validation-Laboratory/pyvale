@@ -7,13 +7,19 @@ authors: thescepticalrabbit
 '''
 from pprint import pprint
 from pathlib import Path
-import mooseherder as mh
+from functools import partial
+from dataclasses import asdict
+
 import numpy as np
+
+import mooseherder as mh
+
 import pycave
 
 def main() -> None:
     data_path = Path('data/monoblock_thermal_out.e')
-    #data_path = Path('data/moose_2d_thermal_basic_out.e')
+    dim = 3
+    field_name = 'temperature'
 
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
@@ -42,17 +48,30 @@ def main() -> None:
     sens_pos = np.vstack((sens_pos_x,sens_pos_y,sens_pos_z)).T
     pprint(sens_pos.shape)
 
-    t_field = pycave.Field(sim_data,'temperature',3)
+    t_field = pycave.Field(sim_data,field_name,dim)
     tc_array = pycave.ThermocoupleArray(sens_pos,t_field)
 
-    sens_vals = tc_array.get_random_errs()
-    pprint(sens_vals)
-    pprint(type(sens_vals))
-    pprint(sens_vals.shape)
+    rand_err_func = partial(np.random.default_rng().normal,
+                            loc=0.0,
+                            scale=20.0)
+    sys_err_func = partial(np.random.default_rng().uniform,
+                            low=-20.0,
+                            high=20.0)
+
+    tc_array.set_random_err_func(rand_err_func)
+    tc_array.set_systematic_err_func(sys_err_func)
+
+    sens_data = tc_array.get_measurement_data()
+
+    sens_dict = asdict(sens_data)
+    for ss in sens_dict:
+        print()
+        print(f'{ss} =')
+        pprint(sens_dict[ss])
 
     pv_sens = tc_array.get_visualiser()
     pv_sim = t_field.get_visualiser()
-    #pycave.plot_sensors(pv_sim,pv_sens)
+    pycave.plot_sensors(pv_sim,pv_sens,field_name)
 
 
 #-------------------------------------------------------------------------------
