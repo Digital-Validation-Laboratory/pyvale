@@ -14,9 +14,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import mooseherder as mh
+from pyvista.plotting.opts import ElementType
 
 import pycave
 from pycave.plotprops import PlotProps
+
 
 def main() -> None:
     data_path = Path('data/thermal_2d_basic_out.e')
@@ -67,16 +69,28 @@ def main() -> None:
     sens_data = tc_array.get_measurement_data()
 
     sens_dict = asdict(sens_data)
-    for ss in sens_dict:
-        print()
-        print(f'{ss} =')
-        pprint(sens_dict[ss])
 
     pv_sens = tc_array.get_visualiser()
     pv_sim = t_field.get_visualiser()
-    #pycave.plot_sensors(pv_sim,pv_sens,field_name)
+    pv_plot = pycave.plot_sensors(pv_sim,pv_sens,field_name)
 
-    tc_array.plot_time_traces()
+    pv_plot.show(auto_close=False)
+
+    pprint(pv_plot.camera_position)
+
+    return
+    pprint(pv_plot.camera_position)
+
+    pv_plot.camera_position = 'xy'
+    pprint(pv_plot.camera_position)
+
+    scale = 4.0
+    pv_plot.camera.position = (scale*1.0,scale*1.0,scale*1.0)
+    pprint(pv_plot.camera_position)
+
+    pv_plot.show()
+
+    (fig,ax) = tc_array.plot_time_traces()
 
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':

@@ -6,11 +6,12 @@ authors: thescepticalrabbit
 ================================================================================
 '''
 from abc import ABC, abstractmethod
-from typing import Callable
+from typing import Callable, Any
 from functools import partial
 from dataclasses import dataclass
 
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pyvista as pv
 from pyvista import CellType
@@ -150,6 +151,11 @@ class ThermocoupleArray(SensorArray):
         self._rand_err_func = None
         self._sys_err_func = None
 
+        self._sensor_names = list([])
+        for ss in range(self.get_num_sensors()):
+            num_str = f'{ss}'.zfill(2)
+            self._sensor_names.append(f'TC{num_str}')
+
 
     def get_positions(self) -> np.ndarray:
         return self._positions
@@ -162,6 +168,9 @@ class ThermocoupleArray(SensorArray):
     def get_measurement_shape(self) -> tuple[int,int]:
         return (self.get_num_sensors(),
                 self._field.get_time_steps().shape[0])
+
+    def get_sensor_names(self) -> list[str]:
+        return self._sensor_names
 
 
     def get_measurements(self) -> np.ndarray:
@@ -206,7 +215,9 @@ class ThermocoupleArray(SensorArray):
 
 
     def get_visualiser(self) -> pv.PolyData:
-        return pv.PolyData(self._positions)
+        pv_data = pv.PolyData(self._positions)
+        pv_data['labels'] = self._sensor_names
+        return pv_data
 
 
     def get_measurement_data(self) -> MeasurementData:
@@ -218,7 +229,7 @@ class ThermocoupleArray(SensorArray):
         return measurement_data
 
 
-    def plot_time_traces(self) -> None:
+    def plot_time_traces(self) -> tuple[Any,Any]:
         pp = PlotProps()
         prop_cycle = plt.rcParams['axes.prop_cycle']
         colors = prop_cycle.by_key()['color']
@@ -230,39 +241,53 @@ class ThermocoupleArray(SensorArray):
         for ii in range(self.get_num_sensors()):
             measurements = self.get_measurements()
             ax.plot(p_time,measurements[ii,:],
-                '-',label=f'TC{ii}',
+                '-',label=self._sensor_names[ii],
                 lw=pp.lw,ms=pp.ms,color=colors[ii])
 
         ax.set_xlabel('Time, $t$ [s]',
                     fontsize=pp.font_ax_size, fontname=pp.font_name)
-        ax.set_ylabel('Temperature, $T$ [K]',
+        ax.set_ylabel('Temperature, $T$ [$\circ C$]',
                     fontsize=pp.font_ax_size, fontname=pp.font_name)
 
         plt.grid(True)
         ax.legend()
         ax.legend(prop={"size":pp.font_leg_size},loc='upper left')
-        plt.show()
+        plt.draw()
+        #plt.show()
+
+        return (fig,ax)
 
 
 
 #===============================================================================
 def plot_sensors(pv_simdata: pv.UnstructuredGrid,
                  pv_sensdata: pv.PolyData,
-                 field_name: str) -> None:
+                 field_name: str,
+                 time_step: int = -1) -> Any: # Stupid plotter doesn't allow type hinting!
     #pv.set_plot_theme('dark') # type: ignore
-    pv_plot = pv.Plotter(window_size=[1000, 1000]) # type: ignore
-    pv_plot.add_mesh(pv_sensdata,
-                     label='sensors',
-                     color='red',
-                     render_points_as_spheres=True,
-                     point_size=20
-                     )
+
+    pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
+
+
+    pv_plot.add_point_labels(pv_sensdata, "labels",
+                            font_size=40,
+                            shape_color='grey',
+                            point_color='red',
+                            render_points_as_spheres=True,
+                            point_size=20,
+                            always_visible=True
+                            )
 
     pv_plot.add_mesh(pv_simdata,
-                     scalars=pv_simdata[field_name][:,-1],
+                     scalars=pv_simdata[field_name][:,time_step],
                      label='sim data',
                      show_edges=True)
-    pv_plot.camera_position = 'xy'
+
     pv_plot.add_axes_at_origin(labels_off=False)
-    pv_plot.set_scale(xscale = 100, yscale = 100, zscale = 100)
-    pv_plot.show()
+    #pv_plot.set_scale(xscale = 100, yscale = 100, zscale = 100)
+    #pv_plot.camera_position = 'xy'
+    #pv_plot.camera.zoom(5)
+
+    #pv_plot.show()
+
+    return pv_plot
