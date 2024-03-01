@@ -148,8 +148,10 @@ class ThermocoupleArray(SensorArray):
         self._positions = positions
         self._field = field
 
-        self._rand_err_func = None
         self._sys_err_func = None
+        self._sys_errs = None
+
+        self._rand_err_func = None
 
         self._sensor_names = list([])
         for ss in range(self.get_num_sensors()):
@@ -192,15 +194,25 @@ class ThermocoupleArray(SensorArray):
         return self._field.sample(self._positions)
 
 
-    def set_systematic_err_func(self, sys_fun: Callable | None = None) -> None:
+    def set_systematic_err_func(self, sys_fun: Callable | None = None
+                                ) -> np.ndarray | None:
+
         self._sys_err_func = sys_fun
+
+        if self._sys_err_func is None:
+            self._sys_errs = None
+            return None
+
+        self._sys_errs = self._sys_err_func(size=self.get_measurement_shape())
+        return self._sys_errs
 
 
     def get_systematic_errs(self) -> np.ndarray | None:
+
         if self._sys_err_func is None:
             return None
 
-        return self._sys_err_func(size=self.get_measurement_shape())
+        return self._sys_errs
 
 
     def set_random_err_func(self, rand_fun: Callable | None = None) -> None:
@@ -229,7 +241,7 @@ class ThermocoupleArray(SensorArray):
         return measurement_data
 
 
-    def plot_time_traces(self) -> tuple[Any,Any]:
+    def plot_time_traces(self, plot_truth: bool = False) -> tuple[Any,Any]:
         pp = PlotProps()
         prop_cycle = plt.rcParams['axes.prop_cycle']
         colors = prop_cycle.by_key()['color']
@@ -238,22 +250,30 @@ class ThermocoupleArray(SensorArray):
         fig.set_dpi(pp.resolution)
 
         p_time = self._field.get_time_steps()
+
+        if plot_truth:
+            for ii in range(self.get_num_sensors()):
+                truth = self.get_truth_values()
+                ax.plot(p_time,truth[ii,:],'-',
+                    lw=pp.lw/2,ms=pp.ms,color=colors[ii])
+
         for ii in range(self.get_num_sensors()):
             measurements = self.get_measurements()
             ax.plot(p_time,measurements[ii,:],
-                '-',label=self._sensor_names[ii],
+                '--+',label=self._sensor_names[ii],
                 lw=pp.lw,ms=pp.ms,color=colors[ii])
 
-        ax.set_xlabel('Time, $t$ [s]',
+        ax.set_xlabel(r'Time, $t$ [s]',
                     fontsize=pp.font_ax_size, fontname=pp.font_name)
-        ax.set_ylabel('Temperature, $T$ [$\circ C$]',
+        ax.set_ylabel(r'Temperature, $T$ [$\degree C$]',
                     fontsize=pp.font_ax_size, fontname=pp.font_name)
+
+        ax.set_xlim([np.min(p_time),np.max(p_time)])
 
         plt.grid(True)
         ax.legend()
         ax.legend(prop={"size":pp.font_leg_size},loc='upper left')
         plt.draw()
-        #plt.show()
 
         return (fig,ax)
 
@@ -264,10 +284,8 @@ def plot_sensors(pv_simdata: pv.UnstructuredGrid,
                  pv_sensdata: pv.PolyData,
                  field_name: str,
                  time_step: int = -1) -> Any: # Stupid plotter doesn't allow type hinting!
-    #pv.set_plot_theme('dark') # type: ignore
 
     pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
-
 
     pv_plot.add_point_labels(pv_sensdata, "labels",
                             font_size=40,
@@ -280,14 +298,10 @@ def plot_sensors(pv_simdata: pv.UnstructuredGrid,
 
     pv_plot.add_mesh(pv_simdata,
                      scalars=pv_simdata[field_name][:,time_step],
-                     label='sim data',
-                     show_edges=True)
+                     label='sim-data',
+                     show_edges=True,
+                     show_scalar_bar=False)
 
     pv_plot.add_axes_at_origin(labels_off=False)
-    #pv_plot.set_scale(xscale = 100, yscale = 100, zscale = 100)
-    #pv_plot.camera_position = 'xy'
-    #pv_plot.camera.zoom(5)
-
-    #pv_plot.show()
 
     return pv_plot

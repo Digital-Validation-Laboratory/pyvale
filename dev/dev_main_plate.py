@@ -50,7 +50,6 @@ def main() -> None:
     sens_pos_y = sens_grid_y.flatten()
     sens_pos_z = sens_grid_z.flatten()
     sens_pos = np.vstack((sens_pos_x,sens_pos_y,sens_pos_z)).T
-    pprint(sens_pos.shape)
 
     t_field = pycave.Field(sim_data,field_name,dim)
     tc_array = pycave.ThermocoupleArray(sens_pos,t_field)
@@ -59,38 +58,51 @@ def main() -> None:
     rand_err_func = partial(np.random.default_rng().normal,
                             loc=0.0,
                             scale=err_range)
-    sys_err_func = partial(np.random.default_rng().uniform,
-                            low=-err_range,
-                            high=err_range)
+
+    def sys_err_func(size: tuple) -> np.ndarray:
+        # Assume the first index of the tuple is the number of sensors
+        err_range = 20.0
+        sys_errs = np.random.default_rng().uniform(low=-err_range,
+                                                   high=err_range,
+                                                   size=(size[0],1))
+        #print(sys_errs.shape)
+        sys_errs = np.tile(sys_errs,(1,size[1]))
+        #print(sys_errs.shape)
+        return sys_errs
+
 
     tc_array.set_random_err_func(rand_err_func)
     tc_array.set_systematic_err_func(sys_err_func)
 
     sens_data = tc_array.get_measurement_data()
 
-    sens_dict = asdict(sens_data)
+    #sens_dict = asdict(sens_data)
 
     pv_sens = tc_array.get_visualiser()
     pv_sim = t_field.get_visualiser()
     pv_plot = pycave.plot_sensors(pv_sim,pv_sens,field_name)
 
-    pv_plot.show(auto_close=False)
+    pv_plot.add_scalar_bar('Temperature, T [degC]')
+    #pv_plot.add_text(r'$\rho$', position='upper_left', font_size=150, color='blue')
 
-    pprint(pv_plot.camera_position)
+    set_iso_view = False
+    if set_iso_view:
+        pv_plot.view_isometric()
+    else:
+        # Determined manually by moving camera and then dumping camera position to
+        # console after window close
+        pv_plot.camera_position = [(-0.295, 1.235, 3.369),
+                                (1.0274, 0.314, 0.0211),
+                                (0.081, 0.969, -0.234)]
+    save_render = Path('dev/images/plate_thermal_2d_sim_view.pdf')
+    pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
+    #pprint(pv_plot.camera_position)
+    pv_plot.close()
 
-    return
-    pprint(pv_plot.camera_position)
-
-    pv_plot.camera_position = 'xy'
-    pprint(pv_plot.camera_position)
-
-    scale = 4.0
-    pv_plot.camera.position = (scale*1.0,scale*1.0,scale*1.0)
-    pprint(pv_plot.camera_position)
-
-    pv_plot.show()
-
-    (fig,ax) = tc_array.plot_time_traces()
+    (fig,ax) = tc_array.plot_time_traces(plot_truth=True)
+    plt.show()
+    save_traces = save_render.with_name('plate_thermal_2d_traces').with_suffix('.png')
+    fig.savefig(save_traces, dpi=300, format='png', bbox_inches='tight')
 
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
