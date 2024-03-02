@@ -1,14 +1,21 @@
 # Notes: pycave developement
 
 # TODO
-
-- Plot point sensor data traces with noise on them using matplotlib
-
+General
 - Allow user to specify sideset to locate sensors
+- Need to allow user to specify noise as a percentage of the sensor value like a COV
 - Add a sampling frequency to the sensor and allow interpolation between simulation time steps
-- Add a sampling geometry to the sensors to allow
+- Allow chaining/list of functions for sys/rand errors
+- Split systematic and random error handlers into own objects?
+
+Systematic error handling
+- Probably need to split into its own class
+- Add a sampling geometry to the sensors to allow systematic error calculation
 - Add positioning errors to the sensors
 - Add digitisation / voltage / calibration errors
+
+Random error handling
+- Probably need to plit into its own class
 
 # Notes: sensors
 

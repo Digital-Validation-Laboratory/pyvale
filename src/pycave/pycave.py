@@ -11,7 +11,6 @@ from functools import partial
 from dataclasses import dataclass
 
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pyvista as pv
 from pyvista import CellType
@@ -158,7 +157,8 @@ class ThermocoupleArray(SensorArray):
             num_str = f'{ss}'.zfill(2)
             self._sensor_names.append(f'TC{num_str}')
 
-
+    #---------------------------------------------------------------------------
+    # Basic getters / setters
     def get_positions(self) -> np.ndarray:
         return self._positions
 
@@ -175,26 +175,28 @@ class ThermocoupleArray(SensorArray):
         return self._sensor_names
 
 
-    def get_measurements(self) -> np.ndarray:
-
-        measurements = self.get_truth_values()
-        sys_errs = self.get_systematic_errs()
-        rand_errs = self.get_random_errs()
-
-        if sys_errs is not None:
-            measurements = measurements + sys_errs
-
-        if rand_errs is not None:
-            measurements = measurements + rand_errs
-
-        return measurements
-
-
+    #---------------------------------------------------------------------------
+    # Truth values - from simulation
     def get_truth_values(self) -> np.ndarray:
         return self._field.sample(self._positions)
 
 
-    def set_systematic_err_func(self, sys_fun: Callable | None = None
+    #---------------------------------------------------------------------------
+    # Systematic error calculation functions
+    def set_uniform_systematic_err_func(self, low: float, high: float) -> None:
+
+        def sys_err_func(size: tuple) -> np.ndarray:
+            sys_errs = np.random.default_rng().uniform(low=low,
+                                                    high=high,
+                                                    size=(size[0],1))
+            sys_errs = np.tile(sys_errs,(1,size[1]))
+            return sys_errs
+
+        self._sys_err_func = sys_err_func
+        self._sys_errs = self._sys_err_func(size=self.get_measurement_shape())
+
+
+    def set_custom_systematic_err_func(self, sys_fun: Callable | None = None
                                 ) -> np.ndarray | None:
 
         self._sys_err_func = sys_fun
@@ -214,8 +216,17 @@ class ThermocoupleArray(SensorArray):
 
         return self._sys_errs
 
+    #---------------------------------------------------------------------------
+    # Random error calculation functions
+    def set_normal_random_err_func(self, std_dev: float) -> None:
 
-    def set_random_err_func(self, rand_fun: Callable | None = None) -> None:
+        self._rand_err_func = partial(np.random.default_rng().normal,
+                                        loc=0.0,
+                                        scale=std_dev)
+
+
+    def set_custom_random_err_func(self, rand_fun: Callable | None = None
+                                   ) -> None:
         self._rand_err_func = rand_fun
 
 
@@ -226,10 +237,21 @@ class ThermocoupleArray(SensorArray):
         return self._rand_err_func(size=self.get_measurement_shape())
 
 
-    def get_visualiser(self) -> pv.PolyData:
-        pv_data = pv.PolyData(self._positions)
-        pv_data['labels'] = self._sensor_names
-        return pv_data
+    #---------------------------------------------------------------------------
+    # Measurement calculations
+    def get_measurements(self) -> np.ndarray:
+
+        measurements = self.get_truth_values()
+        sys_errs = self.get_systematic_errs()
+        rand_errs = self.get_random_errs()
+
+        if sys_errs is not None:
+            measurements = measurements + sys_errs
+
+        if rand_errs is not None:
+            measurements = measurements + rand_errs
+
+        return measurements
 
 
     def get_measurement_data(self) -> MeasurementData:
@@ -240,6 +262,13 @@ class ThermocoupleArray(SensorArray):
         measurement_data.truth_values = self.get_truth_values()
         return measurement_data
 
+
+    #---------------------------------------------------------------------------
+    # Plotting tools
+    def get_visualiser(self) -> pv.PolyData:
+        pv_data = pv.PolyData(self._positions)
+        pv_data['labels'] = self._sensor_names
+        return pv_data
 
     def plot_time_traces(self, plot_truth: bool = False) -> tuple[Any,Any]:
         pp = PlotProps()
@@ -276,6 +305,27 @@ class ThermocoupleArray(SensorArray):
         plt.draw()
 
         return (fig,ax)
+
+#===============================================================================
+def create_sensor_pos_grid(n_sens: tuple[int,int,int],
+                           x_lims: tuple[float, float],
+                           y_lims: tuple[float, float],
+                           z_lims: tuple[float, float]) -> np.ndarray:
+
+    sens_pos_x = np.linspace(x_lims[0],x_lims[1],n_sens[0]+2)[1:-1]
+    sens_pos_y = np.linspace(y_lims[0],y_lims[1],n_sens[1]+2)[1:-1]
+    sens_pos_z = np.linspace(z_lims[0],z_lims[1],n_sens[2]+2)[1:-1]
+
+    (sens_grid_x,sens_grid_y,sens_grid_z) = np.meshgrid(
+        sens_pos_x,sens_pos_y,sens_pos_z)
+
+    sens_pos_x = sens_grid_x.flatten()
+    sens_pos_y = sens_grid_y.flatten()
+    sens_pos_z = sens_grid_z.flatten()
+
+    sens_pos = np.vstack((sens_pos_x,sens_pos_y,sens_pos_z)).T
+    return sens_pos
+
 
 
 

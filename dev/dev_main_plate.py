@@ -5,19 +5,15 @@ pycave: dev_main
 authors: thescepticalrabbit
 ================================================================================
 '''
-from pprint import pprint
 from pathlib import Path
 from functools import partial
-from dataclasses import asdict
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 import mooseherder as mh
-from pyvista.plotting.opts import ElementType
-
 import pycave
-from pycave.plotprops import PlotProps
+
 
 
 def main() -> None:
