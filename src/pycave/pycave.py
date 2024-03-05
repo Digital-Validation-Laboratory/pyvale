@@ -5,6 +5,7 @@ pycave: mono repo
 authors: thescepticalrabbit
 ================================================================================
 '''
+from pprint import pprint
 from abc import ABC, abstractmethod
 from typing import Callable, Any
 from functools import partial
@@ -93,10 +94,32 @@ class Field:
     def get_time_steps(self) -> np.ndarray:
         return self._time_steps # type: ignore
 
-    def sample(self, sample_points: np.ndarray) -> np.ndarray:
+    def sample(self, sample_points: np.ndarray,
+               sample_freq: float | None = None) -> np.ndarray:
+
         pv_points = pv.PolyData(sample_points)
         sample_data = pv_points.sample(self._data_grid)
-        return np.array(sample_data[self._name]) # type: ignore
+        sample_data = np.array(sample_data[self._name]) # type: ignore
+
+        if sample_freq is None:
+            return sample_data
+
+        end_time = self._time_steps[-1] # type: ignore
+        time_step = 1/sample_freq
+        sample_times = np.arange(0.0,end_time,time_step)
+
+        sample_func = lambda x: np.interp(sample_times,self._time_steps,x) # type: ignore
+        sample_vals = np.apply_along_axis(sample_func,1,sample_data)
+
+
+        print()
+        pprint('Sample time shape = ')
+        pprint(sample_times.shape)
+        pprint('Sample val shape = ')
+        pprint(sample_vals.shape)
+        print()
+
+        return sample_vals
 
     def get_visualiser(self) -> pv.UnstructuredGrid:
         return self._data_grid
@@ -142,10 +165,13 @@ class SensorArray(ABC):
 class ThermocoupleArray(SensorArray):
     def __init__(self,
                  positions: np.ndarray,
-                 field: Field) -> None:
+                 field: Field,
+                 sample_freq: float | None = None
+                 ) -> None:
 
         self._positions = positions
         self._field = field
+        self._sample_freq = sample_freq
 
         self._sys_err_func = None
         self._sys_errs = None
@@ -178,7 +204,7 @@ class ThermocoupleArray(SensorArray):
     #---------------------------------------------------------------------------
     # Truth values - from simulation
     def get_truth_values(self) -> np.ndarray:
-        return self._field.sample(self._positions)
+        return self._field.sample(self._positions,self._sample_freq)
 
 
     #---------------------------------------------------------------------------
@@ -283,14 +309,14 @@ class ThermocoupleArray(SensorArray):
         if plot_truth:
             for ii in range(self.get_num_sensors()):
                 truth = self.get_truth_values()
-                ax.plot(p_time,truth[ii,:],'-',
-                    lw=pp.lw/2,ms=pp.ms,color=colors[ii])
+                ax.plot(p_time,truth[ii,:],'-x',
+                    lw=pp.lw/2,ms=pp.ms/2,color=colors[ii])
 
         for ii in range(self.get_num_sensors()):
             measurements = self.get_measurements()
             ax.plot(p_time,measurements[ii,:],
-                '--+',label=self._sensor_names[ii],
-                lw=pp.lw,ms=pp.ms,color=colors[ii])
+                ':+',label=self._sensor_names[ii],
+                lw=pp.lw/2,ms=pp.ms/2,color=colors[ii])
 
         ax.set_xlabel(r'Time, $t$ [s]',
                     fontsize=pp.font_ax_size, fontname=pp.font_name)
@@ -305,6 +331,7 @@ class ThermocoupleArray(SensorArray):
         plt.draw()
 
         return (fig,ax)
+
 
 #===============================================================================
 def create_sensor_pos_grid(n_sens: tuple[int,int,int],
@@ -325,8 +352,6 @@ def create_sensor_pos_grid(n_sens: tuple[int,int,int],
 
     sens_pos = np.vstack((sens_pos_x,sens_pos_y,sens_pos_z)).T
     return sens_pos
-
-
 
 
 #===============================================================================

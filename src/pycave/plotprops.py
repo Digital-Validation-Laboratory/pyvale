@@ -34,7 +34,7 @@ class PlotProps:
     font_ax_size: float = 11
     font_leg_size: float = 9
 
-    ms: float = 8.0
+    ms: float = 6.0
     lw: float = 1.0
 
     cmap_seq: str = "cividis"
