@@ -1,6 +1,9 @@
 # Notes: pycave developement
 
 # TODO
+GRUG DEMANDS 3D WORKING DEMO IMMEDIATELY!
+MAKE LUKES MONOBLOCK TRANSIENT AND CREATE EXAMPLE!
+
 General
 - Allow user to specify sideset to locate sensors
 - Need to allow user to specify noise as a percentage of the sensor value like a COV

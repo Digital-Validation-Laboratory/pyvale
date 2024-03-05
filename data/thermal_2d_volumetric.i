@@ -61,7 +61,7 @@ init_temp = 0.0
     [t_right]
         type = FunctionDirichletBC
         variable = T
-        function = '${init_temp} + 10*t'
+        function = '${init_temp} + 10*exp(-1*t)'
         boundary = 'right'
     []
 []

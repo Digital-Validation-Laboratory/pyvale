@@ -118,10 +118,6 @@ class SensorArray(ABC):
         pass
 
     @abstractmethod
-    def get_measurements(self) -> np.ndarray:
-        pass
-
-    @abstractmethod
     def get_truth_values(self) -> np.ndarray:
         pass
 
@@ -131,6 +127,10 @@ class SensorArray(ABC):
 
     @abstractmethod
     def get_random_errs(self) -> np.ndarray:
+        pass
+
+    @abstractmethod
+    def get_measurements(self) -> np.ndarray:
         pass
 
     @abstractmethod
@@ -352,6 +352,6 @@ def plot_sensors(pv_simdata: pv.UnstructuredGrid,
                      show_edges=True,
                      show_scalar_bar=False)
 
-    pv_plot.add_axes_at_origin(labels_off=False)
+    pv_plot.add_axes_at_origin(labels_off=True)
 
     return pv_plot

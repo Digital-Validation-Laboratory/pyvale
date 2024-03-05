@@ -20,10 +20,10 @@ def main() -> None:
     moose_config = MooseConfig(config)
     moose_runner = MooseRunner(moose_config)
 
-    moose_runner.set_run_opts(n_tasks = 1, n_threads = 4, redirect_out = False)
+    moose_runner.set_run_opts(n_tasks = 1, n_threads = 6, redirect_out = False)
 
 
-    input_file = Path('data/thermal_2d_basic.i')
+    input_file = Path('data/monoblock_transient_thermal.i')
     moose_runner.run(input_file)
 
 if __name__ == '__main__':
