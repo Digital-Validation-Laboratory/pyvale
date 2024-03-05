@@ -18,14 +18,14 @@ import pycave
 
 def main() -> None:
     # Use mooseherder to read the exodus and get a SimData object
-    data_path = Path('data/thermal_2d_basic_out.e')
+    data_path = Path('data/plate_2d_thermal_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
     # Create a Field object that will allow the sensors to interpolate the sim
     # data field of interest quickly by using the mesh and shape functions
     spat_dims = 2       # Specify that we only have 2 spatial dimensions
-    field_name = 'T'    # Same as in the moose input and SimData node_var key
+    field_name = 'temperature'    # Same as in the moose input and SimData node_var key
     t_field = pycave.Field(sim_data,field_name,spat_dims)
 
     # This creates a grid of 3x2 sensors in the xy plane
@@ -64,7 +64,7 @@ def main() -> None:
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector
     # graphic using a specified camera position.
-    pv_plot_mode = 'interactive'
+    pv_plot_mode = 'save_fig'
 
     if pv_plot_mode == 'interactive':
         # Shows the pyvista interactive 3D plot
@@ -80,14 +80,14 @@ def main() -> None:
                                 (1.0274, 0.314, 0.0211),
                                 (0.081, 0.969, -0.234)]
         # Save a vector graphic to file for our selected camera view
-        save_render = Path('examples/images/plate_thermal_2d_sim_view.pdf')
+        save_render = Path('examples/images/plate_thermal_2d_sim_view.svg')
         pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
 
 
     # Set this to 'interactive' to get a matplotlib.pyplot with the sensor
     # traces plotted over time. Set to 'save_fig' to save an image of the plot
     # to file.
-    trace_plot_mode = 'interactive'
+    trace_plot_mode = 'save_fig'
 
     # Plots the sensor time traces using matplotlib, thin solid lines are ground
     # truth from the simulation and dashed lines with '+' are simulated sensor

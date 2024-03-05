@@ -23,7 +23,8 @@ def main() -> None:
     moose_runner.set_run_opts(n_tasks = 1, n_threads = 6, redirect_out = False)
 
 
-    input_file = Path('data/monoblock_transient_thermal.i')
+    #input_file = Path('data/plate_2d_thermal.i')
+    input_file = Path('data/monoblock_3d_thermal.i')
     moose_runner.run(input_file)
 
 if __name__ == '__main__':

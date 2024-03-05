@@ -18,7 +18,7 @@ import pycave
 
 def main() -> None:
     # Use mooseherder to read the exodus and get a SimData object
-    data_path = Path('data/monoblock_transient_thermal_out.e')
+    data_path = Path('data/monoblock_3d_thermal_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scalling easier
@@ -62,13 +62,13 @@ def main() -> None:
 
     pv_plot = pycave.plot_sensors(pv_sim,pv_sens,field_name)
     # We label the temperature scale bar ourselves and can
-    pv_plot.add_scalar_bar('Temperature, T [degC]')
+    pv_plot.add_scalar_bar('Temp., T [degC]',vertical=True)
 
 
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector
     # graphic using a specified camera position.
-    pv_plot_mode = 'off'
+    pv_plot_mode = 'save_fig'
 
     if pv_plot_mode == 'interactive':
         # Shows the pyvista interactive 3D plot
@@ -87,14 +87,14 @@ def main() -> None:
                                     (0.0, 4.0, 5.5),
                                     (-0.190, 0.960, -0.206)]
         # Save a vector graphic to file for our selected camera view
-        save_render = Path('examples/images/plate_thermal_2d_sim_view.pdf')
+        save_render = Path('examples/images/monoblock_thermal_sim_view.svg')
         pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
 
 
     # Set this to 'interactive' to get a matplotlib.pyplot with the sensor
     # traces plotted over time. Set to 'save_fig' to save an image of the plot
     # to file.
-    trace_plot_mode = 'interactive'
+    trace_plot_mode = 'save_fig'
 
     # Plots the sensor time traces using matplotlib, thin solid lines are ground
     # truth from the simulation and dashed lines with '+' are simulated sensor
@@ -104,7 +104,7 @@ def main() -> None:
     if trace_plot_mode == 'interactive':
         plt.show()
     if trace_plot_mode == 'save_fig':
-        save_traces = Path('examples/images/plate_thermal_2d_traces.png')
+        save_traces = Path('examples/images/monoblock_thermal_traces.png')
         fig.savefig(save_traces, dpi=300, format='png', bbox_inches='tight')
 
 
