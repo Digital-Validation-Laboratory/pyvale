@@ -95,29 +95,18 @@ class Field:
         return self._time_steps # type: ignore
 
     def sample(self, sample_points: np.ndarray,
-               sample_freq: float | None = None) -> np.ndarray:
+               sample_times: np.ndarray | None = None
+               ) -> np.ndarray:
 
         pv_points = pv.PolyData(sample_points)
         sample_data = pv_points.sample(self._data_grid)
         sample_data = np.array(sample_data[self._name]) # type: ignore
 
-        if sample_freq is None:
+        if sample_times is None:
             return sample_data
-
-        end_time = self._time_steps[-1] # type: ignore
-        time_step = 1/sample_freq
-        sample_times = np.arange(0.0,end_time,time_step)
 
         sample_func = lambda x: np.interp(sample_times,self._time_steps,x) # type: ignore
         sample_vals = np.apply_along_axis(sample_func,1,sample_data)
-
-
-        print()
-        pprint('Sample time shape = ')
-        pprint(sample_times.shape)
-        pprint('Sample val shape = ')
-        pprint(sample_vals.shape)
-        print()
 
         return sample_vals
 
@@ -166,12 +155,12 @@ class ThermocoupleArray(SensorArray):
     def __init__(self,
                  positions: np.ndarray,
                  field: Field,
-                 sample_freq: float | None = None
+                 sample_times: np.ndarray | None = None
                  ) -> None:
 
         self._positions = positions
         self._field = field
-        self._sample_freq = sample_freq
+        self._sample_times = sample_times
 
         self._sys_err_func = None
         self._sys_errs = None
@@ -188,14 +177,20 @@ class ThermocoupleArray(SensorArray):
     def get_positions(self) -> np.ndarray:
         return self._positions
 
+    def get_sample_times(self) -> np.ndarray | None:
+        return self._sample_times
 
     def get_num_sensors(self) -> int:
         return self._positions.shape[0]
 
 
     def get_measurement_shape(self) -> tuple[int,int]:
+        if self._sample_times is None:
+            return (self.get_num_sensors(),
+                    self._field.get_time_steps().shape[0])
+
         return (self.get_num_sensors(),
-                self._field.get_time_steps().shape[0])
+                self._sample_times.shape[0])
 
     def get_sensor_names(self) -> list[str]:
         return self._sensor_names
@@ -204,7 +199,7 @@ class ThermocoupleArray(SensorArray):
     #---------------------------------------------------------------------------
     # Truth values - from simulation
     def get_truth_values(self) -> np.ndarray:
-        return self._field.sample(self._positions,self._sample_freq)
+        return self._field.sample(self._positions,self._sample_times)
 
 
     #---------------------------------------------------------------------------
@@ -296,7 +291,9 @@ class ThermocoupleArray(SensorArray):
         pv_data['labels'] = self._sensor_names
         return pv_data
 
-    def plot_time_traces(self, plot_truth: bool = False) -> tuple[Any,Any]:
+    def plot_time_traces(self,
+                         plot_truth: bool = False,
+                         plot_sim: bool = False) -> tuple[Any,Any]:
         pp = PlotProps()
         prop_cycle = plt.rcParams['axes.prop_cycle']
         colors = prop_cycle.by_key()['color']
@@ -304,17 +301,27 @@ class ThermocoupleArray(SensorArray):
         fig, ax = plt.subplots(figsize=pp.single_fig_size,layout='constrained')
         fig.set_dpi(pp.resolution)
 
-        p_time = self._field.get_time_steps()
-
-        if plot_truth:
+        sim_time = self._field.get_time_steps()
+        if plot_sim:
+            sim_vals = self._field.sample(self._positions)
             for ii in range(self.get_num_sensors()):
-                truth = self.get_truth_values()
-                ax.plot(p_time,truth[ii,:],'-x',
+                ax.plot(sim_time,sim_vals[ii,:],'-o',
                     lw=pp.lw/2,ms=pp.ms/2,color=colors[ii])
 
+        if self.get_sample_times() is None:
+            samp_time = self._field.get_time_steps()
+        else:
+            samp_time = self.get_sample_times()
+
+        if plot_truth:
+            truth = self.get_truth_values()
+            for ii in range(self.get_num_sensors()):
+                ax.plot(samp_time,truth[ii,:],'-',
+                    lw=pp.lw/2,ms=pp.ms/2,color=colors[ii])
+
+        measurements = self.get_measurements()
         for ii in range(self.get_num_sensors()):
-            measurements = self.get_measurements()
-            ax.plot(p_time,measurements[ii,:],
+            ax.plot(samp_time,measurements[ii,:],
                 ':+',label=self._sensor_names[ii],
                 lw=pp.lw/2,ms=pp.ms/2,color=colors[ii])
 
@@ -323,7 +330,7 @@ class ThermocoupleArray(SensorArray):
         ax.set_ylabel(r'Temperature, $T$ [$\degree C$]',
                     fontsize=pp.font_ax_size, fontname=pp.font_name)
 
-        ax.set_xlim([np.min(p_time),np.max(p_time)])
+        ax.set_xlim([np.min(samp_time),np.max(samp_time)]) # type: ignore
 
         plt.grid(True)
         ax.legend()
@@ -334,7 +341,7 @@ class ThermocoupleArray(SensorArray):
 
 
 #===============================================================================
-def create_sensor_pos_grid(n_sens: tuple[int,int,int],
+def create_sensor_pos_array(n_sens: tuple[int,int,int],
                            x_lims: tuple[float, float],
                            y_lims: tuple[float, float],
                            z_lims: tuple[float, float]) -> np.ndarray:

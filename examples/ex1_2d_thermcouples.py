@@ -7,7 +7,6 @@ authors: thescepticalrabbit
 '''
 from pprint import pprint
 from pathlib import Path
-from functools import partial
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -35,7 +34,7 @@ def main() -> None:
     z_lims = (0.0,0.0)
     # Gives a n_sensx3 array of sensor positions where each row is a sensor with
     # coords (x,y,z) - can also just manually create this array
-    sens_pos = pycave.create_sensor_pos_grid(n_sens,x_lims,y_lims,z_lims)
+    sens_pos = pycave.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
     # Now we create a thermocouple array with with the sensor positions and the
     # temperature field from the simulation
@@ -82,7 +81,7 @@ def main() -> None:
         # Save a vector graphic to file for our selected camera view
         save_render = Path('examples/images/plate_thermal_2d_sim_view.svg')
         pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
-
+        pv_plot.screenshot(save_render.with_suffix('.png'))
 
     # Set this to 'interactive' to get a matplotlib.pyplot with the sensor
     # traces plotted over time. Set to 'save_fig' to save an image of the plot
