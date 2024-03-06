@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pyCAVE"
+name = "pycave"
 version = "0.0.1"
-description = "A python computer aided validation engine (CAVE)"
+description = "A python computer aided validation engine (pycave)"
 authors = [
   { name = "thescepticalrabbit", email = "thescepticalrabbit@gmail.com" },
 ]
@@ -16,10 +16,11 @@ classifiers = [
     "License :: GNU LGPL",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = [
   "numpy>=1.26.0",
-  "netCDF4>=1.6.5"
+  "netCDF4>=1.6.5",
+  "pyvista>=0.43.3"
 ]
 
 [project.urls]
