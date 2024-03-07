@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2024-03-07T18:48:30.105Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" etag="AzjgFXz4nx2iQ8qD3OmK" version="24.0.1" type="github">
+<mxfile host="app.diagrams.net" modified="2024-03-07T18:50:55.444Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" etag="bV7eexrz4gjFMzW8AfXp" version="24.0.1" type="github">
   <diagram name="Page-1" id="SjQAdK_OS_gNisBgjSGl">
     <mxGraphModel dx="1364" dy="759" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
@@ -47,7 +47,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="37p0PDooPlaZ-HSsAcqx-17" value="Inputs:&lt;div&gt;sensor positions [S]&lt;/div&gt;&lt;div&gt;sample times [T]&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="710" y="80" width="140" height="60" as="geometry" />
+          <mxGeometry x="700" y="70" width="140" height="60" as="geometry" />
         </mxCell>
         <mxCell id="37p0PDooPlaZ-HSsAcqx-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-18" target="37p0PDooPlaZ-HSsAcqx-27">
           <mxGeometry relative="1" as="geometry" />
