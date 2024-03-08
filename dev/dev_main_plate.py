@@ -32,7 +32,7 @@ def main() -> None:
     sens_pos = pycave.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
     sample_freq = 5.0
-    sample_times = np.arange(sim_data.time[0],sim_data.time[-1],1/sample_freq)
+    sample_times = np.arange(sim_data.time[0],sim_data.time[-1],1/sample_freq) # type: ignore
 
     tc_array = pycave.ThermocoupleArray(sens_pos,t_field,sample_times)
 
@@ -61,7 +61,7 @@ def main() -> None:
 
     (fig,ax) = tc_array.plot_time_traces(plot_truth=False,plot_sim=True)
     if trace_plot_mode == 'interactive':
-        ax.set_xlim([0.0,5.0])
+        #ax.set_xlim([0.0,5.0])
         plt.show()
     if trace_plot_mode == 'save_fig':
         save_traces = Path('examples/images/plate_thermal_2d_traces.png')
