@@ -13,7 +13,7 @@ A software engine for simulating experimental data from simulations would has a 
 
 ### Aims & Objectives
 
-The aim of this project is to develop a software engine that can use an input multi-physics simulation to produce a set of simulated experimental data with realistic uncertainties. This software engine will be developed as a python package, as use of python provides access to a range of scientific computing, optimisation and machine learning libraries. The package will be called the python computer aided validation engine (pycave). The underlying engineering simulation tool is assumed to be the Multi-Physics Object Oriented Simulation Environment (MOOSE) being developed for fusion digital twin applications by the AES group. The objectives of this project are to create:
+The aim of this project is to develop a software engine that can use an input multi-physics simulation to produce a set of simulated experimental data with realistic uncertainties. This software engine will be developed as a python package, as use of python provides access to a range of scientific computing, optimisation and machine learning libraries. The package will be called the python computer aided validation engine (`pycave`). The underlying engineering simulation tool is assumed to be the Multi-Physics Object Oriented Simulation Environment (MOOSE) being developed for fusion digital twin applications by the AES group. The objectives of this project are to create:
 
 1. An overarching conceptual model of a sensor to be implemented as an abstract base class.
 2. A module that contains a library of different sensors.
@@ -26,18 +26,22 @@ The aim of this project is to develop a software engine that can use an input mu
 ### Deliverables for Financial Year 2023-2024
 The scope of the following deliverables were set based on the project starting half way through the year with an equivalent allocation of 0.75 FTE. All deliverables have been achieved and the results are detailed in this report.
 
-1. A short report detailing a development work plan for the package as well as full system specifications.
+1. A report detailing a development work plan for the package as well as full system specifications.
 2. A flow chart for the package showing the key classes/functions and their relationships as well as external dependencies.
     * See the [flow chart](#flow-chart) below.
-3. A first version of ‘mooseherder’, a package being developed to be able to run MOOSE simulations in parallel, which is required for objective 4 and 5 as well as other projects within AMT on test design and topology optimisation.
+3. A first version of `mooseherder`, a package being developed to be able to run MOOSE simulations in parallel, which is required for objective 4 and 5 as well as other projects within AMT on test design and topology optimisation.
     * Source code for `mooseherder` v0.1: https://github.com/ScepticalRabbit/mooseherder
 4. A first version of pycave demonstrated on the simplest test case of a scalar field with point sensors - specifically, simulated thermocouple data for a divertor monoblock simulation in MOOSE.
     * Source code for `pycave` prototype: https://github.com/ScepticalRabbit/pycave
     * A prototype demonstration is detailed in this report.
 
-## Flow Chart: `pycave`
+## Package Workflow & Flow Chart: `pycave`
 
-TODO: description of the package.
+The overall structure of the `pycave` package is shown in the figure below. The user inputs to the package include an output exodus file from the MOOSE simulation to be analysed; a list of sensor positions as a `numpy` array where each row is a sensor with position [x,y,z] in the simulation coordinates; and the optional parameter of the sample times at which sensor measurements should be simulated. If the user specifies sample times... Note that if the sample times are not specified they are assumed to coincide with the simulation time steps and no interpolation is performed.
+
+The package has two main classes the first is a `Field` which interpolates the underlying simulation results to extract the ground truth values for the sensors. The second is a `SensorArray` which is an abstract base class (ABC) containing four key methods for simulating sensor output. The `ThermocoupleArray` is a concrete implementation of the `SensorArray` ABC that allows the user to extract measurements with simulated experimental errors.
+
+It should be noted that the `mooseherder` package has a range of additional functionality which is not shown in the figure below as only the current dependencies for the `pycave` package are shown. This includes the ability to: 1) Dynamically update parameters in a MOOSE or Gmsh input file; 2) Run MOOSE simulations from python with Gmsh mesh generation; 3) Run a parameter sweep of a chain of MOOSE/Gmsh simulations in parallel; and 4) Read the output of the parameter sweep in parallel. This additional functionality of `mooseherder` is demonstrated in the worked examples in the `mooseherder` github repository.
 
 |![fig_pycave_flowchart](images/pycave.drawio.svg)|
 |:--:|
@@ -58,7 +62,6 @@ Two MOOSE thermal simulations were constructed and run to demonstrate the functi
 |:--:|
 |*Figure: Simulated thermocouple traces for the 2D plate model with sensor locations shown in the previous figure. The simulated traces use dashed lines with crosses abd include systematic and random error models. The solid lines are the ground truth taken from the simulation.* |
 
-A more complex case is simulating thermocouples placed on a 3D model of a divertor monoblock.
 
 |![fig_3dmonoblock_pyvista](images/monoblock_thermal_sim_view.svg)|
 |:--:|
@@ -70,13 +73,8 @@ A more complex case is simulating thermocouples placed on a 3D model of a divert
 |*Figure: Simulated thermocouple traces for the 3D monoblock model with sensor locations shown in the previous figure. The simulated traces use dashed lines with crosses and include the systematic and random error models. The solid lines are the ground truth taken from the simulation.* |
 
 
-## Software Architecture
+## Software Specification
 
-
-### Current Prototype Architecture
-
-
-### General Software Specification
 
 **Inputs**
 
