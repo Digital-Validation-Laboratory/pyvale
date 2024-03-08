@@ -7,10 +7,7 @@ authors: thescepticalrabbit
 '''
 from pprint import pprint
 from pathlib import Path
-
-import numpy as np
 import matplotlib.pyplot as plt
-
 import mooseherder as mh
 import pycave
 
@@ -50,6 +47,8 @@ def main() -> None:
     # a standard deviation which should be visible on the time traces. Note that
     # the random error is sampled repeatedly for each time step.
     tc_array.set_normal_random_err_func(std_dev=5.0)
+
+    measurements = tc_array.get_measurements()
 
     # Now we use pyvista to get a 3D interactive labelled plot of the sensor
     # locations on our simulation geometry.

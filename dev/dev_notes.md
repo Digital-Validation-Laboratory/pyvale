@@ -1,8 +1,6 @@
 # Notes: pycave developement
 
 # TODO
-GRUG DEMANDS 3D WORKING DEMO IMMEDIATELY!
-MAKE MONOBLOCK TRANSIENT AND CREATE EXAMPLE!
 
 General
 - Allow user to specify sideset to locate sensors

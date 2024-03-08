@@ -24,8 +24,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Repository" = "https://github.com/ScepticalRabbit/pycave"
-"Issue Tracker" = "https://github.com/ScepticalRabbit/pycave/issues"
+"Repository" = "https://github.com/Applied-Materials-Technology/pycave"
+"Issue Tracker" = "https://github.com/Applied-Materials-Technology/pycave/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
