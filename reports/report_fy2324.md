@@ -95,14 +95,14 @@ tc_array.set_normal_random_err_func(std_dev=5.0)
 
 Custom functions for generating the systematic and random errors can be specified using the `ThermocoupleArray.set_custom_systematic_err_func()` and `ThermocoupleArray.set_custom_random_err_func()` functions. For this case the functions must take a single `size` parameter which will be the size of the array that will be returned which must be the same size as the measurement array. The measurement array has dimensions of [number of sensors, number of sample times]. The custom error function must return a `numpy` array of this size.
 
-The measurements are constructed using: measurement = truth + systematic error + random error. Simulated measurements from the `ThermocoupleArray` can then be generated using:
+The measurements are constructed using: measurement = truth + systematic error + random error.
+The measurements are returned as a `numpy` array with dimensions of [number of sensors, number of sample times]. Simulated measurements from the `ThermocoupleArray` can then be generated using:
 
 ```python
 measurements = tc_array.get_measurements()
 ```
 
-The measurements are returned as a `numpy` array with dimensions of [number of sensors, number of sample times].
-
+The location of the sensors can be interactively viewed in 3D on the simulation mesh using `pyvista`. The figure below shows the simple 2D plate with the locations of the simulated thermocouple grid.
 
 ```python
 pv_sens = tc_array.get_visualiser()
@@ -116,6 +116,8 @@ pv_plot.show()
 |:--:|
 |*Figure: Simple 2D thermal plate visualised with pyvista showing thermocouple location over the simulated temperature field for the last time step.*|
 
+The time traces for the simulated thermocouples can also be plotted for the total simulation duration using the `plot_time_traces()` function with an example time trace plot shown below. Note that the solid lines on the plot correspond to the truth and the dashed line with crosses is the simulated sensor values.
+
 ```python3
 (fig,ax) = tc_array.plot_time_traces(plot_truth=True)
 plt.show()
@@ -125,6 +127,7 @@ plt.show()
 |:--:|
 |*Figure: Simulated thermocouple traces for the 2D plate model with sensor locations shown in the previous figure. The simulated traces use dashed lines with crosses abd include systematic and random error models. The solid lines are the ground truth taken from the simulation.* |
 
+The same functionality is demonstrated for the 3D simulation of a monoblock divertor armour in the [second example](https://github.com/Applied-Materials-Technology/pycave/blob/main/examples/ex2_3d_thermcouples_monoblock.py) in the `pycave` repository. The 3D visualisation and thermocouple traces for the monoblock model are shown below.
 
 |![fig_3dmonoblock_pyvista](images/monoblock_thermal_sim_view.svg)|
 |:--:|
