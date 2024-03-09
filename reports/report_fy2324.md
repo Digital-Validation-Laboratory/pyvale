@@ -1,4 +1,4 @@
-# Digital-Physical Interface Tools: Sensor Simulation Engine
+# Digital-Physical Interface Tools: `pycave` Experiment Simulation Engine
 
 Lloyd Fletcher
 
@@ -27,6 +27,7 @@ The aim of this project is to develop a software engine that can use an input mu
 The scope of the following deliverables were set based on the project starting half way through the year with an equivalent allocation of 0.75 FTE. All deliverables have been achieved and the results are detailed in this report.
 
 1. A report detailing a development work plan for the package as well as full system specifications.
+    * Detailed in the following document.
 2. A flow chart for the package showing the key classes/functions and their relationships as well as external dependencies.
     * See the [flow chart](#flow-chart) below.
 3. A first version of `mooseherder`, a package being developed to be able to run MOOSE simulations in parallel, which is required for objective 4 and 5 as well as other projects within AMT on test design and topology optimisation.
@@ -139,9 +140,11 @@ The same functionality is demonstrated for the 3D simulation of a monoblock dive
 |*Figure: Simulated thermocouple traces for the 3D monoblock model with sensor locations shown in the previous figure. The simulated traces use dashed lines with crosses and include the systematic and random error models. The solid lines are the ground truth taken from the simulation.* |
 
 
-## System & Software Specification: `pycave`
+# System & Software Specification: `pycave`
 
-### Aims & Objectives of `pycave`
+The purpose of this section is to provide a system specification for the complete `pycave` software with all proposed functionality. This articulates the overarching vision for the `pycave` software and provides a roadmap for further developement.
+
+## Aims & Objectives of `pycave`
 
 The aim of `pycave` is to develop an engine to simulate validation experiments and sensors applied to a multi-physics simulation that recreate realistic uncertainties. The use of `pycave` is meant to follow from the digital engineering design workflow starting at CAD for geometrical design to CAE for multi-physics simulation and then Computer Aided Validation (CAV). CAV allows an engineer to design and dynamically optimise a series of validation experiments. The overall purpose being to minimise the experimental cost and time required to validate a simulation by extracting the as much high quality validation data as possible per experiment.
 
@@ -185,9 +188,39 @@ Or
 - TODO
 
 ### Outputs
-
 -
 
-## Future Plan
+## Deliverables for Financial Year 24-25
+
+Given that this is a research project with significant unknowns it is expected that the core deliverables will be dynamic and adjusted throughout the project. The scope of the deliverables will also be adjusted to take advantage of any synergies with other research projects throughout UKAEA such as digital shadow/twin work in the Advanced Engineering Simulation group or as part of Key Challenge 4 on digital qualification. An initial proposal for core deliverables in the next financial year is given below.
+
+**Core Deliverables:**
+
+1. Enhanced uncertainty function generation for random errors focusing on point sensors including:
+    - Specification of noise as a function/percentage of sensor measurement value
+2. Enhanced uncertainty function generation for systematic errors focusing on point sensors including:
+    - Calibration errors
+    - Digitisation errors
+    - Positioning errors
+    - Spatial averaging errors
+    - Temporal averaging errors
+    - Ability to collapse all of the above into a single probability density function
+3. Developement of library sensor models to include:
+    - Measurement of a vector field accounting for sensor orientation
+    - Developement of simplified camera sensor models for:
+        - Infrared cameras measuring temperature fields
+        - Digital image correlation measuring displacement field on a surface
+4. A toolbox for calculating validation metrics from sensor data (simulated or real)
+6. A software test suite for point sensor functionality after completion of the additional features.
+7. Documentation and worked examples using the following test cases:
+    - Thermo-mechanical analysis of a simple 2D plate
+    - Thermo-mechanical analysis of a 3D divertor monoblock model
+
+**Extension Deliverables:**
+1. A v0.1 release of the `pycave` package on pypi
+2. A journal article in SoftwareX detailing
+3. A journal article detailing the application of `pycave` to the simulations and experimental data generated as part of the Key Challenge 4 'simple test case'.
+4. Develop training materials to enable translation of the `pycave` into engineering practice with the potential to run a `pycave` hackathon in the future.
+
 
 
