@@ -44,7 +44,6 @@ class Field:
         return self._data_grid
 
 
-
 def convert_simdata_to_pyvista(sim_data: mh.SimData, dim: int = 3
                                ) -> pv.UnstructuredGrid:
 

@@ -1,18 +1,20 @@
-from pprint import pprint
+'''
+================================================================================
+pycave: sensorarray
+
+authors: thescepticalrabbit
+================================================================================
+'''
+from typing import Any
 from abc import ABC, abstractmethod
-from typing import Callable, Any
-from functools import partial
 from dataclasses import dataclass
 
 import numpy as np
 import matplotlib.pyplot as plt
 import pyvista as pv
-from pyvista import CellType
 
-import mooseherder as mh
-
+from pycave.field import Field
 from pycave.plotprops import PlotProps
-
 
 @dataclass
 class MeasurementData():
@@ -25,6 +27,10 @@ class MeasurementData():
 class SensorArray(ABC):
     @abstractmethod
     def get_positions(self) -> np.ndarray:
+        pass
+
+    @abstractmethod
+    def get_sample_times(self) -> np.ndarray:
         pass
 
     @abstractmethod
@@ -93,4 +99,81 @@ def plot_sensors(pv_simdata: pv.UnstructuredGrid,
     pv_plot.add_axes_at_origin(labels_off=True)
 
     return pv_plot
+
+
+@dataclass
+class TraceProps:
+    legend: bool = True
+    y_label: str = r'Sensor Value, [unit]'
+    x_label: str = r'Time, $t$ [s]'
+    truth_line: str | None = '-'
+    sim_line: str | None = '-'
+    meas_line: str = '--+'
+    sensors: np.ndarray | None = None
+    time_inds: np.ndarray | None = None
+
+
+def plot_time_traces(sensor_array: SensorArray,
+                     field: Field | None = None,
+                     trace_props: TraceProps | None  = None,
+                     plot_props: PlotProps | None = None
+                     ) -> tuple[Any,Any]:
+
+        if plot_props is None:
+            plot_props = PlotProps()
+
+        if trace_props is None:
+            trace_props = TraceProps()
+
+        prop_cycle = plt.rcParams['axes.prop_cycle']
+        colors = prop_cycle.by_key()['color']
+
+        fig, ax = plt.subplots(figsize=plot_props.single_fig_size,layout='constrained')
+        fig.set_dpi(plot_props.resolution)
+
+
+        if field is not None and trace_props.sim_line is not None:
+            sim_time = field.get_time_steps()
+            sim_vals = field.sample(sensor_array.get_positions())
+            for ii in range(sensor_array.get_positions()[0]):
+                ax.plot(sim_time,sim_vals[ii,:],'-o',
+                    lw=plot_props.lw/2,ms=plot_props.ms/2,color=colors[ii])
+
+        samp_time = sensor_array.get_sample_times()
+
+        if trace_props.truth_line is not None:
+            truth = sensor_array.get_truth_values()
+            for ii in range(truth.shape[0]):
+                ax.plot(samp_time,
+                        truth[ii,:],
+                        trace_props.truth_line,
+                        lw=plot_props.lw/2,
+                        ms=plot_props.ms/2,
+                        color=colors[ii])
+
+        measurements = sensor_array.get_measurements()
+        for ii in range(measurements.shape[0]):
+            ax.plot(samp_time,
+                    measurements[ii,:],
+                    trace_props.meas_line,
+                    #label=self._sensor_names[ii],
+                    lw=plot_props.lw/2,
+                    ms=plot_props.ms/2,
+                    color=colors[ii])
+
+        ax.set_xlabel(trace_props.x_label,
+                    fontsize=plot_props.font_ax_size, fontname=plot_props.font_name)
+        ax.set_ylabel(trace_props.y_label,
+                    fontsize=plot_props.font_ax_size, fontname=plot_props.font_name)
+
+        ax.set_xlim([np.min(samp_time),np.max(samp_time)]) # type: ignore
+
+        if trace_props.legend:
+            ax.legend(prop={"size":plot_props.font_leg_size},loc='best')
+
+        plt.grid(True)
+        plt.draw()
+
+        return (fig,ax)
+
 

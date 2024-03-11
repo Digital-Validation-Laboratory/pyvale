@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 '''
 ================================================================================
 pycave
@@ -7,7 +6,11 @@ authors: thescepticalrabbit
 ================================================================================
 '''
 
-# IMPORT THE MONO REPO!!!
 from pycave.pycave import *
+from pycave.sensorarray import *
+from pycave.field import *
+from pycave.plotprops import PlotProps
+
+from pycave.sensorlibrary.thermocouplearray import *
 
 __all__ = ["pycave"]

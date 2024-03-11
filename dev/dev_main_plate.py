@@ -7,7 +7,6 @@ authors: thescepticalrabbit
 '''
 from pprint import pprint
 from pathlib import Path
-from functools import partial
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -59,7 +58,7 @@ def main() -> None:
 
     trace_plot_mode = 'interactive'
 
-    (fig,ax) = tc_array.plot_time_traces(plot_truth=False,plot_sim=True)
+    (fig,ax) = pycave.plot_time_traces(tc_array)
     if trace_plot_mode == 'interactive':
         #ax.set_xlim([0.0,5.0])
         plt.show()
