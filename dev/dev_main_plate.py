@@ -7,7 +7,6 @@ authors: thescepticalrabbit
 '''
 from pprint import pprint
 from pathlib import Path
-from functools import partial
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -29,9 +28,12 @@ def main() -> None:
     x_lims = (0.0,2.0)  # Limits for each coord in sim length units
     y_lims = (0.0,1.0)
     z_lims = (0.0,0.0)
-    sens_pos = pycave.create_sensor_pos_grid(n_sens,x_lims,y_lims,z_lims)
+    sens_pos = pycave.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    tc_array = pycave.ThermocoupleArray(sens_pos,t_field,sample_freq=5.0)
+    sample_freq = 5.0
+    sample_times = np.arange(sim_data.time[0],sim_data.time[-1],1/sample_freq) # type: ignore
+
+    tc_array = pycave.ThermocoupleArray(sens_pos,t_field,sample_times)
 
     tc_array.set_uniform_systematic_err_func(low=-10.0,high=10.0)
     tc_array.set_normal_random_err_func(std_dev=5.0)
@@ -56,7 +58,7 @@ def main() -> None:
 
     trace_plot_mode = 'interactive'
 
-    (fig,ax) = tc_array.plot_time_traces(plot_truth=False,plot_sim=True)
+    (fig,ax) = pycave.plot_time_traces(tc_array)
     if trace_plot_mode == 'interactive':
         #ax.set_xlim([0.0,5.0])
         plt.show()

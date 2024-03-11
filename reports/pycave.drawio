@@ -1,0 +1,103 @@
+<mxfile host="app.diagrams.net" modified="2024-03-07T18:54:33.915Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" etag="6JHcMEzfDhPuSvr0Zk25" version="24.0.1" type="github">
+  <diagram name="Page-1" id="SjQAdK_OS_gNisBgjSGl">
+    <mxGraphModel dx="1364" dy="759" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-4" target="37p0PDooPlaZ-HSsAcqx-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-4" target="37p0PDooPlaZ-HSsAcqx-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-4" value="&lt;b style=&quot;font-size: 16px;&quot;&gt;Package:&lt;br style=&quot;&quot;&gt;pycave&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="490" y="90" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-5" value="Dependencies" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="140" y="10" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-12" value="python 3.11&lt;div style=&quot;font-size: 14px;&quot;&gt;numpy&lt;/div&gt;&lt;div style=&quot;font-size: 14px;&quot;&gt;matplotlib&lt;/div&gt;&lt;div style=&quot;font-size: 14px;&quot;&gt;pyvista&lt;/div&gt;&lt;div style=&quot;font-size: 14px;&quot;&gt;mooseherder&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="140" y="40" width="120" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-13" target="37p0PDooPlaZ-HSsAcqx-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-13" value="Class:&lt;div style=&quot;font-size: 14px;&quot;&gt;Field&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="500" y="210" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-14" value="Abstract Base Class:&lt;div style=&quot;font-size: 14px;&quot;&gt;SensorArray&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="650" y="215" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-15" target="37p0PDooPlaZ-HSsAcqx-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-15" value="Class:&lt;div style=&quot;font-size: 14px;&quot;&gt;SimData&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="320" y="215" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-16" target="37p0PDooPlaZ-HSsAcqx-42">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-44" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-16" target="37p0PDooPlaZ-HSsAcqx-41">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-16" value="Class:&lt;div style=&quot;font-size: 14px;&quot;&gt;ThermocoupleArray&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="650" y="400" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-17" target="37p0PDooPlaZ-HSsAcqx-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-17" value="Inputs:&lt;div style=&quot;font-size: 14px;&quot;&gt;sensor positions [S]&lt;/div&gt;&lt;div style=&quot;font-size: 14px;&quot;&gt;sample times [T]&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="700" y="70" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-18" target="37p0PDooPlaZ-HSsAcqx-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-18" value="Input:&lt;div style=&quot;font-size: 14px;&quot;&gt;MOOSE exodus output file, *.e&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="330" y="30" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-26" target="37p0PDooPlaZ-HSsAcqx-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-26" target="37p0PDooPlaZ-HSsAcqx-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-26" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;&lt;b&gt;Package:&lt;/b&gt;&lt;/font&gt;&lt;div style=&quot;font-size: 16px;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;&lt;b&gt;mooseherder&lt;/b&gt;&lt;/font&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="140" y="170" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-27" target="37p0PDooPlaZ-HSsAcqx-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-27" value="Class:&lt;div style=&quot;font-size: 14px;&quot;&gt;ExodusReader&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="320" y="120" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="720" y="410" as="sourcePoint" />
+            <mxPoint x="720" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-36" target="37p0PDooPlaZ-HSsAcqx-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-36" value="Abstract methods:&lt;div style=&quot;font-size: 14px;&quot;&gt;get_truth_values()&lt;/div&gt;&lt;div style=&quot;font-size: 14px;&quot;&gt;get_systematic_errors()&lt;/div&gt;&lt;div style=&quot;font-size: 14px;&quot;&gt;get_random_errors()&lt;/div&gt;&lt;div style=&quot;font-size: 14px;&quot;&gt;get_measurements()&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="650" y="275" width="160" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-39" target="37p0PDooPlaZ-HSsAcqx-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-39" value="Inputs:&lt;div style=&quot;font-size: 14px;&quot;&gt;Systematic error function&lt;/div&gt;&lt;div style=&quot;font-size: 14px;&quot;&gt;Random error function&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="440" y="400" width="165" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-41" value="Outputs as np.ndarray [S,T]:&lt;div style=&quot;font-size: 14px;&quot;&gt;- measurements&lt;/div&gt;&lt;div style=&quot;font-size: 14px;&quot;&gt;- truth values (from sim)&lt;/div&gt;&lt;div style=&quot;font-size: 14px;&quot;&gt;- random errors&lt;/div&gt;&lt;div style=&quot;font-size: 14px;&quot;&gt;- systematic errors&lt;/div&gt;&lt;div style=&quot;font-size: 14px;&quot;&gt;&lt;br style=&quot;font-size: 14px;&quot;&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="520" y="500" width="190" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-42" value="Visualisers as&amp;nbsp;&lt;div style=&quot;font-size: 14px;&quot;&gt;- pyvista&lt;/div&gt;&lt;div style=&quot;font-size: 14px;&quot;&gt;- matplotlib&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="750" y="500" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-41" target="37p0PDooPlaZ-HSsAcqx-41">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
