@@ -1,4 +1,4 @@
-# Digital-Physical Interface Tools: `pycave` Experiment Simulation Engine
+# Digital-Physical Interface Tools: `pycave` a Digital Validation Engine
 
 Lloyd Fletcher
 
@@ -146,24 +146,25 @@ The purpose of this section is to provide a system specification for the complet
 
 ## Aims & Objectives of `pycave`
 
-The aim of `pycave` is to develop an engine to simulate validation experiments and sensors applied to a multi-physics simulation that recreate realistic uncertainties. The use of `pycave` is meant to follow from the digital engineering design workflow starting at CAD for geometrical design to CAE for multi-physics simulation and then Computer Aided Validation (CAV). CAV allows an engineer to design and dynamically optimise a series of validation experiments. The overall purpose being to minimise the experimental cost and time required to validate a simulation by extracting the as much high quality validation data as possible per experiment.
+The aim of `pycave` is to develop an engine to simulate validation experiments and sensors applied to a multi-physics simulation that recreate realistic uncertainties. The use of `pycave` is meant to follow from the digital engineering design workflow starting at CAD for geometrical design to CAE for multi-physics simulation and then Computer Aided Validation (CAV). CAV allows an engineer to design and dynamically optimise a series of validation experiments. The overall purpose being to minimise the experimental cost and time required to validate a simulation by extracting the as much high quality validation data as possible per experiment. The objectives of `pycave` are to provide workflows that allow engineers to perform:
 
-1. TODO
+1. Uncertainty quantification for any given array of sensors applied to a multi-physics experiment and simulation.
+2. Simulation validation analysis through calculation of validation metrics accounting for realistic experimental uncertainties.
+3. Sensor selection and placement optimisation for a given set of experimental scenarios with the ability to deal with multi-physics experiments.
+4. Simulation-driven experimental design allowing engineers to use active learning approaches to iteratively update experimental parameters to extract the most information per experiment.
 
-### Extension Aims
+### Extension Aim
 
-An extension application of `pycave` will be to provide real-time sensor emulation software that can be used to validate the performance of digital shadows/twins without having to connect them to a real world system. Here the idea will be to use two simulations one which is the digital shadow/twin and one which is a surrogate for the real world system. The `pycave` sensor emulation engine will then be used to sample the surrogate system
-
-TODO: insert workflow diagram for the digital twin test bed
+An extension aim of `pycave` will be to provide real-time sensor emulation software that can be used to validate the performance of digital shadows/twins without having to connect them to a real world system. Here the idea will be to use two simulations one of which is the digital shadow/twin and one which is a surrogate for the real world system. The `pycave` sensor emulation engine will then be used to sample the surrogate system and provide simulated sensor signals to the digital shadow/twin. The surrogate system can then be perturbed with different expected states including failure scenarios with the associated sensor signals fed through to the digital shadow/twin. The predictions of the digital shadow/twin can then be assessed against the known 'truth' state taken from the surrogate simulation. This provides significant advantages for testing digital shadows/twins as the underlying state of the surrogate physical system is known which is not the case for a real physical system.
 
 ### Workflows & Implementation
 
 A simplified workflow using the whole functionality of `pycave` would be as follows:
 
-1. Input a series of multi-physics simulations for the scenarios of interest.
-2. Optimise the experimental parameters and sensors used for the experiment to extract the most high quality validation data while minimising costs.
+1. Input a series of multi-physics simulations for the experimental scenarios of interest.
+2. Optimise the experimental parameters and selection/placement of sensors used for the experiment to extract the most high quality validation data while minimising costs.
 3. Perform the experiments and input the data to calculate validation metrics that use uncerntaity quantification to assess the degree to which the simulation agrees with the experimental data.
-4. If the model is deemed valid it can be used for design qualification decisions, if the model is not valid determine areas of highest uncertainty and repeat the process to design a new series of experiments.
+4. If the model is deemed valid it can be used for design qualification decisions, if the model is not valid determine use active learning approachs to determine areas of highest uncertainty and repeat the process to design a new series of experiments.
 
 This workflow contrasts with current validation experimental procedures which perform parameter sweeps or grid searches which gather a large amount of redundant data. The `pycave` will provide iterative optimisation procedures to minimise experimental effort and cost while providing more high quality validation information to reduce design risk.
 
@@ -173,22 +174,8 @@ The `pycave` engine will be modular allowing users to design custom workflows to
 - How sensitive is a chosen validation metric to differences in the simulation parameters (geometry, material properties and boundary conditions/loads) e.g. if my material properties change by 10% does my validation metric and chosen sensor array detect this difference?
 - If the data from my experimental campaign determines that my simulation is not valid what is the likely cause of this difference (geometry, material properties and/or boundary conditions/loads)?
 
-The `pycave` will leverage advances in machine learning algorithms to solve regression, classification and multi-objective optimisation problems throughout the workflow.
+The `pycave` will leverage machine learning algorithms to solve regression, classification, uncertainty quantification and multi-objective optimisation problems throughout the workflow. Regression models will be used to predict physics field variables from sparse sensor values; classification models will be used to validate simulations; uncertainty quantification will be used in the digital and physical spaces as part of validation metric calculations; and multi-objective optimisation will be used for simulation-driven experimental design and sensor selection/placement optimisation.
 
-- Uncertainty Quantification
-- Validation Workflow
-- Sensor Placement Optimisation
-- Real-Time Sensor Emulation Engine
-- Simulation-Driven Experimental Design Engine
-
-### Inputs
-
-- A multi-physics simulation of interest
-Or
-- TODO
-
-### Outputs
--
 
 ## Deliverables for Financial Year 24-25
 
@@ -217,8 +204,8 @@ Given that this is a research project with significant unknowns it is expected t
     - Thermo-mechanical analysis of a 3D divertor monoblock model
 
 **Extension Deliverables:**
-1. A v0.1 release of the `pycave` package on pypi
-2. A journal article in SoftwareX detailing
+1. A v0.1 release of the `pycave` package on pypi allowing users to pip install the package into a virtual environment without cloning the git repository.
+2. A journal article in SoftwareX detailing the implementation of the first version of `pycave`.
 3. A journal article detailing the application of `pycave` to the simulations and experimental data generated as part of the Key Challenge 4 'simple test case'.
 4. Develop training materials to enable translation of the `pycave` into engineering practice with the potential to run a `pycave` hackathon in the future.
 
