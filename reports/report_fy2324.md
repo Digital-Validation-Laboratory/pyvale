@@ -1,6 +1,6 @@
 # Digital-Physical Interface Tools: `pycave` a Digital Validation Engine
 
-Lloyd Fletcher, Adel Tayeb and Alex Marsh.<br>
+Lloyd Fletcher, Adel Tayeb, Michael Atkinson, Alex Marsh.<br>
 
 Applied Materials Technology Group, Fusion Technology Division,<br>
 United Kingdom Atomic Energy Authority (UKAEA).
