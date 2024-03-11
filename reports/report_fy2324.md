@@ -1,9 +1,11 @@
 # Digital-Physical Interface Tools: `pycave` a Digital Validation Engine
 
-Lloyd Fletcher, Adel Tayeb and Alex Marsh
-United Kingdom Atomic Energy Authority (UKAEA)
+Lloyd Fletcher, Adel Tayeb and Alex Marsh.<br>
 
-## Introduction for Financial Year 23-24
+Applied Materials Technology Group, Fusion Technology Division,<br>
+United Kingdom Atomic Energy Authority (UKAEA).
+
+## Introduction for Financial Year 2023-2024
 
 ### Motivation & Impact
 
@@ -18,8 +20,7 @@ A software engine for simulating experimental data from simulations would has a 
 The aim of this project is to develop a software engine that can use an input multi-physics simulation to produce a set of simulated experimental data with realistic uncertainties. This software engine will be developed as a python package, as use of python provides access to a range of scientific computing, optimisation and machine learning libraries. The package will be called the python computer aided validation engine (`pycave`). The underlying engineering simulation tool is assumed to be the Multi-Physics Object Oriented Simulation Environment (MOOSE) being developed for fusion digital twin applications by the AES group. The objectives of this project are to create:
 
 1. An overarching conceptual model of a sensor to be implemented as an abstract base class.
-2. A module that contains a library of different sensors.
-    Including different spatial arrangements (e.g. point, line, camera/area, volume).
+2. A module that contains a library of different sensors. Including different spatial arrangements (e.g. point, line, camera/area, volume).
     * Including increasing complexity of quantities of interest: scalar, vector & tensor.
     * A sensor array module that can manage a variety of sensors selected from the library.
 3. An experiment simulation module that can take an input multi-physics simulation (from MOOSE) and a sensor array using this to generate a simulated experimental dataset.
@@ -41,9 +42,9 @@ The scope of the following deliverables were set based on the project starting h
 
 ## Package Workflow & Flow Chart: `pycave`
 
-The overall structure of the `pycave` package is shown in the figure below. The user inputs to the package include an output exodus file from the MOOSE simulation to be analysed; a list of sensor positions as a `numpy` array where each row is a sensor with position [x,y,z] in the simulation coordinates; and the optional parameter of the sample times at which sensor measurements should be simulated as a `numpy` array. If the user specifies sample times then the sensor values are linearly interpolated between the simulation time steps. Note that if the sample times are not specified they are assumed to coincide with the simulation time steps and no interpolation is performed.
+The overall structure of the `pycave` package is shown in the figure below. The user inputs to the package include an output exodus file from the MOOSE simulation to be analysed; a list of sensor positions as a `numpy` array where each row is a sensor with position [x,y,z] in the simulation coordinates; and the optional parameter of the sample times as a `numpy` array at which sensor measurements should be simulated. If the user specifies sample times then the sensor values are linearly interpolated between the simulation time steps. Note that if the sample times are not specified they are assumed to coincide with the simulation time steps and no temporal interpolation is performed.
 
-The package has two main classes the first is a `Field` which interpolates the underlying simulation results to extract the ground truth values for the sensors at the specified times and locations. The second is a `SensorArray` which is an abstract base class (ABC) containing four key methods for simulating sensor output. The `ThermocoupleArray` is a concrete implementation of the `SensorArray` ABC that allows the user to extract measurements with simulated experimental errors.
+The package has two main classes, the first is a `Field` which interpolates the underlying simulation results to extract the ground truth values for the sensors at the specified times and locations. The second is a `SensorArray` which is an abstract base class (ABC) containing four key methods for simulating sensor output. The `ThermocoupleArray` is a concrete implementation of the `SensorArray` ABC that allows the user to extract measurements with simulated experimental errors.
 
 It should be noted that the `mooseherder` package has a range of additional functionality which is not shown in the figure below as only the current dependencies for the `pycave` package are shown. This includes the ability to: 1) Dynamically update parameters in a MOOSE or Gmsh input file; 2) Run MOOSE simulations from python with Gmsh mesh generation; 3) Run a parameter sweep of a chain of MOOSE/Gmsh simulations in parallel; and 4) Read the output of the parameter sweep in parallel. This additional functionality of `mooseherder` is demonstrated in the worked examples in the `mooseherder` github repository.
 
@@ -53,9 +54,9 @@ It should be noted that the `mooseherder` package has a range of additional func
 
 ## Prototype Demonstration: `pycave`
 
-This prototype demonstration will focus on the simplest case for sensor simulation which is point sensors used to measure a scalar field. For this purpose a temperature field measurements with thermocouples was chosen. In the future it is intended that `pycave` will be extended to simulate more complex sensors such as cameras and more complex fields such as vector (e.g. displacement) or tensor fields (e.g. strain).
+This prototype demonstration will focus on the simplest case for sensor simulation which is point sensors used to measure a scalar field. For this purpose a temperature field measurement with thermocouples was chosen. In the future it is intended that `pycave` will be extended to simulate more complex sensors such as cameras and more complex fields such as vector (e.g. displacement) or tensor fields (e.g. strain).
 
-Two MOOSE thermal simulations were constructed and run to demonstrate the functionality of the `pycave`. The input files for these simulations and associated output can be found [here](https://github.com/Applied-Materials-Technology/pycave/tree/main/data). The first simulation is based on a MOOSE tutorial problem analysing the thermal field in a 2D plate where the temperature is held constant on the left hand edge and then increased on the right hand edge with a user specified function. The second simulation is a 3D thermal model of a divertor monoblock armour component that includes three materials with temperature dependent material properties (tungsten, copper, copper-chromium-zirconium).
+Two MOOSE thermal simulations were constructed and run to demonstrate the functionality of the `pycave`. The input files for these simulations and associated output can be found in the `pycave` repository [here](https://github.com/Applied-Materials-Technology/pycave/tree/main/data). The first simulation is based on a MOOSE tutorial problem analysing the thermal field in a 2D plate. For this case the temperature is held constant on the left hand edge and then increased on the right hand edge with a user specified function. The second simulation is a 3D thermal model of a divertor monoblock armour component that includes three materials with temperature dependent material properties (tungsten, copper, copper-chromium-zirconium).
 
 Here we use the code from the [first example](https://github.com/Applied-Materials-Technology/pycave/blob/main/examples/ex1_2d_thermcouples.py) in the repository to demonstrate the use of `pycave`. The first step is to import dependencies and use `mooseherder` to read the output exodus file for the simulation of interest:
 
@@ -70,7 +71,7 @@ data_reader = mh.ExodusReader(data_path)
 sim_data = data_reader.read_all_sim_data()
 ```
 
-Now we need to construct the first input which is a `Field` object that will be used to interpolate the simulation data to the desired sensor positions.
+Now we need to construct the first input for `pycave` which is a `Field` object that will be used to interpolate the simulation data to the desired sensor positions.
 
 ```python
 spat_dims = 2
@@ -78,7 +79,7 @@ field_name = 'temperature'
 t_field = pycave.Field(sim_data,field_name,spat_dims)
 ```
 
-The second required input is the locations of the sensors. Here we use a helper function from `pycave` to generate a uniform grid of sensor positions excluding edges. The sensor positions can also be manually specified where each row of the position `numpy` array is a sensor with position [x,y,z].
+The second required input is the locations of the sensors. Here we use a helper function from `pycave` to generate a uniform grid of sensor positions excluding edges. The sensor positions can also be manually specified where each row of the `numpy` array is a sensor with position [x,y,z] in simulation coordinates.
 
 ```python
 n_sens = (3,2,1)
@@ -88,7 +89,7 @@ z_lims = (0.0,0.0)
 sens_pos = pycave.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 ```
 
-Having created a `Field` object and the desired sensors positions a `ThermocoupleArray` can now be created. We also generate the standard uncertainty functions by specifying their parameters. The standard systematic error function is a randomly generated constant offset from a uniform distribution where the high and low bounds are specified. The standard random error function is a sampled from normal distribution at each sample time where the standard deviation is specified.
+Having created a `Field` object and the desired sensors positions a `ThermocoupleArray` can now be created. We also generate the standard uncertainty functions by specifying their parameters. The standard systematic error function is a randomly generated constant offset from a uniform distribution where the high and low bounds are specified. The standard random error function is sampled from normal distribution at each sample time where the standard deviation is specified. For this case the maximum temperature is on the order of 100 degrees centrigrade so errors on the order of 10's of degrees will be visible on the sensor traces for demonstration purposes.
 
 ```python
 tc_array = pycave.ThermocoupleArray(sens_pos,t_field)
@@ -97,10 +98,9 @@ tc_array.set_uniform_systematic_err_func(low=-10.0,high=10.0)
 tc_array.set_normal_random_err_func(std_dev=5.0)
 ```
 
-Custom functions for generating the systematic and random errors can be specified using the `ThermocoupleArray.set_custom_systematic_err_func()` and `ThermocoupleArray.set_custom_random_err_func()` functions. For this case the functions must take a single `size` parameter which will be the size of the array that will be returned which must be the same size as the measurement array. The measurement array has dimensions of [number of sensors, number of sample times]. The custom error function must return a `numpy` array of this size.
+Custom functions for generating the systematic and random errors can be specified using the methods of `ThermocoupleArray`, `set_custom_systematic_err_func()` and `set_custom_random_err_func()`. For this case the functions must take a single `size` parameter which will be the size of the measurement `numpy` array. The measurement array has dimensions of [number of sensors, number of sample times]. The custom error function must return a `numpy` array of this size. Note that the in-built python `functools` package can be useful for creating user specified error functions and additional examples of this will be included in futrue versions.
 
-The measurements are constructed using: measurement = truth + systematic error + random error.
-The measurements are returned as a `numpy` array with dimensions of [number of sensors, number of sample times]. Simulated measurements from the `ThermocoupleArray` can then be generated using:
+The measurements are constructed using: measurement = truth + systematic error + random error. The measurements are returned as a `numpy` array with dimensions of [number of sensors, number of sample times]. Simulated measurements from the `ThermocoupleArray` can then be generated using:
 
 ```python
 measurements = tc_array.get_measurements()
@@ -120,7 +120,7 @@ pv_plot.show()
 |:--:|
 |*Figure: Simple 2D thermal plate visualised with pyvista showing thermocouple location over the simulated temperature field for the last time step.*|
 
-The time traces for the simulated thermocouples can also be plotted for the total simulation duration using the `plot_time_traces()` function with an example time trace plot shown below. Note that the solid lines on the plot correspond to the truth and the dashed line with crosses is the simulated sensor values.
+The time traces for the simulated thermocouples can also be plotted for the total simulation duration using the `plot_time_traces()` function with an example time trace plot shown below. Note that the solid lines on the plot correspond to the truth and the dashed lines with crosses are the simulated sensor values.
 
 ```python3
 (fig,ax) = tc_array.plot_time_traces(plot_truth=True)
@@ -158,20 +158,20 @@ The aim of `pycave` is to develop an engine to simulate validation experiments a
 
 ### Extension Aim
 
-An extension aim of `pycave` will be to provide real-time sensor emulation software that can be used to validate the performance of digital shadows/twins without having to connect them to a real world system. Here the idea will be to use two simulations one of which is the digital shadow/twin and one which is a surrogate for the real world system. The `pycave` sensor emulation engine will then be used to sample the surrogate system and provide simulated sensor signals to the digital shadow/twin. The surrogate system can then be perturbed with different expected states including failure scenarios with the associated sensor signals fed through to the digital shadow/twin. The predictions of the digital shadow/twin can then be assessed against the known 'truth' state taken from the surrogate simulation. This provides significant advantages for testing digital shadows/twins as the underlying state of the surrogate physical system is known which is not the case for a real physical system.
+An extension aim of `pycave` will be to provide real-time sensor emulation software that can be used to validate the performance of digital shadows/twins without having to connect them to a real world system. Here the idea will be to use two simulations, one of which is the digital shadow/twin and one which is a surrogate for the real world system. The `pycave` sensor emulation engine will then be used to sample the surrogate system and provide simulated sensor signals to the digital shadow/twin. The surrogate system can then be perturbed with different expected states, including failure scenarios, with the associated sensor signals fed through to the digital shadow/twin. The predictions of the digital shadow/twin can then be assessed against the known 'truth' state taken from the surrogate simulation. This provides significant advantages for testing digital shadows/twins as the underlying state of the surrogate physical system is known which is not the case for a real physical system.
 
 ### Workflows & Implementation
 
 A simplified workflow using the whole functionality of `pycave` would be as follows:
 
 1. Input a series of multi-physics simulations for the experimental scenarios of interest.
-2. Optimise the experimental parameters and selection/placement of sensors used for the experiment to extract the most high quality validation data while minimising costs.
+2. Optimise the experimental parameters and selection/placement of sensors used for the experiments to extract the most high quality validation data while minimising costs.
 3. Perform the experiments and input the data to calculate validation metrics that use uncerntaity quantification to assess the degree to which the simulation agrees with the experimental data.
-4. If the model is deemed valid it can be used for design qualification decisions, if the model is not valid determine use active learning approachs to determine areas of highest uncertainty and repeat the process to design a new series of experiments.
+4. If the model is deemed valid it can be used for design qualification decisions, if the model is not valid determine use active learning to determine areas of highest uncertainty and repeat the process to design a new series of experiments.
 
 This workflow contrasts with current validation experimental procedures which perform parameter sweeps or grid searches which gather a large amount of redundant data. The `pycave` will provide iterative optimisation procedures to minimise experimental effort and cost while providing more high quality validation information to reduce design risk.
 
-The `pycave` engine will be modular allowing users to design custom workflows to answer engineering questions of interest performing 'What if?' analysis. For example:
+The `pycave` engine will be modular allowing users to design custom workflows to answer engineering questions of interest by performing 'What if?' analysis. For example:
 
 - Given a specific set of sensors that are already deployed on an engineering system what are the expected uncertainties on these measurements and how do these propagate through to my chosen validation metric?
 - How sensitive is a chosen validation metric to differences in the simulation parameters (geometry, material properties and boundary conditions/loads) e.g. if my material properties change by 10% does my validation metric and chosen sensor array detect this difference?
@@ -210,7 +210,7 @@ Given that this is a research project with significant unknowns it is expected t
 1. A v0.1 release of the `pycave` package on pypi allowing users to pip install the package into a virtual environment without cloning the git repository.
 2. A journal article in SoftwareX detailing the implementation of the first version of `pycave`.
 3. A journal article detailing the application of `pycave` to the simulations and experimental data generated as part of the Key Challenge 4 'simple test case'.
-4. Develop training materials to enable translation of the `pycave` into engineering practice with the potential to run a `pycave` hackathon in the future.
+4. An application of `pycave` to optimise placement of neutronics sensors for LIBRTI.
 
 
 
