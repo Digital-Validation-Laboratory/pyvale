@@ -37,4 +37,6 @@ The examples folder includes a sequence of examples using `pycave`.
 
 ## Contributors
 
-- Lloyd Fletcher, UK Atomic Energy Authority, (TheScepticalRabbit)
+- Lloyd Fletcher, UK Atomic Energy Authority
+- Adel Tayeb, UK Atomic Energy Authority
+- Alex Marsh, UK Atomic Energy Authority
