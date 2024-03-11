@@ -1,10 +1,12 @@
 # Digital-Physical Interface Tools: `pycave` a Digital Validation Engine
 
-Lloyd Fletcher
+Lloyd Fletcher, Adel Tayeb and Alex Marsh
+United Kingdom Atomic Energy Authority (UKAEA)
 
 ## Introduction for Financial Year 23-24
 
 ### Motivation & Impact
+
 Qualification of fusion technology is reliant on simulations to predict the performance of components in extreme (e.g., thermal and electromagnetic) and untestable (e.g., fusion neutron fluxes) environments. Enabling the use of simulations for design qualification requires that they are validated with experimental data over testable domains to reduce uncertainty when extrapolating into irradiated conditions. A key set of tools for simulation validation are the statistical metrics used to assess the agreement between the model and experimental data. High agreement between a model and experimental data increases the credibility of the model and confidence in decisions made based on model predictions.
 
 Validation metrics must account for uncertainties (systematic and random) in the simulation as well as the experimental data. The Advanced Engineering Simulation (AES) Group in the Computing Division at UKAEA are developing the tools necessary to produce probabilistic simulation predictions accounting for uncertainties in model inputs such as geometry, material properties and boundary conditions/loads. The purpose of this project is to develop a software engine to simulate experimental data from a given model and use this to assess the impact of uncertainty in the experimental domain.
@@ -24,6 +26,7 @@ The aim of this project is to develop a software engine that can use an input mu
 4. A validation dataset factory module that can perturb an input multi-physics simulation (e.g. geometry, material model, boundary conditions) and apply a sensor array to create a series of ‘invalid’ datasets to assess validation metrics.
 
 ### Deliverables for Financial Year 2023-2024
+
 The scope of the following deliverables were set based on the project starting half way through the year with an equivalent allocation of 0.75 FTE. All deliverables have been achieved and the results are detailed in this report.
 
 1. A report detailing a development work plan for the package as well as full system specifications.
