@@ -33,7 +33,7 @@ The scope of the following deliverables were set based on the project starting h
 1. A report detailing a development work plan for the package as well as full system specifications.
     * Detailed in the following document.
 2. A flow chart for the package showing the key classes/functions and their relationships as well as external dependencies.
-    * See the [flow chart](#flow-chart) below.
+    * See the [flow chart](#package-workflow--flow-chart-pycave) below.
 3. A first version of `mooseherder`, a package being developed to be able to run MOOSE simulations in parallel, which is required for objective 4 and 5 as well as other projects within AMT on test design and topology optimisation.
     * Source code for `mooseherder` v0.1: https://github.com/Applied-Materials-Technology/mooseherder
 4. A first version of pycave demonstrated on the simplest test case of a scalar field with point sensors - specifically, simulated thermocouple data for a divertor monoblock simulation in MOOSE.
@@ -201,8 +201,8 @@ Given that this is a research project with significant unknowns it is expected t
         - Infrared cameras measuring temperature fields
         - Digital image correlation measuring displacement field on a surface
 4. A toolbox for calculating validation metrics from sensor data (simulated or real)
-6. A software test suite for point sensor functionality after completion of the additional features.
-7. Documentation and worked examples using the following test cases:
+5. A software test suite for point sensor functionality after completion of the additional features.
+6. Documentation and worked examples using the following test cases:
     - Thermo-mechanical analysis of a simple 2D plate
     - Thermo-mechanical analysis of a 3D divertor monoblock model
 
