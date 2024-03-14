@@ -1,8 +1,9 @@
 # Notes: pycave developement
 
 # Deliverables FY 24-25
-- A coding standard?
+- Python coding pinciples.
     - Use git, vscode and pylint
+    - Work in your own 'dev' branch - don't push to main!
     - Type hint everything
     - Default mutable data types to None
     - Numpy is your friend - no for/while loops!
