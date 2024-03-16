@@ -9,6 +9,7 @@
     - Numpy is your friend - no for/while loops!
     - No inheritance unless it is an interface / ABC - use composition
     - Use a mixture of functions and classes with methods where they make sense
+    - Use code reviews to help each other but be nice!
 
 - Module: `Experiment`
     - Manages and builds the overall workflow
