@@ -1,23 +1,21 @@
 SetFactory("OpenCASCADE");
 
-Point(1) = {0, 0, 0, 1.0};
-Point(2) = {2, 0, 0, 1.0};
-Point(3) = {2, 1, 0, 1.0};
-Point(4) = {0, 1, 0, 1.0};
+// View Options
+Geometry.PointLabels = 1;
+Geometry.CurveLabels = 1;
+Geometry.SurfaceLabels = 1;
+Geometry.VolumeLabels = 1;
 
-Line(1) = {1, 2};
-Line(2) = {2, 3};
-Line(3) = {3, 4};
-Line(4) = {4, 1};
+// Create the first rectangle using OpenCASCADE
+Rectangle(1) = {0, 0, 0, 10, 5, 0};
 
-Circle(5) = {1, 0.5, 0, 0.25, 0, 2*Pi};
+// Create the second rectangle using OpenCASCADE
+Rectangle(2) = {5, 5, 0, 10, 10, 0};
 
-Curve Loop(1) = {3, 4, 1, 2};
-Curve Loop(2) = {5};
-Plane Surface(1) = {1, 2};
+// Merge overlapping lines
+Line Loop(3) = {4, -5, 6, 7};
+Plane Surface(4) = {3};
 
-Physical Surface("plate") = {1};
-
-Mesh.size = 0.01;
-
-Mesh 2;
+// Merge overlapping lines for the other rectangle
+Line Loop(5) = {1, 2, 3, 5};
+Plane Surface(6) = {5};

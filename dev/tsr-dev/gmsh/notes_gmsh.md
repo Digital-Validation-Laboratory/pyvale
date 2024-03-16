@@ -4,6 +4,10 @@ OpenCASCADE Tutorials: 16,18,19,20
 
 ## Geometry
 
+**New**
+Analogously to ‘newp’, the special
+variables ‘newc’, ‘newcl, ‘news’, ‘newsl’ and ‘newv’ select new curve, curve loop, surface, surface loop and volume tags.
+
 ## Controlling Mesh Options
 
 **Control min/max mesh size**
