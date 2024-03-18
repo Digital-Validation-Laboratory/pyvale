@@ -13,18 +13,19 @@ Qualification of fusion technology is reliant on simulations to predict the perf
 
 Validation metrics must account for uncertainties (systematic and random) in the simulation as well as the experimental data. The Advanced Engineering Simulation (AES) Group in the Computing Division at UKAEA are developing the tools necessary to produce probabilistic simulation predictions accounting for uncertainties in model inputs such as geometry, material properties and boundary conditions/loads. The purpose of this project is to develop a software engine to simulate experimental data from a given model and use this to assess the impact of uncertainty in the experimental domain.
 
-A software engine for simulating experimental data from simulations would has a wide variety of applications: 1) experiment design and sensor placement optimisation; 2) provide ground-truth data for benchmarking and developing validation metrics; and 3) testing the predictive capability of digital shadows/twins.  A digital shadow is connected to a real-world system and receives sensor data from the system to update the model state. A digital twin takes this one step further by acting on the model state and feeding back control signals into the real-world system. Both of these can be tested by connecting them to another simulation as a surrogate for the real-world system with a layer of software between that acts to simulate the sensor signals. It is then possible to perturb the surrogate real world system to model failure and then assess the predictive capability of the digital twin/shadow.
+A software engine for simulating experimental data from simulations has a wide variety of applications: 1) experiment design and sensor placement optimisation; 2) provide ground-truth data for benchmarking and developing validation metrics; and 3) testing the predictive capability of digital shadows/twins.  A digital shadow is connected to a real-world system and receives sensor data from the system to update the model state. A digital twin takes this one step further by acting on the model state and feeding back control signals into the real-world system. Both of these can be tested by connecting them to another simulation as a surrogate for the real-world system with a layer of software between that acts to simulate the sensor signals. It is then possible to perturb the surrogate real world system to model failure and then assess the predictive capability of the digital twin/shadow.
 
 ### Aims & Objectives
 
 The aim of this project is to develop a software engine that can use an input multi-physics simulation to produce a set of simulated experimental data with realistic uncertainties. This software engine will be developed as a python package, as use of python provides access to a range of scientific computing, optimisation and machine learning libraries. The package will be called the python computer aided validation engine (`pycave`). The underlying engineering simulation tool is assumed to be the Multi-Physics Object Oriented Simulation Environment (MOOSE) being developed for fusion digital twin applications by the AES group. The objectives of this project are to create:
 
 1. An overarching conceptual model of a sensor to be implemented as an abstract base class.
-2. A module that contains a library of different sensors. Including different spatial arrangements (e.g. point, line, camera/area, volume).
+2. A module that contains a library of different sensors:
+    * Including different spatial arrangements (e.g. point, line, camera/area, volume).
     * Including increasing complexity of quantities of interest: scalar, vector & tensor.
     * A sensor array module that can manage a variety of sensors selected from the library.
-3. An experiment simulation module that can take an input multi-physics simulation (from MOOSE) and a sensor array using this to generate a simulated experimental dataset.
-4. A validation dataset factory module that can perturb an input multi-physics simulation (e.g. geometry, material model, boundary conditions) and apply a sensor array to create a series of ‘invalid’ datasets to assess validation metrics.
+3. An experiment simulation module that can take an input multi-physics simulation (from MOOSE) and a sensor array using the above module to generate a simulated experimental dataset.
+4. A validation dataset factory module that can perturb an input multi-physics simulation (e.g., geometry, material model, boundary conditions) and apply a sensor array to create a series of ‘invalid’ datasets to assess validation metrics.
 
 ### Deliverables for Financial Year 2023-2024
 
@@ -89,7 +90,7 @@ z_lims = (0.0,0.0)
 sens_pos = pycave.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 ```
 
-Having created a `Field` object and the desired sensors positions a `ThermocoupleArray` can now be created. We also generate the standard uncertainty functions by specifying their parameters. The standard systematic error function is a randomly generated constant offset from a uniform distribution where the high and low bounds are specified. The standard random error function is sampled from normal distribution at each sample time where the standard deviation is specified. For this case the maximum temperature is on the order of 100 degrees centrigrade so errors on the order of 10's of degrees will be visible on the sensor traces for demonstration purposes.
+Having created a `Field` object and the desired sensor positions, a `ThermocoupleArray` can now be created. We also generate the standard uncertainty functions by specifying their parameters. The standard systematic error function is a randomly generated constant offset from a uniform distribution where the high and low bounds are specified. The standard random error function is sampled from normal distribution at each sample time where the standard deviation is specified. For this case the maximum temperature is on the order of 100 degrees centigrade so errors on the order of 10's of degrees will be visible on the sensor traces for demonstration purposes.
 
 ```python
 tc_array = pycave.ThermocoupleArray(sens_pos,t_field)
@@ -98,7 +99,7 @@ tc_array.set_uniform_systematic_err_func(low=-10.0,high=10.0)
 tc_array.set_normal_random_err_func(std_dev=5.0)
 ```
 
-Custom functions for generating the systematic and random errors can be specified using the methods of `ThermocoupleArray`, `set_custom_systematic_err_func()` and `set_custom_random_err_func()`. For this case the functions must take a single `size` parameter which will be the size of the measurement `numpy` array. The measurement array has dimensions of [number of sensors, number of sample times]. The custom error function must return a `numpy` array of this size. Note that the in-built python `functools` package can be useful for creating user specified error functions and additional examples of this will be included in futrue versions.
+Custom functions for generating the systematic and random errors can be specified using the methods of `ThermocoupleArray`, `set_custom_systematic_err_func()` and `set_custom_random_err_func()`. For this case the functions must take a single `size` parameter which will be the size of the measurement `numpy` array. The measurement array has dimensions of [number of sensors, number of sample times]. The custom error function must return a `numpy` array of this size. Note that the in-built python `functools` package can be useful for creating user specified error functions and additional examples of this will be included in future versions.
 
 The measurements are constructed using: measurement = truth + systematic error + random error. The measurements are returned as a `numpy` array with dimensions of [number of sensors, number of sample times]. Simulated measurements from the `ThermocoupleArray` can then be generated using:
 
@@ -149,9 +150,9 @@ The purpose of this section is to provide a system specification for the complet
 
 ## Aims & Objectives of `pycave`
 
-The aim of `pycave` is to develop an engine to simulate validation experiments and sensors applied to a multi-physics simulation that recreate realistic uncertainties. The use of `pycave` is meant to follow from the digital engineering design workflow starting at CAD for geometrical design to CAE for multi-physics simulation and then Computer Aided Validation (CAV). CAV allows an engineer to design and dynamically optimise a series of validation experiments. The overall purpose being to minimise the experimental cost and time required to validate a simulation by extracting the as much high quality validation data as possible per experiment. The objectives of `pycave` are to provide workflows that allow engineers to perform:
+The aim of `pycave` is to develop an engine to simulate validation experiments and sensors applied to a multi-physics simulation that recreate realistic uncertainties. The use of `pycave` is meant to follow from the digital engineering design workflow starting at CAD for geometrical design to CAE for multi-physics simulation and then Computer Aided Validation (CAV). CAV allows an engineer to design and dynamically optimise a series of validation experiments. The overall purpose being to minimise the experimental cost and time required to validate a simulation by extracting as much high-quality validation data as possible per experiment. The objectives of `pycave` are to provide workflows that allow engineers to perform:
 
-1. Uncertainty quantification for any given array of sensors applied to a multi-physics experiment and simulation.
+1. Uncertainty visualisation & quantification for any given array of sensors applied to a multi-physics experiment and simulation.
 2. Simulation validation analysis through calculation of validation metrics accounting for realistic experimental uncertainties.
 3. Sensor selection and placement optimisation for a given set of experimental scenarios with the ability to deal with multi-physics experiments.
 4. Simulation-driven experimental design allowing engineers to use active learning approaches to iteratively update experimental parameters to extract the most information per experiment.
@@ -165,30 +166,30 @@ An extension aim of `pycave` will be to provide real-time sensor emulation softw
 A simplified workflow using the whole functionality of `pycave` would be as follows:
 
 1. Input a series of multi-physics simulations for the experimental scenarios of interest.
-2. Optimise the experimental parameters and selection/placement of sensors used for the experiments to extract the most high quality validation data while minimising costs.
-3. Perform the experiments and input the data to calculate validation metrics that use uncerntaity quantification to assess the degree to which the simulation agrees with the experimental data.
-4. If the model is deemed valid it can be used for design qualification decisions, if the model is not valid determine use active learning to determine areas of highest uncertainty and repeat the process to design a new series of experiments.
+2. Optimise the experimental parameters and selection/placement of sensors used for the experiments to extract the most high-quality validation data while minimising costs.
+3. Perform the experiments and input the data to calculate validation metrics that use uncertainty quantification to assess the degree to which the simulation agrees with the experimental data.
+4. If the model is deemed valid it can be used for design qualification decisions. If the model is not valid, use active learning to determine areas of highest uncertainty and repeat the process to design a new series of experiments.
 
-This workflow contrasts with current validation experimental procedures which perform parameter sweeps or grid searches which gather a large amount of redundant data. The `pycave` will provide iterative optimisation procedures to minimise experimental effort and cost while providing more high quality validation information to reduce design risk.
+This workflow contrasts with current validation experimental procedures, which perform parameter sweeps or grid searches that gather a large amount of redundant data. The `pycave` engine will provide iterative optimisation procedures to minimise experimental effort and cost while providing more high-quality validation information to reduce design risk.
 
-The `pycave` engine will be modular allowing users to design custom workflows to answer engineering questions of interest by performing 'What if?' analysis. For example:
+The `pycave` engine will be modular, allowing users to design custom workflows to answer engineering questions of interest by performing 'What if?' analysis. For example:
 
 - Given a specific set of sensors that are already deployed on an engineering system what are the expected uncertainties on these measurements and how do these propagate through to my chosen validation metric?
 - How sensitive is a chosen validation metric to differences in the simulation parameters (geometry, material properties and boundary conditions/loads) e.g. if my material properties change by 10% does my validation metric and chosen sensor array detect this difference?
 - If the data from my experimental campaign determines that my simulation is not valid what is the likely cause of this difference (geometry, material properties and/or boundary conditions/loads)?
 
-The `pycave` will leverage machine learning algorithms to solve regression, classification, uncertainty quantification and multi-objective optimisation problems throughout the workflow. Regression models will be used to predict physics field variables from sparse sensor values; classification models will be used to validate simulations; uncertainty quantification will be used in the digital and physical spaces as part of validation metric calculations; and multi-objective optimisation will be used for simulation-driven experimental design and sensor selection/placement optimisation.
+The `pycave` engine will leverage machine learning algorithms to solve regression, classification, uncertainty quantification and multi-objective optimisation problems throughout the workflow. Regression models will be used to predict physics field variables from sparse sensor values; classification models will be used to validate simulations; uncertainty quantification will be used in the digital and physical spaces as part of validation metric calculations; and multi-objective optimisation will be used for simulation-driven experimental design and sensor selection/placement optimisation.
 
 
 ## Deliverables for Financial Year 24-25
 
-The scope of the deliverables for this project will be adjusted to take advantage of any synergies with other research projects throughout UKAEA such as digital shadow/twin work in the Advanced Engineering Simulation group or as part of Key Challenge 4 on digital qualification. An initial proposal for core deliverables in the next financial year is given below.
+The scope of the deliverables for this project will be adjusted to take advantage of any synergies with other research projects throughout UKAEA such as digital shadow/twin work in the Advanced Engineering Simulation group or as part of EPSRC Key Challenge 4 on digital qualification. An initial proposal for core deliverables in the next financial year is given below.
 
 **Core Deliverables:**
 
-1. Enhanced uncertainty function generation for random errors focusing on point sensors including:
+1. Enhanced uncertainty function generation for random errors, with a focus on point sensors, including:
     - Specification of noise as a function/percentage of sensor measurement value
-2. Enhanced uncertainty function generation for systematic errors focusing on point sensors including:
+2. Enhanced uncertainty function generation for systematic errors, with a focus on point sensors, including:
     - Calibration errors
     - Digitisation errors
     - Positioning errors
@@ -210,7 +211,7 @@ The scope of the deliverables for this project will be adjusted to take advantag
 - An application of `pycave` to optimise placement of neutronics sensors for LIBRTI. Set as extension as dependent on provision of a relevant neutronics simulation.
 - A toolbox for simulation parameter calibration using optimisers from the multi-objective optimisation library `pymoo`.
 - A journal article in SoftwareX detailing the implementation of the first version of `pycave`.
-- A journal article detailing the application of `pycave` to the simulations and experimental data generated as part of the Key Challenge 4 'simple test case'.
+- A journal article detailing the application of `pycave` to the simulations and experimental data generated as part of the EPSRC Key Challenge 4 'simple test case'.
 
 
 
