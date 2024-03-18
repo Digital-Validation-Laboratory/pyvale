@@ -67,7 +67,7 @@ def main() -> None:
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector
     # graphic using a specified camera position.
-    pv_plot_mode = 'save_fig'
+    pv_plot_mode = 'interactive'
 
     if pv_plot_mode == 'interactive':
         # Shows the pyvista interactive 3D plot

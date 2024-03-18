@@ -1,5 +1,9 @@
 {
     "cSpell.words": [
         "optimisation"
-    ]
+    ],
+    "[moose]": {
+        "outline.showProperties": false,
+        "outline.showStrings": false
+    }
 }

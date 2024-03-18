@@ -1,20 +1,76 @@
 # Notes: pycave developement
 
+# Deliverables FY 24-25
+- Python coding pinciples.
+    - Use git, vscode and pylint
+    - Work in your own 'dev' branch - don't push to main!
+    - Type hint everything
+    - Default mutable data types to None
+    - Numpy is your friend - no for/while loops!
+    - No inheritance unless it is an interface / ABC - use composition
+    - Use a mixture of functions and classes with methods where they make sense
+    - Use code reviews to help each other but be nice!
+
+- Module: `Experiment`
+    - Manages and builds the overall workflow
+- Module: `RandErrGenerator`= Enhanced uncertainty function generation for random errors focusing on point sensors including:
+    - Specification of noise as a function/percentage of sensor measurement value
+- Module: `SysErrGenerator` = Enhanced uncertainty function generation for systematic errors focusing on point sensors including:
+    - Calibration errors
+    - Digitisation errors
+    - Positioning errors
+    - Spatial averaging errors
+    - Temporal averaging errors
+    - Ability to collapse all of the above into a single probability density function
+- Module: `SensorLibrary` = Developement of library sensor models.
+    - ABC: `SensorArray`
+    - Module: `ThermocoupleArray`
+    - Module: `CameraSensor`= Developement of simplified camera sensor models for:
+        - Infrared cameras measuring temperature fields
+        - Digital image correlation measuring displacement field on a surface
+- ABC: `Field`
+    - Module: `ScalarField`
+    - Module: `VectorField`
+    - **Ext**, Module: `TensorField`
+    - **Ext**, How do these reconstruct fields from sparse values? e.g. using GPs
+- Module: `Validator` = A toolbox for calculating validation metrics from sensor data (simulated or real)
+    - Applicable to point sensors for thermal fields
+    - **Ext** Applicable to camera sensors for thermal fields
+- Testing: A software test suite for point sensor functionality after completion of the additional features.
+- Documentation: and worked examples using the following test cases:
+    - Thermo-mechanical analysis of a simple 2D plate
+    - Thermo-mechanical analysis of a 3D divertor monoblock model
+- Modules: `Calibrator` and `Optimiser`
+    - Based on Adel's thermocouple optimiser
+    - Optimiser wraps `pymoo`
+
+
 # TODO
 
-General
+**General**
 - Allow user to specify sideset to locate sensors
 - Need to allow user to specify noise as a percentage of the sensor value like a COV
 - Allow chaining/list of functions for sys/rand errors
 - Split systematic and random error handlers into own objects?
 
-Systematic error handling
+**MOOSE Models**
+- Rejig monoblock model:
+    - Rebuild mesh in Gmsh
+    - Simplify to single material properties instead of temp dependent
+    - Include a tensor mechanics version
+- Build KC4 STC as simple thermo-mechanical model
+    - Build parametric mesh in Gmsh
+    - Build simplified single material parameter models
+        - Pure thermal
+        - Thermo-mechanical
+
+**Systematic error handling**
 - Probably need to split into its own class
 - Add a sampling geometry to the sensors to allow systematic error calculation
 - Add positioning errors to the sensors
 - Add digitisation / voltage / calibration errors
 
-Random error handling
+**Random error handling**
 - Probably need to split into its own class
 
 # Notes: sensors
