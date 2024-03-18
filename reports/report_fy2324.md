@@ -50,7 +50,7 @@ It should be noted that the `mooseherder` package has a range of additional func
 
 |![fig_pycave_flowchart](images/pycave.drawio.svg)|
 |:--:|
-|*Figure: Overview of the current structure of `pycave` as applied to the modelling of thermocouples measuring a temperature field.*|
+|*Overview of the current structure of `pycave` as applied to the modelling of thermocouples measuring a temperature field.*|
 
 ## Prototype Demonstration: `pycave`
 
@@ -118,7 +118,7 @@ pv_plot.show()
 
 |![fig_2dplate_pyvista](images/plate_thermal_2d_sim_view.svg)|
 |:--:|
-|*Figure: Simple 2D thermal plate visualised with pyvista showing thermocouple location over the simulated temperature field for the last time step.*|
+|*Simple 2D thermal plate visualised with pyvista showing thermocouple location over the simulated temperature field for the last time step.*|
 
 The time traces for the simulated thermocouples can also be plotted for the total simulation duration using the `plot_time_traces()` function with an example time trace plot shown below. Note that the solid lines on the plot correspond to the truth and the dashed lines with crosses are the simulated sensor values.
 
@@ -129,18 +129,18 @@ plt.show()
 
 |![fig_2dplate_traces](images/plate_thermal_2d_traces.png)|
 |:--:|
-|*Figure: Simulated thermocouple traces for the 2D plate model with sensor locations shown in the previous figure. The simulated traces use dashed lines with crosses abd include systematic and random error models. The solid lines are the ground truth taken from the simulation.* |
+|*Simulated thermocouple traces for the 2D plate model with sensor locations shown in the previous figure. The simulated traces use dashed lines with crosses abd include systematic and random error models. The solid lines are the ground truth taken from the simulation.* |
 
 The same functionality is demonstrated for the 3D simulation of a monoblock divertor armour in the [second example](https://github.com/Applied-Materials-Technology/pycave/blob/main/examples/ex2_3d_thermcouples_monoblock.py) in the `pycave` repository. The 3D visualisation and thermocouple traces for the monoblock model are shown below.
 
 |![fig_3dmonoblock_pyvista](images/monoblock_thermal_sim_view.svg)|
 |:--:|
-|*Figure: Monoblock 3D thermal model visualised with pyvista showing thermocouple location over the simulated temperature field for the last time step.*|
+|*Monoblock 3D thermal model visualised with pyvista showing thermocouple location over the simulated temperature field for the last time step.*|
 
 
 |![fig_3dmonoblock_traces](images/monoblock_thermal_traces.png)|
 |:--:|
-|*Figure: Simulated thermocouple traces for the 3D monoblock model with sensor locations shown in the previous figure. The simulated traces use dashed lines with crosses and include the systematic and random error models. The solid lines are the ground truth taken from the simulation.* |
+|*Simulated thermocouple traces for the 3D monoblock model with sensor locations shown in the previous figure. The simulated traces use dashed lines with crosses and include the systematic and random error models. The solid lines are the ground truth taken from the simulation.* |
 
 
 # System & Software Specification: `pycave`
@@ -182,7 +182,7 @@ The `pycave` will leverage machine learning algorithms to solve regression, clas
 
 ## Deliverables for Financial Year 24-25
 
-Given that this is a research project with significant unknowns it is expected that the core deliverables will be dynamic and adjusted throughout the project. The scope of the deliverables will also be adjusted to take advantage of any synergies with other research projects throughout UKAEA such as digital shadow/twin work in the Advanced Engineering Simulation group or as part of Key Challenge 4 on digital qualification. An initial proposal for core deliverables in the next financial year is given below.
+The scope of the deliverables for this project will be adjusted to take advantage of any synergies with other research projects throughout UKAEA such as digital shadow/twin work in the Advanced Engineering Simulation group or as part of Key Challenge 4 on digital qualification. An initial proposal for core deliverables in the next financial year is given below.
 
 **Core Deliverables:**
 
@@ -200,17 +200,17 @@ Given that this is a research project with significant unknowns it is expected t
     - Developement of simplified camera sensor models for:
         - Infrared cameras measuring temperature fields
         - Digital image correlation measuring displacement field on a surface
-4. A toolbox for calculating validation metrics from sensor data (simulated or real)
-5. A software test suite for point sensor functionality after completion of the additional features.
-6. Documentation and worked examples using the following test cases:
+4. A toolbox for calculating validation metrics from sensor data (simulated or real).
+5. Software tests using `pytest` for point sensor functionality after completion of the additional features.
+6. Automated documentation generation and worked examples using the following test cases:
     - Thermo-mechanical analysis of a simple 2D plate
     - Thermo-mechanical analysis of a 3D divertor monoblock model
 
 **Extension Deliverables:**
-1. A v0.1 release of the `pycave` package on pypi allowing users to pip install the package into a virtual environment without cloning the git repository.
-2. A journal article in SoftwareX detailing the implementation of the first version of `pycave`.
-3. A journal article detailing the application of `pycave` to the simulations and experimental data generated as part of the Key Challenge 4 'simple test case'.
-4. An application of `pycave` to optimise placement of neutronics sensors for LIBRTI.
+- An application of `pycave` to optimise placement of neutronics sensors for LIBRTI. Set as extension as dependent on provision of a relevant neutronics simulation.
+- A toolbox for simulation parameter calibration using optimisers from the multi-objective optimisation library `pymoo`.
+- A journal article in SoftwareX detailing the implementation of the first version of `pycave`.
+- A journal article detailing the application of `pycave` to the simulations and experimental data generated as part of the Key Challenge 4 'simple test case'.
 
 
 
