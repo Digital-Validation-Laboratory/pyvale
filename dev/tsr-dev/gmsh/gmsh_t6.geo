@@ -61,6 +61,7 @@ Transfinite Surface{1} = {1, 2, 3, 4};
 // command:
 Recombine Surface{1};
 
+/*
 // When the surface has only 3 or 4 points on its boundary the list of corners
 // can be omitted in the `Transfinite Surface' constraint:
 Point(7) = {0.2, 0.2, 0, 1.0};
@@ -85,3 +86,4 @@ Transfinite Surface{15};
 // Finally we apply an elliptic smoother to the grid to have a more regular
 // mesh:
 Mesh.Smoothing = 100;
+*/

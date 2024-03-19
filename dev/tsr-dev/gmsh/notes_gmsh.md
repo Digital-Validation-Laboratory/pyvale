@@ -10,6 +10,9 @@ variables ‘newc’, ‘newcl, ‘news’, ‘newsl’ and ‘newv’ select ne
 
 ## Controlling Mesh Options
 
+**Create a quandrangular mesh from a triangular one**
+Recombine Surface{1};
+
 **Control min/max mesh size**
 Mesh.MeshSizeMin = 0.001;
 Mesh.MeshSizeMax = 0.3;
@@ -26,3 +29,15 @@ Mesh.HighOrderOptimize = 2;
 Hide {:}
 Recursive Show { Volume{129}; }
 Mesh.MeshOnlyVisible=1;
+
+## Controlling Mesh Size
+Need to use `Transfinite` functions.
+
+**Control number of nodes on a curve/surface**
+- Note: includes nodes at the end of the line.
+Transfinite Curve{*line numbers*} = *number of nodes*;
+
+Then use:
+
+Transfinite Surface{*surface numbers*} = {*corner points*}
+
