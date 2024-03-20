@@ -9,7 +9,8 @@ Geometry.SurfaceLabels = 1;
 Geometry.VolumeLabels = 1;
 
 // Variables
-elem_size = 0.5e-3;
+elem_size = 1e-3;
+tol = elem_size;
 plate_leng = 100e-3;
 plate_height = 100e-3;
 hole_rad = 50e-3/2;
@@ -29,12 +30,22 @@ s5 = news; Plane Surface(s5) = {cl2};
 
 BooleanDifference{ Surface{s1,s2,s3,s4}; Delete; }{ Surface{s5}; Delete; }
 
-Transfinite Curve{2,4,7,11} = 5;
-Transfinite Curve{1,5} = 5;
-Transfinite Curve{3} = 9;
 
-Transfinite Surface{s1} = {1,3,4,5};
-Recombine Surface{s1};
+l_size() = Curve In
+BoundingBox{-tol,-tol,-tol,tol,plate_height+tol,tol};
+Transfinite Curve{l_size()} = 10;
+
+l_size() = Curve In
+BoundingBox{hole_loc_x-hole_rad-tol,hole_loc_y-hole_rad-tol,-tol,
+            hole_loc_x+hole_rad+tol,hole_loc_y+hole_rad+tol,tol};
+Transfinite Curve{l_size()} = 21;
+
+//Transfinite Curve{2,4,7,11} = 5;
+//Transfinite Curve{1,5} = 5;
+//Transfinite Curve{3} = 9;
+
+//Transfinite Surface{s1} = {1,3,4,5};
+//Recombine Surface{s1};
 
 
 //Mesh.MeshSizeMin = elem_size;
@@ -45,3 +56,5 @@ Mesh.HighOrderOptimize = 2;
 Mesh 2;
 
 
+//+
+Show "*";

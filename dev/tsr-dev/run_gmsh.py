@@ -7,7 +7,7 @@ def main() -> None:
 
 
     base_dir = Path('dev/tsr-dev/gmsh')
-    gmsh_in = base_dir / 'gmsh_2d_plate.geo'
+    gmsh_in = base_dir / 'gmsh_3d_monoblock.geo'
     #gmsh_in = base_dir / 'gmsh_temp.geo'
     gmsh_runner.set_input_file(gmsh_in)
 

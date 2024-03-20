@@ -93,7 +93,7 @@ def main() -> None:
     # Set this to 'interactive' to get a matplotlib.pyplot with the sensor
     # traces plotted over time. Set to 'save_fig' to save an image of the plot
     # to file.
-    trace_plot_mode = 'save_fig'
+    trace_plot_mode = 'interactive'
 
     # Plots the sensor time traces using matplotlib, thin solid lines are ground
     # truth from the simulation and dashed lines with '+' are simulated sensor
