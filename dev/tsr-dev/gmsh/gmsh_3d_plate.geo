@@ -1,19 +1,21 @@
-// Gmsh 2D parametric plate mesh
+// Gmsh 3D parametric plate mesh with hole
 // author: scepticalrabbit
 SetFactory("OpenCASCADE");
+General.Terminal = 1;
 
 // View Options
 Geometry.PointLabels = 0;
-Geometry.CurveLabels = 1;
-Geometry.SurfaceLabels = 0;
+Geometry.CurveLabels = 0;
+Geometry.SurfaceLabels = 1;
 Geometry.VolumeLabels = 0;
 
 // Variables
 elem_size = 1e-3;
-tol = elem_size;
+tol = elem_size/4;
 
 plate_leng = 100e-3;
 plate_height = 100e-3;
+plate_thick = 10e-3;
 hole_rad = 50e-3/2;
 hole_loc_x = plate_leng/2;
 hole_loc_y = plate_height/2;
@@ -21,6 +23,7 @@ hole_loc_y = plate_height/2;
 hole_sect_nodes = 7;
 plate_rad_nodes = 7;
 plate_edge_nodes = Floor((hole_sect_nodes-1)/2)+1;
+plate_thick_divs = 3;
 
 // Geometry Definition
 s1 = news; Rectangle(s1) = {0.0,0.0,0.0,plate_leng/2,plate_height/2};
@@ -49,10 +52,15 @@ Recombine Surface{s3};
 Transfinite Surface{s4} = {3,9,10,1};
 Recombine Surface{s4};
 
+// Extrude the surface mesh to 3D
+Extrude{0.0,0.0,plate_thick}{
+    Surface{:}; Layers{plate_thick_divs}; Recombine;
+}
 
-//Mesh.MeshSizeMin = elem_size;
-//Mesh.MeshSizeMax = elem_size;
-
+// Meshing controls
 Mesh.ElementOrder = 2;
-Mesh.HighOrderOptimize = 2;
-Mesh 2;
+Mesh 3;
+
+
+
+
