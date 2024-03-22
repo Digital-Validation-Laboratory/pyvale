@@ -5,8 +5,6 @@
 SetFactory("OpenCASCADE");
 General.Terminal = 1;
 
-// Set to number of threads available
-
 
 // View Options
 Geometry.PointLabels = 0;
@@ -17,6 +15,7 @@ Geometry.Surfaces = 1;
 
 //------------------------------------------------------------------------------
 // Variables
+file_name = "mesh_3d_monoblock.msh";
 
 // Geometry variables
 pipe_rad_int = 6e-3;
@@ -306,6 +305,18 @@ Extrude{0.0,0.0,monoblock_depth}{
 }
 
 //------------------------------------------------------------------------------
+// Physical Volumes for Material Defs
+Physical Volume("pipe-cucrzr") = {6,9,5,14};
+Physical Volume("interlayer-cu") = {4,7,10,13};
+Physical Volume("armour-w") = {1,2,8,11,3,12};
+
+
+//------------------------------------------------------------------------------
+// Physical Surfaces for Loads and Boundary Condition
+Physical Surface("bc-top-heatflux") = {36,41};
+Physical Surface("bc-pipe-heattransf") = {54,59,83,67};
+
+//------------------------------------------------------------------------------
 // Global Mesh controls
 num_threads = 8;
 General.NumThreads = num_threads;
@@ -319,7 +330,12 @@ Mesh.Algorithm3D = 10;
 // Mesh.MeshSizeMin = elem_size;
 // Mesh.MeshSizeMax = elem_size;
 Mesh.ElementOrder = 2;
+
 Mesh 3;
 
-//Exit;
+//------------------------------------------------------------------------------
+// Save and exit
+Save Str(file_name);
+Exit;
+
 
