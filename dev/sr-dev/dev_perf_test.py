@@ -1,14 +1,14 @@
 '''
 ================================================================================
-pycave: 2d thermocouples
-
-authors: thescepticalrabbit
+pycave: the python computer aided validation engine.
+license: LGPL-2.1
+Copyright (C) 2024 Lloyd Fletcher (scepticalrabbit)
 ================================================================================
 '''
+
 import time
 from pprint import pprint
 from pathlib import Path
-from functools import partial
 
 import numpy as np
 import matplotlib.pyplot as plt

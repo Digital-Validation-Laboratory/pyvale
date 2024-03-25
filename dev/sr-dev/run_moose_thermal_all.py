@@ -1,10 +1,11 @@
 '''
--------------------------------------------------------------------------------
-pycave: dev_run_moose_thermal
-
-authors: thescepticalrabbit
--------------------------------------------------------------------------------
+================================================================================
+pycave: the python computer aided validation engine.
+license: LGPL-2.1
+Copyright (C) 2024 Lloyd Fletcher (scepticalrabbit)
+================================================================================
 '''
+
 import os
 from pathlib import Path
 from mooseherder.mooseconfig import MooseConfig

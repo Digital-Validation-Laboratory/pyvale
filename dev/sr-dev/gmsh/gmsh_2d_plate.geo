@@ -13,7 +13,7 @@ elem_size = 1e-3;
 tol = elem_size;
 
 plate_leng = 100e-3;
-plate_height = 100e-3;
+plate_height = plate_leng;
 hole_rad = 50e-3/2;
 hole_loc_x = plate_leng/2;
 hole_loc_y = plate_height/2;
