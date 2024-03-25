@@ -16,8 +16,8 @@ def main() -> None:
 
 
     base_dir = Path('dev/sr-dev/gmsh')
-    gmsh_in = base_dir / 'plate_2d_rectangle.geo'
-    #gmsh_in = base_dir / 'monoblock_3d_tutorial.geo'
+    #gmsh_in = base_dir / 'plate_2d_rectangle.geo'
+    gmsh_in = base_dir / 'monoblock_3d_tutorial.geo'
     gmsh_runner.set_input_file(gmsh_in)
 
     start_time = time.perf_counter()
