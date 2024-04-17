@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------
 # monoblock_transient_thermal.i
-# Author: Luke Humphrey, Lloyd Fletcher
+# Author: Luke Humphrey
 # (c) Copyright UKAEA 2024.
 #
 #-------------------------------------------------------------------------

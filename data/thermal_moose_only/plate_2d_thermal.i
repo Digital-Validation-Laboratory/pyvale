@@ -1,14 +1,9 @@
-#
-# Single block thermal input with time derivative and volumetric heat source terms
-# https://mooseframework.inl.gov/modules/heat_transfer/tutorials/introduction/therm_step03.html
-#
-
+#_*
 end_time = 30
 time_step = 0.5
-
 max_temp = 500
 init_temp = 20.0
-
+#**
 
 [Mesh]
     [generated]
