@@ -1,8 +1,9 @@
 '''
 ================================================================================
-pycave: the python computer aided validation engine.
-license: LGPL-2.1
-Copyright (C) 2024 Lloyd Fletcher (scepticalrabbit)
+pycave: the python computer aided validation engine
+
+License: LGPL-2.1
+Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 import time
@@ -22,8 +23,6 @@ def main() -> None:
 
     moose_runner.set_run_opts(n_tasks = 1, n_threads = 6, redirect_out = False)
 
-
-    #input_file = Path('data/plate_2d_thermal.i')
     input_file = Path('data/monoblock_3d_thermal.i')
 
     start_time = time.perf_counter()

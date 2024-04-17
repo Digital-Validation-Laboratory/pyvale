@@ -1,11 +1,11 @@
 '''
 ================================================================================
-pycave: the python computer aided validation engine.
-license: LGPL-2.1
-Copyright (C) 2024 Lloyd Fletcher (scepticalrabbit)
+pycave: the python computer aided validation engine
+
+License: LGPL-2.1
+Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
-
 from pathlib import Path
 import time
 import mooseherder as mh
@@ -14,9 +14,7 @@ def main() -> None:
     gmsh_path = Path().home() / 'moose-workdir/gmsh/bin/gmsh'
     gmsh_runner = mh.GmshRunner(gmsh_path)
 
-
-    base_dir = Path('dev/sr-dev/gmsh')
-    #gmsh_in = base_dir / 'plate_2d_rectangle.geo'
+    base_dir = Path('data/gmsh_meshes/')
     gmsh_in = base_dir / 'monoblock_3d.geo'
     gmsh_runner.set_input_file(gmsh_in)
 

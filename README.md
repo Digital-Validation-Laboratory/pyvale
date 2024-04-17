@@ -8,8 +8,8 @@ A python computer aided validation engine (pyCAVE). Used to simulate experimenta
 We recommend installing `pycave` in a virtual environment using `venv` or `pycave` can be installed into an existing environment of your choice. To create a specific virtual environment for `pycave` use:
 
 ```
-python3 -m venv herder-env
-source herder-env/bin/activate
+python3 -m venv pycave-env
+source pycave-env/bin/activate
 ```
 
 ### Standard Installation
@@ -36,7 +36,7 @@ pip install -e .
 The examples folder includes a sequence of examples using `pycave`.
 
 ## Contributors
-
+The Computer Aided Validation Team:
 - Lloyd Fletcher, UK Atomic Energy Authority
 - Adel Tayeb, UK Atomic Energy Authority
 - Michael Atkinson, UK Atomic Energy Authority
