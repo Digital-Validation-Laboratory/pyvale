@@ -23,7 +23,7 @@ def main() -> None:
 
     moose_runner.set_run_opts(n_tasks = 1, n_threads = 7, redirect_out = False)
 
-    input_file = Path('data/thermal_with_gmsh/monoblock_gmsh_thermal.i')
+    input_file = Path('data/thermal_with_gmsh/monoblock_gmsh_thermal_test.i')
 
     start_time = time.perf_counter()
     moose_runner.run(input_file)
