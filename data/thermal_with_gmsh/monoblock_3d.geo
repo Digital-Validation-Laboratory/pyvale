@@ -36,6 +36,7 @@ monoblock_side = 3e-3;
 monoblock_arm_height = 8e-3;
 
 // Specified Mesh variables
+base_divs = 1;
 mesh_ref = 1; //  Must be an integer greater than 0
 
 //_* MOOSEHERDER VARIABLES - END

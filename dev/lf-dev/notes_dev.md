@@ -1,4 +1,6 @@
 # Notes: pycave developement
+
+# TODO
 - Need an simulated experiment generator with mooseherder
     - Build monoblock models of increasing fidelity (thermal -> thermo-mech, single value mat props -> temp dependence)
     - Monte Carlo or Latin Hypercube sampling
@@ -9,10 +11,17 @@
     - Look at sensitivity maps? - how does this work with a geometric perturbation
     - Start with the purely thermal case with thermocouples
 
+# MOOSE sim naming convention
+- Need 2d vs 3d
+- monoblock vs plate (monob, plate)
+- Steady vs Transient (stead, trans)
+- therm vs mech vs therm-mech
+- mat props temp dependent vs not
+
 # Deliverables FY 24-25
 - Python coding pinciples.
     - Use git, vscode and pylint (PEP8)
-    - Use descriptive variable names, no single letter variables 
+    - Use descriptive variable names, no single letter variables
     - Avoid comments unless needed to explain something weird (like 1 vs 0 indexing) – the code and variable names should speak for themselves
     - Work in your own 'feature' branch, pull to 'dev' - don't push to main!
     - Type hint everything: e.g. 'def add_ints(a: int, b: int) -> int:'
