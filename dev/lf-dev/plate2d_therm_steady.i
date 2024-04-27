@@ -1,4 +1,11 @@
 #-------------------------------------------------------------------------
+# pycave: simple 2D plate thermal model
+#
+# License: LGPL-2.1
+# Copyright (C) 2024 The Computer Aided Validation Team
+#-------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
 end_time = 1
@@ -24,7 +31,6 @@ cuSpecHeat = 406.0  # J.kg^-1.K^-1
 
 #** MOOSEHERDER VARIABLES - END
 #-------------------------------------------------------------------------
-
 
 [Mesh]
     [generated]
