@@ -355,3 +355,87 @@ pv_plot = pv.Plotter()
 # Add whatever mesh you want
 pv_plot.save_graphic('save_image.svg')
 ```
+
+# Notes: pymoo
+
+## GA: Genetic Alogorithm
+
+```python
+class GA(GeneticAlgorithm):
+    def __init__(self,
+                 pop_size=100,
+                 sampling=FloatRandomSampling(),
+                 selection=TournamentSelection(func_comp=comp_by_cv_and_fitness),
+                 crossover=SBX(),
+                 mutation=PM(),
+                 survival=FitnessSurvival(),
+                 eliminate_duplicates=True,
+                 n_offsprings=None,
+                 output=SingleObjectiveOutput(),
+                 **kwargs):
+
+```
+
+## PSO: Particle Swarm Optimisation
+
+```python
+class PSO(Algorithm):
+    def __init__(self,
+                 pop_size=25,
+                 sampling=LHS(),
+                 w=0.9,
+                 c1=2.0,
+                 c2=2.0,
+                 adaptive=True,
+                 initial_velocity="random",
+                 max_velocity_rate=0.20,
+                 pertube_best=True,
+                 repair=NoRepair(),
+                 output=PSOFuzzyOutput(),
+                 **kwargs):
+```
+
+## Problem with constraints
+```python
+class SphereWithConstraint(Problem):
+    def __init__(self):
+        super().__init__(n_var=10, n_obj=1, n_ieq_constr=1, xl=0.0, xu=1.0)
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        out["F"] = np.sum((x - 0.5) ** 2, axis=1)
+        out["G"] = 0.1 - out["F"]
+```
+
+## Parallelisation:
+https://pymoo.org/problems/parallelization.html
+Example:
+```python
+from pymoo.core.problem import Problem
+
+pool = ThreadPool(8)
+
+class MyProblem(Problem):
+
+    def __init__(self, **kwargs):
+        super().__init__(n_var=10, n_obj=1, n_ieq_constr=0, xl=-5, xu=5, **kwargs)
+
+    def _evaluate(self, X, out, *args, **kwargs):
+
+        # define the function
+        def my_eval(x):
+            return (x ** 2).sum()
+
+        # prepare the parameters for the pool
+        params = [[X[k]] for k in range(len(X))]
+
+        # calculate the function values in a parallelized manner and wait until done
+        F = pool.starmap(my_eval, params)
+
+        # store the function values and return them.
+        out["F"] = np.array(F)
+
+problem = MyProblem()
+res = minimize(problem, GA(), termination=("n_gen", 200), seed=1)
+print('Threads:', res.exec_time)
+pool.close()
+```

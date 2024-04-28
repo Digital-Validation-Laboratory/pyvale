@@ -16,8 +16,8 @@ lengX = 100e-3  # m
 lengY = 50e-3   # m
 
 # Mesh Properties
-nElemX = 20
-nElemY = 10
+nElemX = 10
+nElemY = 5
 
 # Thermal Initial/Boundary Conditions
 coolantTemp = 20.0      # degC

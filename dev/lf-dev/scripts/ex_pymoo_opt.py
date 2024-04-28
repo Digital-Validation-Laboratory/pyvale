@@ -1,18 +1,14 @@
 # EXAMPLE: pymoo optimisation
 import numpy as np
 import matplotlib.pyplot as plt
-from pycave.plotprops import PlotProps
 
 from pymoo.core.problem import Problem
 from pymoo.algorithms.soo.nonconvex.pso import PSO
 from pymoo.algorithms.soo.nonconvex.ga import GA
-import pymoo.gradient.toolbox as anp
-from pymoo.termination import get_termination
 from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.optimize import minimize
 
-from pymoo.problems.single import Rastrigin, Ackley
-
+from pycave.plotprops import PlotProps
 import pycave.optimisers.checkfuncs as cf
 
 #-------------------------------------------------------------------------------
