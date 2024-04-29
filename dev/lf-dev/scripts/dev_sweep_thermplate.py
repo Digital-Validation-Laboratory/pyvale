@@ -7,6 +7,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 from pathlib import Path
+import numpy as np
 from mooseherder import (MooseHerd,
                          MooseRunner,
                          MooseConfig,
@@ -38,14 +39,19 @@ def main() -> None:
     dir_manager.clear_dirs()
     dir_manager.create_dirs()
 
-    n_elem_y = [10,20]
-    e_mod = [1e9,2e9]
-    p_rat = [0.3,0.35]
+    xv1 = np.linspace(xlim1[0],xlim1[1],n)
+    xv2 = np.linspace(xlim2[0],xlim2[1],n)
+    xv = (xv1,xv2)
+    (xm1,xm2) = np.meshgrid(*xv)
+
+    x1_str = ''
+    x2_str = ''
+    x1 = (10,20)
+    x2 = (1e9,2e9)
     moose_vars = list([])
-    for nn in n_elem_y:
-        for ee in e_mod:
-            for pp in p_rat:
-                moose_vars.append([{'n_elem_y':nn,'e_modulus':ee,'p_ratio':pp}])
+    for xx1 in x1:
+        for xx2 in x2:
+                moose_vars.append([{x1_str:xx1,x2_str:xx2}])
 
     print(moose_modifier.get_vars())
 
