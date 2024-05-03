@@ -1,8 +1,10 @@
 '''
 ================================================================================
-pycave: 2d thermocouples
+example: thermocouples on a 2d plate
 
-authors: thescepticalrabbit
+pycave: the python computer aided validation engine.
+License: MIT
+Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 from pprint import pprint
