@@ -5,6 +5,8 @@ Lloyd Fletcher, Adel Tayeb, Michael Atkinson, Alex Marsh.<br>
 Applied Materials Technology Group, Fusion Technology Division,<br>
 United Kingdom Atomic Energy Authority (UKAEA).
 
+NOTE: due to a conflict on the pypi repository `pycave` has been renamed to `pyvale` as of May 2024s
+
 ## Introduction for Financial Year 2023-2024
 
 ### Motivation & Impact

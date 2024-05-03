@@ -8,8 +8,8 @@ from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.optimize import minimize
 
-from pycave.plotprops import PlotProps
-import pycave.optimisers.checkfuncs as cf
+from pyvale.plotprops import PlotProps
+import pyvale.optimisers.checkfuncs as cf
 
 #-------------------------------------------------------------------------------
 def cost_func(x):

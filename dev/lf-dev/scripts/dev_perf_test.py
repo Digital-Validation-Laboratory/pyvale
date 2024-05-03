@@ -15,7 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import mooseherder as mh
-import pycave
+import pyvale
 
 
 N_SENS = (2**4,2**5,2**6,2**8,2**10)
@@ -30,7 +30,7 @@ def main() -> None:
 
     spat_dims = 2       # Specify that we only have 2 spatial dimensions
     field_name = 'temperature'    # Same as in the moose input and SimData node_var key
-    t_field = pycave.Field(sim_data,field_name,spat_dims)
+    t_field = pyvale.Field(sim_data,field_name,spat_dims)
 
     x_lims = (0.0,2.0)  # Limits for each coord in sim length units
     y_lims = (0.0,1.0)
@@ -46,13 +46,13 @@ def main() -> None:
                     start_time = time.perf_counter()
 
                     n_sens = (ss,ss,1)    # Number of sensor (x,y,z)
-                    sens_pos = pycave.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
+                    sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
                     sample_times = np.arange(t_field.get_time_steps()[0],
                                             t_field.get_time_steps()[1],
                                             nn)
 
-                    tc_array = pycave.ThermocoupleArray(sens_pos,t_field,sample_times)
+                    tc_array = pyvale.ThermocoupleArray(sens_pos,t_field,sample_times)
 
                     tc_array.set_uniform_systematic_err_func(low=-10.0,high=10.0)
                     tc_array.set_normal_random_err_func(std_dev=5.0)
