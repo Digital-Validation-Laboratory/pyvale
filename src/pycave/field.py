@@ -1,7 +1,7 @@
 '''
 ================================================================================
 pycave: the python computer aided validation engine.
-License: LGPL-2.1
+License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
@@ -10,7 +10,6 @@ import pyvista as pv
 from pyvista import CellType
 
 import mooseherder as mh
-
 
 class Field:
     def __init__(self, sim_data: mh.SimData, name: str, dim: int = 3) -> None:

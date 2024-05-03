@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pycave"
+name = "pyvale"
 version = "0.0.1"
-description = "A python computer aided validation engine (pycave)"
+description = "A python validation engine (pyvale)"
 authors = [
   { name = "thescepticalrabbit", email = "thescepticalrabbit@gmail.com" },
 ]
