@@ -1,0 +1,37 @@
+
+simulation_cases:
+  - name: simple
+    geometry: 2D_1mat
+    physics: thermal
+    BC: thermal
+    material:
+      - material_model: 
+          thermal: temp_indep
+    time_dependence: steady
+
+  - name: simple
+    geometry: 2D_2mat
+    physics: thermal
+    BC: thermal
+    material:
+      - material_model: 
+          thermal: temp_indep
+      - material_model: 
+          thermal: temp_indep
+    time_dependence: steady
+
+  - name: complex
+    geometry: 3D
+    physics: thermal_mech
+    BC: thermal_mech
+    material:
+      - material_model: 
+          thermal: temp_dep
+          mech: elastic
+      - material_model: 
+          thermal: temp_indep
+          mech: plastic
+      - material_model: 
+          thermal: temp_dep
+          mech: plastic
+    time_dependence: transient
