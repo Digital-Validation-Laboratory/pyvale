@@ -1,6 +1,6 @@
 '''
 ================================================================================
-pycave: the python computer aided validation engine.
+pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
@@ -13,8 +13,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyvista as pv
 
-from pycave.field import Field
-from pycave.plotprops import PlotProps
+from pyvale.field import Field
+from pyvale.plotprops import PlotProps
 
 @dataclass
 class MeasurementData():

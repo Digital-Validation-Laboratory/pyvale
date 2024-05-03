@@ -2,7 +2,7 @@
 ================================================================================
 Example: 3d thermocouples on a monoblock
 
-pycave: the python computer aided validation engine.
+pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import mooseherder as mh
-import pycave
+import pyvale
 
 
 def main() -> None:
@@ -29,7 +29,7 @@ def main() -> None:
     # data field of interest quickly by using the mesh and shape functions
     spat_dims = 3       # Specify that we only have 2 spatial dimensions
     field_name = 'temperature'    # Same as in the moose input and SimData node_var key
-    t_field = pycave.Field(sim_data,field_name,spat_dims)
+    t_field = pyvale.Field(sim_data,field_name,spat_dims)
 
     # This creates a grid of 3x2 sensors in the xy plane
     n_sens = (1,4,1)    # Number of sensor (x,y,z)
@@ -38,11 +38,11 @@ def main() -> None:
     z_lims = (0.0,12.0)
     # Gives a n_sensx3 array of sensor positions where each row is a sensor with
     # coords (x,y,z) - can also just manually create this array
-    sens_pos = pycave.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
+    sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
     # Now we create a thermocouple array with with the sensor positions and the
     # temperature field from the simulation
-    tc_array = pycave.ThermocoupleArray(sens_pos,t_field)
+    tc_array = pyvale.ThermocoupleArray(sens_pos,t_field)
 
     # Setup the UQ functions for the sensors. Here we use the basic defaults
     # which is a uniform distribution for the systematic error which is sampled
@@ -61,7 +61,7 @@ def main() -> None:
     pv_sim = t_field.get_visualiser()
     pprint(pv_sim)
 
-    pv_plot = pycave.plot_sensors(pv_sim,pv_sens,field_name)
+    pv_plot = pyvale.plot_sensors(pv_sim,pv_sens,field_name)
     # We label the temperature scale bar ourselves and can
     pv_plot.add_scalar_bar('Temp., T [degC]',vertical=True)
 

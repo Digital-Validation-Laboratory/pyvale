@@ -1,6 +1,6 @@
 '''
 ================================================================================
-pycave: the python computer aided validation engine.
+pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================

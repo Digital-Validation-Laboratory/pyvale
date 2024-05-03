@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from pycave import PlotProps
+from pyvale import PlotProps
 
 t = np.linspace(0.01,10,100)
 #f =  10*(1 - 2**-t)

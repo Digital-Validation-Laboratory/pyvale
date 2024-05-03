@@ -1,16 +1,16 @@
 '''
 ================================================================================
-pycave: the python computer aided validation engine.
+pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 
-from pycave.pycave import *
-from pycave.sensorarray import *
-from pycave.field import *
-from pycave.plotprops import PlotProps
+from pyvale.pycave import *
+from pyvale.sensorarray import *
+from pyvale.field import *
+from pyvale.plotprops import PlotProps
 
-from pycave.sensorlibrary.thermocouplearray import *
+from pyvale.sensorlibrary.thermocouplearray import *
 
 __all__ = ["pycave"]

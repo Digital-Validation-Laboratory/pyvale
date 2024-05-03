@@ -1,6 +1,6 @@
 '''
 ================================================================================
-pycave: the python computer aided validation engine.
+pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
@@ -12,9 +12,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyvista as pv
 
-from pycave.field import Field
-from pycave.sensorarray import SensorArray, MeasurementData
-from pycave.plotprops import PlotProps
+from pyvale.field import Field
+from pyvale.sensorarray import SensorArray, MeasurementData
+from pyvale.plotprops import PlotProps
 
 
 class ThermocoupleArray(SensorArray):
