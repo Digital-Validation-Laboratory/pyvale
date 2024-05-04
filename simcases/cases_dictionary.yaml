@@ -1,37 +1,42 @@
 
 simulation_cases:
-  - name: simple
+  - name: case01.i
     geometry: 2D_1mat
     physics: thermal
-    BC: thermal
+    BC: htc_heatflux
     material:
-      - material_model: 
+      - material_model:
           thermal: temp_indep
     time_dependence: steady
 
-  - name: simple
+  - name: case02.i
+    geometry: 2D_1mat
+    physics: mechanical
+    BC: disp_disp
+    material:
+      - material_model:
+          mechanical: temp_indep
+      - material_model:
+          mechanical: temp_indep
+    time_dependence: steady
+
+# TODO: complete cases below
+  - name: case03.i
     geometry: 2D_2mat
     physics: thermal
-    BC: thermal
+    BC: htc_heatflux
     material:
-      - material_model: 
-          thermal: temp_indep
-      - material_model: 
+      - material_model:
           thermal: temp_indep
     time_dependence: steady
 
-  - name: complex
-    geometry: 3D
-    physics: thermal_mech
-    BC: thermal_mech
+  - name: case04.i
+    geometry: 2D_2mat
+    physics: mechanical
+    BC: disp_disp
     material:
-      - material_model: 
-          thermal: temp_dep
-          mech: elastic
-      - material_model: 
-          thermal: temp_indep
-          mech: plastic
-      - material_model: 
-          thermal: temp_dep
-          mech: plastic
-    time_dependence: transient
+      - material_model:
+          mechanical: temp_indep
+      - material_model:
+          mechanical: temp_indep
+    time_dependence: steady

@@ -9,10 +9,12 @@ Copyright (C) 2024 The Computer Aided Validation Team
 import time
 from pathlib import Path
 from mooseherder import (MooseConfig,
-                        MooseRunner)
+                         MooseRunner)
 
-CASE_FILES = ('','case01.i')
-CASE_DIR = Path('simcases/case01/')
+CASE_STR = 'case02'
+CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')
+CASE_DIR = Path('simcases/'+CASE_STR+'/')
+
 USER_DIR = Path.home()
 
 def main() -> None:
@@ -24,7 +26,7 @@ def main() -> None:
     moose_runner = MooseRunner(moose_config)
 
     moose_runner.set_run_opts(n_tasks = 1,
-                              n_threads = 4,
+                              n_threads = 7,
                               redirect_out = False)
 
     input_file = CASE_DIR / CASE_FILES[1]
@@ -36,7 +38,7 @@ def main() -> None:
 
     print()
     print("="*80)
-    print(f'MOOSE run time = {moose_run_time:.3f} seconds')
+    print(f'Run time = {moose_run_time:.3f} seconds')
     print("="*80)
     print()
 
