@@ -21,7 +21,7 @@ coolantTemp = 20.0      # degC
 heatTransCoeff = 125.0e3 # W.m^-2.K^-1
 surfHeatFlux = 500.0e3    # W.m^-2
 
-# Pure Copper ITER SDC-IC pg.134 at 250degC
+# Pure (OFHC) Copper at 250degC
 cuDensity = 8829.0  # kg.m^-3
 cuThermCond = 384.0 # W.m^-1.K^-1
 cuSpecHeat = 406.0  # J.kg^-1.K^-1
