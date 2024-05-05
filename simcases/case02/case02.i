@@ -23,8 +23,8 @@ topDisp = 0.1e-3  # m
 # tensLoad = 10e6 # Pa
 
 # Material Properties: OFHC Copper 250degC
-eModulus= 108e9   # Pa
-pRatio = 0.33     # -
+cuEMod= 108e9   # Pa
+cuPRatio = 0.33     # -
 
 #** MOOSEHERDER VARIABLES - END
 #-------------------------------------------------------------------------
@@ -48,7 +48,9 @@ pRatio = 0.33     # -
 
 [Modules/TensorMechanics/Master]
     [all]
-        add_variables = true
+        add_variables =
+        material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
+        material_output_order = FIRST       # CONSTANT, FIRST, SECOND,
         generate_output = 'vonmises_stress stress_xx stress_yy stress_xy strain_xx strain_yy strain_xy'
     []
 []
@@ -89,8 +91,8 @@ pRatio = 0.33     # -
 [Materials]
     [elasticity]
         type = ComputeIsotropicElasticityTensor
-        youngs_modulus = ${eModulus}
-        poissons_ratio = ${pRatio}
+        youngs_modulus = ${cuEMod}
+        poissons_ratio = ${cuPRatio}
     []
     [stress]
         type = ComputeLinearElasticStress
@@ -106,8 +108,9 @@ pRatio = 0.33     # -
 
 [Executioner]
     type = Transient
-    petsc_options_iname = '-pc_type'
-    petsc_options_value = 'lu'
+    solve_type = 'PJFNK'
+    petsc_options_iname = '-pc_type -pc_hypre_type'
+    petsc_options_value = 'hypre boomeramg'
     end_time= ${endTime}
     dt = ${timeStep}
 []

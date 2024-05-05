@@ -1,95 +1,139 @@
-#
-# Added subdomains and subdomain-specific properties
-# https://mooseframework.inl.gov/modules/tensor_mechanics/tutorials/introduction/step03.html
-#
+#-------------------------------------------------------------------------
+# pyvale: simple,2Dplate,2mat,thermal,steady,
+#-------------------------------------------------------------------------
 
-[GlobalParams]
-  displacements = 'disp_x disp_y'
-[]
+#-------------------------------------------------------------------------
+#_* MOOSEHERDER VARIABLES - START
+
+endTime = 1
+timeStep = 1
+
+# Geometric Properties
+lengX = 100e-3  # m
+lengY = 50e-3   # m
+
+# Mesh Properties
+nElemX = 20
+nElemY = 10
+eType = QUAD4 # QUAD4 for 1st order, QUAD8 for 2nd order
+
+# Thermal Loads/BCs
+coolantTemp = 20.0      # degC
+heatTransCoeff = 125.0e3 # W.m^-2.K^-1
+surfHeatFlux = 500.0e3    # W.m^-2
+
+# Material Properties:
+# Pure (OFHC) Copper at 250degC
+cuDensity = 8829.0  # kg.m^-3
+cuThermCond = 384.0 # W.m^-1.K^-1
+cuSpecHeat = 406.0  # J.kg^-1.K^-1
+
+# Tungsten at 600degC
+wDensity = 19150.0  # kg.m^-3
+wThermCond = 127.0 # W.m^-1.K^-1
+wSpecHeat = 147.0  # J.kg^-1.K^-1
+
+#** MOOSEHERDER VARIABLES - END
+#-------------------------------------------------------------------------
 
 [Mesh]
   [generated]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 40
-    ny = 20
-    xmax = 2
-    ymax = 1
-    elem_type = QUAD8
+    nx = ${nElemX}
+    ny = ${nElemY}
+    xmax = ${lengX}
+    ymax = ${lengY}
+    elem_type = ${eType}
   []
 
-  # assign two subdomains
   [block1]
     type = SubdomainBoundingBoxGenerator
     input = generated
     block_id = 1
     bottom_left = '0 0 0'
-    top_right = '1 1 0'
+    top_right = '${fparse lengX/2} ${fparse lengY} 0'
   []
   [block2]
     type = SubdomainBoundingBoxGenerator
     input = block1
     block_id = 2
-    bottom_left = '1 0 0'
-    top_right = '2 1 0'
+    bottom_left = '${fparse lengX/2} 0 0'
+    top_right = '${fparse lengX} ${fparse lengY} 0'
   []
 []
 
-[Modules/TensorMechanics/Master]
-  [all]
-    add_variables = true
-    material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
-    material_output_order = FIRST       # CONSTANT, FIRST, SECOND, 
-    generate_output = 'vonmises_stress strain_xx strain_yy strain_zz'
+[Variables]
+  [temperature]
+      initial_condition = ${coolantTemp}
+  []
+[]
+
+[Kernels]
+  [heat_conduction]
+      type = HeatConduction
+      variable = temperature
+  []
+  #[time_derivative]
+  #    type = HeatConductionTimeDerivative
+  #    variable = temperature
+  #[]
+[]
+
+[Materials]
+  [copper_thermal]
+    type = HeatConductionMaterial
+    thermal_conductivity = ${cuThermCond}
+    specific_heat = ${cuSpecHeat}
+    block = 1
+  []
+  [copper_density]
+      type = GenericConstantMaterial
+      prop_names = 'density'
+      prop_values = ${cuDensity}
+      block = 1
+  []
+  [tungsten_thermal]
+    type = HeatConductionMaterial
+    thermal_conductivity = ${wThermCond}
+    specific_heat = ${wSpecHeat}
+    block = 2
+  []
+  [tungsten_density]
+    type = GenericConstantMaterial
+    prop_names = 'density'
+    prop_values = ${wDensity}
+    block = 2
   []
 []
 
 [BCs]
-  [bottom_x]
-    type = DirichletBC
-    variable = disp_x
-    boundary = bottom
-    value = 0
+  [heat_flux_out]
+      type = ConvectiveHeatFluxBC
+      variable = temperature
+      boundary = 'left'
+      T_infinity = ${coolantTemp}
+      heat_transfer_coefficient = ${heatTransCoeff}
   []
-  [bottom_y]
-    type = DirichletBC
-    variable = disp_y
-    boundary = bottom
-    value = 0
-  []
-  [Pressure]
-    [top]
-      boundary = top
-      function = 1e7*t
-    []
-  []
-[]
-
-[Materials]
-  [elasticity1]
-    type = ComputeIsotropicElasticityTensor
-    youngs_modulus = 1e9
-    poissons_ratio = 0.3
-    block = 1
-  []
-  [elasticity2]
-    type = ComputeIsotropicElasticityTensor
-    youngs_modulus = 5e8
-    poissons_ratio = 0.3
-    block = 2
-  []
-  [stress]
-    type = ComputeLinearElasticStress
+  [heat_flux_in]
+      type = NeumannBC
+      variable = temperature
+      boundary = 'right'
+      value = ${surfHeatFlux}
   []
 []
 
 [Executioner]
   type = Transient
-  solve_type = 'PJFNK'
-  petsc_options_iname = '-pc_type -pc_hypre_type'
-  petsc_options_value = 'hypre boomeramg'
-  end_time = 5
-  dt = 1
+  end_time= ${endTime}
+  dt = ${timeStep}
+[]
+
+[Postprocessors]
+  [max_temp]
+      type = ElementExtremeValue
+      variable = temperature
+  []
 []
 
 [Outputs]

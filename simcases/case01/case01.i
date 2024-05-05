@@ -1,12 +1,12 @@
 #-------------------------------------------------------------------------
-# pyvale: simple 2D plate thermal model
+# pyvale: simple,2Dplate,1mat,thermal,steady,
 #-------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
-end_time = 1
-time_step = 1
+endTime= 1
+timeStep = 1
 
 # Geometric Properties
 lengX = 100e-3  # m
@@ -16,12 +16,12 @@ lengY = 50e-3   # m
 nElemX = 10
 nElemY = 5
 
-# Thermal Initial/Boundary Conditions
+# Thermal Loads/BCs
 coolantTemp = 20.0      # degC
 heatTransCoeff = 125.0e3 # W.m^-2.K^-1
 surfHeatFlux = 500.0e3    # W.m^-2
 
-# Pure (OFHC) Copper at 250degC
+# Material Properties: Pure (OFHC) Copper at 250degC
 cuDensity = 8829.0  # kg.m^-3
 cuThermCond = 384.0 # W.m^-1.K^-1
 cuSpecHeat = 406.0  # J.kg^-1.K^-1
@@ -37,6 +37,7 @@ cuSpecHeat = 406.0  # J.kg^-1.K^-1
         ny = ${nElemY}
         xmax = ${lengX}
         ymax = ${lengY}
+        elem_type = ${eType}
     []
 []
 
@@ -88,8 +89,8 @@ cuSpecHeat = 406.0  # J.kg^-1.K^-1
 
 [Executioner]
     type = Transient
-    end_time = ${end_time}
-    dt = ${time_step}
+    end_time= ${end_time}
+    dt = ${timeStep}
 []
 
 [Postprocessors]

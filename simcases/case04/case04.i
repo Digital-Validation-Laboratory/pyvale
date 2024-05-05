@@ -1,7 +1,38 @@
-#
-# Added subdomains and subdomain-specific properties
-# https://mooseframework.inl.gov/modules/tensor_mechanics/tutorials/introduction/step03.html
-#
+#-------------------------------------------------------------------------
+# pyvale: simple,2Dplate,2mat,thermal,steady,
+#-------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------
+#_* MOOSEHERDER VARIABLES - START
+
+endTime = 1
+timeStep = 1
+
+# Geometric Properties
+lengX = 50e-3  # m
+lengY = 100e-3   # m
+
+# Mesh Properties
+nElemX = 10
+nElemY = 20
+eType = QUAD8 # QUAD4 for 1st order, QUAD8 for 2nd order
+
+# Mechanical Loads/BCs
+topDisp = 0.1e-3  # m
+# tensLoad = 10e6 # Pa
+
+# Material Properties:
+# OFHC Copper 250degC
+cuEMod= 108e9    # Pa
+cuPRatio = 0.33  # -
+
+# Tungsten at 600degC
+wEMod = 387e9   # Pa
+wPRatio = 0.29  # -
+
+#** MOOSEHERDER VARIABLES - END
+#-------------------------------------------------------------------------
+
 
 [GlobalParams]
   displacements = 'disp_x disp_y'
@@ -11,27 +42,26 @@
   [generated]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 40
-    ny = 20
-    xmax = 2
-    ymax = 1
-    elem_type = QUAD8
+    nx = ${nElemX}
+    ny = ${nElemY}
+    xmax = ${lengX}
+    ymax = ${lengY}
+    elem_type = ${eType}
   []
 
-  # assign two subdomains
   [block1]
     type = SubdomainBoundingBoxGenerator
     input = generated
     block_id = 1
     bottom_left = '0 0 0'
-    top_right = '1 1 0'
+    top_right = '${fparse lengX} ${fparse lengY/2} 0'
   []
   [block2]
     type = SubdomainBoundingBoxGenerator
     input = block1
     block_id = 2
-    bottom_left = '1 0 0'
-    top_right = '2 1 0'
+    bottom_left = '0 ${fparse lengY/2} 0'
+    top_right = '${fparse lengX} ${fparse lengY} 0'
   []
 []
 
@@ -39,43 +69,22 @@
   [all]
     add_variables = true
     material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
-    material_output_order = FIRST       # CONSTANT, FIRST, SECOND, 
-    generate_output = 'vonmises_stress strain_xx strain_yy strain_zz'
-  []
-[]
-
-[BCs]
-  [bottom_x]
-    type = DirichletBC
-    variable = disp_x
-    boundary = bottom
-    value = 0
-  []
-  [bottom_y]
-    type = DirichletBC
-    variable = disp_y
-    boundary = bottom
-    value = 0
-  []
-  [Pressure]
-    [top]
-      boundary = top
-      function = 1e7*t
-    []
+    material_output_order = FIRST       # CONSTANT, FIRST, SECOND,
+    generate_output = 'vonmises_stress stress_xx stress_yy stress_xy strain_xx strain_yy strain_xy'
   []
 []
 
 [Materials]
   [elasticity1]
     type = ComputeIsotropicElasticityTensor
-    youngs_modulus = 1e9
-    poissons_ratio = 0.3
+    youngs_modulus = ${cuEMod}
+    poissons_ratio = ${cuPRatio}
     block = 1
   []
   [elasticity2]
     type = ComputeIsotropicElasticityTensor
-    youngs_modulus = 5e8
-    poissons_ratio = 0.3
+    youngs_modulus = ${wEMod}
+    poissons_ratio = ${wPRatio}
     block = 2
   []
   [stress]
@@ -83,13 +92,73 @@
   []
 []
 
+[BCs]
+  [bottom_x]
+      type = DirichletBC
+      variable = disp_x
+      boundary = 'bottom'
+      value = 0
+  []
+  [bottom_y]
+      type = DirichletBC
+      variable = disp_y
+      boundary = 'bottom'
+      value = 0
+  []
+  [top_x]
+      type = DirichletBC
+      variable = disp_x
+      boundary = 'top'
+      value = 0
+  []
+  [top_y]
+      type = DirichletBC
+      variable = disp_y
+      boundary = 'top'
+      value = ${topDisp}
+  []
+  #[Pressure]
+  #    [top]
+  #        boundary = 'top'
+  #        function = '${fparse -1*tensLoad}'
+  #    []
+  #[]
+[]
+
 [Executioner]
   type = Transient
   solve_type = 'PJFNK'
   petsc_options_iname = '-pc_type -pc_hypre_type'
   petsc_options_value = 'hypre boomeramg'
-  end_time = 5
-  dt = 1
+  end_time= ${endTime}
+  dt = ${timeStep}
+[]
+
+[Postprocessors]
+  [react_y_bot]
+      type = SidesetReaction
+      direction = '0 1 0'
+      stress_tensor = stress
+      boundary = 'bottom'
+  []
+  [react_y_top]
+      type = SidesetReaction
+      direction = '0 1 0'
+      stress_tensor = stress
+      boundary = 'top'
+  []
+  [max_y_disp]
+      type = NodalExtremeValue
+      variable = disp_y
+  []
+  [max_yy_stress]
+      type = ElementExtremeValue
+      variable = stress_yy
+  []
+  [avg_yy_stress]
+      type = ElementAverageValue
+      variable = stress_yy
+  []
 []
 
 [Outputs]

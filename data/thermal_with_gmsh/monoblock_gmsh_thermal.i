@@ -11,17 +11,17 @@ coolantTemp=100.0      # degC
 heatTransCoeff=125.0e3 # W.m^-2.K^-1
 surfHeatFlux=10.0e6    # W.m^-2
 
-# Copper-Chromium-Zirconium ITER SDC-IC pg.148 at 200degC
+# Copper-Chromium-Zirconium pg.148 at 200degC
 cucrzrDensity = 8816.0  # kg.m^-3
 cucrzrThermCond = 343.0 # W.m^-1.K^-1
 cucrzrSpecHeat = 407.0  # J.kg^-1.K^-1
 
-# Pure Copper ITER SDC-IC pg.134 at 250degC
+# Pure Copper pg.134 at 250degC
 cuDensity = 8829.0  # kg.m^-3
 cuThermCond = 384.0 # W.m^-1.K^-1
 cuSpecHeat = 406.0  # J.kg^-1.K^-1
 
-# Tungsten ITER SDC-IC pg.224 at 600degC
+# Tungsten pg.224 at 600degC
 wDensity = 19150.0  # kg.m^-3
 wThermCond = 127.0 # W.m^-1.K^-1
 wSpecHeat = 147.0  # J.kg^-1.K^-1

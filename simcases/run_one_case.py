@@ -11,7 +11,7 @@ from pathlib import Path
 from mooseherder import (MooseConfig,
                          MooseRunner)
 
-CASE_STR = 'case02'
+CASE_STR = 'case03'
 CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')
 CASE_DIR = Path('simcases/'+CASE_STR+'/')
 
