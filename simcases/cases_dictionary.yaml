@@ -40,3 +40,17 @@ simulation_cases:
       - material_model:
           mechanical: temp_indep
     time_dependence: steady
+
+  - name: case05.i
+    geometry: 2D_1mat
+    physics: thermo_mechanical
+    BC: htc_heatflux_disp
+    material:
+      - material_model:
+          thermal: temp_indep
+          mechanical: temp_indep
+      - material_model:
+          thermal: temp_indep
+          mechanical: temp_indep
+    time_dependence: steady
+

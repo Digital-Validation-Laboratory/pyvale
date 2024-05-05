@@ -29,7 +29,6 @@ cuPRatio = 0.33     # -
 #** MOOSEHERDER VARIABLES - END
 #-------------------------------------------------------------------------
 
-
 [GlobalParams]
     displacements = 'disp_x disp_y'
 []
@@ -48,7 +47,7 @@ cuPRatio = 0.33     # -
 
 [Modules/TensorMechanics/Master]
     [all]
-        add_variables =
+        add_variables = true
         material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
         material_output_order = FIRST       # CONSTANT, FIRST, SECOND,
         generate_output = 'vonmises_stress stress_xx stress_yy stress_xy strain_xx strain_yy strain_xy'
@@ -62,17 +61,10 @@ cuPRatio = 0.33     # -
         boundary = 'bottom'
         value = 0
     []
-    [bottom_y]
-        type = DirichletBC
-        variable = disp_y
-        boundary = 'bottom'
-        value = 0
-    []
-    [top_x]
-        type = DirichletBC
-        variable = disp_x
-        boundary = 'top'
-        value = 0
+    [bottom_y]  [max_stress]
+        type = ElementExtremeValue
+        variable = vonmises_stress
+      []
     []
     [top_y]
         type = DirichletBC
@@ -140,6 +132,10 @@ cuPRatio = 0.33     # -
     [avg_yy_stress]
         type = ElementAverageValue
         variable = stress_yy
+    []
+    [max_vm_stress]
+        type = ElementExtremeValue
+        variable = vonmises_stress
     []
 []
 

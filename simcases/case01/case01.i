@@ -15,6 +15,7 @@ lengY = 50e-3   # m
 # Mesh Properties
 nElemX = 10
 nElemY = 5
+eType = QUAD4 # QUAD4 for 1st order, QUAD8 for 2nd order
 
 # Thermal Loads/BCs
 coolantTemp = 20.0      # degC
@@ -89,17 +90,20 @@ cuSpecHeat = 406.0  # J.kg^-1.K^-1
 
 [Executioner]
     type = Transient
-    end_time= ${end_time}
+    end_time= ${endTime}
     dt = ${timeStep}
 []
 
 [Postprocessors]
     [max_temp]
-      type = ElementExtremeValue
-      variable = temperature
+        type = NodalExtremeValue
+        variable = temperature
     []
-  []
-
+    [avg_temp]
+        type = AverageNodalVariableValue
+        variable = temperature
+    []
+[]
 
 [Outputs]
     exodus = true

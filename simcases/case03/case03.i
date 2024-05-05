@@ -65,14 +65,14 @@ wSpecHeat = 147.0  # J.kg^-1.K^-1
 
 [Variables]
   [temperature]
-      initial_condition = ${coolantTemp}
+    initial_condition = ${coolantTemp}
   []
 []
 
 [Kernels]
   [heat_conduction]
-      type = HeatConduction
-      variable = temperature
+    type = HeatConduction
+    variable = temperature
   []
   #[time_derivative]
   #    type = HeatConductionTimeDerivative
@@ -88,10 +88,10 @@ wSpecHeat = 147.0  # J.kg^-1.K^-1
     block = 1
   []
   [copper_density]
-      type = GenericConstantMaterial
-      prop_names = 'density'
-      prop_values = ${cuDensity}
-      block = 1
+    type = GenericConstantMaterial
+    prop_names = 'density'
+    prop_values = ${cuDensity}
+    block = 1
   []
   [tungsten_thermal]
     type = HeatConductionMaterial
@@ -131,7 +131,11 @@ wSpecHeat = 147.0  # J.kg^-1.K^-1
 
 [Postprocessors]
   [max_temp]
-      type = ElementExtremeValue
+      type = NodalExtremeValue
+      variable = temperature
+  []
+  [avg_temp]
+      type = AverageNodalVariableValue
       variable = temperature
   []
 []
