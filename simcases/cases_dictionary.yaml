@@ -65,3 +65,30 @@ simulation_cases:
           thermal: temp_indep
           mechanical: temp_indep
     time_dependence: steady
+
+# TODO: complete description of cases below
+  - name: case07.i
+    geometry: 2D_2mat
+    physics: thermo_mechanical
+    BC: uniformtemp_disp
+    material:
+      - material_model:
+          thermal: temp_indep
+          mechanical: temp_indep
+      - material_model:
+          thermal: temp_indep
+          mechanical: temp_indep
+    time_dependence: steady
+
+  - name: case08.i
+    geometry: 2D_2mat
+    physics: thermo_mechanical
+    BC: uniformtemp_disp
+    material:
+      - material_model:
+          thermal: temp_indep
+          mechanical: temp_indep
+      - material_model:
+          thermal: temp_indep
+          mechanical: temp_indep
+    time_dependence: steady

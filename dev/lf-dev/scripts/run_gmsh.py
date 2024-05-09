@@ -1,0 +1,42 @@
+'''
+================================================================================
+pyvale: the python computer aided validation engine
+
+License: MIT
+Copyright (C) 2024 The Computer Aided Validation Team
+================================================================================
+'''
+import time
+from pathlib import Path
+from mooseherder import (MooseConfig,
+                        MooseRunner,
+                        GmshRunner)
+
+USER_DIR = Path.home()
+DATA_DIR = Path('data/thermal_with_gmsh/')
+
+def main() -> None:
+
+    gmsh_path = USER_DIR / 'moose-workdir/gmsh/bin/gmsh'
+    gmsh_runner = GmshRunner(gmsh_path)
+
+    gmsh_input = DATA_DIR / 'monoblock_3d.geo'
+    gmsh_runner.set_input_file(gmsh_input)
+
+    print('Running gmsh...')
+    print()
+
+    gmsh_start = time.perf_counter()
+    gmsh_runner.run()
+    gmsh_run_time = time.perf_counter()-gmsh_start
+
+    print()
+    print("="*80)
+    print(f'Gmsh run time = {gmsh_run_time:.2f} seconds')
+    print("="*80)
+    print()
+
+
+if __name__ == '__main__':
+    main()
+
