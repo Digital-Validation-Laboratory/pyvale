@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------
-# pyvale: simple,2Dplate,1mat,thermal,steady,
+# pyvale: simple,2Dplate,1mat,thermomechanical,steady,
 #-------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------
@@ -165,43 +165,18 @@ sTol = ${fparse lengX/(nElemX*4)}
         value = ${surfHeatFlux}
     []
 
-    [bottom_left_disp_x]
-        type = DirichletBC
-        variable = disp_x
-        boundary = 'bottom_left_node'
-        value = 0
-    []
-    [bottom_left_disp_y]
+    [left_disp_y]
         type = DirichletBC
         variable = disp_y
-        boundary = 'bottom_left_node'
+        boundary = 'left'
         value = 0
     []
-    [bottom_right_disp_y]
-        type = DirichletBC
-        variable = disp_y
-        boundary = 'bottom_right_node'
-        value = 0
-    []
-    [top_left_disp_x]
+    [left_disp_x]
         type = DirichletBC
         variable = disp_x
-        boundary = 'top_left_node'
+        boundary = 'left'
         value = 0
     []
-
-    #[left_disp_y]
-    #    type = DirichletBC
-    #    variable = disp_y
-    #    boundary = 'left'
-    #    value = 0
-    #[]
-    #[left_disp_x]
-    #    type = DirichletBC
-    #    variable = disp_x
-    #    boundary = 'left'
-    #    value = 0
-    #[]
 []
 
 [Preconditioning]
@@ -228,6 +203,19 @@ sTol = ${fparse lengX/(nElemX*4)}
     [avg_temp]
         type = AverageNodalVariableValue
         variable = temperature
+    []
+
+    [max_x_disp]
+        type = NodalExtremeValue
+        variable = disp_x
+    []
+    [max_xx_strain]
+        type = ElementExtremeValue
+        variable = strain_xx
+    []
+    [avg_xx_strain]
+        type = ElementAverageValue
+        variable = strain_yy
     []
 []
 
