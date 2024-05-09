@@ -10,7 +10,7 @@
         <mxCell id="37p0PDooPlaZ-HSsAcqx-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;fontSize=14;fontFamily=Helvetica;" edge="1" parent="1" source="37p0PDooPlaZ-HSsAcqx-4" target="37p0PDooPlaZ-HSsAcqx-14">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="37p0PDooPlaZ-HSsAcqx-4" value="&lt;b style=&quot;font-size: 16px;&quot;&gt;Package:&lt;br style=&quot;&quot;&gt;pycave&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
+        <mxCell id="37p0PDooPlaZ-HSsAcqx-4" value="&lt;b style=&quot;font-size: 16px;&quot;&gt;Package:&lt;br style=&quot;&quot;&gt;pyvale&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">
           <mxGeometry x="490" y="90" width="140" height="70" as="geometry" />
         </mxCell>
         <mxCell id="37p0PDooPlaZ-HSsAcqx-5" value="Dependencies" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1">

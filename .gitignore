@@ -1,8 +1,10 @@
 # vscode
 .vscode/
 
-# MOOSE
+# MOOSE / gmsh
 *-opt
+*.e
+*.msh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,0 +1,85 @@
+<mxfile host="app.diagrams.net" modified="2024-05-03T10:45:32.034Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" etag="2NbZ1R8D--lqzARJoQan" version="24.3.1" type="google">
+  <diagram name="Page-1" id="z9l2CuvR86Q_oUoxjJoo">
+    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-1" value="1)&amp;nbsp;Thermal" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="130" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-2" value="2)&amp;nbsp;Mechanical" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="460" y="130" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-3" value="1) Plate 2D&lt;div&gt;(1 material)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="20" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-4" value="3)&amp;nbsp;Monoblock 3D&amp;nbsp;&lt;div&gt;(3 materials)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="630" y="20" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-5" value="3)&amp;nbsp;Thermo-mechanical" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="630" y="130" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-6" value="2)&amp;nbsp;Plate 2D&lt;div&gt;(2 materials)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="460" y="20" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-7" value="Geometry&lt;div&gt;(Material)&lt;/div&gt;" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="20" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-8" value="Physics" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="130" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="EmCZJuvhLJTYNPbDlbLy-2" value="1) Flux BC - HTC" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="190" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="EmCZJuvhLJTYNPbDlbLy-4" value="BCs" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="210" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-9" value="2) Disp BC -&amp;nbsp;&lt;span style=&quot;font-weight: 400;&quot;&gt;Disp BC&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="460" y="190" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-12" value="Disp BC&lt;div&gt;Flux + HTC BC&lt;/div&gt;" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="630" y="190" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-13" value="Material Models" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="370" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-14" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="140" y="350" as="sourcePoint" />
+            <mxPoint x="780" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-15" value="1.1) Temperature independent" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="370" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-16" value="2.1) Isotropic&lt;div&gt;Elasticity&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="465" y="370" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="EmCZJuvhLJTYNPbDlbLy-6" value="1.2) Temperature dependent" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="460" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-27" value="NAMING CONVENTION&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="800" y="370" width="330" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="EmCZJuvhLJTYNPbDlbLy-7" value="&lt;div&gt;2.2) Simple bi-linear plasticity&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="465" y="460" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6rUi_oK67B5XtZt92YjK-1" value="Temperature + mech. model permutation" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="610" y="370" width="150" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-28" value="CASES: *.i&lt;div&gt;Store list as yaml&lt;br&gt;&lt;div&gt;Simplest: 2d mono plate - thermal&amp;nbsp; - temp indep - steady&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Most complex: 3d monoblock - themo-mech - temp dep / plas - transient&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="20" width="310" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-29" value="Time dependence" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="550" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-30" value="1) Steady-state" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="550" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="DjvrYF2vDFqex7q5yf0V-31" value="2) Transient" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="465" y="550" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
