@@ -66,11 +66,10 @@ simulation_cases:
           mechanical: temp_indep
     time_dependence: steady
 
-# TODO: complete description of cases below
   - name: case07.i
-    geometry: 2D_2mat
-    physics: thermo_mechanical
-    BC: uniformtemp_disp
+    geometry: 2D_1mat_gmsh_plateWHole
+    physics: thermal
+    BC: htc_heatflux
     material:
       - material_model:
           thermal: temp_indep
@@ -81,9 +80,9 @@ simulation_cases:
     time_dependence: steady
 
   - name: case08.i
-    geometry: 2D_2mat
-    physics: thermo_mechanical
-    BC: uniformtemp_disp
+    geometry: 3D_1mat_gmsh_plateWHole
+    physics: mechanical
+    BC: disp_disp
     material:
       - material_model:
           thermal: temp_indep
