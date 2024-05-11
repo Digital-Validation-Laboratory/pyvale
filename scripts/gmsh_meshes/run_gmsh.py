@@ -14,8 +14,10 @@ def main() -> None:
     gmsh_path = Path().home() / 'moose-workdir/gmsh/bin/gmsh'
     gmsh_runner = mh.GmshRunner(gmsh_path)
 
-    base_dir = Path('data/gmsh_meshes/')
-    gmsh_in = base_dir / 'monoblock_3d.geo'
+    #base_dir = Path('scripts/gmsh_meshes/')
+    #gmsh_in = base_dir / 'simpletestcase_3d.geo'
+    base_dir = Path('simcases/case10/')
+    gmsh_in = base_dir / 'case10.geo'
     gmsh_runner.set_input_file(gmsh_in)
 
     start_time = time.perf_counter()
