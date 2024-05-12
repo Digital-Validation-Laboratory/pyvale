@@ -5,8 +5,9 @@
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
-endTime= 1
-timeStep = 1
+# NOTE: only used for transient solves
+#endTime= 1
+#timeStep = 1
 
 # Thermal Loads/BCs
 coolantTemp = 20.0      # degC
@@ -73,17 +74,17 @@ cuSpecHeat = 406.0  # J.kg^-1.K^-1
 []
 
 [Executioner]
-    type = Transient
-    end_time= ${endTime}
-    dt = ${timeStep}
+    type = Steady
+    #end_time= ${endTime}
+    #dt = ${timeStep}
 []
 
 [Postprocessors]
-    [max_temp]
+    [temp_max]
         type = NodalExtremeValue
         variable = temperature
     []
-    [avg_temp]
+    [temp_avg]
         type = AverageNodalVariableValue
         variable = temperature
     []

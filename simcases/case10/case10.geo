@@ -1,5 +1,5 @@
 //==============================================================================
-// Gmsh 2D parametric plate mesh
+// Gmsh 3D simple test case divertor armour mock-up
 // author: Lloyd Fletcher (scepticalrabbit)
 //==============================================================================
 // Always set to OpenCASCADE - circles and boolean opts are much easier!
@@ -31,10 +31,10 @@ hole_circ = 2*Pi*hole_rad;
 
 // Mesh variables
 mesh_ref = 1;
-hole_sect_nodes = 7*mesh_ref; // Must be odd
-block_rad_nodes = 7*mesh_ref;
-block_diff_nodes = 7*mesh_ref; // numbers of nodes along the rectangular extension
-block_depth_divs = 7*mesh_ref;
+hole_sect_nodes = 5*mesh_ref; // Must be odd
+block_rad_nodes = 5*mesh_ref;
+block_diff_nodes = 5*mesh_ref; // numbers of nodes along the rectangular extension
+block_halfdepth_divs = 2*mesh_ref;
 
 block_edge_nodes = Floor((hole_sect_nodes-1)/2)+1;
 elem_size = hole_circ/(4*(hole_sect_nodes-1));
@@ -106,43 +106,83 @@ Recombine Surface{s6};
 
 //------------------------------------------------------------------------------
 // Extrude the surface mesh to 3D
-Extrude{0.0,0.0,block_depth}{
-    Surface{:}; Layers{block_depth_divs}; Recombine;
+// Extrude only hlafway and then extrude again to allow BCs on the centre line
+Extrude{0.0,0.0,block_depth/2}{
+    Surface{:}; Layers{block_halfdepth_divs}; Recombine;
+}
+
+es1() = Surface In BoundingBox{
+    -block_width/2-tol,0.0-tol,block_depth/2-tol,
+    block_width/2+tol,block_height+tol,block_depth/2+tol};
+
+Extrude{0.0,0.0,block_depth/2}{
+    Surface{es1(0),es1(1),es1(2),es1(3),es1(4),es1(5)};
+    Layers{block_halfdepth_divs}; Recombine;
 }
 
 //------------------------------------------------------------------------------
 // Physical surfaces and volumes for export/BCs
-//Physical Point("Embedded point") = {p};
-//Physical Curve("Embdded curve") = {l};
-//Physical Surface("Embedded surface") = {s};
-//Physical Volume("Volume") = {1};
-
 Physical Volume("stc-vol") = {Volume{:}};
 
+// Physical surface for mechanical BC for dispy - like sitting on a flat surface
 ps1() = Surface In BoundingBox{
     -block_width/2-tol,0.0-tol,0.0-tol,
     block_width/2+tol,0.0+tol,block_depth+tol};
-Physical Surface("bc-base-disp") = {ps1(0),ps1(1)};
+Physical Surface("bc-base-disp") = {ps1(0),ps1(1),ps1(2),ps1(3)};
 
+// thermal BCs for top surface heat flux and pipe htc
 ps2() = Surface In BoundingBox{
     -block_width/2-tol,block_height-tol,0.0-tol,
     block_width/2+tol,block_height+tol,block_depth+tol};
-Physical Surface("bc-top-heatflux") = {ps2(0),ps2(1)};
+Physical Surface("bc-top-heatflux") = {ps2(0),ps2(1),ps2(2),ps2(3)};
 
 ps3() = Surface In BoundingBox{
     -hole_rad-tol,block_width/2-hole_rad-tol,0.0-tol,
     hole_rad+tol,block_width/2+hole_rad+tol,block_depth+tol};
-Physical Surface("bc-pipe-htc") = {ps3(0),ps3(1),ps3(2),ps3(3)};
+Physical Surface("bc-pipe-htc") = {ps3(0),ps3(1),ps3(2),ps3(3),ps3(4),ps3(5),ps3(6),ps3(7)};
 
+// These don't work in MOOSE because of how it handles 3D meshes from Gmsh
+// See: https://github.com/idaholab/moose/discussions/27607
+/*
 pc1() = Curve In BoundingBox{
     -tol,-tol,-tol,
     +tol,+tol,block_depth+tol};
-Physical Curve("bc-axz-dispxy-mech") = {pc1(0)};
+Physical Curve("bc-curve-xy-mech") = {pc1(0)};
 
 pc2() = Curve In BoundingBox{
     -block_width/2-tol,-tol,-tol,
     block_width/2+tol,+tol,+tol};
-Physical Curve("bc-axx-dispyz-mech") = {pc2(0),pc2(1)};
+Physical Curve("bc-curve-yz-mech") = {pc2(0),pc2(1)};
+*/
+
+// Physical points for applying mechanical BCs
+// Center of the base of the block - lock all DOFs
+pp0() = Point In BoundingBox{
+    -tol,-tol,block_depth/2-tol,
+    +tol,+tol,block_depth/2+tol};
+Physical Point("bc-c-point-xyz-mech") = {pp0(0)};
+
+// Left and right on the base center line
+pp1() = Point In BoundingBox{
+    -block_width/2-tol,-tol,block_depth/2-tol,
+    -block_width/2+tol,+tol,block_depth/2+tol};
+Physical Point("bc-l-point-yz-mech") = {pp1(0)};
+
+pp2() = Point In BoundingBox{
+    block_width/2-tol,-tol,block_depth/2-tol,
+    block_width/2+tol,+tol,block_depth/2+tol};
+Physical Point("bc-r-point-yz-mech") = {pp2(0)};
+
+// Front and back on the base center line
+pp3() = Point In BoundingBox{
+    -tol,-tol,block_depth-tol,
+    +tol,+tol,block_depth+tol};
+Physical Point("bc-f-point-xy-mech") = {pp3(0)};
+
+pp4() = Point In BoundingBox{
+    -tol,-tol,0.0-tol,
+    +tol,+tol,0.0+tol};
+Physical Point("bc-b-point-xy-mech") = {pp4(0)};
 
 //------------------------------------------------------------------------------
 // Global meshing
@@ -161,4 +201,4 @@ Mesh 3;
 //------------------------------------------------------------------------------
 // Save and exit
 Save Str(file_name);
-//Exit;
+Exit;

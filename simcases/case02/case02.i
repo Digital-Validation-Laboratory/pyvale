@@ -6,8 +6,9 @@
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
-endTime = 1
-timeStep = 1
+# NOTE: only used for transient solves
+#endTime = 1
+#timeStep = 1
 
 # Geometric Properties
 lengX = 50e-3  # m
@@ -50,7 +51,7 @@ cuPRatio = 0.33     # -
         add_variables = true
         material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
         material_output_order = FIRST       # CONSTANT, FIRST, SECOND,
-        generate_output = 'vonmises_stress stress_xx stress_yy stress_xy strain_xx strain_yy strain_xy'
+        generate_output = 'vonmises_stress stress_xx stress_yy stress_xy strain_xx strain_yy strain_xy max_principal_strain mid_principal_strain min_principal_strain'
     []
 []
 
@@ -59,19 +60,19 @@ cuPRatio = 0.33     # -
         type = DirichletBC
         variable = disp_x
         boundary = 'bottom'
-        value = 0
+        value = 0.0
     []
     [bottom_y]
         type = DirichletBC
         variable = disp_y
         boundary = 'bottom'
-        value = 0
+        value = 0.0
     []
     [top_x]
         type = DirichletBC
         variable = disp_x
         boundary = 'top'
-        value = 0
+        value = 0.0
     []
     [top_y]
         type = DirichletBC
@@ -106,12 +107,12 @@ cuPRatio = 0.33     # -
 []
 
 [Executioner]
-    type = Transient
+    type = Steady
     solve_type = 'PJFNK'
     petsc_options_iname = '-pc_type -pc_hypre_type'
     petsc_options_value = 'hypre boomeramg'
-    end_time= ${endTime}
-    dt = ${timeStep}
+    #end_time= ${endTime}
+    #dt = ${timeStep}
 []
 
 
@@ -128,19 +129,31 @@ cuPRatio = 0.33     # -
         stress_tensor = stress
         boundary = 'top'
     []
-    [max_y_disp]
+
+    [disp_y_max]
         type = NodalExtremeValue
         variable = disp_y
     []
+    [disp_x_max]
+        type = NodalExtremeValue
+        variable = disp_x
+    []
+
     [max_yy_stress]
         type = ElementExtremeValue
         variable = stress_yy
     []
-    [avg_yy_stress]
+
+    [strain_yy_avg]
         type = ElementAverageValue
-        variable = stress_yy
+        variable = strain_yy
     []
-    [max_vm_stress]
+    [strain_xx_avg]
+        type = ElementAverageValue
+        variable = strain_xx
+    []
+
+    [stress_vm_max]
         type = ElementExtremeValue
         variable = vonmises_stress
     []

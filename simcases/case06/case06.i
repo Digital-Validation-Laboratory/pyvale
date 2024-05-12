@@ -5,6 +5,7 @@
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
+# NOTE: only used for transient solves
 #endTime = 1
 #timeStep = 1
 
@@ -18,10 +19,7 @@ nElemY = 10
 eType = QUAD4 # QUAD4 for 1st order, QUAD8 for 2nd order
 
 # Thermal Loads/BCs
-uniformTemp = 200 # degC
-#coolantTemp = 20.0      # degC
-#heatTransCoeff = 125.0e3 # W.m^-2.K^-1
-#surfHeatFlux = 500.0e3    # W.m^-2
+uniformTemp = 100 # degC
 
 # Material Properties:
 # Thermal Props: Pure (OFHC) Copper at 250degC
@@ -152,11 +150,11 @@ sTol = ${fparse lengX/(nElemX*4)}
 [Modules/TensorMechanics/Master]
   [all]
       add_variables = true
-      #material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
-      #material_output_order = FIRST       # CONSTANT, FIRST, SECOND,
-      strain = SMALL                     # SMALL or FINITE
+      material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
+      material_output_order = FIRST       # CONSTANT, FIRST, SECOND,
+      strain = SMALL                      # SMALL or FINITE
       automatic_eigenstrain_names = true
-      generate_output = 'vonmises_stress stress_xx stress_yy stress_xy strain_xx strain_yy strain_xy'
+      generate_output = 'vonmises_stress strain_xx strain_xy strain_xz strain_yx strain_yy strain_yz strain_zx strain_zy strain_zz stress_xx stress_xy stress_xz stress_yx stress_yy stress_yz stress_zx stress_zy stress_zz max_principal_strain mid_principal_strain min_principal_strain'
   []
 []
 
@@ -232,39 +230,26 @@ sTol = ${fparse lengX/(nElemX*4)}
     type = DirichletBC
     variable = disp_x
     boundary = 'bottom_left_node'
-    value = 0
+    value = 0.0
   []
   [bottom_left_disp_y]
       type = DirichletBC
       variable = disp_y
       boundary = 'bottom_left_node'
-      value = 0
+      value = 0.0
   []
   [bottom_right_disp_y]
       type = DirichletBC
       variable = disp_y
       boundary = 'bottom_right_node'
-      value = 0
+      value = 0.0
   []
   [top_left_disp_x]
       type = DirichletBC
       variable = disp_x
       boundary = 'top_left_node'
-      value = 0
+      value = 0.0
   []
-
-  #[left_disp_y]
-  #    type = DirichletBC
-  #    variable = disp_y
-  #    boundary = 'left'
-  #    value = 0
-  #[]
-  #[left_disp_x]
-  #    type = DirichletBC
-  #    variable = disp_x
-  #    boundary = 'left'
-  #    value = 0
-  #[]
 []
 
 [Preconditioning]
@@ -283,25 +268,40 @@ sTol = ${fparse lengX/(nElemX*4)}
   #dt = ${timeStep}
 []
 
+
 [Postprocessors]
-  [max_temp]
+  [temp_max]
       type = NodalExtremeValue
       variable = temperature
   []
-  [avg_temp]
+  [temp_avg]
       type = AverageNodalVariableValue
       variable = temperature
   []
 
-  [max_x_disp]
+  [disp_x_max]
       type = NodalExtremeValue
       variable = disp_x
   []
-  [max_xx_strain]
+  [disp_y_max]
+      type = NodalExtremeValue
+      variable = disp_y
+  []
+
+  [strain_xx_max]
       type = ElementExtremeValue
       variable = strain_xx
   []
-  [avg_xx_strain]
+  [strain_yy_max]
+      type = ElementExtremeValue
+      variable = strain_yy
+  []
+
+  [strain_xx_avg]
+      type = ElementAverageValue
+      variable = strain_xx
+  []
+  [strain_yy_avg]
       type = ElementAverageValue
       variable = strain_yy
   []

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------
-# pyvale: simple,2Dplate,1mat,thermomechanical,steady,
+# pyvale: simple,3Dstcgmsh,1mat,thermomechanical,steady,
 #-------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------
@@ -62,11 +62,11 @@ cuThermExp = 17.8e-6 # 1/degC
 [Modules/TensorMechanics/Master]
     [all]
         add_variables = true
-        #material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
-        #material_output_order = FIRST       # CONSTANT, FIRST, SECOND,
-        strain = SMALL                     # SMALL or FINITE
+        material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
+        material_output_order = FIRST       # CONSTANT, FIRST, SECOND,
+        strain = SMALL                      # SMALL or FINITE
         automatic_eigenstrain_names = true
-        generate_output = 'vonmises_stress stress_xx stress_yy stress_xy strain_xx strain_yy strain_xy'
+        generate_output = 'vonmises_stress strain_xx strain_xy strain_xz strain_yx strain_yy strain_yz strain_zx strain_zy strain_zz stress_xx stress_xy stress_xz stress_yx stress_yy stress_yz stress_zx stress_zy stress_zz max_principal_strain mid_principal_strain min_principal_strain'
     []
 []
 
@@ -114,24 +114,86 @@ cuThermExp = 17.8e-6 # 1/degC
         value = ${surfHeatFlux}
     []
 
-    [mech_dispx_bc]
+    # Lock disp_y for base
+    # NOTE: if locking y on base need to comment all disp_y conditions below
+    [mech_bc_c_dispy]
+        type = DirichletBC
+       variable = disp_y
+        boundary = 'bc-base-disp'
+        value = 0.0
+    []
+
+    # Lock all disp DOFs at the center of the block
+    [mech_bc_c_dispx]
         type = DirichletBC
         variable = disp_x
-        boundary = 'bc-base-disp'
-        value = 0
+        boundary = 'bc-c-point-xyz-mech'
+        value = 0.0
     []
-    [mech_dispy_bc]
-        type = DirichletBC
-        variable = disp_y
-        boundary = 'bc-base-disp'
-        value = 0
-    []
-    [mech_dispz_bc]
+    #[mech_bc_c_dispy]
+    #    type = DirichletBC
+    #    variable = disp_y
+    #    boundary = 'bc-c-point-xyz-mech'
+    #    value = 0.0
+    #[]
+    [mech_bc_c_dispz]
         type = DirichletBC
         variable = disp_z
-        boundary = 'bc-base-disp'
-        value = 0
+        boundary = 'bc-c-point-xyz-mech'
+        value = 0.0
     []
+
+    # Lock disp yz along the x (left-right) axis
+    #[mech_bc_l_dispy]
+    #    type = DirichletBC
+    #    variable = disp_y
+    #    boundary = 'bc-l-point-yz-mech'
+    #    value = 0.0
+    #[]
+    [mech_bc_l_dispz]
+        type = DirichletBC
+        variable = disp_z
+        boundary = 'bc-l-point-yz-mech'
+        value = 0.0
+    []
+    #[mech_bc_r_dispy]
+    #    type = DirichletBC
+    #    variable = disp_y
+    #    boundary = 'bc-r-point-yz-mech'
+    #    value = 0.0
+    #[]
+    [mech_bc_r_dispz]
+        type = DirichletBC
+        variable = disp_z
+        boundary = 'bc-r-point-yz-mech'
+        value = 0.0
+    []
+
+    # Lock disp xy along the z (front-back) axis
+    [mech_bc_f_dispx]
+        type = DirichletBC
+        variable = disp_x
+        boundary = 'bc-f-point-xy-mech'
+        value = 0.0
+    []
+    #[mech_bc_f_dispy]
+    #    type = DirichletBC
+    #    variable = disp_y
+    #    boundary = 'bc-f-point-xy-mech'
+    #    value = 0.0
+    #[]
+    [mech_bc_b_dispx]
+        type = DirichletBC
+        variable = disp_x
+        boundary = 'bc-b-point-xy-mech'
+        value = 0.0
+    []
+    #[mech_bc_b_dispy]
+    #    type = DirichletBC
+    #    variable = disp_y
+    #    boundary = 'bc-b-point-xy-mech'
+    #    value = 0.0
+    #[]
 []
 
 [Preconditioning]
@@ -151,27 +213,49 @@ cuThermExp = 17.8e-6 # 1/degC
 []
 
 [Postprocessors]
-    [max_temp]
+    [temp_max]
         type = NodalExtremeValue
         variable = temperature
     []
-    [avg_temp]
+    [temp_avg]
         type = AverageNodalVariableValue
         variable = temperature
     []
 
-    [max_x_disp]
+    [disp_x_max]
         type = NodalExtremeValue
         variable = disp_x
     []
-    [max_xx_strain]
+    [disp_y_max]
+        type = NodalExtremeValue
+        variable = disp_y
+    []
+    [disp_z_max]
+        type = NodalExtremeValue
+        variable = disp_z
+    []
+
+    [strain_xx_max]
         type = ElementExtremeValue
         variable = strain_xx
     []
-    [avg_xx_strain]
-        type = ElementAverageValue
+    [strain_yy_max]
+        type = ElementExtremeValue
         variable = strain_yy
     []
+    [strain_zz_max]
+        type = ElementExtremeValue
+        variable = strain_zz
+    []
+
+    #[strain_xx_avg]
+    #    type = ElementAverageValue
+    #    variable = strain_xx
+    #[]
+    #[strain_yy_avg]
+    #    type = ElementAverageValue
+    #    variable = strain_yy
+    #[]
 []
 
 [Outputs]

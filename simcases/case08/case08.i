@@ -6,6 +6,7 @@
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
+# NOTE: only used for transient solves
 #endTime = 1
 #timeStep = 1
 
@@ -76,13 +77,6 @@ cuPRatio = 0.33     # -
         boundary = 'bc-top'
         value = 0
     []
-
-    #[Pressure]
-    #    [top]
-    #        boundary = 'top'
-    #        function = '${fparse -1*tensLoad}'
-    #    []
-    #[]
 []
 
 [Materials]
@@ -126,19 +120,31 @@ cuPRatio = 0.33     # -
         stress_tensor = stress
         boundary = 'bc-top'
     []
-    [max_y_disp]
+
+    [disp_y_max]
         type = NodalExtremeValue
         variable = disp_y
     []
+    [disp_x_max]
+        type = NodalExtremeValue
+        variable = disp_x
+    []
+
     [max_yy_stress]
         type = ElementExtremeValue
         variable = stress_yy
     []
-    [avg_yy_stress]
+
+    [strain_yy_avg]
         type = ElementAverageValue
-        variable = stress_yy
+        variable = strain_yy
     []
-    [max_vm_stress]
+    [strain_xx_avg]
+        type = ElementAverageValue
+        variable = strain_xx
+    []
+
+    [stress_vm_max]
         type = ElementExtremeValue
         variable = vonmises_stress
     []
