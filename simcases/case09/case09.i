@@ -1,12 +1,13 @@
 #-------------------------------------------------------------------------
-# pyvale: simple,3Dstc,1mat,thermal,steady,
+# pyvale: gmsh,3Dstc,1mat,thermal,steady,
 #-------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
-endTime= 1
-timeStep = 1
+# NOTE: only used for transient solves
+#endTime= 1
+#timeStep = 1
 
 # Thermal Loads/BCs
 coolantTemp = 100.0      # degC
@@ -73,9 +74,9 @@ cuSpecHeat = 406.0  # J.kg^-1.K^-1
 []
 
 [Executioner]
-    type = Transient
-    end_time= ${endTime}
-    dt = ${timeStep}
+    type = Steady
+    #end_time= ${endTime}
+    #dt = ${timeStep}
 []
 
 [Postprocessors]

@@ -117,3 +117,31 @@ simulation_cases:
           thermal: temp_indep
           mechanical: temp_indep
     time_dependence: steady
+
+  - name: case11.i
+    geometry: 3D_3mat_gmsh_monoblock
+    physics: thermal
+    BC: htc_heatflux
+    material:
+      - material_model:
+          thermal: temp_indep
+          mechanical: temp_indep
+      - material_model:
+          thermal: temp_indep
+          mechanical: temp_indep
+    time_dependence: steady
+
+  # TODO: this case is under construction
+  # Need to add mechanical solve to the thermal
+  - name: case12.i
+    geometry: 3D_3mat_gmsh_monoblock
+    physics: thermo_mechanical
+    BC: htc_heatflux_disp_disp_disp
+    material:
+      - material_model:
+          thermal: temp_indep
+          mechanical: temp_indep
+      - material_model:
+          thermal: temp_indep
+          mechanical: temp_indep
+    time_dependence: steady

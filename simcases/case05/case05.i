@@ -170,13 +170,13 @@ sTol = ${fparse lengX/(nElemX*4)}
         type = DirichletBC
         variable = disp_y
         boundary = 'left'
-        value = 0
+        value = 0.0
     []
     [left_disp_x]
         type = DirichletBC
         variable = disp_x
         boundary = 'left'
-        value = 0
+        value = 0.0
     []
 []
 
