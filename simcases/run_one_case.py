@@ -9,15 +9,35 @@ Copyright (C) 2024 The Computer Aided Validation Team
 import time
 from pathlib import Path
 from mooseherder import (MooseConfig,
-                         MooseRunner)
+                         MooseRunner,
+                         GmshRunner)
 
-CASE_STR = 'case06'
+#======================================
+# Change this to run a different case
+CASE_STR = 'case12'
+#======================================
+
 CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')
 CASE_DIR = Path('simcases/'+CASE_STR+'/')
 
 USER_DIR = Path.home()
 
+FORCE_GMSH = False
+
 def main() -> None:
+    # NOTE: if the msh file exists then gmsh will not run
+    if (((CASE_DIR / CASE_FILES[0]).is_file() and not
+        (CASE_DIR / CASE_FILES[0]).with_suffix('.msh').is_file()) or
+        FORCE_GMSH):
+        gmsh_runner = GmshRunner(USER_DIR / 'moose-workdir/gmsh/bin/gmsh')
+
+        gmsh_start = time.perf_counter()
+        gmsh_runner.run(CASE_DIR / CASE_FILES[0])
+        gmsh_run_time = time.perf_counter()-gmsh_start
+    else:
+        print('Bypassing gmsh.')
+        gmsh_run_time = 0.0
+
     config = {'main_path': USER_DIR / 'moose',
             'app_path': USER_DIR / 'moose-workdir/proteus',
             'app_name': 'proteus-opt'}
@@ -29,19 +49,16 @@ def main() -> None:
                               n_threads = 7,
                               redirect_out = False)
 
-    input_file = CASE_DIR / CASE_FILES[1]
-    print(input_file)
-
     moose_start_time = time.perf_counter()
-    moose_runner.run(input_file)
+    moose_runner.run(CASE_DIR / CASE_FILES[1])
     moose_run_time = time.perf_counter() - moose_start_time
 
     print()
     print("="*80)
-    print(f'Run time = {moose_run_time:.3f} seconds')
+    print(f'Gmsh run time = {gmsh_run_time:.2f} seconds')
+    print(f'MOOSE run time = {moose_run_time:.3f} seconds')
     print("="*80)
     print()
-
 
 if __name__ == '__main__':
     main()
