@@ -22,7 +22,7 @@ Geometry.VolumeLabels = 0;
 
 //------------------------------------------------------------------------------
 //_* MOOSEHERDER VARIABLES - START
-file_name = "case11.msh";
+file_name = "case12.msh";
 num_threads = 7;
 
 // Specified Geometry variables
