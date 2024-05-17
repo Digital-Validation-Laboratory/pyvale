@@ -1,3 +1,5 @@
+# NOTE: all simulation cases have a very coarse mesh for testing. Refinement is
+# required before use.
 
 simulation_cases:
   - name: case01.i
@@ -131,8 +133,6 @@ simulation_cases:
           mechanical: temp_indep
     time_dependence: steady
 
-  # TODO: this case is under construction
-  # Need to add mechanical solve to the thermal
   - name: case12.i
     geometry: 3D_3mat_gmsh_monoblock
     physics: thermo_mechanical
@@ -145,3 +145,23 @@ simulation_cases:
           thermal: temp_indep
           mechanical: temp_indep
     time_dependence: steady
+
+  - name: case13.i
+    geometry: 2D_1mat
+    physics: thermal
+    BC: htc_heatflux
+    material:
+      - material_model:
+          thermal: temp_indep
+    time_dependence: transient
+
+  - name: case14.i
+    geometry: 2D_1mat
+    physics: mechanical
+    BC: disp_disp
+    material:
+      - material_model:
+          mechanical: temp_indep
+      - material_model:
+          mechanical: temp_indep
+    time_dependence: transient

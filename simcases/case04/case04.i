@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------
-# pyvale: simple,2Dplate,2mat,thermal,steady,
+# pyvale: simple,2Dplate,2mat,mech,steady,
 #-------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------
@@ -20,7 +20,6 @@ eType = QUAD8 # QUAD4 for 1st order, QUAD8 for 2nd order
 
 # Mechanical Loads/BCs
 topDisp = 0.1e-3  # m
-# tensLoad = 10e6 # Pa
 
 # Material Properties:
 # OFHC Copper 250degC
@@ -68,6 +67,8 @@ wPRatio = 0.29  # -
 
 [Modules/TensorMechanics/Master]
   [all]
+      strain = SMALL
+      incremental = true
       add_variables = true
       material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
       material_output_order = FIRST       # CONSTANT, FIRST, SECOND,
@@ -89,8 +90,8 @@ wPRatio = 0.29  # -
     block = 2
   []
   [stress]
-    type = ComputeLinearElasticStress
-  []
+    type = ComputeFiniteStrainElasticStress # ComputeLinearElasticStress
+[]
 []
 
 [BCs]
@@ -118,12 +119,6 @@ wPRatio = 0.29  # -
       boundary = 'top'
       value = ${topDisp}
   []
-  #[Pressure]
-  #    [top]
-  #        boundary = 'top'
-  #        function = '${fparse -1*tensLoad}'
-  #    []
-  #[]
 []
 
 [Preconditioning]

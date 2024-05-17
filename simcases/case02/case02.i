@@ -48,6 +48,8 @@ cuPRatio = 0.33     # -
 
 [Modules/TensorMechanics/Master]
     [all]
+        strain = SMALL
+        incremental = true
         add_variables = true
         material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
         material_output_order = FIRST       # CONSTANT, FIRST, SECOND,
@@ -80,12 +82,6 @@ cuPRatio = 0.33     # -
         boundary = 'top'
         value = ${topDisp}
     []
-    #[Pressure]
-    #    [top]
-    #        boundary = 'top'
-    #        function = '${fparse -1*tensLoad}'
-    #    []
-    #[]
 []
 
 [Materials]
@@ -95,7 +91,7 @@ cuPRatio = 0.33     # -
         poissons_ratio = ${cuPRatio}
     []
     [stress]
-        type = ComputeLinearElasticStress
+        type = ComputeFiniteStrainElasticStress # ComputeLinearElasticStress
     []
 []
 
