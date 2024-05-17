@@ -38,10 +38,6 @@ cuSpecHeat = 406.0  # J.kg^-1.K^-1
         type = HeatConduction
         variable = temperature
     []
-    #[time_derivative]
-    #    type = HeatConductionTimeDerivative
-    #    variable = temperature
-    #[]
 []
 
 [Materials]

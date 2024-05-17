@@ -22,7 +22,7 @@ Geometry.VolumeLabels = 0;
 
 //------------------------------------------------------------------------------
 //_* MOOSEHERDER VARIABLES - START
-file_name = "case11.msh";
+file_name = "case16.msh";
 num_threads = 7;
 
 // Specified Geometry variables
@@ -56,11 +56,11 @@ pipe_cent_y = interlayer_rad_ext + monoblock_side;
 
 // Calculated Mesh Variables
 pipe_sect_nodes = Round(mesh_ref*5); // Must be odd
-pipe_rad_nodes = Round(mesh_ref*5);
-interlayer_rad_nodes = Round(mesh_ref*5);
+pipe_rad_nodes = Round(mesh_ref*4);
+interlayer_rad_nodes = Round(mesh_ref*4);
 monoblock_side_nodes = Round(mesh_ref*5);
 monoblock_arm_nodes = Round(mesh_ref*5);
-monoblock_depth_nodes = Round(mesh_ref*2);
+monoblock_depth_nodes = Round(mesh_ref*3); // NOTE: this is half the depth!
 monoblock_width_nodes = Floor((pipe_sect_nodes-1)/2)+1;
 /*
 // This is a more reasonable mesh refinement for the monoblock but solve time
@@ -300,20 +300,71 @@ Recombine Surface{31};
 
 //------------------------------------------------------------------------------
 // Extrude the surface mesh to 3D
-Extrude{0.0,0.0,monoblock_depth}{
+Extrude{0.0,0.0,monoblock_depth/2}{
     Surface{:}; Layers{monoblock_depth_nodes}; Recombine;
+}
+
+es1() = Surface In BoundingBox{
+    -monoblock_width/2-tol,0.0-tol,monoblock_depth/2-tol,
+    monoblock_width/2+tol,monoblock_height+tol,monoblock_depth/2+tol};
+
+Extrude{0.0,0.0,monoblock_depth/2}{
+    Surface{es1(0),es1(1),es1(2),es1(3),es1(4),es1(5),es1(6),es1(7),es1(8),es1(9),es1(10),es1(11),es1(12),es1(13)}; Layers{monoblock_depth_nodes}; Recombine;
 }
 
 //------------------------------------------------------------------------------
 // Physical Surfaces for Loads and Boundary Condition
-Physical Surface("bc-top-heatflux") = {36,41};
-Physical Surface("bc-pipe-heattransf") = {54,59,83,67};
+
+ps0() = Surface In BoundingBox{
+    -monoblock_width/2-tol,0.0-tol,0.0-tol,
+    monoblock_width/2+tol,0.0+tol,monoblock_depth+tol};
+Physical Surface("bc-base-disp") = {ps0(0),ps0(1),ps0(2),ps0(3)};
+
+ps1() = Surface In BoundingBox{
+    -monoblock_width/2-tol,monoblock_height-tol,0.0-tol,
+    monoblock_width/2+tol,monoblock_height+tol,monoblock_depth+tol};
+Physical Surface("bc-top-heatflux") = {ps1(0),ps1(1),ps1(2),ps1(3)};
+
+ps2() = Surface In BoundingBox{
+    -pipe_rad_int-tol,monoblock_width/2-pipe_rad_int-tol,0.0-tol,
+    pipe_rad_int+tol,monoblock_width/2+pipe_rad_int+tol,monoblock_depth+tol};
+Physical Surface("bc-pipe-heattransf") = {ps2(0),ps2(1),ps2(2),ps2(3),ps2(4),ps2(5),ps2(6),ps2(7)};
+
+
+// Physical points for applying mechanical BCs
+// Center of the base of the block - lock all DOFs
+pp0() = Point In BoundingBox{
+    -tol,-tol,monoblock_depth/2-tol,
+    +tol,+tol,monoblock_depth/2+tol};
+Physical Point("bc-c-point-xyz-mech") = {pp0(0)};
+
+// Left and right on the base center line
+pp1() = Point In BoundingBox{
+    -monoblock_width/2-tol,-tol,monoblock_depth/2-tol,
+    -monoblock_width/2+tol,+tol,monoblock_depth/2+tol};
+Physical Point("bc-l-point-yz-mech") = {pp1(0)};
+
+pp2() = Point In BoundingBox{
+    monoblock_width/2-tol,-tol,monoblock_depth/2-tol,
+    monoblock_width/2+tol,+tol,monoblock_depth/2+tol};
+Physical Point("bc-r-point-yz-mech") = {pp2(0)};
+
+// Front and back on the base center line
+pp3() = Point In BoundingBox{
+    -tol,-tol,monoblock_depth-tol,
+    +tol,+tol,monoblock_depth+tol};
+Physical Point("bc-f-point-xy-mech") = {pp3(0)};
+
+pp4() = Point In BoundingBox{
+    -tol,-tol,-tol,
+    +tol,+tol,+tol};
+Physical Point("bc-b-point-xy-mech") = {pp4(0)};
 
 //------------------------------------------------------------------------------
 // Physical Volumes for Material Defs
-Physical Volume("pipe-cucrzr") = {6,9,5,14};
-Physical Volume("interlayer-cu") = {4,7,10,13};
-Physical Volume("armour-w") = {1,2,8,11,3,12};
+Physical Volume("pipe-cucrzr") = {5,19,6,20,9,23,14,28};
+Physical Volume("interlayer-cu") = {4,18,7,21,10,24,13,27};
+Physical Volume("armour-w") = {3,17,8,22,25,11,12,26,1,15,2,16};
 
 //------------------------------------------------------------------------------
 // Global Mesh controls

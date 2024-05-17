@@ -14,7 +14,7 @@ from mooseherder import (MooseConfig,
 
 #======================================
 # Change this to run a different case
-CASE_STR = 'case12'
+CASE_STR = 'case16'
 #======================================
 
 CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')
@@ -22,7 +22,7 @@ CASE_DIR = Path('simcases/'+CASE_STR+'/')
 
 USER_DIR = Path.home()
 
-FORCE_GMSH = False
+FORCE_GMSH = True
 
 def main() -> None:
     # NOTE: if the msh file exists then gmsh will not run
@@ -46,7 +46,7 @@ def main() -> None:
     moose_runner = MooseRunner(moose_config)
 
     moose_runner.set_run_opts(n_tasks = 1,
-                              n_threads = 7,
+                              n_threads = 8,
                               redirect_out = False)
 
     moose_start_time = time.perf_counter()

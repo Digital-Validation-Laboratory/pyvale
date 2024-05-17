@@ -16,7 +16,7 @@ import pyvale
 
 def main() -> None:
     # Use mooseherder to read the exodus and get a SimData object
-    data_path = Path('data/plate_2d_thermal_out.e')
+    data_path = Path('scripts/moose_thermal/plate_2d_thermal_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
