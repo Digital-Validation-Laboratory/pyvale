@@ -1,3 +1,6 @@
+#-------------------------------------------------------------------------------
+# pyvale ignore
+
 # vscode
 .vscode/
 
@@ -5,6 +8,13 @@
 *-opt
 *.e
 *.msh
+
+# Image deformation test cases
+*.pkl
+imdefcase*_*/
+
+#-------------------------------------------------------------------------------
+# Python Standard Ignore
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

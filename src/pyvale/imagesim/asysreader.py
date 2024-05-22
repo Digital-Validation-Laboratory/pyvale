@@ -10,8 +10,7 @@ import os
 import numpy as np
 import pyvale.imagesim.textreader as tr
 
-#%% CLASS DEFINITIONS
-#-----------------------------------------------------------------------------
+# CLASS DEFINITIONS
 class Options:
     def __init__(self,in_path,in_sim_num,dims):
         self.path = in_path
@@ -109,10 +108,10 @@ class SimParams:
 # Data structure for holding the initial node positions in the mesh
 class Nodes:
     def __init__(self):
-        self.nums = []
-        self.loc_x = []
-        self.loc_y = []
-        self.loc_z = []
+        self.nums = list([])
+        self.loc_x = list([])
+        self.loc_y = list([])
+        self.loc_z = list([])
 
 # TODO: element functions are not fully implemented
 # Data structure for holding the element table
@@ -123,10 +122,10 @@ class Elems:
 # Generic Vector Field Class and Inheriting Vector Classes
 class Vector:
     def __init__(self):
-        self.node_nums = []
-        self.x = []
-        self.y = []
-        self.z = []
+        self.node_nums = list([])
+        self.x = list([])
+        self.y = list([])
+        self.z = list([])
 
 class Disp(Vector):
     pass
@@ -144,13 +143,13 @@ class Force(Vector):
 # Generic Tensorial Field Class and Inheriting Tensor Classes
 class Tensor2:
     def __init__(self):
-        self.node_nums = []
-        self.xx = []
-        self.yy = []
-        self.zz = []
-        self.xy = []
-        self.yz = []
-        self.xz = []
+        self.node_nums = list([])
+        self.xx = list([])
+        self.yy = list([])
+        self.zz = list([])
+        self.xy = list([])
+        self.yz = list([])
+        self.xz = list([])
 
 class Stress(Tensor2):
     pass
@@ -170,7 +169,7 @@ class FEData:
         self.strain = Strain()
         self.force = Force()
 
-#%% FUNCTIONS
+# FUNCTIONS
 #-----------------------------------------------------------------------------
 # Reads the simulation parameters file into a data structure, one field is
 # created for each parameter. This is not a core ANSYS file but is generated

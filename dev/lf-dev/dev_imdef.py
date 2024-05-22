@@ -28,15 +28,17 @@ import time
 import tkinter
 from tkinter import filedialog
 import pickle
-import numpy as np
 from pprint import pprint
+from pathlib import Path
+
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mplim
 from PIL import Image
 
 import pyvale.imagesim.imagedef as sit
 
-def main():
+def main() -> None:
     # LOAD DATA
     print()
     print('------------------------------------------------------------------')
@@ -48,7 +50,7 @@ def main():
     root.withdraw()
 
     # Gets the directory of the current script file
-    cwd = os.getcwd()+'\\'
+    cwd = Path.cwd()
     print("Current working directory:")
     print(cwd)
 
@@ -61,19 +63,16 @@ def main():
                                             initialdir=cwd,
                                             title="Select speckle image file")
         im_path, im_file = os.path.split(full_path)
-        im_path = im_path+'\\'
+        im_path = Path(im_path)
     else:
-        #im_path = 'SyntheticSpeckleImages_TestCases\\'
-        #im_file = 'OptimisedSpeckle_500_500_width3.0_16bit_GBlur1.tiff'
-
-        im_path = 'SyntheticSpeckleImages_5MPx\\'
-        im_file = 'OptimisedSpeckle_2464_2056_width5.0_16bit_GBlur2.tiff'
+        im_path = Path('data/speckleimages')
+        im_file = 'OptimisedSpeckle_500_500_width3.0_16bit_GBlur1.tiff'
 
     print('\nLoading speckle image from path:')
     print('{}'.format(im_path))
 
     # Load synthetic speckle image to mask
-    input_im = mplim.imread(im_path+im_file)
+    input_im = mplim.imread(im_path / im_file)
     input_im = input_im.astype(float)
     # If we have RGB then get rid of it
     if input_im.ndim > 2:
@@ -88,19 +87,16 @@ def main():
                                             initialdir=cwd,
                                             title="Select FE data pickle")
         fe_path, fe_file = os.path.split(full_path)
-        fe_path = fe_path+'\\'
+        fe_path = Path(fe_path)
     else:
-        fe_path = 'TestRAMP1_RigidBodyMotion_1_0px\\'
-
-        #fe_path = 'FEData_MatTest2D_Notched3PtBend\\'
-
+        fe_path = Path('scripts/imdef_cases/imdefcase7_RampRigidBodyMotion_1_0px')
         fe_file = 'fe_data.pkl'
 
     print('\nLoading pickled FE data from path:')
     print('{}'.format(fe_path))
 
     tic = time.time()
-    with open(fe_path+fe_file,'rb') as fe_load_file:
+    with open(fe_path / fe_file,'rb') as fe_load_file:
         fe_data = pickle.load(fe_load_file)
     toc = time.time()
 
@@ -141,7 +137,7 @@ def main():
     # Calculates the m/px value based on fitting the specimen/ROI within the camera
     # FOV and leaving a set number of pixels as a border on the longest edge
     id_opts.calc_res_from_fe = True
-    id_opts.calc_res_border_px = 5
+    id_opts.calc_res_border_px = 10
 
     # Set this to true to create an undeformed masked image
     id_opts.add_static_frame = True
@@ -173,7 +169,7 @@ def main():
 
     # Assume 1mm/px to start with, can update this to fit FE data within the FOV
     # using the id_opts above. Or set this manually.
-    default_res = 1.0e-3
+    default_res = 1.0e-3 # Overwritten by id_opts.calc_res_from_fe = True
 
     # Set the core camera parameters based on the specified options
     camera.num_px = pixels
@@ -294,16 +290,16 @@ def main():
 
         #--------------------------------------------------------------------------
         # SAVE IMAGE
-        save_path = fe_path + 'deformed_images\\'
+        save_path = fe_path / 'deformed_images'
 
         # Need to flip image so coords are top left with Y down
         save_image = def_image[::-1,:]
 
-        if not os.path.isdir(save_path):
-            os.mkdir(save_path)
+        if not save_path.is_dir():
+            save_path.mkdir()
 
         im_num = sit.get_image_num_str(ff,3)
-        save_file = save_path+'defimage_'+im_num+'.tiff'
+        save_file = save_path / str('defimage_'+im_num+'.tiff')
         im = Image.fromarray(save_image.astype(np.uint16))
         im.save(save_file)
 
