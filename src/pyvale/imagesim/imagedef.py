@@ -419,8 +419,7 @@ def average_subpixel_image(subpx_image,subsample):
 def deform_image(upsampled_image,camera,id_opts,coords,disp,
                  image_mask=np.array([]),print_on=True):
     # Indices to make code more readable
-    [xi,yi] = [0,1]
-
+    (xi,yi) = (0,1)
 
     # Check that the image mask matches the camera if not warn the user
     if (image_mask.shape[0] != camera.num_px[yi]) or (image_mask.shape[1] != camera.num_px[xi]):
@@ -432,12 +431,12 @@ def deform_image(upsampled_image,camera,id_opts,coords,disp,
 
 
     # Get grid of pixel centroid locations
-    [px_vec_xm,px_vec_ym] = get_pixel_vec(camera)
-    [px_grid_xm,px_grid_ym] = get_pixel_grid(camera)
+    #[px_vec_xm,px_vec_ym] = get_pixel_vec(camera)
+    (px_grid_xm,px_grid_ym) = get_pixel_grid(camera)
 
     # Get grid of sub-pixel centroid locations
-    [subpx_vec_xm,subpx_vec_ym] = get_subpixel_vec(camera, id_opts.subsample)
-    [subpx_grid_xm,subpx_grid_ym] = get_subpixel_grid(camera, id_opts.subsample)
+    #[subpx_vec_xm,subpx_vec_ym] = get_subpixel_vec(camera, id_opts.subsample)
+    (subpx_grid_xm,subpx_grid_ym) = get_subpixel_grid(camera, id_opts.subsample)
 
     #--------------------------------------------------------------------------
     # Interpolate FE displacements onto the sub-pixel grid
@@ -445,15 +444,22 @@ def deform_image(upsampled_image,camera,id_opts,coords,disp,
         print('Interpolating displacement onto sub-pixel grid.')
         tic = time.perf_counter()
 
-    # Create deformed coords in the cameras reference frame
-    def_node_x = coords[xi] + disp[xi] + camera.roi_loc[xi]
-    def_node_y = coords[yi] + disp[yi] + camera.roi_loc[yi]
-
     # Interpolate displacements onto sub-pixel locations - nan extrapolation
-    subpx_disp_x = griddata((def_node_x,def_node_y),disp[xi],(subpx_grid_xm,subpx_grid_ym),
-                         method=id_opts.fe_interp,fill_value=np.nan,rescale=id_opts.fe_rescale)
-    subpx_disp_y = griddata((def_node_x,def_node_y),disp[yi],(subpx_grid_xm,subpx_grid_ym),
-                         method=id_opts.fe_interp,fill_value=np.nan,rescale=id_opts.fe_rescale)
+    subpx_disp_x = griddata((coords[xi] + disp[xi] + camera.roi_loc[xi],
+                             coords[yi] + disp[yi] + camera.roi_loc[yi]),
+                            disp[xi],
+                            (subpx_grid_xm,subpx_grid_ym),
+                            method=id_opts.fe_interp,
+                            fill_value=np.nan,
+                            rescale=id_opts.fe_rescale)
+
+    subpx_disp_y = griddata((coords[xi] + disp[xi] + camera.roi_loc[xi],
+                             coords[yi] + disp[yi] + camera.roi_loc[yi]),
+                            disp[yi],
+                            (subpx_grid_xm,subpx_grid_ym),
+                            method=id_opts.fe_interp,
+                            fill_value=np.nan,
+                            rescale=id_opts.fe_rescale)
 
     # Ndimage interp can't handle nans so force everything outside the specimen
     # to extrapolate outside the FOV - then use ndimage opts to control

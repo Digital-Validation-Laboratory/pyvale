@@ -129,7 +129,9 @@ def main() -> None:
 
     # If the input image is just a pattern then the image needs to be masked to
     # show just the sample geometry.
-    id_opts.mask_input_image = True
+    id_opts.mask_input_image = False
+    # Set this to True for holes and notches and False for a rectangle
+    id_opts.complex_geom = False
 
     # If the input image is much larger than needed it can also be cropped to
     # increase computational speed.
@@ -156,7 +158,7 @@ def main() -> None:
 
     # Assume the camera has the same number of pixels as the input image unless we
     # are going to crop/mask the input image
-    [xi,yi] = [0,1] # Indices to make code more readable
+    (xi,yi) = (0,1) # Indices to make code more readable
     pixels = np.array([input_im.shape[1],input_im.shape[0]])
     if id_opts.crop_on:
         if id_opts.crop_px[xi] > 0:
@@ -229,6 +231,7 @@ def main() -> None:
     input_im = sit.crop_image(camera,input_im)
 
     # 3) MASK IMAGE
+    image_mask = None
     if id_opts.mask_input_image:
         print('Image masking turned on, masking image...')
         tic = time.time()
@@ -245,6 +248,9 @@ def main() -> None:
         image_mask = sit.get_image_mask(camera, fe_data.nodes, 1)
         toc = time.time()
         print('Calculating image mask took {:.4f} seconds'.format(toc-tic))
+
+    if image_mask is None:
+        image_mask = np.ones([camera.num_px[yi],camera.num_px[xi]])
 
     if plot_diags:
         fig, ax = plt.subplots()

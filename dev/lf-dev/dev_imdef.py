@@ -127,7 +127,9 @@ def main() -> None:
 
     # If the input image is just a pattern then the image needs to be masked to
     # show just the sample geometry.
-    id_opts.mask_input_image = True
+    id_opts.mask_input_image = False
+    # Set this to True for holes and notches and False for a rectangle
+    id_opts.complex_geom = False
 
     # If the input image is much larger than needed it can also be cropped to
     # increase computational speed.
@@ -154,7 +156,7 @@ def main() -> None:
 
     # Assume the camera has the same number of pixels as the input image unless we
     # are going to crop/mask the input image
-    [xi,yi] = [0,1] # Indices to make code more readable
+    (xi,yi) = (0,1) # Indices to make code more readable
     pixels = np.array([input_im.shape[1],input_im.shape[0]])
     if id_opts.crop_on:
         if id_opts.crop_px[xi] > 0:
