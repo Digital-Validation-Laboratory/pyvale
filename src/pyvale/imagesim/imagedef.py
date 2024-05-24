@@ -8,6 +8,8 @@ Copyright (C) 2024 The Computer Aided Validation Team
 
 import time
 import warnings
+from dataclasses import dataclass
+
 import numpy as np
 from shapely.geometry import Point
 from scipy.signal import convolve2d
@@ -15,198 +17,59 @@ from scipy.interpolate import griddata
 from scipy.interpolate import interp2d
 from scipy import ndimage
 
+from pyvale.imagesim.imagedefopts import ImageDefOpts
+from pyvale.imagesim.cameradata import CameraData
 from pyvale.imagesim.alphashape import alphashape
 
-class CameraData:
-    def __init__(self,num_px=np.array([1000,1000]),bits=8,m_per_px=1.0e-3):
-        # Core params
-        self._num_px = num_px
-        self._bits = bits
-        self._m_per_px = m_per_px
 
-        # Calculated parameters
-        self._fov = self._m_per_px*self._num_px
-        self._dyn_range = 2**self._bits
-        self._background = self._dyn_range/2
-
-        # Region of Interest (ROI)
-        self._roi_cent = [True,True]
-        self._roi_len = self._fov
-        self._roi_loc = np.array([0.0,0.0])
-
-    @property
-    def num_px(self):
-        return self._num_px
-
-    @property
-    def bits(self):
-        return self._bits
-    @property
-    def m_per_px(self):
-        return self._m_per_px
-
-    @property
-    def fov(self):
-        return self._fov
-
-    @property
-    def dyn_range(self):
-        return self._dyn_range
-
-    @property
-    def background(self):
-        return self._background
-
-    @property
-    def roi_len(self):
-        return self._roi_len
-
-    @property
-    def roi_loc(self):
-        return self._roi_loc
-
-    @property
-    def roi_cent(self):
-        return self._roi_cent
-
-    @num_px.setter
-    def num_px(self,in_px):
-        self._num_px = in_px
-        self._fov = self._m_per_px*self._num_px
-
-    @bits.setter
-    def bits(self,in_bits):
-        self._bits = in_bits
-        self._dyn_range = 2**self._bits
-        self._background = self._dyn_range*0.5
-
-    @background.setter
-    def background(self,background):
-        self._background = background
-
-    @m_per_px.setter
-    def m_per_px(self,in_calib):
-        self._m_per_px = in_calib
-        self._fov = self._m_per_px*self._num_px
-
-    @roi_len.setter
-    def roi_len(self,in_len):
-        self._roi_len = in_len
-        self._cent_roi()
-
-    @roi_loc.setter
-    def roi_loc(self,in_loc):
-        if sum(self._roi_cent) > 0:
-            warnings.warn('ROI is centered, cannot set ROI location. Update centering flags to adjust.')
-        else:
-            self._roi_loc = in_loc
-
-    @roi_cent.setter
-    def roi_cent(self,in_flags):
-        self._roi_cent = in_flags
-        self._cent_roi()
-
-    def _cent_roi(self):
-        if self._roi_cent[0] == True:
-            self._roi_loc[0] = (self._fov[0] - self._roi_len[0])/2
-        if self._roi_cent[1] == True:
-            self._roi_loc[1] = (self._fov[1] - self._roi_len[1])/2
-
-class ImageDefOpts:
-    def __init__(self):
-        #----------------------------------------------------------------------
-        # USER CONTROLLED OPTIONS
-        # Set these to achieve desired behaviour
-
-        # Use this if starting with a full speckle or grid to create an
-        # an artificial image with just the specimen geom
-        self.mask_input_image = True
-
-        # Use this to crop the image to reduce computational  time, useful if
-        # there are large borders around the specimen
-        self.crop_on = False
-        self.crop_px = np.array([1000,1000]) # only used to crop input image if above is true
-
-        # Used to calculate ideal resolution using FE data and leaving a
-        # a specified number of pixels around the border of the image
-        self.calc_res_from_fe =  False
-        self.calc_res_border_px = 5
-
-        # Options to append the input image to the list or to add a zero disp
-        # frame at the start of the displacement data, useful to create static
-        # image with masking
-        self.add_static_frame = True
-
-        #----------------------------------------------------------------------
-        # IMAGE AND DISPLACEMENT INTERPOLATION OPTIONS
-        # Leave these as defaults unless advanced options are required. The
-        # Following setup achieves a 1/1000th pixel accuracy using a rigid body
-        # motion test analysed with the grid method and DIC. Computation time
-        # is ~15 seconds per 1Mpx image on an AMD Ryzen 7, 4700U, 8 core CPU.
-
-        # Interpolation type for using griddata to interpolate: scipy-griddata
-        self.fe_interp = 'linear'
-        self.fe_rescale = True
-        self.fe_extrap_outside_fov = True # forces displacements outside the
-        # specimen area to be padded with border values
-
-        # Subsampling used to split each pixel in the input image
-        self.subsample = 3
-
-        # Interpolation used to upsample the input image: scipy-interp2d
-        self.image_upsamp_interp = 'cubic'
-
-        # Order of interpolant used to deform the image: scipy.ndimage.map_coords
-        self.image_def_order = 3
-        self.image_def_extrap = 'nearest'
-        self.image_def_extval = 0.0 # only used if above is 'constant'
-
-        # Used to deal with holes and notches - if the specimen is just a
-        # rectangle this can be set to false
-        self.complex_geom = True
-
-
-def get_pixel_vec(camera):
+def get_pixel_vec_in_m(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
     (xi,yi) = (0,1)
     mppx = camera.m_per_px
     px_vec_xm = np.arange(mppx/2,camera.fov[xi],mppx)
     px_vec_ym = np.arange(mppx/2,camera.fov[yi],mppx)
-    px_vec_ym = px_vec_ym[::-1] #flip
-    return [px_vec_xm,px_vec_ym]
+    px_vec_ym = px_vec_ym[::-1] # flip
+    return (px_vec_xm,px_vec_ym)
 
-def get_pixel_grid(camera):
-    [px_vec_xm,px_vec_ym] = get_pixel_vec(camera)
-    [px_grid_xm,px_grid_ym] = np.meshgrid(px_vec_xm,px_vec_ym)
-    return [px_grid_xm,px_grid_ym]
 
-def get_pixel_vec_inpx(camera):
-    [xi,yi] = [0,1]
+def get_pixel_grid_in_m(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
+    (px_vec_xm,px_vec_ym) = get_pixel_vec_in_m(camera)
+    (px_grid_xm,px_grid_ym) = np.meshgrid(px_vec_xm,px_vec_ym)
+    return (px_grid_xm,px_grid_ym)
+
+
+def get_pixel_vec_in_px(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
+    (xi,yi) = (0,1)
     px_vec_x = np.arange(0,camera.num_px[xi],1)
     px_vec_y = np.arange(0,camera.num_px[yi],1)
-    px_vec_y = px_vec_y[::-1] #flip
-    return [px_vec_x,px_vec_y]
+    px_vec_y = px_vec_y[::-1] # flip
+    return (px_vec_x,px_vec_y)
 
-def get_pixel_grid_inpx(camera):
-    [px_vec_x,px_vec_y] = get_pixel_vec_inpx(camera)
-    [px_grid_x,px_grid_y] = np.meshgrid(px_vec_x,px_vec_y)
-    return [px_grid_x,px_grid_y]
 
-def get_subpixel_vec(camera,subsample):
-    [xi,yi] = [0,1]
+def get_pixel_grid_in_px(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
+    (px_vec_x,px_vec_y) = get_pixel_vec_in_px(camera)
+    (px_grid_x,px_grid_y) = np.meshgrid(px_vec_x,px_vec_y)
+    return (px_grid_x,px_grid_y)
+
+
+def get_subpixel_vec(camera: CameraData, subsample: int = 3
+                     ) -> tuple[np.ndarray,np.ndarray]:
+    (xi,yi) = (0,1)
     mppx = camera.m_per_px
     subpx_vec_xm = np.arange(mppx/(2*subsample),camera.fov[xi],mppx/subsample)
     subpx_vec_ym = np.arange(mppx/(2*subsample),camera.fov[yi],mppx/subsample)
     subpx_vec_ym = subpx_vec_ym[::-1] #flip
-    return [subpx_vec_xm,subpx_vec_ym]
+    return (subpx_vec_xm,subpx_vec_ym)
 
-def get_subpixel_grid(camera,subsample):
-    [subpx_vec_xm,subpx_vec_ym] = get_subpixel_vec(camera,subsample)
-    [subpx_grid_xm,subpx_grid_ym] = np.meshgrid(subpx_vec_xm,subpx_vec_ym)
-    return [subpx_grid_xm,subpx_grid_ym]
 
-def get_roi_node_vec(camera):
-    [xi,yi] = [0,1]
-    # Create a mesh of nodal locations along the sample area covered by grid
+def get_subpixel_grid(camera: CameraData, subsample: int = 3
+                     ) -> tuple[np.ndarray,np.ndarray]:
+    (subpx_vec_xm,subpx_vec_ym) = get_subpixel_vec(camera,subsample)
+    (subpx_grid_xm,subpx_grid_ym) = np.meshgrid(subpx_vec_xm,subpx_vec_ym)
+    return (subpx_grid_xm,subpx_grid_ym)
+
+
+def get_roi_node_vec(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
+    (xi,yi) = (0,1)
     node_vec_x = np.arange(0+camera.roi_loc[xi],
                            camera.roi_len[xi]+camera.roi_loc[xi]+camera.m_per_px/2,
                            camera.m_per_px)
@@ -214,15 +77,18 @@ def get_roi_node_vec(camera):
                            camera.roi_len[yi]+camera.roi_loc[yi]+camera.m_per_px/2,
                            camera.m_per_px)
     node_vec_y = node_vec_y[::-1] # flipud
-    return [node_vec_x,node_vec_y]
+    return (node_vec_x,node_vec_y)
 
-def get_roi_node_grid(camera):
-    [node_vec_x,node_vec_y] = get_roi_node_vec(camera)
-    [node_grid_x,node_grid_y] = np.meshgrid(node_vec_x,node_vec_y)
-    return [node_grid_x,node_grid_y]
 
-def calc_roi_from_nodes(camera,nodes):
-    [xi,yi] = [0,1]
+def get_roi_node_grid(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
+    (node_vec_x,node_vec_y) = get_roi_node_vec(camera)
+    (node_grid_x,node_grid_y) = np.meshgrid(node_vec_x,node_vec_y)
+    return (node_grid_x,node_grid_y)
+
+
+# TODO: nodes need to be changed to SimData
+def calc_roi_from_nodes(camera: CameraData,nodes):
+    (xi,yi) = (0,1)
     roi_len_x = np.max(nodes.loc_x) - np.min(nodes.loc_x)
     roi_len_y = np.max(nodes.loc_y) - np.min(nodes.loc_y)
     roi_len = np.array([roi_len_x,roi_len_y])
@@ -230,6 +96,8 @@ def calc_roi_from_nodes(camera,nodes):
         warnings.warn('ROI is larger than the cameras FOV')
     return roi_len
 
+
+# TODO: nodes need to changed to SimData
 def calc_res_from_nodes(camera,nodes,border_px):
     [xi,yi] = [0,1]
     # Calculate ROI length based on dist between furthest nodes
@@ -246,13 +114,15 @@ def calc_res_from_nodes(camera,nodes,border_px):
 
     return m_per_px
 
-def norm_dynamic_range(in_image,bits):
+
+def norm_dynamic_range(in_image: np.ndarray, bits: int) -> np.ndarray:
     if bits > 8 and bits < 16:
         ret_image  = ((2**16)/(2**bits))*in_image
     elif bits < 8:
         raise ValueError('Camera cannot have less than an 8 bit dynamic range\n.')
 
     return ret_image
+
 
 def get_image_num_str(im_num,width,cam_num=-1):
     num_str = str(im_num)
@@ -265,9 +135,9 @@ def get_image_num_str(im_num,width,cam_num=-1):
     return num_str
 
 
-def crop_image(camera,image):
+def crop_image(camera: CameraData, image: np.ndarray) -> np.ndarray:
     [xi,yi] = [0,1]
-    # If the loaded image is larger than required then crop based on the camera
+    # If the loaded image is larger than required  then crop based on the camera
     if camera.num_px[xi] > image.shape[1]:
         raise ValueError('Cannot crop image: Number of pixels in camera class is larger than in the loaded image\n.')
     elif camera.num_px[xi] < image.shape[1]:
@@ -281,27 +151,31 @@ def crop_image(camera,image):
     return image
 
 
-def mask_image_with_fe(camera,image,nodes):
+# TODO: nodes
+def mask_image_with_fe(camera: CameraData, image: np.ndarray, nodes):
     # Indices to make code more readable
-    [xi,yi] = [0,1]
+    (xi,yi) = (0,1)
 
     # Create a mesh of pixel centroid locations
-    [px_x_m,px_y_m] = get_pixel_grid(camera)
+    (px_x_m,px_y_m) = get_pixel_grid_in_m(camera)
 
     # If the loaded image is larger than required then crop based on the camera
     image = crop_image(camera,image)
 
     # Specify the size of the ROI based on the farthest node on each axis
-    #camera.roi_len = calc_roi_from_nodes(camera, nodes)
+    # camera.roi_len = calc_roi_from_nodes(camera, nodes)
 
     # Create a list of nodal points to calculate the alpha shape
+    '''
     points = list()
     for ii in range(nodes.nums.shape[0]):
         points.append((nodes.loc_x[ii]+camera.roi_loc[xi],
                        nodes.loc_y[ii]+camera.roi_loc[yi]))
+    '''
 
     # Convert to np array for compatibility with new alpha shape function
-    points = np.array(points)
+    points = np.array((nodes.loc_x+camera.roi_loc[xi],
+                       nodes.loc_y+camera.roi_loc[yi]))
 
     # Calculate the element edge length to use as the alpha radius
     elem_edge = 2*np.max(np.diff(np.sort(nodes.loc_x)))
@@ -344,7 +218,7 @@ def get_image_mask(camera,nodes,subsample):
     if subsample > 1:
         [px_x_m,px_y_m] = get_subpixel_grid(camera,subsample)
     else:
-        [px_x_m,px_y_m] = get_pixel_grid(camera)
+        [px_x_m,px_y_m] = get_pixel_grid_in_m(camera)
 
     # Specify the size of the ROI based on the farthest node on each axis
     camera.roi_len = calc_roi_from_nodes(camera, nodes)
@@ -388,7 +262,7 @@ def get_image_mask(camera,nodes,subsample):
 
 def upsample_image(camera,id_opts,input_im):
     # Get grid of pixel centroid locations
-    [px_vec_xm,px_vec_ym] = get_pixel_vec(camera)
+    [px_vec_xm,px_vec_ym] = get_pixel_vec_in_m(camera)
 
     # Get grid of sub-pixel centroid locations
     [subpx_vec_xm,subpx_vec_ym] = get_subpixel_vec(camera, id_opts.subsample)
@@ -416,6 +290,17 @@ def average_subpixel_image(subpx_image,subsample):
     return avg_image
 
 
+def gen_grid_image(camera,px_per_period,contrast_amp,contrast_offset=0.5):
+    [px_grid_x,px_grid_y] = get_pixel_grid_in_px(camera)
+
+    grid_image = (2*contrast_amp*camera.dyn_range)/4 \
+                    *(1+np.cos(2*np.pi*px_grid_x/px_per_period)) \
+                    *(1+np.cos(2*np.pi*px_grid_y/px_per_period)) \
+                    +camera.dyn_range*(contrast_offset-contrast_amp)
+
+    return grid_image
+
+
 def deform_image(upsampled_image,camera,id_opts,coords,disp,
                  image_mask=np.array([]),print_on=True):
     # Indices to make code more readable
@@ -432,7 +317,7 @@ def deform_image(upsampled_image,camera,id_opts,coords,disp,
 
     # Get grid of pixel centroid locations
     #[px_vec_xm,px_vec_ym] = get_pixel_vec(camera)
-    (px_grid_xm,px_grid_ym) = get_pixel_grid(camera)
+    (px_grid_xm,px_grid_ym) = get_pixel_grid_in_m(camera)
 
     # Get grid of sub-pixel centroid locations
     #[subpx_vec_xm,subpx_vec_ym] = get_subpixel_vec(camera, id_opts.subsample)
@@ -466,7 +351,7 @@ def deform_image(upsampled_image,camera,id_opts,coords,disp,
     if id_opts.fe_extrap_outside_fov:
         subpx_disp_ext_vals = 2*camera.fov
     else:
-        subpx_disp_ext_vals = [0.0,0.0]
+        subpx_disp_ext_vals = (0.0,0.0)
 
     # Set the nans to the extrapoltion value
     subpx_disp_x[np.isnan(subpx_disp_x)] = subpx_disp_ext_vals[xi]
@@ -492,13 +377,13 @@ def deform_image(upsampled_image,camera,id_opts,coords,disp,
     # NDIMAGE: IMAGE DEF
     # NOTE: need to shift to pixel centroid co-ords from nodal so -0.5 makes the
     # top left 0,0 in pixel co-ords
-    def_subpx_x_inpx = def_subpx_x*(id_opts.subsample/camera.m_per_px)-0.5
-    def_subpx_y_inpx = def_subpx_y*(id_opts.subsample/camera.m_per_px)-0.5
+    def_subpx_x_in_px = def_subpx_x*(id_opts.subsample/camera.m_per_px)-0.5
+    def_subpx_y_in_px = def_subpx_y*(id_opts.subsample/camera.m_per_px)-0.5
     # NOTE: prefilter needs to be on to match griddata and interp2D!
     # with prefilter on this exactly matches I2D but 10x faster!
     def_image_subpx = ndimage.map_coordinates(upsampled_image,
-                                            [[def_subpx_y_inpx],
-                                             [def_subpx_x_inpx]],
+                                            [[def_subpx_y_in_px],
+                                             [def_subpx_x_in_px]],
                                             prefilter=True,
                                             order= id_opts.image_def_order,
                                             mode= id_opts.image_def_extrap,
@@ -539,13 +424,13 @@ def deform_image(upsampled_image,camera,id_opts,coords,disp,
         # NDIMAGE: DEFORM IMAGE MASK
         # NOTE: need to shift to pixel centroid co-ords from nodal so -0.5 makes the
         # top left 0,0 in pixel co-ords
-        def_px_x_inpx = def_px_x*(1/camera.m_per_px)-0.5
-        def_px_y_inpx = def_px_y*(1/camera.m_per_px)-0.5
+        def_px_x_in_px = def_px_x*(1/camera.m_per_px)-0.5
+        def_px_y_in_px = def_px_y*(1/camera.m_per_px)-0.5
         # NOTE: prefilter needs to be on to match griddata and interp2D!
         # with prefilter on this exactly matches I2D but 10x faster!
         def_mask = ndimage.map_coordinates(image_mask,
-                                            [[def_px_y_inpx],
-                                             [def_px_x_inpx]],
+                                            [[def_px_y_in_px],
+                                             [def_px_x_in_px]],
                                             prefilter=True,
                                             order=2,
                                             mode='constant',
@@ -560,14 +445,8 @@ def deform_image(upsampled_image,camera,id_opts,coords,disp,
             toc = time.perf_counter()
             print('Deforming image mask with ndimage took {:.4f} seconds'.format(toc-tic))
 
-    return [def_image,def_image_subpx,subpx_disp_x,subpx_disp_y,def_mask]
+    else:
+        def_mask = None
 
-def gen_grid_image(camera,px_per_period,contrast_amp,contrast_offset=0.5):
-    [px_grid_x,px_grid_y] = get_pixel_grid_inpx(camera)
+    return (def_image,def_image_subpx,subpx_disp_x,subpx_disp_y,def_mask)
 
-    grid_image = (2*contrast_amp*camera.dyn_range)/4 \
-                    *(1+np.cos(2*np.pi*px_grid_x/px_per_period)) \
-                    *(1+np.cos(2*np.pi*px_grid_y/px_per_period)) \
-                    +camera.dyn_range*(contrast_offset-contrast_amp)
-
-    return grid_image

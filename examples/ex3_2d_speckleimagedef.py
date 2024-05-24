@@ -23,10 +23,7 @@ must also locate the sample within the cameras FOV which is controlled by the
 Region Of Interest (roi) parameters in the camera object.
 """
 
-import os
 import time
-import tkinter
-from tkinter import filedialog
 import pickle
 from pprint import pprint
 from pathlib import Path
@@ -36,19 +33,17 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mplim
 from PIL import Image
 
+from pyvale.imagesim.imagedefopts import ImageDefOpts
+from pyvale.imagesim.cameradata import CameraData
 import pyvale.imagesim.imagedef as sit
+
 
 def main() -> None:
     # LOAD DATA
     print()
     print('------------------------------------------------------------------')
-    print('SYNTHETIC IMAGE DEFORMATION')
+    print('PYVALE EXAMPLE: IMAGE DEFORMATION 2D')
     print('------------------------------------------------------------------')
-    # Setup up the root window of the GUI and hide it
-    root = tkinter.Tk()
-    root.wm_attributes('-topmost', 1)
-    root.withdraw()
-
     # Gets the directory of the current script file
     cwd = Path.cwd()
     print("Current working directory:")
@@ -56,19 +51,9 @@ def main() -> None:
 
     #------------------------------------------------------------------------------
     # Get path and file name of the synethetic speckle image
-    hardCodePath = True
-    if not hardCodePath:
-        # Pop a file dialog and get the file name and path
-        full_path = filedialog.askopenfilename(parent=root,
-                                            initialdir=cwd,
-                                            title="Select speckle image file")
-        im_path, im_file = os.path.split(full_path)
-        im_path = Path(im_path)
-    else:
-        im_path = Path('data/speckleimages')
-        #im_file = 'OptimisedSpeckle_500_500_width3.0_16bit_GBlur1.tiff'
-        im_file = 'OptimisedSpeckle_2464_2056_width5.0_8bit_GBlur1.tiff'
-
+    im_path = Path('data/speckleimages')
+    #im_file = 'OptimisedSpeckle_500_500_width3.0_16bit_GBlur1.tiff'
+    im_file = 'OptimisedSpeckle_2464_2056_width5.0_8bit_GBlur1.tiff'
 
     print('\nLoading speckle image from path:')
     print('{}'.format(im_path))
@@ -82,17 +67,8 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # Load FE data
-    hardCodePath = True
-    if not hardCodePath:
-        # Pop a file dialog and get the file name and path
-        full_path = filedialog.askopenfilename(parent=root,
-                                            initialdir=cwd,
-                                            title="Select FE data pickle")
-        fe_path, fe_file = os.path.split(full_path)
-        fe_path = Path(fe_path)
-    else:
-        fe_path = Path('scripts/imdef_cases/imdefcase7_RampRigidBodyMotion_1_0px')
-        fe_file = 'fe_data.pkl'
+    fe_path = Path('scripts/imdef_cases/imdefcase7_RampRigidBodyMotion_1_0px')
+    fe_file = 'fe_data.pkl'
 
     print('\nLoading pickled FE data from path:')
     print('{}'.format(fe_path))
@@ -125,7 +101,7 @@ def main() -> None:
 
     #------------------------------------------------------------------------------
     # CREATE IMAGE DEF OPTS
-    id_opts = sit.ImageDefOpts()
+    id_opts = ImageDefOpts()
 
     # If the input image is just a pattern then the image needs to be masked to
     # show just the sample geometry.
@@ -153,7 +129,7 @@ def main() -> None:
     #------------------------------------------------------------------------------
     # CREATE CAMERA OBJECT
     # Create a default camera object
-    camera = sit.CameraData()
+    camera = CameraData()
     # Need to set the number of pixels in [X,Y], the bit depth and the m/px
 
     # Assume the camera has the same number of pixels as the input image unless we
@@ -327,12 +303,12 @@ def main() -> None:
 
     if plot_diags:
         # Get grid of pixel centroid locations
-        [px_vec_xm,px_vec_ym] = sit.get_pixel_vec(camera)
-        [px_grid_xm,px_grid_ym] = sit.get_pixel_grid(camera)
+        #(px_vec_xm,px_vec_ym) = sit.get_pixel_vec_in_m(camera)
+        #(px_grid_xm,px_grid_ym) = sit.get_pixel_grid_in_m(camera)
 
         # Get grid of sub-pixel centroid locations
-        [subpx_vec_xm,subpx_vec_ym] = sit.get_subpixel_vec(camera, id_opts.subsample)
-        [subpx_grid_xm,subpx_grid_ym] = sit.get_subpixel_grid(camera, id_opts.subsample)
+        #(subpx_vec_xm,subpx_vec_ym) = sit.get_subpixel_vec(camera, id_opts.subsample)
+        (subpx_grid_xm,subpx_grid_ym) = sit.get_subpixel_grid(camera, id_opts.subsample)
 
         #--------------------------------------------------------------------------
         fig, ax = plt.subplots()
@@ -356,11 +332,12 @@ def main() -> None:
             ax.set_title('Undef. Image Mask',fontsize=12)
             cbar = fig.colorbar(cset)
 
-            fig, ax = plt.subplots()
-            cset = plt.imshow(def_mask,cmap=plt.get_cmap(im_cmap),origin='lower')
-            ax.set_aspect('equal','box')
-            ax.set_title('Def. Mask',fontsize=12)
-            cbar = fig.colorbar(cset)
+            if def_mask is not None:
+                fig, ax = plt.subplots()
+                cset = plt.imshow(def_mask,cmap=plt.get_cmap(im_cmap),origin='lower')
+                ax.set_aspect('equal','box')
+                ax.set_title('Def. Mask',fontsize=12)
+                cbar = fig.colorbar(cset)
 
         #--------------------------------------------------------------------------
         fig, ax = plt.subplots()
