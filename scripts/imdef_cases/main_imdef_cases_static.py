@@ -269,6 +269,33 @@ def main() -> None:
     save_test_case(save_path,test_case,sim_data)
 
     #---------------------------------------------------------------------------
+    # TEST CASE 8: Rigid Body Motion RAMP
+    # Linear ramp up to 5px of rigid body motion in X and Y
+    test_case.test_num = test_case.test_num+1
+    test_case.test_tag = 'RampRigidBodyMotion_5_0px'
+    test_case.test_val = 5.0
+    num_frames = 10
+
+    sim_data = gen_data
+    sim_data.node_vars = dict()
+
+    # Create a vector of rigid displacements
+    disp_max_m = test_case.test_val*test_case.m_per_px
+    disp_inc_m = disp_max_m/num_frames
+    disp_vec_m = np.arange(disp_inc_m,disp_max_m+disp_inc_m,disp_inc_m)
+
+    disp_x = np.zeros([num_nodes,num_frames])
+    disp_y = np.zeros([num_nodes,num_frames])
+    for ff in range(num_frames):
+        disp_x[:,ff] = disp_vec_m[ff]
+        disp_y[:,ff] = disp_vec_m[ff]
+
+    sim_data.node_vars['disp_x'] = disp_x
+    sim_data.node_vars['disp_y'] = disp_y
+
+    save_test_case(save_path,test_case,sim_data)
+
+    #---------------------------------------------------------------------------
     # TEST CASE 0: Random Disp x10
     num_frames = 10
     rng = default_rng(42)

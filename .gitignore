@@ -12,6 +12,7 @@
 # Image deformation test cases
 *.pkl
 imdefcase*_*/
+deformed_images/
 
 #-------------------------------------------------------------------------------
 # Python Standard Ignore

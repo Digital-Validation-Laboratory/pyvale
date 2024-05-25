@@ -33,6 +33,8 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mplim
 from PIL import Image
 
+from mooseherder import ExodusReader
+
 from pyvale.imagesim.imagedefopts import ImageDefOpts
 from pyvale.imagesim.cameradata import CameraData
 import pyvale.imagesim.imagedefdiags as idd
@@ -68,17 +70,26 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # Load simulation data - expects a mooseherder.SimData object
-    read_exodus = False
+    read_exodus = True
 
     sim_path = Path.cwd()
     if read_exodus:
-        pass
-        #TODO
+        case_str = 'case14'
+        sim_path = Path(f'simcases/{case_str}')
+        #sim_file = 'case02_out.e'
+        sim_file = f'{case_str}_out.e'
+
+        print('\nLoading SimData from exodus in path:')
+        print(sim_path)
+
+        exodus_reader = ExodusReader(sim_path / sim_file)
+        sim_data = exodus_reader.read_all_sim_data()
+
     else:
-        sim_path = Path('scripts/imdef_cases/imdefcase7_RampRigidBodyMotion_1_0px')
+        sim_path = Path('scripts/imdef_cases/imdefcase8_RampRigidBodyMotion_5_0px')
         sim_file = 'sim_data.pkl'
 
-        print('\nLoading pickled FE data from path:')
+        print('\nLoading pickled SimData from path:')
         print(sim_path)
 
         with open(sim_path / sim_file,'rb') as sim_load_file:
@@ -125,7 +136,10 @@ def main() -> None:
     id_opts.calc_res_border_px = 10
 
     # Set this to true to create an undeformed masked image
-    id_opts.add_static_frame = True
+    if read_exodus:
+        id_opts.add_static_frame = False
+    else:
+        id_opts.add_static_frame = True
 
     print('Image Def Opts:')
     pprint(vars(id_opts))
