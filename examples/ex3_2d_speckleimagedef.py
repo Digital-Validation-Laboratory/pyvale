@@ -66,16 +66,19 @@ def main() -> None:
         input_im = input_im[:,:,0]
 
     #---------------------------------------------------------------------------
-    # Load FE data
-    fe_path = Path('scripts/imdef_cases/imdefcase7_RampRigidBodyMotion_1_0px')
-    fe_file = 'fe_data.pkl'
+    # Load simulation data - expects a mooseherder.SimData object
+    read_exodus = False
+
+
+    sim_path = Path('scripts/imdef_cases/imdefcase7_RampRigidBodyMotion_1_0px')
+    sim_file = 'fe_data.pkl'
 
     print('\nLoading pickled FE data from path:')
-    print('{}'.format(fe_path))
+    print('{}'.format(sim_path))
 
     tic = time.time()
-    with open(fe_path / fe_file,'rb') as fe_load_file:
-        fe_data = pickle.load(fe_load_file)
+    with open(sim_path / sim_file,'rb') as sim_load_file:
+        fe_data = pickle.load(sim_load_file)
     toc = time.time()
 
     print('Loading FE data pickle took {:.4f} seconds'.format(toc-tic))
@@ -194,7 +197,7 @@ def main() -> None:
         cset = plt.imshow(input_im,cmap=plt.get_cmap(im_cmap),origin='lower')
         ax.set_aspect('equal','box')
         ax.set_title('Raw Input Image',fontsize=12)
-        cbar = fig.colorbar(cset)
+        fig.colorbar(cset)
 
     # 1) ADD ZERO DISP FRAME TO FE DATA
     if id_opts.add_static_frame:
@@ -274,7 +277,7 @@ def main() -> None:
 
         #--------------------------------------------------------------------------
         # SAVE IMAGE
-        save_path = fe_path / 'deformed_images'
+        save_path = sim_path / 'deformed_images'
 
         # Need to flip image so coords are top left with Y down
         save_image = def_image[::-1,:]
