@@ -9,7 +9,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 IMAGE DEFORMATION
 
 This program takes an input image and deforms it using the displacement field
-in the fe_data object. The first block of code loads the input image and the
+in the sim_data object. The first block of code loads the input image and the
 pickled FE data which will be used to deform the image.
 
 The second block of code uses Speckle Image Tools (sit) to create the image
@@ -35,15 +35,16 @@ from PIL import Image
 
 from pyvale.imagesim.imagedefopts import ImageDefOpts
 from pyvale.imagesim.cameradata import CameraData
-import pyvale.imagesim.imagedef as sit
+import pyvale.imagesim.imagedefdiags as idd
+import pyvale.imagesim.imagedef as sid
 
 
 def main() -> None:
     # LOAD DATA
     print()
-    print('------------------------------------------------------------------')
+    print('-'*80)
     print('PYVALE EXAMPLE: IMAGE DEFORMATION 2D')
-    print('------------------------------------------------------------------')
+    print('-'*80)
     # Gets the directory of the current script file
     cwd = Path.cwd()
     print("Current working directory:")
@@ -52,11 +53,11 @@ def main() -> None:
     #------------------------------------------------------------------------------
     # Get path and file name of the synethetic speckle image
     im_path = Path('data/speckleimages')
-    #im_file = 'OptimisedSpeckle_500_500_width3.0_16bit_GBlur1.tiff'
-    im_file = 'OptimisedSpeckle_2464_2056_width5.0_8bit_GBlur1.tiff'
+    im_file = 'OptimisedSpeckle_500_500_width3.0_16bit_GBlur1.tiff'
+    #im_file = 'OptimisedSpeckle_2464_2056_width5.0_8bit_GBlur1.tiff'
 
     print('\nLoading speckle image from path:')
-    print('{}'.format(im_path))
+    print(im_path)
 
     # Load synthetic speckle image to mask
     input_im = mplim.imread(im_path / im_file)
@@ -69,23 +70,24 @@ def main() -> None:
     # Load simulation data - expects a mooseherder.SimData object
     read_exodus = False
 
+    sim_path = Path.cwd()
+    if read_exodus:
+        pass
+        #TODO
+    else:
+        sim_path = Path('scripts/imdef_cases/imdefcase7_RampRigidBodyMotion_1_0px')
+        sim_file = 'sim_data.pkl'
 
-    sim_path = Path('scripts/imdef_cases/imdefcase7_RampRigidBodyMotion_1_0px')
-    sim_file = 'fe_data.pkl'
+        print('\nLoading pickled FE data from path:')
+        print(sim_path)
 
-    print('\nLoading pickled FE data from path:')
-    print('{}'.format(sim_path))
+        with open(sim_path / sim_file,'rb') as sim_load_file:
+            sim_data = pickle.load(sim_load_file)
 
-    tic = time.time()
-    with open(sim_path / sim_file,'rb') as sim_load_file:
-        fe_data = pickle.load(sim_load_file)
-    toc = time.time()
-
-    print('Loading FE data pickle took {:.4f} seconds'.format(toc-tic))
 
     print('')
-    print('FE Data:')
-    pprint(vars(fe_data))
+    print('SimData:')
+    pprint(vars(sim_data))
     print('')
 
     #---------------------------------------------------------------------------
@@ -98,19 +100,19 @@ def main() -> None:
 
     # INIT IMAGE DEF OPTIONS AND CAMERA
     print('')
-    print('------------------------------------------------------------------')
+    print('-'*80)
     print('INIT. IMAGE DEF. OPTIONS AND CAMERA')
     print('')
 
-    #------------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
     # CREATE IMAGE DEF OPTS
     id_opts = ImageDefOpts()
 
     # If the input image is just a pattern then the image needs to be masked to
     # show just the sample geometry.
-    id_opts.mask_input_image = False
+    id_opts.mask_input_image = True
     # Set this to True for holes and notches and False for a rectangle
-    id_opts.complex_geom = False
+    id_opts.complex_geom = True
 
     # If the input image is much larger than needed it can also be cropped to
     # increase computational speed.
@@ -129,7 +131,7 @@ def main() -> None:
     pprint(vars(id_opts))
     print('')
 
-    #------------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
     # CREATE CAMERA OBJECT
     # Create a default camera object
     camera = CameraData()
@@ -161,121 +163,120 @@ def main() -> None:
 
     # Centers the specimen (ROI) in the FOV along the [X,Y] axis, if true the
     # camera.roi_loc parameters is set automatically and cannot be overidden
-    camera.roi_cent = [True,True]
+    camera.roi_cent = (True,True)
     # Can manually set the ROI location by setting the above to false and setting
     # the camera.roi_loc as the distance from the origin to the bottom left
     # corner of the sample [X,Y]: camera.roi_loc = np.array([1e-3,1e-3])
 
     # Default ROI is the whole FOV but we want to set this to be based on the
     # furthest nodes, this is set in FE units 'meters' and does not change FOV
-    camera.roi_len = sit.calc_roi_from_nodes(camera,fe_data.nodes)
+    camera.roi_len = sid.calc_roi_from_nodes(camera,sim_data.coords)
 
     # If we are masking an image we might want to set an optimal resolution based
     # on leaving a specified number of pixels free on each image edge, this will
     # change the FOV in 'meters'
     if id_opts.calc_res_from_fe:
-        camera.m_per_px = sit.calc_res_from_nodes(camera,fe_data.nodes,
+        camera.m_per_px = sid.calc_res_from_nodes(camera,sim_data.coords,
                                                 id_opts.calc_res_border_px)
 
     # Default ROI is the whole FOV but we want to set this to be based on the
     # furthest nodes, this is set in FE units 'meters' and does not change FOV
-    camera.roi_len = sit.calc_roi_from_nodes(camera,fe_data.nodes)
+    camera.roi_len = sid.calc_roi_from_nodes(camera,sim_data.coords)
 
     print('Camera:')
     pprint(vars(camera))
     print('')
 
+    #---------------------------------------------------------------------------
     # PRE-PROCESSING
     print('')
-    print('------------------------------------------------------------------')
+    print('-'*80)
     print('IMAGE AND DATA PRE-PROCESSING')
     print('')
 
-    # Show the image before any pre-processing
     if plot_diags:
-        fig, ax = plt.subplots()
-        cset = plt.imshow(input_im,cmap=plt.get_cmap(im_cmap),origin='lower')
-        ax.set_aspect('equal','box')
-        ax.set_title('Raw Input Image',fontsize=12)
-        fig.colorbar(cset)
+        idd.plot_diag_image('Raw input image',input_im,im_cmap)
 
-    # 1) ADD ZERO DISP FRAME TO FE DATA
     if id_opts.add_static_frame:
-        fe_data.disp.x = np.hstack((np.zeros((fe_data.disp.x.shape[0],1)),
-                                    fe_data.disp.x))
-        fe_data.disp.y = np.hstack((np.zeros((fe_data.disp.x.shape[0],1)),
-                                    fe_data.disp.y))
+        num_nodes = sim_data.coords.shape[0]
+        sim_data.node_vars['disp_x'] = np.hstack((np.zeros((num_nodes,1)),
+                                    sim_data.node_vars['disp_x']))
+        sim_data.node_vars['disp_y'] = np.hstack((np.zeros((num_nodes,1)),
+                                    sim_data.node_vars['disp_y']))
 
-    # 2) CROP IMAGE
-    input_im = sit.crop_image(camera,input_im)
+    input_im = sid.crop_image(camera,input_im)
 
-    # 3) MASK IMAGE
     image_mask = None
     if id_opts.mask_input_image:
         print('Image masking turned on, masking image...')
-        tic = time.time()
-        [input_im,image_mask] = sit.mask_image_with_fe(camera, input_im,
-                                                    fe_data.nodes)
-        toc = time.time()
-        print('Masking image took {:.4f} seconds'.format(toc-tic))
+        tic = time.perf_counter()
+        (input_im,image_mask) = sid.mask_image_with_fe(camera, input_im,
+                                                       sim_data.coords)
+        toc = time.perf_counter()
+        print(f'Masking image took {toc-tic:.4f} seconds')
 
     # Only need to do this if there are holes and notches
+    # TODO: use the FE mesh and connectivity to avoid alphashape!
     if id_opts.complex_geom and not id_opts.mask_input_image:
         print('Complex geometry is turned on.')
         print('Finding image mask by finding the alpha-shape of the FE nodes.')
-        tic = time.time()
-        image_mask = sit.get_image_mask(camera, fe_data.nodes, 1)
-        toc = time.time()
-        print('Calculating image mask took {:.4f} seconds'.format(toc-tic))
+        tic = time.perf_counter()
+        image_mask = sid.get_image_mask(camera, sim_data.coords, 1)
+        toc = time.perf_counter()
+        print(f'Calculating image mask took {toc-tic:.4f} seconds')
 
     if image_mask is None:
         image_mask = np.ones([camera.num_px[yi],camera.num_px[xi]])
 
     if plot_diags:
-        fig, ax = plt.subplots()
-        cset = plt.imshow(input_im,cmap=plt.get_cmap(im_cmap),origin='lower')
-        ax.set_aspect('equal','box')
-        ax.set_title('Pre-processed Image',fontsize=12)
-        cbar = fig.colorbar(cset)
+        idd.plot_diag_image('Pre-processed image', input_im, im_cmap)
 
+    #---------------------------------------------------------------------------
     # GENERATE UPSAMPLED IMAGE
     print('')
-    print('------------------------------------------------------------------')
+    print('-'*80)
     print('GENERATE UPSAMPLED IMAGE')
     print('')
 
-    print('Upsampling input image with a {}x{} subpixel'.format(id_opts.subsample,
-                                                                id_opts.subsample))
-    tic = time.time()
-    upsampled_image = sit.upsample_image(camera,id_opts,input_im)
-    toc = time.time()
-    print('Upsampling image with I2D took {:.4f} seconds'.format(toc-tic))
+    print(f'Upsampling input image with a {id_opts.subsample}x{id_opts.subsample} subpixel')
+    tic = time.perf_counter()
+    upsampled_image = sid.upsample_image(camera,id_opts,input_im)
+    toc = time.perf_counter()
+    print(f'Upsampling image with I2D took {toc-tic:.4f} seconds')
 
+
+    #---------------------------------------------------------------------------
     # DEFORM IMAGES
     print('')
-    print('------------------------------------------------------------------')
+    print('-'*80)
     print('DEFORMING IMAGES')
 
     # If there is only one frame we can't call shape
-    if fe_data.disp.x.ndim == 1:
+    if sim_data.node_vars['disp_x'].ndim == 1:
         num_frames = 1
     else:
-        num_frames = fe_data.disp.x.shape[1]
+        num_frames = sim_data.node_vars['disp_x'].shape[1]
 
-    ticl = time.time()
+    ticl = time.perf_counter()
     for ff in range(num_frames):
-        #--------------------------------------------------------------------------
-        ticf = time.time()
+        #-----------------------------------------------------------------------
+        ticf = time.perf_counter()
         print('')
-        print('DEFORMING FRAME: {}'.format(ff))
+        print(f'DEFORMING FRAME: {ff}')
 
-        [def_image,def_image_subpx,subpx_disp_x,subpx_disp_y,def_mask] = sit.deform_image(
-            upsampled_image,camera,id_opts,
-            np.array([fe_data.nodes.loc_x,fe_data.nodes.loc_y]),
-            np.array([fe_data.disp.x[:,ff],fe_data.disp.y[:,ff]]),
-            image_mask=image_mask,print_on=True)
+        disp_input = np.array([sim_data.node_vars['disp_x'][:,ff],
+                               sim_data.node_vars['disp_y'][:,ff]]).T
 
-        #--------------------------------------------------------------------------
+        (def_image,def_image_subpx,subpx_disp_x,subpx_disp_y,def_mask) = sid.deform_image(
+                upsampled_image,
+                camera,
+                id_opts,
+                sim_data.coords,
+                disp_input,
+                image_mask=image_mask,
+                print_on=True)
+
+        #-----------------------------------------------------------------------
         # SAVE IMAGE
         save_path = sim_path / 'deformed_images'
 
@@ -285,49 +286,50 @@ def main() -> None:
         if not save_path.is_dir():
             save_path.mkdir()
 
-        im_num = sit.get_image_num_str(ff,3)
+        im_num = sid.get_image_num_str(ff,3,0)
         save_file = save_path / str('defimage_'+im_num+'.tiff')
         im = Image.fromarray(save_image.astype(np.uint16))
         im.save(save_file)
 
-        tocf = time.time()
-        print('DEFORMING FRAME: {} took {:.4f} seconds'.format(ff,tocf-ticf))
+        tocf = time.perf_counter()
+        print(f'DEFORMING FRAME: {ff} took {tocf-ticf:.4f} seconds')
 
-    tocl = time.time()
+    tocl = time.perf_counter()
     print('')
     print('==================================================')
-    print('Deforming all images took {:.4f}'.format(tocl-ticl))
+    print(f'Deforming all images took {tocl-ticl:.4f}')
     print('==================================================')
 
+    #---------------------------------------------------------------------------
     # DIAGNOSTIC FIGURES
-    print('')
-    print('--------------------------------------------------------------------')
-    print('PLOTTING DIAGNOSTIC FIGURES')
-
     if plot_diags:
+        print('')
+        print('--------------------------------------------------------------------')
+        print('PLOTTING DIAGNOSTIC FIGURES')
+
         # Get grid of pixel centroid locations
-        #(px_vec_xm,px_vec_ym) = sit.get_pixel_vec_in_m(camera)
-        #(px_grid_xm,px_grid_ym) = sit.get_pixel_grid_in_m(camera)
+        #(px_vec_xm,px_vec_ym) = sid.get_pixel_vec_in_m(camera)
+        #(px_grid_xm,px_grid_ym) = sid.get_pixel_grid_in_m(camera)
 
         # Get grid of sub-pixel centroid locations
-        #(subpx_vec_xm,subpx_vec_ym) = sit.get_subpixel_vec(camera, id_opts.subsample)
-        (subpx_grid_xm,subpx_grid_ym) = sit.get_subpixel_grid(camera, id_opts.subsample)
+        #(subpx_vec_xm,subpx_vec_ym) = sid.get_subpixel_vec(camera, id_opts.subsample)
+        (subpx_grid_xm,subpx_grid_ym) = sid.get_subpixel_grid(camera, id_opts.subsample)
 
-        #--------------------------------------------------------------------------
+        #-----------------------------------------------------------------------
         fig, ax = plt.subplots()
         cset = plt.imshow(input_im,cmap=plt.get_cmap(im_cmap),origin='lower')
         ax.set_aspect('equal','box')
         ax.set_title('Input Image',fontsize=12)
         cbar = fig.colorbar(cset)
 
-        #--------------------------------------------------------------------------
+        #-----------------------------------------------------------------------
         fig, ax = plt.subplots()
         cset = plt.imshow(upsampled_image,cmap=plt.get_cmap(im_cmap),origin='lower')
         ax.set_aspect('equal','box')
         ax.set_title('Upsampled Image',fontsize=12)
         cbar = fig.colorbar(cset)
 
-        #--------------------------------------------------------------------------
+        #-----------------------------------------------------------------------
         if id_opts.complex_geom:
             fig, ax = plt.subplots()
             cset = plt.imshow(image_mask,cmap=plt.get_cmap(im_cmap),origin='lower')
@@ -342,21 +344,21 @@ def main() -> None:
                 ax.set_title('Def. Mask',fontsize=12)
                 cbar = fig.colorbar(cset)
 
-        #--------------------------------------------------------------------------
+        #-----------------------------------------------------------------------
         fig, ax = plt.subplots()
         cset = plt.imshow(def_image_subpx,cmap=plt.get_cmap(im_cmap),origin='lower')
         ax.set_aspect('equal','box')
         ax.set_title('Subpx Def. Image',fontsize=12)
         cbar = fig.colorbar(cset)
 
-        #--------------------------------------------------------------------------
+        #-----------------------------------------------------------------------
         fig, ax = plt.subplots()
         cset = plt.imshow(def_image,cmap=plt.get_cmap(im_cmap),origin='lower')
         ax.set_aspect('equal','box')
         ax.set_title('Def. Image',fontsize=12)
         cbar = fig.colorbar(cset)
 
-        #--------------------------------------------------------------------------
+        #-----------------------------------------------------------------------
         title_str = 'Sub Pixel Disp X'
         fig, ax = plt.subplots()
         fig.set_dpi(300)
@@ -371,9 +373,8 @@ def main() -> None:
         ax.set_xlabel('x [mm]',fontsize=12)
         ax.set_ylabel('y [mm]',fontsize=12)
         cbar = fig.colorbar(cset)
-        plt.show()
 
-        #--------------------------------------------------------------------------
+        #-----------------------------------------------------------------------
         title_str = 'Sub Pixel Disp Y'
         fig, ax = plt.subplots()
         fig.set_dpi(300)
@@ -388,11 +389,13 @@ def main() -> None:
         ax.set_xlabel('x [mm]',fontsize=12)
         ax.set_ylabel('y [mm]',fontsize=12)
         cbar = fig.colorbar(cset)
+
+        #-----------------------------------------------------------------------
         plt.show()
 
     # COMPLETE
     print('')
-    print('--------------------------------------------------------------------')
+    print('-'*80)
     print('COMPLETE\n')
 
 if __name__ == "__main__":
