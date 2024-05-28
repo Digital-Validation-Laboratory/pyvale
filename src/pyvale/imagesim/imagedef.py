@@ -8,7 +8,6 @@ Copyright (C) 2024 The Computer Aided Validation Team
 
 import time
 import warnings
-from dataclasses import dataclass
 
 import numpy as np
 from shapely.geometry import Point
@@ -21,7 +20,6 @@ from pyvale.imagesim.imagedefopts import ImageDefOpts
 from pyvale.imagesim.cameradata import CameraData
 from pyvale.imagesim.alphashape import alphashape
 
-# Constants
 (XI,YI) = (0,1)
 
 def get_pixel_vec_in_m(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
@@ -48,6 +46,7 @@ def get_pixel_vec_in_px(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
 
 
 def get_pixel_grid_in_px(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
+
     (px_vec_x,px_vec_y) = get_pixel_vec_in_px(camera)
     (px_grid_x,px_grid_y) = np.meshgrid(px_vec_x,px_vec_y)
     return (px_grid_x,px_grid_y)
@@ -65,6 +64,7 @@ def get_subpixel_vec(camera: CameraData, subsample: int = 3
 
 def get_subpixel_grid(camera: CameraData, subsample: int = 3
                      ) -> tuple[np.ndarray,np.ndarray]:
+
     (subpx_vec_xm,subpx_vec_ym) = get_subpixel_vec(camera,subsample)
     (subpx_grid_xm,subpx_grid_ym) = np.meshgrid(subpx_vec_xm,subpx_vec_ym)
     return (subpx_grid_xm,subpx_grid_ym)
@@ -83,24 +83,26 @@ def get_roi_node_vec(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
 
 
 def get_roi_node_grid(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
+
     (node_vec_x,node_vec_y) = get_roi_node_vec(camera)
     (node_grid_x,node_grid_y) = np.meshgrid(node_vec_x,node_vec_y)
     return (node_grid_x,node_grid_y)
 
 
-# TODO: nodes need to be changed to SimData
-def calc_roi_from_nodes(camera: CameraData, nodes: np.ndarray):
+def calc_roi_from_nodes(camera: CameraData, nodes: np.ndarray
+                        ) -> np.ndarray:
 
     roi_len_x = np.max(nodes[:,XI]) - np.min(nodes[:,XI])
     roi_len_y = np.max(nodes[:,YI]) - np.min(nodes[:,YI])
     roi_len = np.array([roi_len_x,roi_len_y])
     if roi_len[XI] > camera.fov[XI] or roi_len[YI] > camera.fov[YI]:
         warnings.warn('ROI is larger than the cameras FOV')
+
     return roi_len
 
 
-# TODO: nodes need to changed to SimData
-def calc_res_from_nodes(camera,nodes,border_px):
+def calc_res_from_nodes(camera: CameraData, nodes: np.ndarray, border_px: int
+                        ) -> float:
 
     roi_len_x_m = np.max(nodes[:,XI]) - np.min(nodes[:,XI])
     roi_len_y_m = np.max(nodes[:,YI]) - np.min(nodes[:,YI])
@@ -126,7 +128,8 @@ def norm_dynamic_range(in_image: np.ndarray, bits: int) -> np.ndarray:
     return ret_image
 
 
-def get_image_num_str(im_num,width,cam_num=-1):
+def get_image_num_str(im_num: int, width: int , cam_num: int = -1) -> str:
+
     num_str = str(im_num)
     num_str = num_str.zfill(width)
 
@@ -136,34 +139,33 @@ def get_image_num_str(im_num,width,cam_num=-1):
     return num_str
 
 
-def crop_image(camera: CameraData, image: np.ndarray) -> np.ndarray:
+def rectangle_crop_image(camera: CameraData,
+                         image: np.ndarray,
+                         corner: tuple[int,int] = (0,0),
+                         ) -> np.ndarray:
 
-    # If the loaded image is larger than required  then crop based on the camera
-    if camera.num_px[XI] > image.shape[1]:
-        raise ValueError('Cannot crop image: Number of pixels in camera class is larger than in the loaded image\n.')
-    elif camera.num_px[XI] < image.shape[1]:
-        image = image[:,:camera.num_px[XI]]
+    if (corner[XI]+camera.num_px[XI]) > image.shape[0]:
+        raise ValueError('Cannot crop image: '+
+                         f'crop edge X of {corner[XI]+camera.num_px[XI]} is '+
+                         'larger than '+
+                         f'image size {image.shape[0]}\n.')
+    if (corner[YI]+camera.num_px[YI]) > image.shape[0]:
+        raise ValueError('Cannot crop image: '+
+                         f'crop edge Y of {corner[YI]+camera.num_px[YI]} is '+
+                         'larger than '+
+                         f'image size {image.shape[0]}\n.')
 
-    if  camera.num_px[YI] > image.shape[0]:
-        raise ValueError('Cannot crop image: Number of pixels in camera class is larger than in the loaded image\n.')
-    elif camera.num_px[YI] < image.shape[0]:
-         image = image[:camera.num_px[YI],:]
-
+    image = image[corner[YI]:camera.num_px[YI],corner[XI]:camera.num_px[XI]]
     return image
 
 
-# TODO: nodes
-def mask_image_with_fe(camera: CameraData, image: np.ndarray, nodes: np.ndarray
-                       ) -> tuple[np.ndarray,np.ndarray]:
+def get_im_mask_from_sim(camera: CameraData,
+                            image: np.ndarray,
+                            nodes: np.ndarray
+                            ) -> tuple[np.ndarray,np.ndarray]:
 
     # Create a mesh of pixel centroid locations
     (px_x_m,px_y_m) = get_pixel_grid_in_m(camera)
-
-    # If the loaded image is larger than required then crop based on the camera
-    image = crop_image(camera,image)
-
-    # Specify the size of the ROI based on the farthest node on each aXIs
-    # camera.roi_len = calc_roi_from_nodes(camera, nodes)
 
     # Convert to np array for compatibility with new alpha shape function
     points = np.array((nodes[:,XI]+camera.roi_loc[XI],
@@ -178,70 +180,28 @@ def mask_image_with_fe(camera: CameraData, image: np.ndarray, nodes: np.ndarray
     a_shape = alphashape(points, alpha, only_outer=True)
 
     # Create an array of nans to fill as the specimen image
-    spec_im = np.empty(image.shape)
-    spec_im[:] = np.nan
+    masked_im = np.empty(image.shape)
+    masked_im[:] = np.nan
     im_mask = np.zeros([camera.num_px[YI],camera.num_px[XI]])
 
     # Fill the image based on the pixel being within the polygon (alpha-shape)
     # If pixel is not within the specimen set to background default colour
-    for yy in range(spec_im.shape[0]):
-        for xx in range(spec_im.shape[1]):
+    for yy in range(masked_im.shape[0]):
+        for xx in range(masked_im.shape[1]):
             if a_shape.contains(Point(px_x_m[yy,xx],px_y_m[yy,xx])):
-                spec_im[yy,xx] = image[yy,xx]
+                masked_im[yy,xx] = image[yy,xx]
                 im_mask[yy,xx] = 1
             else:
-                spec_im[yy,xx] = camera.background
+                masked_im[yy,xx] = camera.background
                 im_mask[yy,xx] = 0
 
     # Because arrays fill from top down the loop above effectively flips the
     # image, so need to flip it back
-    spec_im = spec_im[::-1,:]
+    masked_im = masked_im[::-1,:]
     im_mask = im_mask[::-1,:]
 
     # Return the image of the specimen
-    return (spec_im,im_mask)
-
-
-def get_image_mask(camera: CameraData,nodes: np.ndarray, subsample: int
-                   ) -> np.ndarray:
-
-    # Create a mesh of pixel centroid locations
-    if subsample > 1:
-        [px_x_m,px_y_m] = get_subpixel_grid(camera,subsample)
-    else:
-        [px_x_m,px_y_m] = get_pixel_grid_in_m(camera)
-
-    # Specify the size of the ROI based on the farthest node on each aXIs
-    camera.roi_len = calc_roi_from_nodes(camera, nodes)
-
-    points = np.array((nodes[:,XI]+camera.roi_loc[XI],
-                       nodes[:,YI]+camera.roi_loc[YI]))
-
-    # Calculate the element edge length to use as the alpha radius
-    elem_edge = 2*np.max(np.diff(np.sort(nodes[:,XI])))
-    alpha = elem_edge
-
-    # Find the alpha shape based on the list of nodal points
-    # Returns a shapely polygon - use 'within' to find points inside
-    a_shape = alphashape(points, alpha, only_outer=True)
-
-    # Create an array of nans to fill as the specimen image
-    im_mask = np.zeros([px_x_m.shape[0],px_x_m.shape[1]])
-
-    # Fill the image based on the pixel being within the polygon (alpha-shape)
-    # If pixel is not within the specimen set to background default colour
-    for yy in range(im_mask.shape[0]):
-        for xx in range(im_mask.shape[1]):
-            if a_shape.contains(Point(px_x_m[yy,xx],px_y_m[yy,xx])):
-                im_mask[yy,xx] = 1
-            else:
-                im_mask[yy,xx] = 0
-
-    # Because arrays fill from top down the loop above effectively flips the
-    # image, so need to flip it back
-    im_mask = im_mask[::-1,:]
-
-    return im_mask
+    return (masked_im,im_mask)
 
 
 def upsample_image(camera: CameraData,
@@ -251,7 +211,7 @@ def upsample_image(camera: CameraData,
     (px_vec_xm,px_vec_ym) = get_pixel_vec_in_m(camera)
 
     # Get grid of sub-pixel centroid locations
-    [subpx_vec_xm,subpx_vec_ym] = get_subpixel_vec(camera, id_opts.subsample)
+    (subpx_vec_xm,subpx_vec_ym) = get_subpixel_vec(camera, id_opts.subsample)
 
     upsampled_image_interp = interp2d(px_vec_xm, px_vec_ym, input_im,
                                       kind=id_opts.image_upsamp_interp)
@@ -276,35 +236,81 @@ def average_subpixel_image(subpx_image,subsample):
     return avg_image
 
 
-def gen_grid_image(camera,px_per_period,contrast_amp,contrast_offset=0.5):
-    [px_grid_x,px_grid_y] = get_pixel_grid_in_px(camera)
+def preprocess(input_im: np.ndarray,
+                coords: np.ndarray,
+                disp_x: np.ndarray,
+                disp_y: np.ndarray,
+                camera: CameraData,
+                id_opts: ImageDefOpts,
+                print_on: bool = True
+                ) -> tuple[np.ndarray,np.ndarray|None,np.ndarray,np.ndarray,np.ndarray]:
 
-    grid_image = (2*contrast_amp*camera.dyn_range)/4 \
-                    *(1+np.cos(2*np.pi*px_grid_x/px_per_period)) \
-                    *(1+np.cos(2*np.pi*px_grid_y/px_per_period)) \
-                    +camera.dyn_range*(contrast_offset-contrast_amp)
+    # This isn't needed for exodus because the first time step in the sim is 0
+    if id_opts.add_static_ref:
+        num_nodes = coords.shape[0] # type: ignore
+        disp_x = np.hstack((np.zeros((num_nodes,1)),disp_x))
+        disp_y = np.hstack((np.zeros((num_nodes,1)),disp_y))
 
-    return grid_image
+    # Image cropping
+    input_im = rectangle_crop_image(camera,input_im)
+
+    # Image masking
+    if id_opts.mask_input_image or id_opts.def_complex_geom:
+        if print_on:
+            print('Image masking or complex geometry on, getting image mask.')
+            tic = time.perf_counter()
 
 
-def deform_image(upsampled_image,camera,id_opts,coords,disp,
-                 image_mask=np.array([]),print_on=True):
+        (masked_im,image_mask) = get_im_mask_from_sim(camera,
+                                                input_im,
+                                                coords) # type: ignore
+        if id_opts.mask_input_image:
+            input_im = masked_im
+        del masked_im
 
-    # Check that the image mask matches the camera if not warn the user
-    if (image_mask.shape[0] != camera.num_px[YI]) or (image_mask.shape[1] != camera.num_px[XI]):
-        if image_mask.size == 0:
-            warnings.warn('Image mask not specified, using default mask of ones.')
-        else:
-            warnings.warn('Image mask size does not match camera, using default mask of ones.')
-        image_mask = np.ones([camera.num_px[YI],camera.num_px[XI]])
+        if print_on:
+            toc = time.perf_counter()
+            print(f'Calculating image mask took {toc-tic:.4f} seconds')
+    else:
+        image_mask = None
+
+    # Image upsampling
+    if print_on:
+        print('\n'+'-'*80)
+        print('GENERATE UPSAMPLED IMAGE\n')
+        print(f'Upsampling input image with a {id_opts.subsample}x{id_opts.subsample} subpixel')
+        tic = time.perf_counter()
+
+    upsampled_image = upsample_image(camera,id_opts,input_im)
+
+    if print_on:
+        toc = time.perf_counter()
+        print(f'Upsampling image with I2D took {toc-tic:.4f} seconds')
+
+    return (upsampled_image,image_mask,input_im,disp_x,disp_y)
+
+
+
+def deform_image(upsampled_image: np.ndarray,
+                 camera: CameraData,
+                 id_opts: ImageDefOpts,
+                 coords: np.ndarray,
+                 disp: np.ndarray,
+                 image_mask: np.ndarray | None = None,
+                 print_on: bool = True):
+
+    if image_mask is not None:
+        if (image_mask.shape[0] != camera.num_px[YI]) or (image_mask.shape[1] != camera.num_px[XI]):
+            if image_mask.size == 0:
+                warnings.warn('Image mask not specified, using default mask of ones.')
+            else:
+                warnings.warn('Image mask size does not match camera, using default mask of ones.')
+            image_mask = np.ones([camera.num_px[YI],camera.num_px[XI]])
 
 
     # Get grid of pixel centroid locations
-    #[px_vec_xm,px_vec_ym] = get_pixel_vec(camera)
     (px_grid_xm,px_grid_ym) = get_pixel_grid_in_m(camera)
-
     # Get grid of sub-pixel centroid locations
-    #[subpx_vec_xm,subpx_vec_ym] = get_subpixel_vec(camera, id_opts.subsample)
     (subpx_grid_xm,subpx_grid_ym) = get_subpixel_grid(camera, id_opts.subsample)
 
     #--------------------------------------------------------------------------
@@ -378,6 +384,8 @@ def deform_image(upsampled_image,camera,id_opts,coords,disp,
         toc = time.perf_counter()
         print('Deforming sub-pixel image with ndimage took {:.4f} seconds'.format(toc-tic))
 
+    #--------------------------------------------------------------------------
+    # Average subpixel image
     if print_on:
         tic = time.perf_counter()
 
@@ -390,7 +398,7 @@ def deform_image(upsampled_image,camera,id_opts,coords,disp,
     #--------------------------------------------------------------------------
     # DEFORMING IMAGE MASK
     # Only need to do this if there are holes and notches
-    if id_opts.complex_geom:
+    if id_opts.def_complex_geom:
         if print_on:
             print('Deforming image mask.')
             tic = time.perf_counter()
@@ -433,4 +441,6 @@ def deform_image(upsampled_image,camera,id_opts,coords,disp,
         def_mask = None
 
     return (def_image,def_image_subpx,subpx_disp_x,subpx_disp_y,def_mask)
+
+
 

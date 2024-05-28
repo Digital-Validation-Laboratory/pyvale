@@ -30,10 +30,10 @@ class ImageDefOpts:
     calc_res_from_fe: bool =  False
     calc_res_border_px: int = 5
 
-    # Options to append the input image to the list or to add a zero disp
+    # Option to append the input image to the list or to add a zero disp
     # frame at the start of the displacement data, useful to create static
     # image with masking
-    add_static_frame: bool = True
+    add_static_ref: str = 'pad_disp'
 
     #----------------------------------------------------------------------
     # IMAGE AND DISPLACEMENT INTERPOLATION OPTIONS
@@ -60,5 +60,6 @@ class ImageDefOpts:
     image_def_extval: float = 0.0 # only used if above is 'constant'
 
     # Used to deal with holes and notches - if the specimen is just a
-    # rectangle this can be set to false
-    complex_geom: bool = True
+    # rectangle this can be set to false. Allows for an image mask which is
+    # also deformed and applied to the deformed image
+    def_complex_geom: bool = True
