@@ -20,7 +20,7 @@ nElemY = 20
 eType = QUAD8 # QUAD4 for 1st order, QUAD8 for 2nd order
 
 # Mechanical Loads/BCs
-topDisp = 0.1e-3  # m
+topDisp = 1.0e-3  # m
 # tensLoad = 10e6 # Pa
 
 # Material Properties: OFHC Copper 250degC

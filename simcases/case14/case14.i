@@ -7,8 +7,8 @@
 #_* MOOSEHERDER VARIABLES - START
 
 # NOTE: only used for transient solves
-endTime = 2
-timeStep = 1
+endTime = 60    # s
+timeStep = 5    # s
 
 # Geometric Properties
 lengX = 50e-3  # m
@@ -20,8 +20,7 @@ nElemY = 20
 eType = QUAD8 # QUAD4 for 1st order, QUAD8 for 2nd order
 
 # Mechanical Loads/BCs
-topDispRate = ${fparse 0.1e-3 / 60}  # m/s
-# tensLoad = 10e6 # Pa
+topDispRate = ${fparse 1e-3 / 60}  # m/s
 
 # Material Properties: OFHC Copper 250degC
 cuEMod= 108e9   # Pa
