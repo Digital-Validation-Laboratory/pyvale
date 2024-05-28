@@ -8,6 +8,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 
 import time
 import warnings
+from pathlib import Path
 
 import numpy as np
 from shapely.geometry import Point
@@ -16,11 +17,43 @@ from scipy.interpolate import griddata
 from scipy.interpolate import interp2d
 from scipy import ndimage
 
+import matplotlib.pyplot as plt
+import matplotlib.image as mplim
+from PIL import Image
+
 from pyvale.imagesim.imagedefopts import ImageDefOpts
 from pyvale.imagesim.cameradata import CameraData
 from pyvale.imagesim.alphashape import alphashape
+import pyvale.imagesim.imagedefdiags as idd
 
 (XI,YI) = (0,1)
+
+def load_image(im_path) -> np.ndarray:
+
+    input_im = mplim.imread(im_path)
+    input_im = input_im.astype(float)
+
+    # If we have RGB then get rid of it
+    if input_im.ndim > 2:
+        input_im = input_im[:,:,0]
+
+    return input_im
+
+
+def save_image(save_file: Path,
+               image: np.ndarray,
+               n_bits: int = 16) -> None:
+
+    # Need to flip image so coords are top left with Y down
+    image = image[::-1,:]
+
+    if n_bits > 8:
+        im = Image.fromarray(image.astype(np.uint16))
+    else:
+        im = Image.fromarray(image.astype(np.uint8))
+
+    im.save(save_file)
+
 
 def get_pixel_vec_in_m(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
 
@@ -242,14 +275,30 @@ def preprocess(input_im: np.ndarray,
                 disp_y: np.ndarray,
                 camera: CameraData,
                 id_opts: ImageDefOpts,
-                print_on: bool = True
-                ) -> tuple[np.ndarray,np.ndarray|None,np.ndarray,np.ndarray,np.ndarray]:
+                print_on: bool = False,
+                diag_on: bool = False
+                ) -> tuple[np.ndarray,
+                           np.ndarray|None,
+                           np.ndarray,
+                           np.ndarray,
+                           np.ndarray]:
+
+    if diag_on:
+        idd.plot_diag_image('Raw input image',input_im,idd.I_CMAP)
+
+    if not id_opts.save_path.is_dir():
+        id_opts.save_path.mkdir()
 
     # This isn't needed for exodus because the first time step in the sim is 0
-    if id_opts.add_static_ref:
+    if id_opts.add_static_ref == 'pad_disp':
         num_nodes = coords.shape[0] # type: ignore
         disp_x = np.hstack((np.zeros((num_nodes,1)),disp_x))
         disp_y = np.hstack((np.zeros((num_nodes,1)),disp_y))
+
+    if disp_x.ndim == 1:
+        disp_x = np.atleast_2d(disp_x).T
+    if disp_y.ndim == 1:
+        disp_y = np.atleast_2d(disp_y).T
 
     # Image cropping
     input_im = rectangle_crop_image(camera,input_im)
@@ -259,7 +308,6 @@ def preprocess(input_im: np.ndarray,
         if print_on:
             print('Image masking or complex geometry on, getting image mask.')
             tic = time.perf_counter()
-
 
         (masked_im,image_mask) = get_im_mask_from_sim(camera,
                                                 input_im,
@@ -287,17 +335,29 @@ def preprocess(input_im: np.ndarray,
         toc = time.perf_counter()
         print(f'Upsampling image with I2D took {toc-tic:.4f} seconds')
 
+    if diag_on:
+        idd.plot_diag_image('Pre-processed image', input_im, idd.I_CMAP)
+        idd.plot_diag_image('Upsampled Image',upsampled_image,idd.I_CMAP)
+        if image_mask is not None:
+            idd.plot_diag_image('Undef. Image Mask',image_mask,idd.I_CMAP)
+        plt.show()
+
+
     return (upsampled_image,image_mask,input_im,disp_x,disp_y)
 
 
-
-def deform_image(upsampled_image: np.ndarray,
+def deform_one_image(upsampled_image: np.ndarray,
                  camera: CameraData,
                  id_opts: ImageDefOpts,
                  coords: np.ndarray,
                  disp: np.ndarray,
                  image_mask: np.ndarray | None = None,
-                 print_on: bool = True):
+                 print_on: bool = True
+                 ) -> tuple[np.ndarray,
+                            np.ndarray,
+                            np.ndarray,
+                            np.ndarray,
+                            np.ndarray | None]:
 
     if image_mask is not None:
         if (image_mask.shape[0] != camera.num_px[YI]) or (image_mask.shape[1] != camera.num_px[XI]):
@@ -306,7 +366,6 @@ def deform_image(upsampled_image: np.ndarray,
             else:
                 warnings.warn('Image mask size does not match camera, using default mask of ones.')
             image_mask = np.ones([camera.num_px[YI],camera.num_px[XI]])
-
 
     # Get grid of pixel centroid locations
     (px_grid_xm,px_grid_ym) = get_pixel_grid_in_m(camera)
@@ -443,4 +502,74 @@ def deform_image(upsampled_image: np.ndarray,
     return (def_image,def_image_subpx,subpx_disp_x,subpx_disp_y,def_mask)
 
 
+def deform_all_images(upsampled_image: np.ndarray,
+                 camera: CameraData,
+                 id_opts: ImageDefOpts,
+                 coords: np.ndarray,
+                 disp_x: np.ndarray,
+                 disp_y: np.ndarray,
+                 image_mask: np.ndarray | None = None,
+                 print_on: bool = False,
+                 diag_on: bool = False) -> None:
 
+    num_frames = disp_x.shape[1]
+    ticl = time.perf_counter()
+
+    for ff in range(num_frames):
+        if print_on:
+            ticf = time.perf_counter()
+            print('')
+            print(f'DEFORMING FRAME: {ff}')
+
+        # Displacements as column vectors for this frame [disp_x,disp_y]
+        if diag_on:
+            (def_image,
+            def_image_subpx,
+            subpx_disp_x,
+            subpx_disp_y,
+            def_mask) = deform_one_image(upsampled_image,
+                                        camera,
+                                        id_opts,
+                                        coords, # type: ignore
+                                        np.array((disp_x[:,ff],disp_y[:,ff])).T,
+                                        image_mask=image_mask,
+                                        print_on=print_on)
+
+            if ff == (num_frames-1):
+                (subpx_grid_xm,subpx_grid_ym) = get_subpixel_grid(
+                    camera, id_opts.subsample)
+                idd.plot_all_diags(def_image,
+                                    def_mask,
+                                    def_image_subpx,
+                                    subpx_disp_x,
+                                    subpx_disp_y,
+                                    subpx_grid_xm,
+                                    subpx_grid_ym)
+
+        else:
+            (def_image,_,_,_,_) = deform_one_image(upsampled_image,
+                                                camera,
+                                                id_opts,
+                                                coords, # type: ignore
+                                                np.array((disp_x[:,ff],disp_y[:,ff])).T,
+                                                image_mask=image_mask,
+                                                print_on=print_on)
+
+        save_file = id_opts.save_path / str(f'{id_opts.save_tag}_'+
+                f'{get_image_num_str(im_num=ff,width=4)}'+
+                '.tiff')
+        save_image(save_file,def_image,camera.bits)
+
+        if print_on:
+            tocf = time.perf_counter()
+            print(f'DEFORMING FRAME: {ff} took {tocf-ticf:.4f} seconds')
+
+    if print_on:
+        tocl = time.perf_counter()
+        print('')
+        print('-'*50)
+        print(f'Deforming all images took {tocl-ticl:.4f} seconds')
+        print('-'*50)
+
+    if diag_on:
+        plt.show()

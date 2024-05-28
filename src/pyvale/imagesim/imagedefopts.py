@@ -6,6 +6,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 from dataclasses import dataclass
+from pathlib import Path
 import numpy as np
 
 @dataclass
@@ -15,6 +16,10 @@ class ImageDefOpts:
     #----------------------------------------------------------------------
     # USER CONTROLLED OPTIONS
     # Set these to achieve desired behaviour
+
+    # Path to save the deformed images
+    save_path: Path = Path.cwd() / 'deformed_images'
+    save_tag: str = 'defimage'
 
     # Use this if starting with a full speckle or grid to create an
     # an artificial image with just the specimen geom
