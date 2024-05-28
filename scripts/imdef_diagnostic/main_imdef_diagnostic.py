@@ -6,25 +6,25 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 """
-
+import time
 import pickle
 from pprint import pprint
 from pathlib import Path
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 import mooseherder as mh
 
 from pyvale.imagesim.imagedefopts import ImageDefOpts
 from pyvale.imagesim.cameradata import CameraData
 import pyvale.imagesim.imagedef as sid
-
-
+import pyvale.imagesim.imagedefdiags as idd
 
 def main() -> None:
     print()
     print('='*80)
-    print('PYVALE EXAMPLE: IMAGE DEFORMATION 2D DETAILED')
+    print('PYVALE EXAMPLE: IMAGE DEFORMATION 2D DIAGNOSTIC')
     print('='*80)
 
     #---------------------------------------------------------------------------
@@ -70,9 +70,7 @@ def main() -> None:
         disp_y = sim_data.node_vars['disp_y']
     del sim_data
 
-    print(f'coords.shape={coords.shape}')
-    print(f'disp_x.shape={disp_x.shape}')
-    print(f'disp_y.shape={disp_y.shape}')
+    DIAG_FRAME = disp_x.shape[1]
 
     #---------------------------------------------------------------------------
     # INIT IMAGE DEF OPTIONS AND CAMERA
@@ -166,6 +164,8 @@ def main() -> None:
     print('IMAGE AND DATA PRE-PROCESSING')
     print('')
 
+    idd.plot_diag_image('Raw input image',input_im,idd.I_CMAP)
+
     # Run all processes that only need to be called once before deforming the
     # images - includes image masking, cropping and upsampling
     # Returns
@@ -181,26 +181,68 @@ def main() -> None:
                                 id_opts,
                                 print_on = True)
 
+    idd.plot_diag_image('Pre-processed image', input_im, idd.I_CMAP)
+    idd.plot_diag_image('Upsampled Image',upsampled_image,idd.I_CMAP)
+    if image_mask is not None:
+        idd.plot_diag_image('Undef. Image Mask',image_mask,idd.I_CMAP)
+
     #---------------------------------------------------------------------------
     # DEFORM IMAGES
     print('')
     print('='*80)
     print('DEFORMING IMAGES')
 
-    sid.deform_all_images(upsampled_image,
-                          camera,
-                          id_opts,
-                          coords,
-                          disp_x,
-                          disp_y,
-                          image_mask,
-                          print_on = True)
+    num_frames = disp_x.shape[1]
+    ticl = time.perf_counter()
+
+    for ff in range(num_frames):
+        ticf = time.perf_counter()
+        print('')
+        print(f'DEFORMING FRAME: {ff}')
+
+        (def_image,
+        def_image_subpx,
+        subpx_disp_x,
+        subpx_disp_y,
+        def_mask) = sid.deform_one_image(upsampled_image,
+                                    camera,
+                                    id_opts,
+                                    coords,
+                                    np.array((disp_x[:,ff],disp_y[:,ff])).T,
+                                    image_mask=image_mask,
+                                    print_on=True)
+
+        if ff == (DIAG_FRAME-1):
+            (subpx_grid_xm,subpx_grid_ym) = sid.get_subpixel_grid(camera,
+                                                                  id_opts.subsample)
+            idd.plot_all_diags(def_image,
+                                def_mask,
+                                def_image_subpx,
+                                subpx_disp_x,
+                                subpx_disp_y,
+                                subpx_grid_xm,
+                                subpx_grid_ym)
+
+        save_file = id_opts.save_path / str(f'{id_opts.save_tag}_'+
+                f'{sid.get_image_num_str(im_num=ff,width=4)}'+
+                '.tiff')
+        sid.save_image(save_file,def_image,camera.bits)
+
+
+        tocf = time.perf_counter()
+        print(f'DEFORMING FRAME: {ff} took {tocf-ticf:.4f} seconds')
+
+    tocl = time.perf_counter()
+    print('')
+    print('-'*50)
+    print(f'Deforming all images took {tocl-ticl:.4f} seconds')
+    print('-'*50)
 
     # COMPLETE
+    plt.show()
     print('')
     print('='*80)
     print('COMPLETE\n')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
-

@@ -275,16 +275,12 @@ def preprocess(input_im: np.ndarray,
                 disp_y: np.ndarray,
                 camera: CameraData,
                 id_opts: ImageDefOpts,
-                print_on: bool = False,
-                diag_on: bool = False
+                print_on: bool = False
                 ) -> tuple[np.ndarray,
                            np.ndarray|None,
                            np.ndarray,
                            np.ndarray,
                            np.ndarray]:
-
-    if diag_on:
-        idd.plot_diag_image('Raw input image',input_im,idd.I_CMAP)
 
     if not id_opts.save_path.is_dir():
         id_opts.save_path.mkdir()
@@ -334,14 +330,6 @@ def preprocess(input_im: np.ndarray,
     if print_on:
         toc = time.perf_counter()
         print(f'Upsampling image with I2D took {toc-tic:.4f} seconds')
-
-    if diag_on:
-        idd.plot_diag_image('Pre-processed image', input_im, idd.I_CMAP)
-        idd.plot_diag_image('Upsampled Image',upsampled_image,idd.I_CMAP)
-        if image_mask is not None:
-            idd.plot_diag_image('Undef. Image Mask',image_mask,idd.I_CMAP)
-        plt.show()
-
 
     return (upsampled_image,image_mask,input_im,disp_x,disp_y)
 
@@ -509,8 +497,7 @@ def deform_all_images(upsampled_image: np.ndarray,
                  disp_x: np.ndarray,
                  disp_y: np.ndarray,
                  image_mask: np.ndarray | None = None,
-                 print_on: bool = False,
-                 diag_on: bool = False) -> None:
+                 print_on: bool = False) -> None:
 
     num_frames = disp_x.shape[1]
     ticl = time.perf_counter()
@@ -521,39 +508,13 @@ def deform_all_images(upsampled_image: np.ndarray,
             print('')
             print(f'DEFORMING FRAME: {ff}')
 
-        # Displacements as column vectors for this frame [disp_x,disp_y]
-        if diag_on:
-            (def_image,
-            def_image_subpx,
-            subpx_disp_x,
-            subpx_disp_y,
-            def_mask) = deform_one_image(upsampled_image,
-                                        camera,
-                                        id_opts,
-                                        coords, # type: ignore
-                                        np.array((disp_x[:,ff],disp_y[:,ff])).T,
-                                        image_mask=image_mask,
-                                        print_on=print_on)
-
-            if ff == (num_frames-1):
-                (subpx_grid_xm,subpx_grid_ym) = get_subpixel_grid(
-                    camera, id_opts.subsample)
-                idd.plot_all_diags(def_image,
-                                    def_mask,
-                                    def_image_subpx,
-                                    subpx_disp_x,
-                                    subpx_disp_y,
-                                    subpx_grid_xm,
-                                    subpx_grid_ym)
-
-        else:
-            (def_image,_,_,_,_) = deform_one_image(upsampled_image,
-                                                camera,
-                                                id_opts,
-                                                coords, # type: ignore
-                                                np.array((disp_x[:,ff],disp_y[:,ff])).T,
-                                                image_mask=image_mask,
-                                                print_on=print_on)
+        (def_image,_,_,_,_) = deform_one_image(upsampled_image,
+                                            camera,
+                                            id_opts,
+                                            coords, # type: ignore
+                                            np.array((disp_x[:,ff],disp_y[:,ff])).T,
+                                            image_mask=image_mask,
+                                            print_on=print_on)
 
         save_file = id_opts.save_path / str(f'{id_opts.save_tag}_'+
                 f'{get_image_num_str(im_num=ff,width=4)}'+
@@ -571,5 +532,3 @@ def deform_all_images(upsampled_image: np.ndarray,
         print(f'Deforming all images took {tocl-ticl:.4f} seconds')
         print('-'*50)
 
-    if diag_on:
-        plt.show()
