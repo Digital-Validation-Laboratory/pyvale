@@ -38,7 +38,7 @@ class ImageDefOpts:
     # Option to append the input image to the list or to add a zero disp
     # frame at the start of the displacement data, useful to create static
     # image with masking
-    add_static_ref: str = 'pad_disp'
+    add_static_ref: str = 'off'
 
     #----------------------------------------------------------------------
     # IMAGE AND DISPLACEMENT INTERPOLATION OPTIONS
@@ -68,3 +68,8 @@ class ImageDefOpts:
     # rectangle this can be set to false. Allows for an image mask which is
     # also deformed and applied to the deformed image
     def_complex_geom: bool = True
+
+    #----------------------------------------------------------------------
+    # PARALLELISATION OPTIONS
+
+

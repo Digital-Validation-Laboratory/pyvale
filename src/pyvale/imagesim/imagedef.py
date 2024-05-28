@@ -282,6 +282,10 @@ def preprocess(input_im: np.ndarray,
                            np.ndarray,
                            np.ndarray]:
 
+    if print_on:
+        print('\n'+'='*80)
+        print('IMAGE PRE-PROCESSING\n')
+
     if not id_opts.save_path.is_dir():
         id_opts.save_path.mkdir()
 
@@ -490,18 +494,70 @@ def deform_one_image(upsampled_image: np.ndarray,
     return (def_image,def_image_subpx,subpx_disp_x,subpx_disp_y,def_mask)
 
 
-def deform_all_images(upsampled_image: np.ndarray,
+def deform_images(input_im: np.ndarray,
                  camera: CameraData,
                  id_opts: ImageDefOpts,
                  coords: np.ndarray,
                  disp_x: np.ndarray,
                  disp_y: np.ndarray,
-                 image_mask: np.ndarray | None = None,
                  print_on: bool = False) -> None:
+    #---------------------------------------------------------------------------
+    # Image Pre-Processing
+    (upsampled_image,
+     image_mask,
+     input_im,
+     disp_x,
+     disp_y) = preprocess(input_im,
+                            coords,
+                            disp_x,
+                            disp_y,
+                            camera,
+                            id_opts,
+                            print_on = print_on)
+
+    #---------------------------------------------------------------------------
+    # Image Deformation Loop
+    if print_on:
+        print('\n'+'='*80)
+        print('DEFORMING IMAGES')
 
     num_frames = disp_x.shape[1]
     ticl = time.perf_counter()
 
+    for ff in range(num_frames):
+        if print_on:
+            ticf = time.perf_counter()
+            print(f'\nDEFORMING FRAME: {ff}')
+
+        (def_image,_,_,_,_) = deform_one_image(upsampled_image,
+                                            camera,
+                                            id_opts,
+                                            coords, # type: ignore
+                                            np.array((disp_x[:,ff],disp_y[:,ff])).T,
+                                            image_mask=image_mask,
+                                            print_on=print_on)
+
+        save_file = id_opts.save_path / str(f'{id_opts.save_tag}_'+
+                f'{get_image_num_str(im_num=ff,width=4)}'+
+                '.tiff')
+        save_image(save_file,def_image,camera.bits)
+
+        if print_on:
+            tocf = time.perf_counter()
+            print(f'DEFORMING FRAME: {ff} took {tocf-ticf:.4f} seconds')
+
+    if print_on:
+        tocl = time.perf_counter()
+        print('\n'+'-'*50)
+        print(f'Deforming all images took {tocl-ticl:.4f} seconds')
+        print('-'*50)
+
+        print('\n'+'='*80)
+        print('COMPLETE\n')
+
+'''
+def _deform_images_sequential() -> None:
+    return
     for ff in range(num_frames):
         if print_on:
             ticf = time.perf_counter()
@@ -525,10 +581,8 @@ def deform_all_images(upsampled_image: np.ndarray,
             tocf = time.perf_counter()
             print(f'DEFORMING FRAME: {ff} took {tocf-ticf:.4f} seconds')
 
-    if print_on:
-        tocl = time.perf_counter()
-        print('')
-        print('-'*50)
-        print(f'Deforming all images took {tocl-ticl:.4f} seconds')
-        print('-'*50)
+def _deform_images_para() -> None:
+    pass
+
+'''
 

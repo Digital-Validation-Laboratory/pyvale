@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------
-# pyvale: simple,2Dplate,mechanical,steady,
+# pyvale: simple,2DplateWHole,mechanical,steady,
 #-------------------------------------------------------------------------
 # NOTE: default 2D MOOSE solid mechanics is plane strain
 
@@ -7,20 +7,12 @@
 #_* MOOSEHERDER VARIABLES - START
 
 # NOTE: only used for transient solves
-endTime = 60    # s
-timeStep = 5    # s
-
-# Geometric Properties
-lengX = 50e-3  # m
-lengY = 100e-3   # m
-
-# Mesh Properties
-nElemX = 10
-nElemY = 20
-eType = QUAD8 # QUAD4 for 1st order, QUAD8 for 2nd order
+endTime = 60
+timeStep = 5
 
 # Mechanical Loads/BCs
 topDispRate = ${fparse 1e-3 / 60}  # m/s
+
 
 # Material Properties: OFHC Copper 250degC
 cuEMod= 108e9   # Pa
@@ -34,15 +26,8 @@ cuPRatio = 0.33     # -
 []
 
 [Mesh]
-    [generated]
-        type = GeneratedMeshGenerator
-        dim = 2
-        nx = ${nElemX}
-        ny = ${nElemY}
-        xmax = ${lengX}
-        ymax = ${lengY}
-        elem_type = ${eType}
-    []
+    type = FileMesh
+    file = 'case17.msh'
 []
 
 [Modules/TensorMechanics/Master]
@@ -52,7 +37,7 @@ cuPRatio = 0.33     # -
         add_variables = true
         material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
         material_output_order = FIRST       # CONSTANT, FIRST, SECOND,
-        generate_output = 'vonmises_stress stress_xx stress_yy stress_xy strain_xx strain_yy strain_xy max_principal_strain mid_principal_strain min_principal_strain'
+        generate_output = 'vonmises_stress stress_xx stress_yy stress_xy strain_xx strain_yy strain_xy'
     []
 []
 
@@ -60,25 +45,27 @@ cuPRatio = 0.33     # -
     [bottom_x]
         type = DirichletBC
         variable = disp_x
-        boundary = 'bottom'
-        value = 0.0
+        boundary = 'bc-base'
+        value = 0
     []
     [bottom_y]
         type = DirichletBC
         variable = disp_y
-        boundary = 'bottom'
-        value = 0.0
+        boundary = 'bc-base'
+        value = 0
     []
+
+
     [top_x]
         type = DirichletBC
         variable = disp_x
-        boundary = 'top'
+        boundary = 'bc-top'
         value = 0.0
     []
     [top_y]
         type = FunctionDirichletBC
         variable = disp_y
-        boundary = 'top'
+        boundary = 'bc-top'
         function = '${topDispRate}*t'
     []
 []
@@ -90,7 +77,7 @@ cuPRatio = 0.33     # -
         poissons_ratio = ${cuPRatio}
     []
     [stress]
-        type = ComputeFiniteStrainElasticStress # ComputeLinearElasticStress
+        type = ComputeFiniteStrainElasticStress
     []
 []
 
@@ -116,13 +103,13 @@ cuPRatio = 0.33     # -
         type = SidesetReaction
         direction = '0 1 0'
         stress_tensor = stress
-        boundary = 'bottom'
+        boundary = 'bc-base'
     []
     [react_y_top]
         type = SidesetReaction
         direction = '0 1 0'
         stress_tensor = stress
-        boundary = 'top'
+        boundary = 'bc-top'
     []
 
     [disp_y_max]

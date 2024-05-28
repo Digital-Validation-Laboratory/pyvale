@@ -20,7 +20,6 @@ from pyvale.imagesim.cameradata import CameraData
 import pyvale.imagesim.imagedef as sid
 
 
-
 def main() -> None:
     print()
     print('='*80)
@@ -160,46 +159,15 @@ def main() -> None:
     print('')
 
     #---------------------------------------------------------------------------
-    # PRE-PROCESSING
-    print('')
-    print('='*80)
-    print('IMAGE AND DATA PRE-PROCESSING')
-    print('')
+    # PRE-PROCESS AND DEFORM IMAGES
+    sid.deform_images(input_im,
+                    camera,
+                    id_opts,
+                    coords,
+                    disp_x,
+                    disp_y,
+                    print_on = True)
 
-    # Run all processes that only need to be called once before deforming the
-    # images - includes image masking, cropping and upsampling
-    # Returns
-    (upsampled_image,
-     image_mask,
-     input_im,
-     disp_x,
-     disp_y) = sid.preprocess(input_im,
-                                coords,
-                                disp_x,
-                                disp_y,
-                                camera,
-                                id_opts,
-                                print_on = True)
-
-    #---------------------------------------------------------------------------
-    # DEFORM IMAGES
-    print('')
-    print('='*80)
-    print('DEFORMING IMAGES')
-
-    sid.deform_all_images(upsampled_image,
-                          camera,
-                          id_opts,
-                          coords,
-                          disp_x,
-                          disp_y,
-                          image_mask,
-                          print_on = True)
-
-    # COMPLETE
-    print('')
-    print('='*80)
-    print('COMPLETE\n')
 
 if __name__ == "__main__":
     main()
