@@ -6,8 +6,6 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 """
-
-import pickle
 from pprint import pprint
 from pathlib import Path
 

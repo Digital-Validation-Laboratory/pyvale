@@ -16,15 +16,12 @@ from scipy.signal import convolve2d
 from scipy.interpolate import griddata
 from scipy.interpolate import interp2d
 from scipy import ndimage
-
-import matplotlib.pyplot as plt
 import matplotlib.image as mplim
 from PIL import Image
 
 from pyvale.imagesim.imagedefopts import ImageDefOpts
 from pyvale.imagesim.cameradata import CameraData
 from pyvale.imagesim.alphashape import alphashape
-import pyvale.imagesim.imagedefdiags as idd
 
 (XI,YI) = (0,1)
 
@@ -554,35 +551,4 @@ def deform_images(input_im: np.ndarray,
 
         print('\n'+'='*80)
         print('COMPLETE\n')
-
-'''
-def _deform_images_sequential() -> None:
-    return
-    for ff in range(num_frames):
-        if print_on:
-            ticf = time.perf_counter()
-            print('')
-            print(f'DEFORMING FRAME: {ff}')
-
-        (def_image,_,_,_,_) = deform_one_image(upsampled_image,
-                                            camera,
-                                            id_opts,
-                                            coords, # type: ignore
-                                            np.array((disp_x[:,ff],disp_y[:,ff])).T,
-                                            image_mask=image_mask,
-                                            print_on=print_on)
-
-        save_file = id_opts.save_path / str(f'{id_opts.save_tag}_'+
-                f'{get_image_num_str(im_num=ff,width=4)}'+
-                '.tiff')
-        save_image(save_file,def_image,camera.bits)
-
-        if print_on:
-            tocf = time.perf_counter()
-            print(f'DEFORMING FRAME: {ff} took {tocf-ticf:.4f} seconds')
-
-def _deform_images_para() -> None:
-    pass
-
-'''
 
