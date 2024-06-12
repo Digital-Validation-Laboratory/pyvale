@@ -101,7 +101,7 @@ def main() -> None:
     # truth from the simulation and dashed lines with '+' are simulated sensor
     # measurements using the specified UQ functions. The sensor traces should
     # have a uniform offset (systematic error) and noise (random error).
-    (fig,ax) = tc_array.plot_time_traces(plot_truth=True)
+    (fig,_) = tc_array.plot_time_traces(plot_truth=True)
     if trace_plot_mode == 'interactive':
         plt.show()
     if trace_plot_mode == 'save_fig':

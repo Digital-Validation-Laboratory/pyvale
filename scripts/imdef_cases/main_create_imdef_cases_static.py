@@ -9,7 +9,6 @@ Copyright (C) 2024 The Computer Aided Validation Team
 GENERATE IMAGE DEFORMATION TEST CASES
 """
 
-import time
 from pprint import pprint
 import pickle
 from pathlib import Path

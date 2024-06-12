@@ -30,6 +30,7 @@ class CameraData:
         self._roi_cent = (True,True)
         self._roi_len = self._fov
         self._roi_loc = np.array((0.0,0.0))
+        self._coord_offset = np.array((0.0,0.0))
 
     @property
     def num_px(self) -> np.ndarray:
@@ -66,6 +67,10 @@ class CameraData:
     @property
     def roi_cent(self) -> tuple[bool,bool]:
         return self._roi_cent
+
+    @property
+    def coord_offset(self) -> np.ndarray:
+        return self._coord_offset
 
     @num_px.setter
     def num_px(self, in_px: np.ndarray) -> None:
@@ -121,8 +126,13 @@ class CameraData:
         self._roi_cent = in_flags
         self._cent_roi()
 
+    @coord_offset.setter
+    def coord_offset(self,in_offset: np.ndarray) -> None:
+        self._coord_offset = in_offset
+        self._cent_roi()
+
     def _cent_roi(self) -> None:
         if self._roi_cent[0] is True:
-            self._roi_loc[0] = (self._fov[0] - self._roi_len[0])/2
+            self._roi_loc[0] = (self._fov[0] - self._roi_len[0])/2 + self._coord_offset[0]
         if self._roi_cent[1] is True:
-            self._roi_loc[1] = (self._fov[1] - self._roi_len[1])/2
+            self._roi_loc[1] = (self._fov[1] - self._roi_len[1])/2 + self._coord_offset[1]

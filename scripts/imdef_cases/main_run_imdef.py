@@ -6,6 +6,7 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 """
+import pickle
 from pprint import pprint
 from pathlib import Path
 
@@ -34,14 +35,20 @@ def main() -> None:
     print(f'\nLoading image to deform from path:{im_path}\n')
     input_im = sid.load_image(im_path)
 
-    case_str = 'case17'
-    sim_path = Path(f'simcases/{case_str}')
-    sim_file = f'{case_str}_out.e'
+    sim_path = Path('scripts/imdef_cases')
+    #sim_path = sim_path / 'imdefcase0_RandDispx10'
+    #sim_path = sim_path / 'imdefcase1_RigidBodyMotion_4_1px'
+    sim_path = sim_path / 'imdefcase2_RigidBodyMotion_0_1px'
+    #sim_path = sim_path / 'imdefcase3_HydroStrain_1meta'
+    #sim_path = sim_path / 'imdefcase4_HydroStrain_1pc'
+    #sim_path = sim_path / 'imdefcase5_ShearStrain_1meta'
+    #sim_path = sim_path / 'imdefcase6_ShearStrain_1pc'
+    #sim_path = sim_path / 'imdefcase7_RampRigidBodyMotion_1_0px'
+    sim_file = 'sim_data.pkl'
 
-    print(f'\nLoading SimData from exodus in path:\n{sim_path}')
-
-    exodus_reader = mh.ExodusReader(sim_path / sim_file)
-    sim_data = exodus_reader.read_all_sim_data()
+    print(f'\nLoading pickled sim data in path:\n{sim_path}')
+    with open(sim_path / sim_file,'rb') as sim_load_file:
+        sim_data = pickle.load(sim_load_file)
 
     print('\nSetting up image deformation inputs.\n')
 
@@ -69,7 +76,7 @@ def main() -> None:
     id_opts.mask_input_image = True
     id_opts.def_complex_geom = True
     id_opts.crop_on = True
-    id_opts.crop_px = np.array([1000,1600])
+    id_opts.crop_px = np.array([1600,1000])
     id_opts.calc_res_from_fe = True
     id_opts.calc_res_border_px = 10
     id_opts.add_static_ref = 'off'

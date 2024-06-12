@@ -120,15 +120,18 @@ def get_roi_node_grid(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
 
 
 def calc_roi_from_nodes(camera: CameraData, nodes: np.ndarray
-                        ) -> np.ndarray:
+                        ) -> tuple[np.ndarray,np.ndarray]:
+
 
     roi_len_x = np.max(nodes[:,XI]) - np.min(nodes[:,XI])
     roi_len_y = np.max(nodes[:,YI]) - np.min(nodes[:,YI])
     roi_len = np.array([roi_len_x,roi_len_y])
-    if roi_len[XI] > camera.fov[XI] or roi_len[YI] > camera.fov[YI]:
-        warnings.warn('ROI is larger than the cameras FOV')
 
-    return roi_len
+    if roi_len[XI] > camera.fov[XI] or roi_len[YI] > camera.fov[YI]:
+        warnings.warn('ROI is larger than the cameras FOV\n')
+
+    coord_offset = np.array([np.min(nodes[:,XI]),np.min(nodes[:,YI])])
+    return (roi_len,coord_offset)
 
 
 def calc_res_from_nodes(camera: CameraData, nodes: np.ndarray, border_px: int
@@ -140,10 +143,13 @@ def calc_res_from_nodes(camera: CameraData, nodes: np.ndarray, border_px: int
     roi_len_x_px = camera.num_px[XI] - 2*border_px
     roi_len_y_px = camera.num_px[YI] - 2*border_px
 
-    if roi_len_x_m > roi_len_y_m:
-        m_per_px = roi_len_x_m/roi_len_x_px
+    m_per_px_in_x = roi_len_x_m/roi_len_x_px
+    m_per_px_in_y = roi_len_y_m/roi_len_y_px
+
+    if m_per_px_in_x > m_per_px_in_y:
+        m_per_px = m_per_px_in_x
     else:
-        m_per_px = roi_len_y_m/roi_len_y_px
+        m_per_px = m_per_px_in_y
 
     return m_per_px
 
