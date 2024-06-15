@@ -23,7 +23,7 @@ def main() -> None:
 
     moose_runner.set_run_opts(n_tasks = 1, n_threads = 8, redirect_out = False)
 
-    input_file = Path('data/thermal_moose_only/monoblock_3d_thermal.i')
+    input_file = Path('data/examplesims/plate_2d_thermal.i')
 
     start_time = time.perf_counter()
     moose_runner.run(input_file)
