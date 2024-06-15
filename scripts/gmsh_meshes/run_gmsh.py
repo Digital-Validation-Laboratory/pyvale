@@ -11,7 +11,7 @@ import time
 import mooseherder as mh
 
 def main() -> None:
-    gmsh_path = Path().home() / 'moose-workdir/gmsh/bin/gmsh'
+    gmsh_path = Path().home() / 'gmsh/bin/gmsh'
     gmsh_runner = mh.GmshRunner(gmsh_path)
 
     base_dir = Path('scripts/gmsh_meshes/')
