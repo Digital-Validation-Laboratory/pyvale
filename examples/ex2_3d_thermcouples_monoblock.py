@@ -19,7 +19,7 @@ import pyvale
 
 def main() -> None:
     # Use mooseherder to read the exodus and get a SimData object
-    data_path = Path('scripts/moose_thermal/monoblock_3d_thermal_out.e')
+    data_path = Path('data/examplesims/monoblock_3d_thermal_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier
@@ -101,7 +101,7 @@ def main() -> None:
     # truth from the simulation and dashed lines with '+' are simulated sensor
     # measurements using the specified UQ functions. The sensor traces should
     # have a uniform offset (systematic error) and noise (random error).
-    (fig,ax) = tc_array.plot_time_traces(plot_truth=True)
+    (fig,_) = tc_array.plot_time_traces(plot_truth=True)
     if trace_plot_mode == 'interactive':
         plt.show()
     if trace_plot_mode == 'save_fig':

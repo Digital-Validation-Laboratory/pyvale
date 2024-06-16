@@ -736,7 +736,7 @@ surfHeatFlux=10e6   # W/m^2
   type = Transient
   solve_type = 'PJFNK'
   petsc_options_iname = '-pc_type -pc_hypre_type'
-  petsc_options_value = 'hypre    boomeramg'
+  petsc_options_value = 'hypre boomeramg'
   end_time = ${end_time}
   dt = ${time_step}
 []

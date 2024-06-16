@@ -8,6 +8,9 @@
 *-opt
 *.e
 *.msh
+# Keep these as they are used for examples
+!scripts/moose_thermal/*.e
+!data/examplesims/*.e
 
 # Image deformation test cases
 *.pkl

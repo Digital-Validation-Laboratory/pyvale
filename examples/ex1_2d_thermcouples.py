@@ -16,7 +16,7 @@ import pyvale
 
 def main() -> None:
     # Use mooseherder to read the exodus and get a SimData object
-    data_path = Path('scripts/moose_thermal/plate_2d_thermal_out.e')
+    data_path = Path('data/examplesims/plate_2d_thermal_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
@@ -64,7 +64,7 @@ def main() -> None:
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector
     # graphic using a specified camera position.
-    pv_plot_mode = 'save_fig'
+    pv_plot_mode = 'interactive'
 
     if pv_plot_mode == 'interactive':
         # Shows the pyvista interactive 3D plot
@@ -87,7 +87,7 @@ def main() -> None:
     # Set this to 'interactive' to get a matplotlib.pyplot with the sensor
     # traces plotted over time. Set to 'save_fig' to save an image of the plot
     # to file.
-    trace_plot_mode = 'save_fig'
+    trace_plot_mode = 'interactive'
 
     # Plots the sensor time traces using matplotlib, thin solid lines are ground
     # truth from the simulation and dashed lines with '+' are simulated sensor

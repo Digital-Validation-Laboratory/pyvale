@@ -8,7 +8,6 @@ Copyright (C) 2024 The Computer Aided Validation Team
 import numpy as np
 import matplotlib.pyplot as plt
 
-import pyvale.imagesim.imagedef as sid
 from pyvale.plotprops import PlotProps
 
 PLOT_PROPS = PlotProps()
@@ -30,16 +29,17 @@ def plot_diag_image_xy(title: str,
                        extent: tuple[float,float,float,float],
                        cmap: str = V_CMAP,
                        ax_units: str = 'mm') -> None:
-        fig, ax = plt.subplots()
-        cset = plt.imshow(image,
-                        aspect='auto',interpolation='none',
-                        origin='lower',cmap=plt.get_cmap(cmap),
-                        extent=extent)
-        ax.set_aspect('equal','box')
-        ax.set_title(title,fontsize=12)
-        ax.set_xlabel(f'x [{ax_units}]',fontsize=12)
-        ax.set_ylabel(f'y [{ax_units}]',fontsize=12)
-        fig.colorbar(cset)
+
+    fig, ax = plt.subplots()
+    cset = plt.imshow(image,
+                    aspect='auto',interpolation='none',
+                    origin='lower',cmap=plt.get_cmap(cmap),
+                    extent=extent)
+    ax.set_aspect('equal','box')
+    ax.set_title(title,fontsize=12)
+    ax.set_xlabel(f'x [{ax_units}]',fontsize=12)
+    ax.set_ylabel(f'y [{ax_units}]',fontsize=12)
+    fig.colorbar(cset)
 
 def plot_all_diags(def_image: np.ndarray,
                    def_mask: np.ndarray | None,

@@ -17,7 +17,7 @@ DATA_DIR = Path('data/thermal_with_gmsh/')
 
 def main() -> None:
 
-    gmsh_path = USER_DIR / 'moose-workdir/gmsh/bin/gmsh'
+    gmsh_path = USER_DIR / 'gmsh/bin/gmsh'
     gmsh_runner = GmshRunner(gmsh_path)
 
     gmsh_input = DATA_DIR / 'monoblock_3d.geo'
@@ -32,7 +32,7 @@ def main() -> None:
 
 
     config = {'main_path': USER_DIR / 'moose',
-            'app_path': USER_DIR / 'moose-workdir/proteus',
+            'app_path': USER_DIR / 'proteus',
             'app_name': 'proteus-opt'}
 
     moose_config = MooseConfig(config)

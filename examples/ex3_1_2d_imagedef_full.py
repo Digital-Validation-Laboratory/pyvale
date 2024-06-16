@@ -139,7 +139,7 @@ def main() -> None:
 
     # Default ROI is the whole FOV but we want to set this to be based on the
     # furthest nodes, this is set in FE units 'meters' and does not change FOV
-    camera.roi_len = sid.calc_roi_from_nodes(camera,coords)
+    (camera.roi_len,camera.coord_offset) = sid.calc_roi_from_nodes(camera,coords)
 
     # If we are masking an image we might want to set an optimal resolution based
     # on leaving a specified number of pixels free on each image edge, this will
@@ -150,7 +150,7 @@ def main() -> None:
 
     # Default ROI is the whole FOV but we want to set this to be based on the
     # furthest nodes, this is set in FE units 'meters' and does not change FOV
-    camera.roi_len = sid.calc_roi_from_nodes(camera,coords)
+    (camera.roi_len,camera.coord_offset) = sid.calc_roi_from_nodes(camera,coords)
 
     print('-'*80)
     print('CameraData:')

@@ -23,7 +23,7 @@ def main() -> None:
     moose_modifier = InputModifier(moose_input,'#','')
 
     config = {'main_path': USER_DIR / 'moose',
-            'app_path': USER_DIR / 'moose-workdir/proteus',
+            'app_path': USER_DIR / 'proteus',
             'app_name': 'proteus-opt'}
     moose_config = MooseConfig(config)
     moose_runner = MooseRunner(moose_config)

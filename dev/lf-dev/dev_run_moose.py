@@ -16,7 +16,7 @@ DATA_DIR = Path('dev/lf-dev/')
 
 def main() -> None:
     config = {'main_path': USER_DIR / 'moose',
-            'app_path': USER_DIR / 'moose-workdir/proteus',
+            'app_path': USER_DIR / 'proteus',
             'app_name': 'proteus-opt'}
 
     moose_config = MooseConfig(config)

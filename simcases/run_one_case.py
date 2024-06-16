@@ -14,7 +14,7 @@ from mooseherder import (MooseConfig,
 
 #======================================
 # Change this to run a different case
-CASE_STR = 'case17'
+CASE_STR = 'case01'
 #======================================
 
 CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')
@@ -29,7 +29,7 @@ def main() -> None:
     if (((CASE_DIR / CASE_FILES[0]).is_file() and not
         (CASE_DIR / CASE_FILES[0]).with_suffix('.msh').is_file()) or
         FORCE_GMSH):
-        gmsh_runner = GmshRunner(USER_DIR / 'moose-workdir/gmsh/bin/gmsh')
+        gmsh_runner = GmshRunner(USER_DIR / 'gmsh/bin/gmsh')
 
         gmsh_start = time.perf_counter()
         gmsh_runner.run(CASE_DIR / CASE_FILES[0])
@@ -39,7 +39,7 @@ def main() -> None:
         gmsh_run_time = 0.0
 
     config = {'main_path': USER_DIR / 'moose',
-            'app_path': USER_DIR / 'moose-workdir/proteus',
+            'app_path': USER_DIR / 'proteus',
             'app_name': 'proteus-opt'}
 
     moose_config = MooseConfig(config)

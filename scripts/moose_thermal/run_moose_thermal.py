@@ -15,15 +15,15 @@ USER_DIR = Path.home()
 
 def main() -> None:
     config = {'main_path': USER_DIR / 'moose',
-            'app_path': USER_DIR / 'moose-workdir/proteus',
+            'app_path': USER_DIR / 'proteus',
             'app_name': 'proteus-opt'}
 
     moose_config = MooseConfig(config)
     moose_runner = MooseRunner(moose_config)
 
-    moose_runner.set_run_opts(n_tasks = 1, n_threads = 6, redirect_out = False)
+    moose_runner.set_run_opts(n_tasks = 1, n_threads = 8, redirect_out = False)
 
-    input_file = Path('data/thermal_moose_only/monoblock_3d_thermal.i')
+    input_file = Path('data/examplesims/plate_2d_thermal.i')
 
     start_time = time.perf_counter()
     moose_runner.run(input_file)

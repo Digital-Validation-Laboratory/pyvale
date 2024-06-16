@@ -19,7 +19,6 @@ from pyvale.imagesim.cameradata import CameraData
 import pyvale.imagesim.imagedef as sid
 
 
-
 def main() -> None:
     print()
     print('='*80)
@@ -71,7 +70,7 @@ def main() -> None:
     id_opts.mask_input_image = True
     id_opts.def_complex_geom = True
     id_opts.crop_on = True
-    id_opts.crop_px = np.array([500,500])
+    id_opts.crop_px = np.array([1000,1600])
     id_opts.calc_res_from_fe = True
     id_opts.calc_res_border_px = 10
     id_opts.add_static_ref = 'off'
@@ -84,11 +83,10 @@ def main() -> None:
     camera = CameraData()
     camera.num_px = id_opts.crop_px
     camera.bits = 8
-    camera.roi_len = sid.calc_roi_from_nodes(camera,coords)
     if id_opts.calc_res_from_fe:
         camera.m_per_px = sid.calc_res_from_nodes(camera,coords, #type: ignore
                                              id_opts.calc_res_border_px)
-    camera.roi_len = sid.calc_roi_from_nodes(camera,coords)
+    (camera.roi_len,camera.coord_offset) = sid.calc_roi_from_nodes(camera,coords)
 
     print('-'*80)
     print('CameraData:')
