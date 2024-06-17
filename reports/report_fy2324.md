@@ -5,7 +5,7 @@ Lloyd Fletcher, Adel Tayeb, Michael Atkinson, Alex Marsh.<br>
 Applied Materials Technology Group, Fusion Technology Division,<br>
 United Kingdom Atomic Energy Authority (UKAEA).
 
-NOTE: due to a conflict on the pypi repository `pyvale` has been renamed to `pyvale` as of May 2024s
+NOTE: due to a conflict on the pypi repository `pycave` has been renamed to `pyvale` as of May 2024s
 
 ## Introduction for Financial Year 2023-2024
 
@@ -51,7 +51,7 @@ The package has two main classes, the first is a `Field` which interpolates the 
 
 It should be noted that the `mooseherder` package has a range of additional functionality which is not shown in the figure below as only the current dependencies for the `pyvale` package are shown. This includes the ability to: 1) Dynamically update parameters in a MOOSE or Gmsh input file; 2) Run MOOSE simulations from python with Gmsh mesh generation; 3) Run a parameter sweep of a chain of MOOSE/Gmsh simulations in parallel; and 4) Read the output of the parameter sweep in parallel. This additional functionality of `mooseherder` is demonstrated in the worked examples in the `mooseherder` github repository.
 
-|![fig_pyvale_flowchart](images/pyvale.drawio.svg)|
+|![fig_pyvale_flowchart](images/pycave.drawio.svg)|
 |:--:|
 |*Overview of the current structure of `pyvale` as applied to the modelling of thermocouples measuring a temperature field.*|
 
@@ -59,7 +59,7 @@ It should be noted that the `mooseherder` package has a range of additional func
 
 This prototype demonstration will focus on the simplest case for sensor simulation which is point sensors used to measure a scalar field. For this purpose a temperature field measurement with thermocouples was chosen. In the future it is intended that `pyvale` will be extended to simulate more complex sensors such as cameras and more complex fields such as vector (e.g. displacement) or tensor fields (e.g. strain).
 
-Two MOOSE thermal simulations were constructed and run to demonstrate the functionality of the `pyvale`. The input files for these simulations and associated output can be found in the `pyvale` repository [here](https://github.com/Applied-Materials-Technology/pyvale/tree/main/data). The first simulation is based on a MOOSE tutorial problem analysing the thermal field in a 2D plate. For this case the temperature is held constant on the left hand edge and then increased on the right hand edge with a user specified function. The second simulation is a 3D thermal model of a divertor monoblock armour component that includes three materials with temperature dependent material properties (tungsten, copper, copper-chromium-zirconium).
+Two MOOSE thermal simulations were constructed and run to demonstrate the functionality of the `pyvale`. The input files for these simulations and associated output can be found in the `pyvale` repository [here](https://github.com/Applied-Materials-Technology/pyvale/tree/main/scripts/moose_thermal). The first simulation is based on a MOOSE tutorial problem analysing the thermal field in a 2D plate. For this case the temperature is held constant on the left hand edge and then increased on the right hand edge with a user specified function. The second simulation is a 3D thermal model of a divertor monoblock armour component that includes three materials with temperature dependent material properties (tungsten, copper, copper-chromium-zirconium).
 
 Here we use the code from the [first example](https://github.com/Applied-Materials-Technology/pyvale/blob/main/examples/ex1_2d_thermcouples.py) in the repository to demonstrate the use of `pyvale`. The first step is to import dependencies and use `mooseherder` to read the output exodus file for the simulation of interest:
 
