@@ -119,61 +119,61 @@ def plot_time_traces(sensor_array: SensorArray,
                      plot_props: PlotProps | None = None
                      ) -> tuple[Any,Any]:
 
-        if plot_props is None:
-            plot_props = PlotProps()
+    if plot_props is None:
+        plot_props = PlotProps()
 
-        if trace_props is None:
-            trace_props = TraceProps()
+    if trace_props is None:
+        trace_props = TraceProps()
 
-        prop_cycle = plt.rcParams['axes.prop_cycle']
-        colors = prop_cycle.by_key()['color']
+    prop_cycle = plt.rcParams['axes.prop_cycle']
+    colors = prop_cycle.by_key()['color']
 
-        fig, ax = plt.subplots(figsize=plot_props.single_fig_size,layout='constrained')
-        fig.set_dpi(plot_props.resolution)
+    fig, ax = plt.subplots(figsize=plot_props.single_fig_size,layout='constrained')
+    fig.set_dpi(plot_props.resolution)
 
 
-        if field is not None and trace_props.sim_line is not None:
-            sim_time = field.get_time_steps()
-            sim_vals = field.sample(sensor_array.get_positions())
-            for ii in range(sensor_array.get_positions()[0]):
-                ax.plot(sim_time,sim_vals[ii,:],'-o',
-                    lw=plot_props.lw/2,ms=plot_props.ms/2,color=colors[ii])
+    if field is not None and trace_props.sim_line is not None:
+        sim_time = field.get_time_steps()
+        sim_vals = field.sample(sensor_array.get_positions())
+        for ii in range(sensor_array.get_positions()[0]):
+            ax.plot(sim_time,sim_vals[ii,:],'-o',
+                lw=plot_props.lw/2,ms=plot_props.ms/2,color=colors[ii])
 
-        samp_time = sensor_array.get_sample_times()
+    samp_time = sensor_array.get_sample_times()
 
-        if trace_props.truth_line is not None:
-            truth = sensor_array.get_truth_values()
-            for ii in range(truth.shape[0]):
-                ax.plot(samp_time,
-                        truth[ii,:],
-                        trace_props.truth_line,
-                        lw=plot_props.lw/2,
-                        ms=plot_props.ms/2,
-                        color=colors[ii])
-
-        measurements = sensor_array.get_measurements()
-        for ii in range(measurements.shape[0]):
+    if trace_props.truth_line is not None:
+        truth = sensor_array.get_truth_values()
+        for ii in range(truth.shape[0]):
             ax.plot(samp_time,
-                    measurements[ii,:],
-                    trace_props.meas_line,
-                    #label=self._sensor_names[ii],
+                    truth[ii,:],
+                    trace_props.truth_line,
                     lw=plot_props.lw/2,
                     ms=plot_props.ms/2,
                     color=colors[ii])
 
-        ax.set_xlabel(trace_props.x_label,
-                    fontsize=plot_props.font_ax_size, fontname=plot_props.font_name)
-        ax.set_ylabel(trace_props.y_label,
-                    fontsize=plot_props.font_ax_size, fontname=plot_props.font_name)
+    measurements = sensor_array.get_measurements()
+    for ii in range(measurements.shape[0]):
+        ax.plot(samp_time,
+                measurements[ii,:],
+                trace_props.meas_line,
+                #label=self._sensor_names[ii],
+                lw=plot_props.lw/2,
+                ms=plot_props.ms/2,
+                color=colors[ii])
 
-        ax.set_xlim([np.min(samp_time),np.max(samp_time)]) # type: ignore
+    ax.set_xlabel(trace_props.x_label,
+                fontsize=plot_props.font_ax_size, fontname=plot_props.font_name)
+    ax.set_ylabel(trace_props.y_label,
+                fontsize=plot_props.font_ax_size, fontname=plot_props.font_name)
 
-        if trace_props.legend:
-            ax.legend(prop={"size":plot_props.font_leg_size},loc='best')
+    ax.set_xlim([np.min(samp_time),np.max(samp_time)]) # type: ignore
 
-        plt.grid(True)
-        plt.draw()
+    if trace_props.legend:
+        ax.legend(prop={"size":plot_props.font_leg_size},loc='best')
 
-        return (fig,ax)
+    plt.grid(True)
+    plt.draw()
+
+    return (fig,ax)
 
 

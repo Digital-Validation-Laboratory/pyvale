@@ -11,6 +11,21 @@ from pyvista import CellType
 
 import mooseherder as mh
 
+# Code reuse between these is not going to be easy as spatial interpolations
+# should be batched where possible i.e. every component of the vector/tensor
+
+# Needs to handle 2D and 3D scalar fields
+class ScalarField:
+    pass
+
+# Needs to handle 2D and 3D vector fields
+class VectorField:
+    pass
+
+# Needs to handle 2D and 3D tensor fields
+class TensorField:
+    pass
+
 class Field:
     def __init__(self, sim_data: mh.SimData, name: str, dim: int = 3) -> None:
         self._name = name

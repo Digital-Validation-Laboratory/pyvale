@@ -14,7 +14,7 @@ from mooseherder import (MooseConfig,
 
 #======================================
 # Change this to run a different case
-CASE_STR = 'case01'
+CASE_STR = 'case11'
 #======================================
 
 CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')
@@ -45,8 +45,8 @@ def main() -> None:
     moose_config = MooseConfig(config)
     moose_runner = MooseRunner(moose_config)
 
-    moose_runner.set_run_opts(n_tasks = 1,
-                              n_threads = 8,
+    moose_runner.set_run_opts(n_tasks = 8,
+                              n_threads = 1,
                               redirect_out = False)
 
     moose_start_time = time.perf_counter()
