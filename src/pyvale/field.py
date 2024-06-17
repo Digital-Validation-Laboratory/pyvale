@@ -27,12 +27,17 @@ class TensorField:
     pass
 
 class Field:
-    def __init__(self, sim_data: mh.SimData, name: str, dim: int = 3) -> None:
-        self._name = name
+    def __init__(self, sim_data: mh.SimData, components: tuple[str], dim: int = 3) -> None:
+        #self._name = name
         self._data_grid = convert_simdata_to_pyvista(sim_data,dim)
+        for cc in components:
+            self._data_grid[cc] =
+
+        '''
         self._data_grid = attach_field_to_pyvista(self._data_grid,
                                                   sim_data.node_vars[name], # type: ignore
                                                   name)
+        '''
         self._time_steps = sim_data.time
 
     def get_time_steps(self) -> np.ndarray:
