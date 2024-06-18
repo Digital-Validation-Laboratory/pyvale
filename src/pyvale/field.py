@@ -26,18 +26,22 @@ class VectorField:
 class TensorField:
     pass
 
+# Now works for a field with arbitrary number of components but does not enforce
+# consistency of the physics
 class Field:
-    def __init__(self, sim_data: mh.SimData, components: tuple[str], dim: int = 3) -> None:
-        #self._name = name
-        self._data_grid = convert_simdata_to_pyvista(sim_data,dim)
-        for cc in components:
-            self._data_grid[cc] =
+    def __init__(self,
+                 sim_data: mh.SimData,
+                 field_name: str,
+                 components: tuple[str],
+                 spat_dim: int) -> None:
 
-        '''
-        self._data_grid = attach_field_to_pyvista(self._data_grid,
-                                                  sim_data.node_vars[name], # type: ignore
-                                                  name)
-        '''
+        self._field_name = field_name
+        self._data_grid = convert_simdata_to_pyvista(sim_data,spat_dim)
+        self._components = components
+
+        for cc in components:
+            self._data_grid[cc] = sim_data.node_vars[cc]
+
         self._time_steps = sim_data.time
 
     def get_time_steps(self) -> np.ndarray:
@@ -45,19 +49,26 @@ class Field:
 
     def sample(self, sample_points: np.ndarray,
                sample_times: np.ndarray | None = None
-               ) -> np.ndarray:
+               ) -> dict[str,np.ndarray]:
 
         pv_points = pv.PolyData(sample_points)
         sample_data = pv_points.sample(self._data_grid)
-        sample_data = np.array(sample_data[self._name]) # type: ignore
+
+        sample_at_sim_time = dict()
+        for cc in self._components:
+            sample_at_sim_time[cc] = np.array(sample_data[cc])
 
         if sample_times is None:
-            return sample_data
+            return sample_at_sim_time
 
-        sample_func = lambda x: np.interp(sample_times,self._time_steps,x) # type: ignore
-        sample_vals = np.apply_along_axis(sample_func,1,sample_data)
+        sample_time_interp = lambda x: np.interp(sample_times,self._time_steps,x) # type: ignore
 
-        return sample_vals
+        sample_at_spec_time = dict()
+        for cc in self._components:
+            sample_at_spec_time[cc] = np.apply_along_axis(sample_time_interp,1,
+                                              sample_at_sim_time[cc])
+
+        return sample_at_spec_time
 
     def get_visualiser(self) -> pv.UnstructuredGrid:
         return self._data_grid
