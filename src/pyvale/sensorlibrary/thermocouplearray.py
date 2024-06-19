@@ -63,7 +63,7 @@ class ThermocoupleArray(SensorArray):
 
     #---------------------------------------------------------------------------
     # Truth values - from simulation
-    def get_truth_values(self) -> np.ndarray:
+    def get_truth_values(self) -> dict[str,np.ndarray]:
         return self._field.sample(self._positions,self._sample_times)
 
 

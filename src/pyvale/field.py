@@ -5,34 +5,19 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
+from abc import ABC, abstractmethod
+
 import numpy as np
 import pyvista as pv
 from pyvista import CellType
 
 import mooseherder as mh
 
-# Code reuse between these is not going to be easy as spatial interpolations
-# should be batched where possible i.e. every component of the vector/tensor
-
-# Needs to handle 2D and 3D scalar fields
-class ScalarField:
-    pass
-
-# Needs to handle 2D and 3D vector fields
-class VectorField:
-    pass
-
-# Needs to handle 2D and 3D tensor fields
-class TensorField:
-    pass
-
-# Now works for a field with arbitrary number of components but does not enforce
-# consistency of the physics
 class Field:
     def __init__(self,
                  sim_data: mh.SimData,
                  field_name: str,
-                 components: tuple[str],
+                 components: tuple,
                  spat_dim: int) -> None:
 
         self._field_name = field_name
@@ -74,6 +59,32 @@ class Field:
         return self._data_grid
 
 
+# Needs to be able to return a scalar value at specified points
+class ScalarField():
+    def __init__(self,in_field: Field) -> None:
+        self.field = in_field
+
+# Need to be able to return vector values (with optional specified orientation)
+# at specific points
+# - Can assume given components are the normal ones but must be consistent with
+#   the spatial dims
+# AND
+# - Need to deal with 2D and 3D spatial dims
+class VectorField():
+    def __init__(self,in_field: Field) -> None:
+        self.field = in_field
+
+# Need to be able to return tensor values (with optional specified orientation)
+# at specific points
+# - Need to know which are the normal components xx,yy,zz
+# - Need to know which are the shear components xy,xz,yz
+# AND
+# - Need to deal with 2D and 3D spatial dims
+class TensorField():
+    def __init__(self,in_field: Field) -> None:
+        self.field = in_field
+
+
 def convert_simdata_to_pyvista(sim_data: mh.SimData, dim: int = 3
                                ) -> pv.UnstructuredGrid:
 
@@ -103,14 +114,6 @@ def convert_simdata_to_pyvista(sim_data: mh.SimData, dim: int = 3
 
     return pv_grid
 
-
-def attach_field_to_pyvista(pv_grid: pv.UnstructuredGrid,
-                                 node_field: np.ndarray,
-                                 name: str) -> pv.UnstructuredGrid:
-    pv_grid[name] = node_field
-    return pv_grid
-
-
 def get_cell_type(nodes_per_elem: int, dim: int = 3) -> int:
     cell_type = 0
 
@@ -131,3 +134,30 @@ def get_cell_type(nodes_per_elem: int, dim: int = 3) -> int:
 
     return cell_type
 
+
+def sample_field(self,
+                components: tuple,
+                data_grid: pv.UnstructuredGrid,
+                time_steps: np.ndarray,
+                sample_points: np.ndarray,
+                sample_times: np.ndarray | None = None
+                ) -> dict[str,np.ndarray]:
+
+    pv_points = pv.PolyData(sample_points)
+    sample_data = pv_points.sample(data_grid)
+
+    sample_at_sim_time = dict()
+    for cc in components:
+        sample_at_sim_time[cc] = np.array(sample_data[cc])
+
+    if sample_times is None:
+        return sample_at_sim_time
+
+    sample_time_interp = lambda x: np.interp(sample_times,time_steps,x) # type: ignore
+
+    sample_at_spec_time = dict()
+    for cc in components:
+        sample_at_spec_time[cc] = np.apply_along_axis(sample_time_interp,1,
+                                            sample_at_sim_time[cc])
+
+    return sample_at_spec_time
