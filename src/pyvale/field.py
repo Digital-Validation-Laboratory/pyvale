@@ -6,63 +6,75 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 from abc import ABC, abstractmethod
-
 import numpy as np
 import pyvista as pv
 from pyvista import CellType
 
 import mooseherder as mh
 
-class Field:
-    def __init__(self,
-                 sim_data: mh.SimData,
-                 field_name: str,
-                 components: tuple,
-                 spat_dim: int) -> None:
 
-        self._field_name = field_name
-        self._data_grid = convert_simdata_to_pyvista(sim_data,spat_dim)
-        self._components = components
+class FieldError(Exception):
+    pass
 
-        for cc in components:
-            self._data_grid[cc] = sim_data.node_vars[cc]
 
-        self._time_steps = sim_data.time
-
+class Field(ABC):
+    @abstractmethod
     def get_time_steps(self) -> np.ndarray:
-        return self._time_steps # type: ignore
+        pass
 
-    def sample(self, sample_points: np.ndarray,
-               sample_times: np.ndarray | None = None
-               ) -> dict[str,np.ndarray]:
-
-        pv_points = pv.PolyData(sample_points)
-        sample_data = pv_points.sample(self._data_grid)
-
-        sample_at_sim_time = dict()
-        for cc in self._components:
-            sample_at_sim_time[cc] = np.array(sample_data[cc])
-
-        if sample_times is None:
-            return sample_at_sim_time
-
-        sample_time_interp = lambda x: np.interp(sample_times,self._time_steps,x) # type: ignore
-
-        sample_at_spec_time = dict()
-        for cc in self._components:
-            sample_at_spec_time[cc] = np.apply_along_axis(sample_time_interp,1,
-                                              sample_at_sim_time[cc])
-
-        return sample_at_spec_time
-
+    @abstractmethod
     def get_visualiser(self) -> pv.UnstructuredGrid:
-        return self._data_grid
+        pass
+
+    @abstractmethod
+    def get_all_components(self) -> tuple[str,...]:
+        pass
+
+    @abstractmethod
+    def sample_field(self,
+                    sample_points: np.ndarray,
+                    sample_times: np.ndarray | None = None
+                    ) -> dict[str,np.ndarray]:
+        pass
+
 
 
 # Needs to be able to return a scalar value at specified points
-class ScalarField():
-    def __init__(self,in_field: Field) -> None:
-        self.field = in_field
+class ScalarField(Field):
+    def __init__(self,
+                 sim_data: mh.SimData,
+                 field_name: str,
+                 spat_dim: int) -> None:
+
+        self._field_name = field_name
+
+        if sim_data.time is None:
+            raise(FieldError("SimData.time is None. SimData does not have time steps"))
+        self._time_steps = sim_data.time
+
+        self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
+                                                    (field_name,),
+                                                    spat_dim)
+
+    def get_time_steps(self) -> np.ndarray:
+        return self._time_steps
+
+    def get_visualiser(self) -> pv.UnstructuredGrid:
+        return self._pyvista_grid
+
+    def get_all_components(self) -> tuple[str, ...]:
+        return (self._field_name,)
+
+    def sample_field(self,
+                    sample_points: np.ndarray,
+                    sample_times: np.ndarray | None = None
+                    ) -> dict[str,np.ndarray]:
+
+        return sample_pyvista((self._field_name,),
+                                self._pyvista_grid,
+                                self._time_steps,
+                                sample_points,
+                                sample_times)
 
 # Need to be able to return vector values (with optional specified orientation)
 # at specific points
@@ -70,9 +82,45 @@ class ScalarField():
 #   the spatial dims
 # AND
 # - Need to deal with 2D and 3D spatial dims
-class VectorField():
-    def __init__(self,in_field: Field) -> None:
-        self.field = in_field
+class VectorField(Field):
+    def __init__(self,
+                 sim_data: mh.SimData,
+                 field_name: str,
+                 components: tuple[str,...],
+                 spat_dim: int) -> None:
+
+        self._field_name = field_name
+        self._components = components
+
+        self.all_components = self._components
+
+        if sim_data.time is None:
+            raise(FieldError("SimData.time is None. SimData does not have time steps"))
+        self._time_steps = sim_data.time
+
+        self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
+                                                    components,
+                                                    spat_dim)
+
+    def get_time_steps(self) -> np.ndarray:
+        return self._time_steps
+
+    def get_visualiser(self) -> pv.UnstructuredGrid:
+        return self._pyvista_grid
+
+    def get_all_components(self) -> tuple[str, ...]:
+        return self._components
+
+    def sample_field(self,
+                sample_points: np.ndarray,
+                sample_times: np.ndarray | None = None
+                ) -> dict[str,np.ndarray]:
+
+        return sample_pyvista(self._components,
+                                self._pyvista_grid,
+                                self._time_steps,
+                                sample_points,
+                                sample_times)
 
 # Need to be able to return tensor values (with optional specified orientation)
 # at specific points
@@ -80,19 +128,58 @@ class VectorField():
 # - Need to know which are the shear components xy,xz,yz
 # AND
 # - Need to deal with 2D and 3D spatial dims
-class TensorField():
-    def __init__(self,in_field: Field) -> None:
-        self.field = in_field
+class TensorField(Field):
+    def __init__(self,
+                 sim_data: mh.SimData,
+                 field_name: str,
+                 norm_components: tuple[str,...],
+                 dev_components: tuple[str,...],
+                 spat_dim: int) -> None:
 
+        self._field_name = field_name
+        self._norm_components = norm_components
+        self._dev_components = dev_components
 
-def convert_simdata_to_pyvista(sim_data: mh.SimData, dim: int = 3
-                               ) -> pv.UnstructuredGrid:
+        if sim_data.time is None:
+            raise(FieldError("SimData.time is None. SimData does not have time steps"))
+        self._time_steps = sim_data.time
+
+        self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
+                                            norm_components+dev_components,
+                                            spat_dim)
+
+    def get_time_steps(self) -> np.ndarray:
+        return self._time_steps
+
+    def get_visualiser(self) -> pv.UnstructuredGrid:
+        return self._pyvista_grid
+
+    def get_all_components(self) -> tuple[str, ...]:
+        return self._norm_components + self._dev_components
+
+    def sample_field(self,
+                sample_points: np.ndarray,
+                sample_times: np.ndarray | None = None
+                ) -> dict[str,np.ndarray]:
+
+        return sample_pyvista(self._norm_components+self._dev_components,
+                                self._pyvista_grid,
+                                self._time_steps,
+                                sample_points,
+                                sample_times)
+
+#-------------------------------------------------------------------------------
+def conv_simdata_to_pyvista(sim_data: mh.SimData,
+                            components: tuple[str,...],
+                            spat_dim: int) -> pv.UnstructuredGrid:
 
     flat_connect = np.array([],dtype=np.int64)
     cell_types = np.array([],dtype=np.int64)
 
     if sim_data.connect is None:
-        raise RuntimeError("SimData does not have a connectivity table, unable to convert to pyvista")
+        raise FieldError("SimData does not have a connectivity table, unable to convert to pyvista")
+    if sim_data.node_vars is None:
+        raise FieldError("SimData does not contain node_vars.")
 
     for cc in sim_data.connect:
         # NOTE: need the -1 here to make element numbers 0 indexed!
@@ -103,21 +190,24 @@ def convert_simdata_to_pyvista(sim_data: mh.SimData, dim: int = 3
         idxs = np.arange(0,n_elems*nodes_per_elem,nodes_per_elem,dtype=np.int64)
         temp_connect = np.insert(temp_connect,idxs,nodes_per_elem)
 
-        this_cell_type = get_cell_type(nodes_per_elem,dim=dim)
+        this_cell_type = get_cell_type(nodes_per_elem,spat_dim)
         cell_types = np.hstack((cell_types,np.full(n_elems,this_cell_type)))
         flat_connect = np.hstack((flat_connect,temp_connect),dtype=np.int64)
-
 
     cells = flat_connect
     points = sim_data.coords
     pv_grid = pv.UnstructuredGrid(cells, cell_types, points)
 
+    for cc in components:
+        pv_grid[cc] = sim_data.node_vars[cc]
+
     return pv_grid
 
-def get_cell_type(nodes_per_elem: int, dim: int = 3) -> int:
+
+def get_cell_type(nodes_per_elem: int, spat_dim: int) -> int:
     cell_type = 0
 
-    if dim == 2:
+    if spat_dim == 2:
         if nodes_per_elem == 4:
             cell_type = CellType.QUAD
         elif nodes_per_elem == 3:
@@ -135,16 +225,15 @@ def get_cell_type(nodes_per_elem: int, dim: int = 3) -> int:
     return cell_type
 
 
-def sample_field(self,
-                components: tuple,
-                data_grid: pv.UnstructuredGrid,
+def sample_pyvista(components: tuple,
+                pyvista_grid: pv.UnstructuredGrid,
                 time_steps: np.ndarray,
                 sample_points: np.ndarray,
                 sample_times: np.ndarray | None = None
                 ) -> dict[str,np.ndarray]:
 
     pv_points = pv.PolyData(sample_points)
-    sample_data = pv_points.sample(data_grid)
+    sample_data = pv_points.sample(pyvista_grid)
 
     sample_at_sim_time = dict()
     for cc in components:

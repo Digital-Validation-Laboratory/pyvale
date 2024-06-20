@@ -64,12 +64,18 @@ class ThermocoupleArray(SensorArray):
     #---------------------------------------------------------------------------
     # Truth values - from simulation
     def get_truth_values(self) -> dict[str,np.ndarray]:
-        return self._field.sample(self._positions,self._sample_times)
+        return self._field.sample_field(self._positions,
+                                  self._sample_times)
 
 
     #---------------------------------------------------------------------------
     # Systematic error calculation functions
-    def set_uniform_systematic_err_func(self, low: float, high: float) -> None:
+    # Only calculated once when set
+
+    def set_uniform_systematic_err_func(self,
+                                        low: float,
+                                        high: float
+                                        ) -> dict[str,np.ndarray] | None:
 
         def sys_err_func(size: tuple) -> np.ndarray:
             sys_errs = np.random.default_rng().uniform(low=low,
@@ -79,11 +85,17 @@ class ThermocoupleArray(SensorArray):
             return sys_errs
 
         self._sys_err_func = sys_err_func
-        self._sys_errs = self._sys_err_func(size=self.get_measurement_shape())
+
+        self._sys_errs = dict()
+        for cc in self._field.get_all_components():
+            self._sys_errs[cc] = self._sys_err_func(
+                size=self.get_measurement_shape())
+
+        return self._sys_errs
 
 
     def set_custom_systematic_err_func(self, sys_fun: Callable | None = None
-                                ) -> np.ndarray | None:
+                                ) -> dict[str,np.ndarray] | None:
 
         self._sys_err_func = sys_fun
 
@@ -92,6 +104,7 @@ class ThermocoupleArray(SensorArray):
             return None
 
         self._sys_errs = self._sys_err_func(size=self.get_measurement_shape())
+
         return self._sys_errs
 
 
