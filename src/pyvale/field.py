@@ -140,6 +140,9 @@ class TensorField(Field):
         self._norm_components = norm_components
         self._dev_components = dev_components
 
+        #TODO: do some checking to make sure norm/dev components are consistent
+        # based on the spatial dimensions
+
         if sim_data.time is None:
             raise(FieldError("SimData.time is None. SimData does not have time steps"))
         self._time_steps = sim_data.time
@@ -234,6 +237,9 @@ def sample_pyvista(components: tuple,
 
     pv_points = pv.PolyData(sample_points)
     sample_data = pv_points.sample(pyvista_grid)
+
+    if sample_data is None:
+        raise(FieldError("Sampling simulation data at sensors locations with pyvista failed."))
 
     sample_at_sim_time = dict()
     for cc in components:

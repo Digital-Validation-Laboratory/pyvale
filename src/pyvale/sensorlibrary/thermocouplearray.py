@@ -72,6 +72,20 @@ class ThermocoupleArray(SensorArray):
     # Systematic error calculation functions
     # Only calculated once when set
 
+    def calc_sys_errs(self) -> dict[str,np.ndarray] | None:
+
+        if self._sys_err_func is None:
+            self._sys_errs = None
+            return None
+
+        self._sys_errs = dict()
+        for cc in self._field.get_all_components():
+            self._sys_errs[cc] = self._sys_err_func(
+                size=self.get_measurement_shape())
+
+        return self._sys_errs
+
+
     def set_uniform_systematic_err_func(self,
                                         low: float,
                                         high: float
@@ -85,11 +99,7 @@ class ThermocoupleArray(SensorArray):
             return sys_errs
 
         self._sys_err_func = sys_err_func
-
-        self._sys_errs = dict()
-        for cc in self._field.get_all_components():
-            self._sys_errs[cc] = self._sys_err_func(
-                size=self.get_measurement_shape())
+        self.calc_sys_errs()
 
         return self._sys_errs
 
@@ -98,17 +108,12 @@ class ThermocoupleArray(SensorArray):
                                 ) -> dict[str,np.ndarray] | None:
 
         self._sys_err_func = sys_fun
-
-        if self._sys_err_func is None:
-            self._sys_errs = None
-            return None
-
-        self._sys_errs = self._sys_err_func(size=self.get_measurement_shape())
+        self.calc_sys_errs()
 
         return self._sys_errs
 
 
-    def get_systematic_errs(self) -> np.ndarray | None:
+    def get_systematic_errs(self) -> dict[str,np.ndarray] | None:
 
         if self._sys_err_func is None:
             return None
@@ -126,29 +131,37 @@ class ThermocoupleArray(SensorArray):
 
     def set_custom_random_err_func(self, rand_fun: Callable | None = None
                                    ) -> None:
+
         self._rand_err_func = rand_fun
 
 
-    def get_random_errs(self) -> np.ndarray | None:
+    def get_random_errs(self) -> dict[str,np.ndarray] | None:
+
         if self._rand_err_func is None:
             return None
 
-        return self._rand_err_func(size=self.get_measurement_shape())
+        rand_errs = dict()
+        for cc in self._field.get_all_components():
+            rand_errs[cc] = self._rand_err_func(size=self.get_measurement_shape())
+
+        return rand_errs
 
 
     #---------------------------------------------------------------------------
     # Measurement calculations
-    def get_measurements(self) -> np.ndarray:
+    def get_measurements(self) -> dict[str,np.ndarray]:
 
         measurements = self.get_truth_values()
         sys_errs = self.get_systematic_errs()
         rand_errs = self.get_random_errs()
 
         if sys_errs is not None:
-            measurements = measurements + sys_errs
+            for cc in self._field.get_all_components():
+                measurements[cc] = measurements[cc] + sys_errs[cc]
 
         if rand_errs is not None:
-            measurements = measurements + rand_errs
+            for cc in self._field.get_all_components():
+                measurements[cc] = measurements[cc] + rand_errs[cc]
 
         return measurements
 
