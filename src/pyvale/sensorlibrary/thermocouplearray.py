@@ -188,15 +188,16 @@ class ThermocoupleArray(SensorArray):
         pp = PlotProps()
         prop_cycle = plt.rcParams['axes.prop_cycle']
         colors = prop_cycle.by_key()['color']
+        comp = self._field.get_all_components()[0]
 
         fig, ax = plt.subplots(figsize=pp.single_fig_size,layout='constrained')
         fig.set_dpi(pp.resolution)
 
         sim_time = self._field.get_time_steps()
         if plot_sim:
-            sim_vals = self._field.sample(self._positions)
+            sim_vals = self._field.sample_field(self._positions)
             for ii in range(self.get_num_sensors()):
-                ax.plot(sim_time,sim_vals[ii,:],'-o',
+                ax.plot(sim_time,sim_vals[comp][ii,:],'-o',
                     lw=pp.lw/2,ms=pp.ms/2,color=colors[ii])
 
         if self.get_sample_times() is None:
@@ -207,12 +208,12 @@ class ThermocoupleArray(SensorArray):
         if plot_truth:
             truth = self.get_truth_values()
             for ii in range(self.get_num_sensors()):
-                ax.plot(samp_time,truth[ii,:],'-',
+                ax.plot(samp_time,truth[comp][ii,:],'-',
                     lw=pp.lw/2,ms=pp.ms/2,color=colors[ii])
 
         measurements = self.get_measurements()
         for ii in range(self.get_num_sensors()):
-            ax.plot(samp_time,measurements[ii,:],
+            ax.plot(samp_time,measurements[comp][ii,:],
                 ':+',label=self._sensor_names[ii],
                 lw=pp.lw/2,ms=pp.ms/2,color=colors[ii])
 

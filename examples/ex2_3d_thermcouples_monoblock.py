@@ -29,7 +29,7 @@ def main() -> None:
     # data field of interest quickly by using the mesh and shape functions
     spat_dims = 3       # Specify that we only have 2 spatial dimensions
     field_name = 'temperature'    # Same as in the moose input and SimData node_var key
-    t_field = pyvale.Field(sim_data,field_name,spat_dims)
+    t_field = pyvale.ScalarField(sim_data,field_name,spat_dims)
 
     # This creates a grid of 3x2 sensors in the xy plane
     n_sens = (1,4,1)    # Number of sensor (x,y,z)

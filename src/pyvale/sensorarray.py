@@ -77,7 +77,7 @@ def create_sensor_pos_array(n_sens: tuple[int,int,int],
 def plot_sensors(pv_simdata: pv.UnstructuredGrid,
                  pv_sensdata: pv.PolyData,
                  field_name: str,
-                 time_step: int = -1) -> Any: # Stupid plotter doesn't allow type hinting!
+                 time_step: int = -1) -> Any: # plotter doesn't allow type hinting!
 
     pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
 
@@ -114,6 +114,7 @@ class TraceProps:
 
 
 def plot_time_traces(sensor_array: SensorArray,
+                     component: str,
                      field: Field | None = None,
                      trace_props: TraceProps | None  = None,
                      plot_props: PlotProps | None = None
@@ -134,27 +135,27 @@ def plot_time_traces(sensor_array: SensorArray,
 
     if field is not None and trace_props.sim_line is not None:
         sim_time = field.get_time_steps()
-        sim_vals = field.sample(sensor_array.get_positions())
+        sim_vals = field.sample_field(sensor_array.get_positions())
         for ii in range(sensor_array.get_positions()[0]):
-            ax.plot(sim_time,sim_vals[ii,:],'-o',
+            ax.plot(sim_time,sim_vals[component][ii,:],'-o',
                 lw=plot_props.lw/2,ms=plot_props.ms/2,color=colors[ii])
 
     samp_time = sensor_array.get_sample_times()
 
     if trace_props.truth_line is not None:
         truth = sensor_array.get_truth_values()
-        for ii in range(truth.shape[0]):
+        for ii in range(truth[component].shape[0]):
             ax.plot(samp_time,
-                    truth[ii,:],
+                    truth[component][ii,:],
                     trace_props.truth_line,
                     lw=plot_props.lw/2,
                     ms=plot_props.ms/2,
                     color=colors[ii])
 
     measurements = sensor_array.get_measurements()
-    for ii in range(measurements.shape[0]):
+    for ii in range(measurements[component].shape[0]):
         ax.plot(samp_time,
-                measurements[ii,:],
+                measurements[component][ii,:],
                 trace_props.meas_line,
                 #label=self._sensor_names[ii],
                 lw=plot_props.lw/2,
