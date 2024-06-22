@@ -44,11 +44,11 @@ def main() -> None:
     # once and remains constant throughout the simulation time creating an
     # offset. The max temp in the simulation is ~200degC so this range [lo,hi]
     # should be visible on the time traces.
-    tc_array.set_uniform_systematic_err_func(low=-10.0,high=10.0)
+    tc_array.set_uniform_systematic_err_func(low=-50.0,high=50.0)
     # The default for the random error is a normal distribution here we specify
     # a standard deviation which should be visible on the time traces. Note that
     # the random error is sampled repeatedly for each time step.
-    tc_array.set_normal_random_err_func(std_dev=5.0)
+    tc_array.set_normal_random_err_func(std_dev=1.0)
 
     measurements = tc_array.get_measurements()
     print(f'\nMeasurements:\n{measurements}\n')

@@ -41,7 +41,7 @@ def main() -> None:
     samples = disp_field.sample_field(sample_points)
     print(sim_data.time)
     print(sim_data.time.shape)
-    print(samples['disp_x'].shape)
+    print(samples.shape)
 
 
 if __name__ == "__main__":

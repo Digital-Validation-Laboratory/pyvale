@@ -34,7 +34,7 @@ class Field(ABC):
     def sample_field(self,
                     sample_points: np.ndarray,
                     sample_times: np.ndarray | None = None
-                    ) -> dict[str,np.ndarray]:
+                    ) -> np.ndarray:
         pass
 
 
@@ -68,7 +68,7 @@ class ScalarField(Field):
     def sample_field(self,
                     sample_points: np.ndarray,
                     sample_times: np.ndarray | None = None
-                    ) -> dict[str,np.ndarray]:
+                    ) -> np.ndarray:
 
         return sample_pyvista((self._field_name,),
                                 self._pyvista_grid,
@@ -114,7 +114,7 @@ class VectorField(Field):
     def sample_field(self,
                 sample_points: np.ndarray,
                 sample_times: np.ndarray | None = None
-                ) -> dict[str,np.ndarray]:
+                ) -> np.ndarray:
 
         return sample_pyvista(self._components,
                                 self._pyvista_grid,
@@ -163,7 +163,7 @@ class TensorField(Field):
     def sample_field(self,
                 sample_points: np.ndarray,
                 sample_times: np.ndarray | None = None
-                ) -> dict[str,np.ndarray]:
+                ) -> np.ndarray:
 
         return sample_pyvista(self._norm_components+self._dev_components,
                                 self._pyvista_grid,
@@ -233,7 +233,7 @@ def sample_pyvista(components: tuple,
                 time_steps: np.ndarray,
                 sample_points: np.ndarray,
                 sample_times: np.ndarray | None = None
-                ) -> dict[str,np.ndarray]:
+                ) -> np.ndarray:
 
     pv_points = pv.PolyData(sample_points)
     sample_data = pv_points.sample(pyvista_grid)
@@ -241,18 +241,23 @@ def sample_pyvista(components: tuple,
     if sample_data is None:
         raise(FieldError("Sampling simulation data at sensors locations with pyvista failed."))
 
-    sample_at_sim_time = dict()
-    for cc in components:
-        sample_at_sim_time[cc] = np.array(sample_data[cc])
+    n_comps = len(components)
+    (n_sensors,n_time_steps) = np.array(sample_data[components[0]]).shape
+    sample_at_sim_time = np.empty((n_sensors,n_comps,n_time_steps))
+
+    for ii,cc in enumerate(components):
+        sample_at_sim_time[:,ii,:] = np.array(sample_data[cc])
 
     if sample_times is None:
         return sample_at_sim_time
 
     sample_time_interp = lambda x: np.interp(sample_times,time_steps,x) # type: ignore
 
-    sample_at_spec_time = dict()
-    for cc in components:
-        sample_at_spec_time[cc] = np.apply_along_axis(sample_time_interp,1,
-                                            sample_at_sim_time[cc])
+    n_time_steps = sample_times.shape[0]
+    sample_at_spec_time = np.empty((n_sensors,n_comps,n_time_steps))
+
+    for ii,cc in enumerate(components):
+        sample_at_spec_time[:,ii,:] = np.apply_along_axis(sample_time_interp,1,
+                                                        sample_at_sim_time[cc])
 
     return sample_at_spec_time

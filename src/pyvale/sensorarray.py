@@ -18,10 +18,10 @@ from pyvale.plotprops import PlotProps
 
 @dataclass
 class MeasurementData():
-    measurements: dict[str,np.ndarray] | None =  None
-    random_errs: dict[str,np.ndarray] | None  = None
-    systematic_errs: dict[str,np.ndarray] | None = None
-    truth_values: dict[str,np.ndarray] | None = None
+    measurements: np.ndarray | None =  None
+    random_errs: np.ndarray | None  = None
+    systematic_errs: np.ndarray | None = None
+    truth_values: np.ndarray | None = None
 
 
 class SensorArray(ABC):
@@ -34,19 +34,19 @@ class SensorArray(ABC):
         pass
 
     @abstractmethod
-    def get_truth_values(self) -> dict[str,np.ndarray]:
+    def get_truth_values(self) -> np.ndarray:
         pass
 
     @abstractmethod
-    def get_systematic_errs(self) -> dict[str,np.ndarray]:
+    def get_systematic_errs(self) -> np.ndarray:
         pass
 
     @abstractmethod
-    def get_random_errs(self) -> dict[str,np.ndarray]:
+    def get_random_errs(self) -> np.ndarray:
         pass
 
     @abstractmethod
-    def get_measurements(self) -> dict[str,np.ndarray]:
+    def get_measurements(self) -> np.ndarray:
         pass
 
     @abstractmethod
