@@ -1,0 +1,21 @@
+'''
+================================================================================
+example: displacement sensors on a 2d plate
+
+pyvale: the python validation engine
+License: MIT
+Copyright (C) 2024 The Computer Aided Validation Team
+================================================================================
+'''
+from pathlib import Path
+import mooseherder as mh
+import pyvale
+
+def main() -> None:
+    # Use mooseherder to read the exodus and get a SimData object
+    data_path = Path('simcases/case17/case17_out.e')
+    data_reader = mh.ExodusReader(data_path)
+    sim_data = data_reader.read_all_sim_data()
+
+if __name__ == "__main__":
+    main()

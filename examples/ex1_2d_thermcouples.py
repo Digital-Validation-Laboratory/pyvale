@@ -51,6 +51,7 @@ def main() -> None:
     tc_array.set_normal_random_err_func(std_dev=5.0)
 
     measurements = tc_array.get_measurements()
+    print(f'\nMeasurements:\n{measurements}\n')
 
     # Now we use pyvista to get a 3D interactive labelled plot of the sensor
     # locations on our simulation geometry.

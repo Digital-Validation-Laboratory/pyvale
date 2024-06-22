@@ -10,7 +10,6 @@ Copyright (C) 2024 The Computer Aided Validation Team
 from pprint import pprint
 from pathlib import Path
 
-import numpy as np
 import matplotlib.pyplot as plt
 
 import mooseherder as mh
