@@ -16,18 +16,37 @@ from pyvale.field import Field
 from pyvale.sensorarray import SensorArray, MeasurementData
 from pyvale.plotprops import PlotProps
 
-class ExtensometerArray(SensorArray):
+
+class DispSensArray(SensorArray):
+    def __init__(self,
+                 positions: np.ndarray,
+                 field: Field,
+                 sample_times: np.ndarray | None = None
+                 ) -> None:
+
+        self._positions = positions
+        self._field = field
+        self._sample_times = sample_times
+
+        self._sys_err_func = None
+        self._sys_errs = None
+
+        self._rand_err_func = None
 
     def get_positions(self) -> np.ndarray:
-        pass
-
+        return self._positions
 
     def get_sample_times(self) -> np.ndarray:
-        pass
+        if self._sample_times is None:
+            return self._field.get_time_steps()
 
+        return self._sample_times
 
+    #---------------------------------------------------------------------------
+    # Truth values - from simulation
     def get_truth_values(self) -> dict[str,np.ndarray]:
-        pass
+        return self._field.sample_field(self._positions,
+                                        self._sample_times)
 
 
     def get_systematic_errs(self) -> dict[str,np.ndarray]:

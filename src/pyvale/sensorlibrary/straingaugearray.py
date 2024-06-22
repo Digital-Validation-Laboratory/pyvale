@@ -16,7 +16,7 @@ from pyvale.field import Field
 from pyvale.sensorarray import SensorArray, MeasurementData
 from pyvale.plotprops import PlotProps
 
-class ExtensometerArray(SensorArray):
+class StrainGaugeArray(SensorArray):
 
     def get_positions(self) -> np.ndarray:
         pass
