@@ -15,6 +15,7 @@ import pyvista as pv
 from pyvale.field import Field
 from pyvale.sensorarray import SensorArray, MeasurementData
 from pyvale.plotprops import PlotProps
+from pyvale.syserrintegrator import SysErrIntegrator
 
 
 class ThermocoupleArray(SensorArray):
@@ -28,8 +29,7 @@ class ThermocoupleArray(SensorArray):
         self._field = field
         self._sample_times = sample_times
 
-        self._sys_err_func = None
-        self._sys_errs = None
+        self._sys_err_int = None
 
         self._rand_err_func = None
 
@@ -70,51 +70,18 @@ class ThermocoupleArray(SensorArray):
     #---------------------------------------------------------------------------
     # Systematic error calculation functions
     # Only calculated once when set
+    def set_sys_err_integrator(self,
+                               err_int: SysErrIntegrator) -> None:
 
-    def calc_sys_errs(self) -> np.ndarray | None:
-
-        if self._sys_err_func is None:
-            self._sys_errs = None
-            return None
-
-        self._sys_errs = self._sys_err_func(size=self.get_measurement_shape())
-
-        return self._sys_errs
-
-
-    def set_uniform_systematic_err_func(self,
-                                        low: float,
-                                        high: float
-                                        ) -> np.ndarray | None:
-
-        def sys_err_func(size: tuple) -> np.ndarray:
-            sys_errs = np.random.default_rng().uniform(low=low,
-                                                    high=high,
-                                                    size=(size[0],1,1))
-            sys_errs = np.tile(sys_errs,(1,1,size[1]))
-            return sys_errs
-
-        self._sys_err_func = sys_err_func
-        self.calc_sys_errs()
-
-        return self._sys_errs
-
-
-    def set_custom_systematic_err_func(self, sys_fun: Callable | None = None
-                                ) -> np.ndarray | None:
-
-        self._sys_err_func = sys_fun
-        self.calc_sys_errs()
-
-        return self._sys_errs
+        self._sys_err_int = err_int
 
 
     def get_systematic_errs(self) -> np.ndarray | None:
 
-        if self._sys_err_func is None:
+        if self._sys_err_int is None:
             return None
 
-        return self._sys_errs
+        return self._sys_err_int.get_sys_errs_tot()
 
     #---------------------------------------------------------------------------
     # Random error calculation functions
