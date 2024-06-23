@@ -31,14 +31,18 @@ def main() -> None:
 
     tc_array = pyvale.ThermocoupleArray(sens_pos,t_field)
 
-    err_unif1 = pyvale.SysErrUniform(low=10.0,high=20.0)
-    err_unif2 = pyvale.SysErrUniform(low=-5.0,high=5.0)
-    sys_err_int = pyvale.SysErrIntegrator([err_unif1,err_unif2],
+    err_sys1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
+    err_sys2 = pyvale.SysErrNormal(std=20)
+    sys_err_int = pyvale.SysErrIntegrator([err_sys1,err_sys2],
                                           tc_array.get_measurement_shape())
-    tc_array.set_sys_err_integrator(sys_err_int)
+    #tc_array.set_sys_err_integrator(sys_err_int)
 
+    err_rand1 = pyvale.RandErrNormal(std=10)
+    err_rand2 = pyvale.RandErrUniform(low=-10,high=10)
+    rand_err_int = pyvale.RandErrIntegrator([err_rand1,err_rand2],
+                                            tc_array.get_measurement_shape())
+    tc_array.set_rand_err_integrator(rand_err_int)
 
-    #tc_array.set_normal_random_err_func(std_dev=1.0)
     #measurements = tc_array.get_measurements()
 
     pv_sens = tc_array.get_visualiser()

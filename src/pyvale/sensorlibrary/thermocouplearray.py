@@ -16,6 +16,7 @@ from pyvale.field import Field
 from pyvale.sensorarray import SensorArray, MeasurementData
 from pyvale.plotprops import PlotProps
 from pyvale.syserrintegrator import SysErrIntegrator
+from pyvale.randerrintegrator import RandErrIntegrator
 
 
 class ThermocoupleArray(SensorArray):
@@ -30,8 +31,7 @@ class ThermocoupleArray(SensorArray):
         self._sample_times = sample_times
 
         self._sys_err_int = None
-
-        self._rand_err_func = None
+        self._rand_err_int = None
 
         self._sensor_names = list([])
         for ss in range(self.get_num_sensors()):
@@ -85,28 +85,18 @@ class ThermocoupleArray(SensorArray):
 
     #---------------------------------------------------------------------------
     # Random error calculation functions
-    def set_normal_random_err_func(self, std_dev: float) -> None:
+    def set_rand_err_integrator(self,
+                                err_int: RandErrIntegrator) -> None:
 
-        self._rand_err_func = partial(np.random.default_rng().normal,
-                                        loc=0.0,
-                                        scale=std_dev)
-
-
-    def set_custom_random_err_func(self, rand_fun: Callable | None = None
-                                   ) -> None:
-
-        self._rand_err_func = rand_fun
+        self._rand_err_int = err_int
 
 
     def get_random_errs(self) -> np.ndarray | None:
 
-        if self._rand_err_func is None:
+        if self._rand_err_int is None:
             return None
 
-
-        rand_errs = self._rand_err_func(size=self.get_measurement_shape())
-
-        return rand_errs
+        return self._rand_err_int.get_rand_errs_tot()
 
 
     #---------------------------------------------------------------------------

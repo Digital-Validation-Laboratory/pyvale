@@ -11,8 +11,11 @@ from pyvale.sensorarray import *
 from pyvale.field import *
 from pyvale.plotprops import PlotProps
 from pyvale.imagesim import *
+
 from pyvale.syserrcalculator import *
 from pyvale.syserrintegrator import *
+from pyvale.randerrcalculator import *
+from pyvale.randerrintegrator import *
 
 from pyvale.sensorlibrary.thermocouplearray import *
 
