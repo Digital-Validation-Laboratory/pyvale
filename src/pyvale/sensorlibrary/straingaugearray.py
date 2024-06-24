@@ -12,10 +12,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyvista as pv
 
-from pyvale.field import Field
+from pyvale.field import TensorField
 from pyvale.sensorarray import SensorArray, MeasurementData
 from pyvale.plotprops import PlotProps
 
+# TODO:
 class StrainGaugeArray(SensorArray):
 
     def get_positions(self) -> np.ndarray:

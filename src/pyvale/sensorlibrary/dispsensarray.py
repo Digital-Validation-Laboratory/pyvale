@@ -28,10 +28,9 @@ class DispSensArray(SensorArray):
         self._field = field
         self._sample_times = sample_times
 
-        self._sys_err_func = None
-        self._sys_errs = None
+        self._sys_err_int = None
+        self._rand_err_int = None
 
-        self._rand_err_func = None
 
     def get_positions(self) -> np.ndarray:
         return self._positions
@@ -42,22 +41,30 @@ class DispSensArray(SensorArray):
 
         return self._sample_times
 
+    def get_num_sensors(self) -> int:
+        return self._positions.shape[0]
+
+    def get_measurement_shape(self) -> tuple[int,int,int]:
+        return (self.get_num_sensors(),
+                len(self._field.get_all_components()),
+                self.get_sample_times().shape[0])
+
     #---------------------------------------------------------------------------
     # Truth values - from simulation
-    def get_truth_values(self) -> dict[str,np.ndarray]:
+    def get_truth_values(self) -> np.ndarray:
         return self._field.sample_field(self._positions,
                                         self._sample_times)
 
 
-    def get_systematic_errs(self) -> dict[str,np.ndarray]:
+    def get_systematic_errs(self) -> np.ndarray:
         pass
 
 
-    def get_random_errs(self) -> dict[str,np.ndarray]:
+    def get_random_errs(self) -> np.ndarray:
         pass
 
 
-    def get_measurements(self) -> dict[str,np.ndarray]:
+    def get_measurements(self) -> np.ndarray:
         pass
 
 

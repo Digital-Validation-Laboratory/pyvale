@@ -6,7 +6,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 import numpy as np
-from pyvale.errorcalculator import ErrCalculator
+from pyvale.uncertainty.errorcalculator import ErrCalculator
 
 # - A systematic error function returns an array of systematic errors, constant
 # in time.

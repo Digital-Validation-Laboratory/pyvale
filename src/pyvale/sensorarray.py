@@ -26,6 +26,10 @@ class MeasurementData():
 
 class SensorArray(ABC):
     @abstractmethod
+    def get_field(self) -> Field:
+        pass
+
+    @abstractmethod
     def get_positions(self) -> np.ndarray:
         pass
 
@@ -109,7 +113,8 @@ class TraceProps:
     truth_line: str | None = '-'
     sim_line: str | None = '-'
     meas_line: str = '--+'
-    sensors: np.ndarray | None = None
+    sensor_tag: str = 'S'
+    sensors_to_plot: np.ndarray | None = None
     time_inds: np.ndarray | None = None
 
 
@@ -128,36 +133,37 @@ def plot_time_traces(sensor_array: SensorArray,
 
     prop_cycle = plt.rcParams['axes.prop_cycle']
     colors = prop_cycle.by_key()['color']
+    comp_ind = sensor_array.get_field().get_component_index(component)
 
     fig, ax = plt.subplots(figsize=plot_props.single_fig_size,layout='constrained')
     fig.set_dpi(plot_props.resolution)
 
-
     if field is not None and trace_props.sim_line is not None:
         sim_time = field.get_time_steps()
         sim_vals = field.sample_field(sensor_array.get_positions())
-        for ii in range(sensor_array.get_positions()[0]):
-            ax.plot(sim_time,sim_vals[component][ii,:],'-o',
+
+        for ii in range(sensor_array.get_positions().shape[0]):
+            ax.plot(sim_time,sim_vals[ii,comp_ind,:],trace_props.sim_line,
                 lw=plot_props.lw/2,ms=plot_props.ms/2,color=colors[ii])
 
     samp_time = sensor_array.get_sample_times()
 
     if trace_props.truth_line is not None:
         truth = sensor_array.get_truth_values()
-        for ii in range(truth[component].shape[0]):
+        for ii in range(truth.shape[0]):
             ax.plot(samp_time,
-                    truth[component][ii,:],
+                    truth[ii,comp_ind,:],
                     trace_props.truth_line,
                     lw=plot_props.lw/2,
                     ms=plot_props.ms/2,
                     color=colors[ii])
 
     measurements = sensor_array.get_measurements()
-    for ii in range(measurements[component].shape[0]):
+    for ii in range(measurements.shape[0]):
         ax.plot(samp_time,
-                measurements[component][ii,:],
+                measurements[ii,comp_ind,:],
                 trace_props.meas_line,
-                #label=self._sensor_names[ii],
+                label=trace_props.sensor_tag+str(ii),
                 lw=plot_props.lw/2,
                 ms=plot_props.ms/2,
                 color=colors[ii])

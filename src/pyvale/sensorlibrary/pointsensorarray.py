@@ -5,21 +5,17 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
-from typing import Callable, Any
-from functools import partial
 
 import numpy as np
-import matplotlib.pyplot as plt
 import pyvista as pv
 
 from pyvale.field import Field
 from pyvale.sensorarray import SensorArray, MeasurementData
-from pyvale.plotprops import PlotProps
 from pyvale.uncertainty.syserrintegrator import SysErrIntegrator
 from pyvale.uncertainty.randerrintegrator import RandErrIntegrator
 
 
-class ThermocoupleArray(SensorArray):
+class PointSensorArray(SensorArray):
     def __init__(self,
                  positions: np.ndarray,
                  field: Field,
@@ -32,11 +28,6 @@ class ThermocoupleArray(SensorArray):
 
         self._sys_err_int = None
         self._rand_err_int = None
-
-        self._sensor_names = list([])
-        for ss in range(self.get_num_sensors()):
-            num_str = f'{ss}'.zfill(2)
-            self._sensor_names.append(f'TC{num_str}')
 
 
     def get_field(self) -> Field:
@@ -58,9 +49,6 @@ class ThermocoupleArray(SensorArray):
         return (self.get_num_sensors(),
                 len(self._field.get_all_components()),
                 self.get_sample_times().shape[0])
-
-    def get_sensor_names(self) -> list[str]:
-        return self._sensor_names
 
 
     def get_truth_values(self) -> np.ndarray:
@@ -117,6 +105,6 @@ class ThermocoupleArray(SensorArray):
 
     def get_visualiser(self) -> pv.PolyData:
         pv_data = pv.PolyData(self._positions)
-        pv_data['labels'] = self._sensor_names
+        #pv_data['labels'] = self._sensor_names
         return pv_data
 

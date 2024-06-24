@@ -31,6 +31,10 @@ class Field(ABC):
         pass
 
     @abstractmethod
+    def get_component_index(self,comp: str) -> int:
+        pass
+
+    @abstractmethod
     def sample_field(self,
                     sample_points: np.ndarray,
                     sample_times: np.ndarray | None = None
@@ -64,6 +68,9 @@ class ScalarField(Field):
 
     def get_all_components(self) -> tuple[str, ...]:
         return (self._field_name,)
+
+    def get_component_index(self,comp: str) -> int:
+        return 0 # scalar fields only have one component!
 
     def sample_field(self,
                     sample_points: np.ndarray,
@@ -110,6 +117,9 @@ class VectorField(Field):
 
     def get_all_components(self) -> tuple[str, ...]:
         return self._components
+
+    def get_component_index(self,comp: str) -> int:
+        return self._components.index(comp)
 
     def sample_field(self,
                 sample_points: np.ndarray,
@@ -160,6 +170,9 @@ class TensorField(Field):
     def get_all_components(self) -> tuple[str, ...]:
         return self._norm_components + self._dev_components
 
+    def get_component_index(self, comp: str) -> int:
+        return self.get_all_components().index(comp)
+
     def sample_field(self,
                 sample_points: np.ndarray,
                 sample_times: np.ndarray | None = None
@@ -170,7 +183,7 @@ class TensorField(Field):
                                 self._time_steps,
                                 sample_points,
                                 sample_times)
-cell_type = CellType.QUAD
+
 #-------------------------------------------------------------------------------
 def conv_simdata_to_pyvista(sim_data: mh.SimData,
                             components: tuple[str,...],
