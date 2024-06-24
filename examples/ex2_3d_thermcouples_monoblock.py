@@ -46,13 +46,25 @@ def main() -> None:
     # Setup the UQ functions for the sensors. Here we use the basic defaults
     # which is a uniform distribution for the systematic error which is sampled
     # once and remains constant throughout the simulation time creating an
-    # offset. The max temp in the simulation is ~200degC so this range [lo,hi]
+    # offset. The max temp in the simulation is ~800degC so this range [lo,hi]
     # should be visible on the time traces.
-    tc_array.set_uniform_systematic_err_func(low=-25.0,high=25.0)
+    err_sys1 = pyvale.SysErrUniform(low=-25.0,high=25.0)
+    sys_err_int = pyvale.SysErrIntegrator([err_sys1],
+                                          tc_array.get_measurement_shape())
+    tc_array.set_sys_err_integrator(sys_err_int)
+
     # The default for the random error is a normal distribution here we specify
     # a standard deviation which should be visible on the time traces. Note that
     # the random error is sampled repeatedly for each time step.
-    tc_array.set_normal_random_err_func(std_dev=25.0)
+    err_rand1 = pyvale.RandErrNormal(std=25.0)
+    rand_err_int = pyvale.RandErrIntegrator([err_rand1],
+                                            tc_array.get_measurement_shape())
+    tc_array.set_rand_err_integrator(rand_err_int)
+
+    # We can get an array of measurements as follows:
+    measurements = tc_array.get_measurements()
+    print(f'\nMeasurements:\n{measurements}\n')
+    
 
     # Now we use pyvista to get a 3D interactive labelled plot of the sensor
     # locations on our simulation geometry.
@@ -61,9 +73,8 @@ def main() -> None:
     pprint(pv_sim)
 
     pv_plot = pyvale.plot_sensors(pv_sim,pv_sens,field_name)
-    # We label the temperature scale bar ourselves and can
+    # We label the temperature scale bar ourselves for clarity
     pv_plot.add_scalar_bar('Temp., T [degC]',vertical=True)
-
 
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector

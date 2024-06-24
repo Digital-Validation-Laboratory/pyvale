@@ -170,7 +170,7 @@ class TensorField(Field):
                                 self._time_steps,
                                 sample_points,
                                 sample_times)
-
+cell_type = CellType.QUAD
 #-------------------------------------------------------------------------------
 def conv_simdata_to_pyvista(sim_data: mh.SimData,
                             components: tuple[str,...],

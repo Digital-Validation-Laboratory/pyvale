@@ -44,11 +44,18 @@ def main() -> None:
     # once and remains constant throughout the simulation time creating an
     # offset. The max temp in the simulation is ~200degC so this range [lo,hi]
     # should be visible on the time traces.
-    tc_array.set_uniform_systematic_err_func(low=-50.0,high=50.0)
+    err_sys1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
+    sys_err_int = pyvale.SysErrIntegrator([err_sys1],
+                                          tc_array.get_measurement_shape())
+    tc_array.set_sys_err_integrator(sys_err_int)
+
     # The default for the random error is a normal distribution here we specify
     # a standard deviation which should be visible on the time traces. Note that
     # the random error is sampled repeatedly for each time step.
-    tc_array.set_normal_random_err_func(std_dev=1.0)
+    err_rand1 = pyvale.RandErrNormal(std=10.0)
+    rand_err_int = pyvale.RandErrIntegrator([err_rand1],
+                                            tc_array.get_measurement_shape())
+    tc_array.set_rand_err_integrator(rand_err_int)
 
     measurements = tc_array.get_measurements()
     print(f'\nMeasurements:\n{measurements}\n')
@@ -58,9 +65,8 @@ def main() -> None:
     pv_sens = tc_array.get_visualiser()
     pv_sim = t_field.get_visualiser()
     pv_plot = pyvale.plot_sensors(pv_sim,pv_sens,field_name)
-    # We label the temperature scale bar ourselves and can
+    # We label the temperature scale bar ourselves
     pv_plot.add_scalar_bar('Temperature, T [degC]')
-
 
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector
