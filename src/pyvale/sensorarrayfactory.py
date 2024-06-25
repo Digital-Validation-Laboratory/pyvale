@@ -7,9 +7,10 @@ Copyright (C) 2024 The Computer Aided Validation Team
 '''
 import numpy as np
 
-import mooseher
+import mooseherder as mh
 
 from pyvale.sensorarray import SensorArray
+from pyvale.field import ScalarField
 from pyvale.sensorlibrary.pointsensorarray import PointSensorArray
 from pyvale.uncertainty.syserrintegrator import SysErrIntegrator
 from pyvale.uncertainty.syserrcalculator import SysErrUniform
@@ -17,15 +18,19 @@ from pyvale.uncertainty.randerrintegrator import RandErrIntegrator
 from pyvale.uncertainty.randerrcalculator import RandErrNormal
 
 class SensorArrayFactory():
-    def basic_thermocouple_array(sim_data: mh.SimData
+    def basic_thermocouple_array(self,
+                                 sim_data: mh.SimData,
                                  positions: np.ndarray,
+                                 field_name: str = "temperature",
+                                 spat_dims: int = 3,
                                  sample_times: np.ndarray | None = None
-                                 ) -> SensorArray:
+                                 ) -> PointSensorArray:
 
+        t_field = ScalarField(sim_data,field_name,spat_dims)
 
-        sens_array = PointSensorArray(positions,,sample_times)
+        sens_array = PointSensorArray(positions,t_field,sample_times)
 
-        err_sys1 = SysErrUniform(low=-20.0,high=20.0)
+        err_sys1 = SysErrUniform(low=-10.0,high=10.0)
         sys_err_int = SysErrIntegrator([err_sys1],
                                         sens_array.get_measurement_shape())
         sens_array.set_sys_err_integrator(sys_err_int)
