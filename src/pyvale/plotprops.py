@@ -6,6 +6,8 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 from dataclasses import dataclass
+import numpy as np
+
 
 @dataclass
 class PlotProps:
@@ -39,3 +41,16 @@ class PlotProps:
 
     cmap_seq: str = "cividis"
     cmap_div: str = "RdBu"
+
+@dataclass
+class SensorPlotProps:
+    legend: bool = True
+    y_label: str = r'Sensor Value, [unit]'
+    x_label: str = r'Time, $t$ [s]'
+    truth_line: str | None = '-'
+    sim_line: str | None = '-'
+    meas_line: str = '--+'
+    sensor_tag: str = 'S'
+    sensors_to_plot: np.ndarray | None = None
+    time_inds: np.ndarray | None = None
+

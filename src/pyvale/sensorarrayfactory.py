@@ -9,7 +9,6 @@ import numpy as np
 
 import mooseherder as mh
 
-from pyvale.sensorarray import SensorArray
 from pyvale.field import ScalarField
 from pyvale.sensorlibrary.pointsensorarray import PointSensorArray
 from pyvale.uncertainty.syserrintegrator import SysErrIntegrator

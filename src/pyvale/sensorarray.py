@@ -15,6 +15,7 @@ import pyvista as pv
 
 from pyvale.field import Field
 from pyvale.plotprops import PlotProps
+from pyvale.plotprops import SensorPlotProps
 
 @dataclass
 class MeasurementData():
@@ -57,6 +58,10 @@ class SensorArray(ABC):
     def get_measurement_data(self) -> MeasurementData:
         pass
 
+    @abstractmethod
+    def get_visualiser(self) -> pv.PolyData:
+        pass
+
 
 def create_sensor_pos_array(n_sens: tuple[int,int,int],
                            x_lims: tuple[float, float],
@@ -78,10 +83,23 @@ def create_sensor_pos_array(n_sens: tuple[int,int,int],
     return sens_pos
 
 
-def plot_sensors(pv_simdata: pv.UnstructuredGrid,
-                 pv_sensdata: pv.PolyData,
+def plot_sensors(sensor_array: SensorArray,
                  field_name: str,
-                 time_step: int = -1) -> Any: # plotter doesn't allow type hinting!
+                 time_step: int = -1,
+                 plot_props: SensorPlotProps | None  = None) -> Any: # plotter doesn't allow type hinting!
+
+    pv_simdata = sensor_array.get_field().get_visualiser()
+    pv_sensdata = sensor_array.get_visualiser()
+
+    if plot_props is None:
+        plot_props = SensorPlotProps()
+
+    sensor_names = list()
+    for ss in range(pv_sensdata.n_points):
+        num_str = f'{ss}'.zfill(2)
+        sensor_names.append(f'{plot_props.sensor_tag}{num_str}')
+
+    pv_sensdata['labels'] = sensor_names
 
     pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
 
@@ -105,23 +123,10 @@ def plot_sensors(pv_simdata: pv.UnstructuredGrid,
     return pv_plot
 
 
-@dataclass
-class TraceProps:
-    legend: bool = True
-    y_label: str = r'Sensor Value, [unit]'
-    x_label: str = r'Time, $t$ [s]'
-    truth_line: str | None = '-'
-    sim_line: str | None = '-'
-    meas_line: str = '--+'
-    sensor_tag: str = 'S'
-    sensors_to_plot: np.ndarray | None = None
-    time_inds: np.ndarray | None = None
-
 
 def plot_time_traces(sensor_array: SensorArray,
                      component: str,
-                     field: Field | None = None,
-                     trace_props: TraceProps | None  = None,
+                     trace_props: SensorPlotProps | None  = None,
                      plot_props: PlotProps | None = None
                      ) -> tuple[Any,Any]:
 
@@ -129,16 +134,18 @@ def plot_time_traces(sensor_array: SensorArray,
         plot_props = PlotProps()
 
     if trace_props is None:
-        trace_props = TraceProps()
+        trace_props = SensorPlotProps()
 
     prop_cycle = plt.rcParams['axes.prop_cycle']
     colors = prop_cycle.by_key()['color']
+
+    field = sensor_array.get_field()
     comp_ind = sensor_array.get_field().get_component_index(component)
 
     fig, ax = plt.subplots(figsize=plot_props.single_fig_size,layout='constrained')
     fig.set_dpi(plot_props.resolution)
 
-    if field is not None and trace_props.sim_line is not None:
+    if trace_props.sim_line is not None:
         sim_time = field.get_time_steps()
         sim_vals = field.sample_field(sensor_array.get_positions())
 

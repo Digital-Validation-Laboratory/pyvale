@@ -7,7 +7,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 '''
 
 from pyvale.pyvale import *
-from pyvale.plotprops import PlotProps
+from pyvale.plotprops import *
 from pyvale.imagesim import *
 
 from pyvale.field import *
@@ -20,6 +20,5 @@ from pyvale.uncertainty.syserrintegrator import *
 from pyvale.uncertainty.randerrcalculator import *
 from pyvale.uncertainty.randerrintegrator import *
 
-from pyvale.sensorlibrary.thermocouplearray import *
 
 __all__ = ["pyvale"]
