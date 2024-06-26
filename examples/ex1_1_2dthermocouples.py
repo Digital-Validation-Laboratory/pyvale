@@ -38,8 +38,17 @@ def main() -> None:
                                   field_name,
                                   spat_dims=2)
 
+    # We can get an array of measurements from the sensor array for all time
+    # steps in the simulation. A measurement is calculated as follows:
+    # measurement = truth + systematic_error + random_error
     measurements = tc_array.get_measurements()
     print(f'\nMeasurements:\n{measurements}\n')
+
+    # We can also get the truth values, systematic and random errors as numpy
+    # arrays
+    truth_values = tc_array.get_truth_values()
+    systematic_errs = tc_array.get_systematic_errs()
+    random_errs = tc_array.get_random_errs()
 
     # Now we use pyvista to get a 3D interactive labelled plot of the sensor
     # locations on our simulation geometry.

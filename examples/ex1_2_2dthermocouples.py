@@ -15,6 +15,8 @@ import pyvale
 
 
 def main() -> None:
+    """main
+    """
     # Use mooseherder to read the exodus and get a SimData object
     data_path = Path('data/examplesims/plate_2d_thermal_out.e')
     data_reader = mh.ExodusReader(data_path)
@@ -35,28 +37,29 @@ def main() -> None:
     # coords (x,y,z) - can also just manually create this array
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    # Now we create a thermocouple array with with the sensor positions and the
+    # Now we create a point sensor array with with the sensor positions and the
     # temperature field from the simulation
-    tc_array = pyvale.ThermocoupleArray(sens_pos,t_field)
+    tc_array = pyvale.PointSensorArray(sens_pos,t_field)
 
-    # Setup the UQ functions for the sensors. Here we use the basic defaults
-    # which is a uniform distribution for the systematic error which is sampled
-    # once and remains constant throughout the simulation time creating an
-    # offset. The max temp in the simulation is ~200degC so this range [lo,hi]
-    # should be visible on the time traces.
+    # Setup the UQ functions for the sensors. Here we can specify a list of
+    # objects that will each calculate an error which will be added together
+    # (integrated).
     err_sys1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
-    sys_err_int = pyvale.SysErrIntegrator([err_sys1],
+    err_sys2 = pyvale.SysErrNormal(std=20.0)
+    sys_err_int = pyvale.SysErrIntegrator([err_sys1,err_sys2],
                                           tc_array.get_measurement_shape())
     tc_array.set_sys_err_integrator(sys_err_int)
 
-    # The default for the random error is a normal distribution here we specify
-    # a standard deviation which should be visible on the time traces. Note that
-    # the random error is sampled repeatedly for each time step.
+    # Random errors are also integrated and we can chain objects to calculate
+    # multiple random error functions. The random error is sampled repeatedly
+    # for each time step.
     err_rand1 = pyvale.RandErrNormal(std=10.0)
-    rand_err_int = pyvale.RandErrIntegrator([err_rand1],
+    err_rand2 = pyvale.RandErrUniform(low=-10.0,high=10.0)
+    rand_err_int = pyvale.RandErrIntegrator([err_rand1,err_rand2],
                                             tc_array.get_measurement_shape())
     tc_array.set_rand_err_integrator(rand_err_int)
 
+    
     measurements = tc_array.get_measurements()
     print(f'\nMeasurements:\n{measurements}\n')
 

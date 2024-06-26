@@ -12,8 +12,9 @@ from pyvale.imagesim import *
 
 from pyvale.field import *
 
-from pyvale.sensorarray import *
-from pyvale.sensorarrayfactory import *
+from pyvale.sensors.sensorarray import *
+from pyvale.sensors.sensorarrayfactory import *
+from pyvale.sensors.pointsensorarray import *
 
 from pyvale.uncertainty.syserrcalculator import *
 from pyvale.uncertainty.syserrintegrator import *
