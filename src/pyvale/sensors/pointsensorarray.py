@@ -11,8 +11,7 @@ import pyvista as pv
 
 from pyvale.field import Field
 from pyvale.sensors.sensorarray import SensorArray, MeasurementData
-from pyvale.uncertainty.syserrintegrator import SysErrIntegrator
-from pyvale.uncertainty.randerrintegrator import RandErrIntegrator
+from pyvale.uncertainty.errorintegrator import ErrorIntegrator
 
 
 class PointSensorArray(SensorArray):
@@ -57,27 +56,43 @@ class PointSensorArray(SensorArray):
 
 
     def set_sys_err_integrator(self,
-                               err_int: SysErrIntegrator) -> None:
+                               err_int: ErrorIntegrator) -> None:
         self._sys_err_int = err_int
+
+
+    def calc_systematic_errs(self) -> np.ndarray | None:
+        if self._sys_err_int is None:
+            return None
+
+        self._sys_err_int.calc_all_errs()
+        return self._sys_err_int.get_errs_tot()
 
 
     def get_systematic_errs(self) -> np.ndarray | None:
         if self._sys_err_int is None:
             return None
 
-        return self._sys_err_int.get_sys_errs_tot()
+        return self._sys_err_int.get_errs_tot()
 
 
     def set_rand_err_integrator(self,
-                                err_int: RandErrIntegrator) -> None:
+                                err_int: ErrorIntegrator) -> None:
         self._rand_err_int = err_int
+
+
+    def calc_random_errs(self)-> np.ndarray | None:
+        if self._rand_err_int is None:
+            return None
+
+        self._rand_err_int.calc_all_errs()
+        return self._rand_err_int.get_errs_tot()
 
 
     def get_random_errs(self) -> np.ndarray | None:
         if self._rand_err_int is None:
             return None
 
-        return self._rand_err_int.get_rand_errs_tot()
+        return self._rand_err_int.get_errs_tot()
 
 
     def get_measurements(self) -> np.ndarray:

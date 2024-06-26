@@ -46,7 +46,7 @@ def main() -> None:
     # (integrated).
     err_sys1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
     err_sys2 = pyvale.SysErrNormal(std=20.0)
-    sys_err_int = pyvale.SysErrIntegrator([err_sys1,err_sys2],
+    sys_err_int = pyvale.ErrorIntegrator([err_sys1,err_sys2],
                                           tc_array.get_measurement_shape())
     tc_array.set_sys_err_integrator(sys_err_int)
 
@@ -55,19 +55,14 @@ def main() -> None:
     # for each time step.
     err_rand1 = pyvale.RandErrNormal(std=10.0)
     err_rand2 = pyvale.RandErrUniform(low=-10.0,high=10.0)
-    rand_err_int = pyvale.RandErrIntegrator([err_rand1,err_rand2],
+    rand_err_int = pyvale.ErrorIntegrator([err_rand1,err_rand2],
                                             tc_array.get_measurement_shape())
     tc_array.set_rand_err_integrator(rand_err_int)
 
-    
-    measurements = tc_array.get_measurements()
-    print(f'\nMeasurements:\n{measurements}\n')
 
     # Now we use pyvista to get a 3D interactive labelled plot of the sensor
     # locations on our simulation geometry.
-    pv_sens = tc_array.get_visualiser()
-    pv_sim = t_field.get_visualiser()
-    pv_plot = pyvale.plot_sensors(pv_sim,pv_sens,field_name)
+    pv_plot = pyvale.plot_sensors(tc_array,field_name)
     # We label the temperature scale bar ourselves
     pv_plot.add_scalar_bar('Temperature, T [degC]')
 
@@ -104,8 +99,7 @@ def main() -> None:
     # measurements using the specified UQ functions. The sensor traces should
     # have a uniform offset (systematic error) and noise (random error).
     (fig,_) = pyvale.plot_time_traces(tc_array,
-                                      field_name,
-                                      t_field)
+                                      field_name)
     if trace_plot_mode == 'interactive':
         plt.show()
     if trace_plot_mode == 'save_fig':
