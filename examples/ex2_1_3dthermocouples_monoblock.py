@@ -24,18 +24,18 @@ def main() -> None:
     data_path = Path('data/examplesims/monoblock_3d_thermal_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
+
+    # Get the string name used for the scalar field in moose: 'temperature'
+    field_name = list(sim_data.node_vars.keys())[0] # type: ignore
+
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
-    field_name = list(sim_data.node_vars.keys())[0] # type: ignore
-
-    # This creates a grid of 3x2 sensors in the xy plane
-    n_sens = (3,2,1)    # Number of sensor (x,y,z)
-    x_lims = (0.0,2.0)  # Limits for each coord in sim length units
-    y_lims = (0.0,1.0)
-    z_lims = (0.0,0.0)
-    # Gives a n_sensx3 array of sensor positions where each row is a sensor with
-    # coords (x,y,z) - can also just manually create this array
+    # This creates a grid of 4x1 sensors in the yz plane
+    n_sens = (1,4,1)    # Number of sensor (x,y,z)
+    x_lims = (11.5,11.5)  # Limits for each coord in sim length units
+    y_lims = (-11.5,19.5)
+    z_lims = (0.0,12.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
     # Now we create a thermocouple array with with the sensor positions and the
@@ -49,7 +49,7 @@ def main() -> None:
 
     # We can get an array of measurements as follows:
     measurements = tc_array.get_measurements()
-    print(f'\nMeasurements for sensor 0:\n{measurements[0,0,:]}\n')
+    print(f'\nMeasurements for sensor at top of block:\n{measurements[-1,0,:]}\n')
 
     # We can also get the truth values, systematic and random errors as numpy
     # arrays
