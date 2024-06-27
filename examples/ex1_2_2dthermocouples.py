@@ -86,7 +86,8 @@ def main() -> None:
     print("If we call the 'get' methods we get the same values again:")
     print(f'get_measurements:\n{tc_array.get_measurements()[0,0,-5:]}\n')
     print(f'get_truth:\n{tc_array.get_truth_values()[0,0,-5:]}\n')
-    print(f'get_systematic_errs:\n{tc_array.get_systematic_errs()[0,0,-5:]}\n')
+    if tc_array.get_systematic_errs() is not None:
+        print(f'get_systematic_errs:\n{tc_array.get_systematic_errs()[0,0,-5:]}\n')
     print(f'get_random_errs:\n{tc_array.get_random_errs()[0,0,-5:]}\n')
 
     # We plot the first experiment for comparison
