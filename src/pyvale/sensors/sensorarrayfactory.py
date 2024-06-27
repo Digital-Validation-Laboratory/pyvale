@@ -11,9 +11,9 @@ import mooseherder as mh
 
 from pyvale.field import ScalarField
 from pyvale.sensors.pointsensorarray import PointSensorArray
-from pyvale.uncertainty.syserrintegrator import SysErrIntegrator
+from pyvale.uncertainty.errorintegrator import ErrorIntegrator
 from pyvale.uncertainty.syserrcalculator import SysErrUniform
-from pyvale.uncertainty.randerrintegrator import RandErrIntegrator
+
 from pyvale.uncertainty.randerrcalculator import RandErrNormal
 
 class SensorArrayFactory():
@@ -30,12 +30,12 @@ class SensorArrayFactory():
         sens_array = PointSensorArray(positions,t_field,sample_times)
 
         err_sys1 = SysErrUniform(low=-10.0,high=10.0)
-        sys_err_int = SysErrIntegrator([err_sys1],
+        sys_err_int = ErrorIntegrator([err_sys1],
                                         sens_array.get_measurement_shape())
         sens_array.set_sys_err_integrator(sys_err_int)
 
         err_rand1 = RandErrNormal(std=10.0)
-        rand_err_int = RandErrIntegrator([err_rand1],
+        rand_err_int = ErrorIntegrator([err_rand1],
                                          sens_array.get_measurement_shape())
         sens_array.set_rand_err_integrator(rand_err_int)
 

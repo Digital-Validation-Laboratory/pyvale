@@ -17,6 +17,9 @@ import pyvale
 
 
 def main() -> None:
+    """pyvale example: this is the same as the first example except we are going
+    to use a 3D simulation of the temperature field on a divertor heatsink.
+    """
     # Use mooseherder to read the exodus and get a SimData object
     data_path = Path('data/examplesims/monoblock_3d_thermal_out.e')
     data_reader = mh.ExodusReader(data_path)
@@ -24,57 +27,41 @@ def main() -> None:
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
-    # Create a Field object that will allow the sensors to interpolate the sim
-    # data field of interest quickly by using the mesh and shape functions
-    spat_dims = 3       # Specify that we only have 2 spatial dimensions
-    field_name = 'temperature'    # Same as in the moose input and SimData node_var key
-    t_field = pyvale.ScalarField(sim_data,field_name,spat_dims)
+    field_name = list(sim_data.node_vars.keys())[0] # type: ignore
 
     # This creates a grid of 3x2 sensors in the xy plane
-    n_sens = (1,4,1)    # Number of sensor (x,y,z)
-    x_lims = (11.5,11.5)  # Limits for each coord in sim length units
-    y_lims = (-11.5,19.5)
-    z_lims = (0.0,12.0)
+    n_sens = (3,2,1)    # Number of sensor (x,y,z)
+    x_lims = (0.0,2.0)  # Limits for each coord in sim length units
+    y_lims = (0.0,1.0)
+    z_lims = (0.0,0.0)
     # Gives a n_sensx3 array of sensor positions where each row is a sensor with
     # coords (x,y,z) - can also just manually create this array
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
     # Now we create a thermocouple array with with the sensor positions and the
     # temperature field from the simulation
-    tc_array = pyvale.ThermocoupleArray(sens_pos,t_field)
+    tc_array = pyvale.SensorArrayFactory() \
+        .basic_thermocouple_array(sim_data,
+                                  sens_pos,
+                                  field_name,
+                                  spat_dims=3)
 
-    # Setup the UQ functions for the sensors. Here we use the basic defaults
-    # which is a uniform distribution for the systematic error which is sampled
-    # once and remains constant throughout the simulation time creating an
-    # offset. The max temp in the simulation is ~800degC so this range [lo,hi]
-    # should be visible on the time traces.
-    err_sys1 = pyvale.SysErrUniform(low=-25.0,high=25.0)
-    sys_err_int = pyvale.SysErrIntegrator([err_sys1],
-                                          tc_array.get_measurement_shape())
-    tc_array.set_sys_err_integrator(sys_err_int)
-
-    # The default for the random error is a normal distribution here we specify
-    # a standard deviation which should be visible on the time traces. Note that
-    # the random error is sampled repeatedly for each time step.
-    err_rand1 = pyvale.RandErrNormal(std=25.0)
-    rand_err_int = pyvale.RandErrIntegrator([err_rand1],
-                                            tc_array.get_measurement_shape())
-    tc_array.set_rand_err_integrator(rand_err_int)
 
     # We can get an array of measurements as follows:
     measurements = tc_array.get_measurements()
-    print(f'\nMeasurements:\n{measurements}\n')
+    print(f'\nMeasurements for sensor 0:\n{measurements[0,0,:]}\n')
 
+    # We can also get the truth values, systematic and random errors as numpy
+    # arrays
+    truth_values = tc_array.get_truth_values()
+    systematic_errs = tc_array.get_systematic_errs()
+    random_errs = tc_array.get_random_errs()
 
     # Now we use pyvista to get a 3D interactive labelled plot of the sensor
     # locations on our simulation geometry.
-    pv_sens = tc_array.get_visualiser()
-    pv_sim = t_field.get_visualiser()
-    pprint(pv_sim)
-
-    pv_plot = pyvale.plot_sensors(pv_sim,pv_sens,field_name)
-    # We label the temperature scale bar ourselves for clarity
-    pv_plot.add_scalar_bar('Temp., T [degC]',vertical=True)
+    pv_plot = pyvale.plot_sensors(tc_array,field_name)
+    # We label the temperature scale bar ourselves
+    pv_plot.add_scalar_bar('Temperature, T [degC]')
 
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector
@@ -111,7 +98,8 @@ def main() -> None:
     # truth from the simulation and dashed lines with '+' are simulated sensor
     # measurements using the specified UQ functions. The sensor traces should
     # have a uniform offset (systematic error) and noise (random error).
-    (fig,_) = tc_array.plot_time_traces(plot_truth=True)
+    (fig,_) = pyvale.plot_time_traces(tc_array,field_name)
+
     if trace_plot_mode == 'interactive':
         plt.show()
     if trace_plot_mode == 'save_fig':

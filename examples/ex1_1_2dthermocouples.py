@@ -15,6 +15,15 @@ import pyvale
 
 
 def main() -> None:
+    """pyvale example: quick start example using the factory to generate a basic
+    default thermocouple array and apply it to the simulation of a temperature
+    field on a 2D plate.
+
+    Shows how to use visualisation tools to view sensor locations on the
+    simulation mesh using pyvista. Also shows how to plot point sensor traces
+    using matplotlib.
+    """
+
     # Use mooseherder to read the exodus and get a SimData object
     data_path = Path('data/examplesims/plate_2d_thermal_out.e')
     data_reader = mh.ExodusReader(data_path)
@@ -42,7 +51,7 @@ def main() -> None:
     # steps in the simulation. A measurement is calculated as follows:
     # measurement = truth + systematic_error + random_error
     measurements = tc_array.get_measurements()
-    print(f'\nMeasurements:\n{measurements}\n')
+    print(f'\nMeasurements for sensor 0:\n{measurements[0,0,:]}\n')
 
     # We can also get the truth values, systematic and random errors as numpy
     # arrays
@@ -88,8 +97,8 @@ def main() -> None:
     # truth from the simulation and dashed lines with '+' are simulated sensor
     # measurements using the specified UQ functions. The sensor traces should
     # have a uniform offset (systematic error) and noise (random error).
-    (fig,_) = pyvale.plot_time_traces(tc_array,
-                                      field_name)
+    (fig,_) = pyvale.plot_time_traces(tc_array,field_name)
+    
     if trace_plot_mode == 'interactive':
         plt.show()
     if trace_plot_mode == 'save_fig':

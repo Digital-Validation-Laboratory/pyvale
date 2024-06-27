@@ -24,6 +24,7 @@ class PointSensorArray(SensorArray):
         self._positions = positions
         self._field = field
         self._sample_times = sample_times
+        self._truth = None
 
         self._sys_err_int = None
         self._rand_err_int = None
@@ -50,10 +51,15 @@ class PointSensorArray(SensorArray):
                 self.get_sample_times().shape[0])
 
 
-    def get_truth_values(self) -> np.ndarray:
+    def calc_truth_values(self) -> np.ndarray:
         return self._field.sample_field(self._positions,
                                         self._sample_times)
 
+    def get_truth_values(self) -> np.ndarray:
+        if self._truth is None:
+            self._truth = self.calc_truth_values()
+            
+        return self._truth
 
     def set_sys_err_integrator(self,
                                err_int: ErrorIntegrator) -> None:
@@ -93,6 +99,20 @@ class PointSensorArray(SensorArray):
             return None
 
         return self._rand_err_int.get_errs_tot()
+
+
+    def calc_measurements(self) -> np.ndarray:
+        measurements = self.get_truth_values()
+        sys_errs = self.calc_systematic_errs()
+        rand_errs = self.calc_random_errs()
+
+        if sys_errs is not None:
+            measurements = measurements + sys_errs
+
+        if rand_errs is not None:
+            measurements = measurements + rand_errs
+
+        return measurements
 
 
     def get_measurements(self) -> np.ndarray:
