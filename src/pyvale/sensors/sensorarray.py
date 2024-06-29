@@ -216,4 +216,5 @@ def print_measurements(sens_array: SensorArray,
         print(f"rand_errs = \n    {rand_errs[sensors[0]:sensors[1],
                                             components[0]:components[1],
                                             time_steps[0]:time_steps[1]]}")
+    print()
 

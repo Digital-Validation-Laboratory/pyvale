@@ -58,7 +58,7 @@ class PointSensorArray(SensorArray):
     def get_truth_values(self) -> np.ndarray:
         if self._truth is None:
             self._truth = self.calc_truth_values()
-            
+
         return self._truth
 
     def set_sys_err_integrator(self,
@@ -70,7 +70,7 @@ class PointSensorArray(SensorArray):
         if self._sys_err_int is None:
             return None
 
-        self._sys_err_int.calc_all_errs()
+        self._sys_err_int.calc_all_errs(self.get_truth_values())
         return self._sys_err_int.get_errs_tot()
 
 
@@ -90,7 +90,7 @@ class PointSensorArray(SensorArray):
         if self._rand_err_int is None:
             return None
 
-        self._rand_err_int.calc_all_errs()
+        self._rand_err_int.calc_all_errs(self.get_truth_values())
         return self._rand_err_int.get_errs_tot()
 
 
@@ -103,6 +103,7 @@ class PointSensorArray(SensorArray):
 
     def calc_measurements(self) -> np.ndarray:
         measurements = self.get_truth_values()
+        
         sys_errs = self.calc_systematic_errs()
         rand_errs = self.calc_random_errs()
 

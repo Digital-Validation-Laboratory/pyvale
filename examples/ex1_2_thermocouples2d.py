@@ -8,7 +8,6 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 from pathlib import Path
-import numpy as np
 import matplotlib.pyplot as plt
 import mooseherder as mh
 import pyvale
@@ -73,7 +72,7 @@ def main() -> None:
     # measurement = truth + systematic_error + random_error
     measurements = tc_array.get_measurements()
 
-    print(80*'-')
+    print('\n'+80*'-')
     print('For a sensor: measurement = truth + sysematic error + random error')
     print(f'measurements.shape = {measurements.shape} = (n_sensors,n_field_components,n_timesteps)\n')
     print('the truth, systematic error and random error arrays have the same shape.')
@@ -84,10 +83,10 @@ def main() -> None:
                               (0,1),
                               (0,1),
                               (measurements.shape[2]-5,measurements.shape[2]))
-
+    print("We haven't called the 'calc' method yet so the errors are zero.\n")
     print(80*'-')
-    print("If we call the 'get' methods we get the same values again:")
-    measurements = tc_array.get_measurements()
+    print("If we call the 'calc_measurements' method then the errors are calculated.")
+    measurements = tc_array.calc_measurements()
 
     pyvale.print_measurements(tc_array,
                               (0,1),
@@ -95,10 +94,24 @@ def main() -> None:
                               (measurements.shape[2]-5,measurements.shape[2]))
 
     # We plot the first experiment for comparison
-    pyvale.plot_time_traces(tc_array,field_name)
+    (_,ax) = pyvale.plot_time_traces(tc_array,field_name)
+    ax.set_title('Exp 1: called calc_measurements()')
 
     print(80*'-')
-    print("If we call the 'calc' methods then the errors are sampled/calculated again:")
+    print("If we call the 'get_measurements' method then the errors are the same:")
+    measurements = tc_array.get_measurements()
+
+    pyvale.print_measurements(tc_array,
+                              (0,1),
+                              (0,1),
+                              (measurements.shape[2]-5,measurements.shape[2]))
+
+    # Plotting the second experiment to visulise the difference in errors
+    (_,ax) = pyvale.plot_time_traces(tc_array,field_name)
+    ax.set_title('Exp 2: called get_measurements()')
+
+    print(80*'-')
+    print("If we call the 'calc_measurements' method again we generate/sample new errors:")
     measurements = tc_array.calc_measurements()
 
     pyvale.print_measurements(tc_array,
@@ -107,7 +120,8 @@ def main() -> None:
                               (measurements.shape[2]-5,measurements.shape[2]))
 
     # Plotting the second experiment to visulise the difference in errors
-    pyvale.plot_time_traces(tc_array,field_name)
+    (_,ax) = pyvale.plot_time_traces(tc_array,field_name)
+    ax.set_title('Exp 3: called calc_measurements()')
 
     print(80*'-')
 

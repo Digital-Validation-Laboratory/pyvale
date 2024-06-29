@@ -10,43 +10,36 @@ from pyvale.uncertainty.errorcalculator import ErrCalculator
 
 
 class ErrorIntegrator():
+
     def __init__(self,
                  err_calcs: list[ErrCalculator],
                  meas_shape: tuple[int,int,int]) -> None:
 
-        self._errs_tot = np.empty(meas_shape)
         self._err_calcs = err_calcs
         self._meas_shape = meas_shape
-        self.calc_all_errs()
+        self._errs_by_func = np.zeros((len(err_calcs),
+                            self._meas_shape[0],
+                            self._meas_shape[1],
+                            self._meas_shape[2]))
+
 
     def set_err_calcs(self, err_calcs: list[ErrCalculator]) -> None:
         self._err_calcs = err_calcs
 
 
-    def add_err_calc(self, err_calc: ErrCalculator) -> None:
-        self._err_calcs.append(err_calc)
-
-
-    def calc_all_errs(self) -> np.ndarray:
-
-        n_erfs = len(self._err_calcs)
-        self._errs_tot = np.empty((n_erfs,
-                            self._meas_shape[0],
-                            self._meas_shape[1],
-                            self._meas_shape[2]))
-
+    def calc_all_errs(self, truth_values: np.ndarray) -> np.ndarray:
         for ii,ff in enumerate(self._err_calcs):
-            self._errs_tot[ii,:,:,:] = ff.calc_errs(self._meas_shape)
-
-        return self._errs_tot
+            self._errs_by_func[ii,:,:,:] = ff.calc_errs(self._meas_shape,
+                                                    truth_values)
+        return self._errs_by_func
 
 
     def get_errs_by_func(self) -> np.ndarray:
-        return self._errs_tot
+        return self._errs_by_func
 
 
     def get_errs_tot(self) -> np.ndarray:
-        return np.sum(self._errs_tot,axis=0)
+        return np.sum(self._errs_by_func,axis=0)
 
 
 

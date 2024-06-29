@@ -10,6 +10,9 @@ import numpy as np
 
 class ErrCalculator(ABC):
     @abstractmethod
-    def calc_errs(self, meas_shape: tuple[int,...]) -> np.ndarray:
+    def calc_errs(self,
+                  meas_shape: tuple[int,...],
+                  truth_values: np.ndarray,
+                  ) -> np.ndarray:
         pass
 
