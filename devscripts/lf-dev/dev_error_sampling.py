@@ -61,7 +61,7 @@ def main() -> None:
     print(80*"="+"\n")
 
     n_bins = 40
-    fig, axs = plt.subplots(1,3,tight_layout=True)
+    _, axs = plt.subplots(1,3,tight_layout=True)
     axs[0].hist(np.squeeze(measurements[:,0,0,-1]),bins=n_bins)
     axs[1].hist(np.squeeze(measurements[:,1,0,-1]),bins=n_bins)
     axs[2].hist(np.squeeze(measurements[:,2,0,-1]),bins=n_bins)

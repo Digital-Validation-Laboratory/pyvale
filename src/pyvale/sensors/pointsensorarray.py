@@ -103,7 +103,7 @@ class PointSensorArray(SensorArray):
 
     def calc_measurements(self) -> np.ndarray:
         measurements = self.get_truth_values()
-        
+
         sys_errs = self.calc_systematic_errs()
         rand_errs = self.calc_random_errs()
 
@@ -129,6 +129,14 @@ class PointSensorArray(SensorArray):
 
         return measurements
 
+
+    def calc_measurement_data(self) -> MeasurementData:
+        measurement_data = MeasurementData()
+        measurement_data.measurements = self.calc_measurements()
+        measurement_data.systematic_errs = self.get_systematic_errs()
+        measurement_data.random_errs = self.get_random_errs()
+        measurement_data.truth_values = self.get_truth_values()
+        return measurement_data
 
     def get_measurement_data(self) -> MeasurementData:
         measurement_data = MeasurementData()
