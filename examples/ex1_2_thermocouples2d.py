@@ -13,18 +13,6 @@ import matplotlib.pyplot as plt
 import mooseherder as mh
 import pyvale
 
-def print_measurements(tag: str,
-                       measurement: np.ndarray,
-                       truth: np.ndarray,
-                       sys_errs: np.ndarray | None,
-                       rand_errs: np.ndarray | None) -> None:
-
-    print()
-
-    if sys_errs is not None:
-        print(f"{tag}_sys_errs() = \n{sys_errs}\n")
-    if sys_errs is not None:
-        print(f"{tag}_sys_errs() = \n{sys_errs}\n")
 
 def main() -> None:
     """pyvale example: building a point sensor array applied to a scalar field
