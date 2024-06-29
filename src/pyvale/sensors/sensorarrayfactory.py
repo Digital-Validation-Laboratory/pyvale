@@ -12,9 +12,9 @@ import mooseherder as mh
 from pyvale.field import ScalarField
 from pyvale.sensors.pointsensorarray import PointSensorArray
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
-from pyvale.uncertainty.syserrcalculator import SysErrUniform
+from pyvale.uncertainty.sampledsyserrors import SysErrUniform
 
-from pyvale.uncertainty.randerrcalculator import RandErrNormal
+from pyvale.uncertainty.sampledranderrors import RandErrNormal
 
 class SensorArrayFactory():
     def basic_thermocouple_array(self,

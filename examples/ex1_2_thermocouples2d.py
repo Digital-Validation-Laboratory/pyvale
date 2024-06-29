@@ -23,7 +23,8 @@ def main() -> None:
 
     Calling the 'get' methods of the sensor array will retrieve the results for
     the current experiment. Calling the 'calc' methods will generate a new
-    experiment by sampling/calculating the systematic and random errors.
+    experiment by sampling/calculating the systematic and random errors. The
+    'calc' method must be called to initialise the errors.
     """
     # Use mooseherder to read the exodus and get a SimData object
     data_path = Path('data/examplesims/plate_2d_thermal_out.e')
