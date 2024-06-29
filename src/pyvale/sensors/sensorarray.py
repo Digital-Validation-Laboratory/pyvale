@@ -191,3 +191,29 @@ def plot_time_traces(sensor_array: SensorArray,
     return (fig,ax)
 
 
+def print_measurements(sens_array: SensorArray,
+                       sensors: tuple[int,int],
+                       components: tuple[int,int],
+                       time_steps: tuple[int,int])  -> None:
+
+    measurement =  sens_array.get_measurements()
+    truth = sens_array.get_truth_values()
+    sys_errs = sens_array.get_systematic_errs()
+    rand_errs = sens_array.get_random_errs()
+
+    print(f"\nmeasurement.shape = \n    {measurement.shape}")
+    print(f"measurement = \n    {measurement[sensors[0]:sensors[1],
+                                             components[0]:components[1],
+                                             time_steps[0]:time_steps[1]]}")
+    print(f"truth = \n    {truth[sensors[0]:sensors[1],
+                                components[0]:components[1],
+                                time_steps[0]:time_steps[1]]}")
+    if sys_errs is not None:
+        print(f"sys_errs = \n    {sys_errs[sensors[0]:sensors[1],
+                                            components[0]:components[1],
+                                            time_steps[0]:time_steps[1]]}")
+    if rand_errs is not None:
+        print(f"rand_errs = \n    {rand_errs[sensors[0]:sensors[1],
+                                            components[0]:components[1],
+                                            time_steps[0]:time_steps[1]]}")
+

@@ -1,6 +1,6 @@
 '''
 ================================================================================
-example: displacement sensors on a 2d plate
+example: strain gauges on a 2d plate
 
 pyvale: the python validation engine
 License: MIT

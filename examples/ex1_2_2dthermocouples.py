@@ -13,6 +13,18 @@ import matplotlib.pyplot as plt
 import mooseherder as mh
 import pyvale
 
+def print_measurements(tag: str,
+                       measurement: np.ndarray,
+                       truth: np.ndarray,
+                       sys_errs: np.ndarray | None,
+                       rand_errs: np.ndarray | None) -> None:
+
+    print()
+
+    if sys_errs is not None:
+        print(f"{tag}_sys_errs() = \n{sys_errs}\n")
+    if sys_errs is not None:
+        print(f"{tag}_sys_errs() = \n{sys_errs}\n")
 
 def main() -> None:
     """pyvale example: building a point sensor array applied to a scalar field
@@ -76,35 +88,44 @@ def main() -> None:
     print(80*'-')
     print('For a sensor: measurement = truth + sysematic error + random error')
     print(f'measurements.shape = {measurements.shape} = (n_sensors,n_field_components,n_timesteps)\n')
+    print('the truth, systematic error and random error arrays have the same shape.')
+
     print(80*'-')
     print('Looking at the last 5 time steps (measurements) of sensor 0:')
-    print(f'Measurements:\n{tc_array.get_measurements()[0,0,-5:]}\n')
-    print(f'Truth:\n{tc_array.get_truth_values()[0,0,-5:]}\n')
-    print(f'Systematic errors:\n{tc_array.get_systematic_errs()[0,0,-5:]}\n')
-    print(f'Random errors:\n{tc_array.get_random_errs()[0,0,-5:]}\n')
+    pyvale.print_measurements(tc_array,
+                              (0,1),
+                              (0,1),
+                              (measurements.shape[2]-5,measurements.shape[2]))
+
     print(80*'-')
     print("If we call the 'get' methods we get the same values again:")
-    print(f'get_measurements:\n{tc_array.get_measurements()[0,0,-5:]}\n')
-    print(f'get_truth:\n{tc_array.get_truth_values()[0,0,-5:]}\n')
-    if tc_array.get_systematic_errs() is not None:
-        print(f'get_systematic_errs:\n{tc_array.get_systematic_errs()[0,0,-5:]}\n')
-    print(f'get_random_errs:\n{tc_array.get_random_errs()[0,0,-5:]}\n')
+    measurements = tc_array.get_measurements()
+
+    pyvale.print_measurements(tc_array,
+                              (0,1),
+                              (0,1),
+                              (measurements.shape[2]-5,measurements.shape[2]))
 
     # We plot the first experiment for comparison
     pyvale.plot_time_traces(tc_array,field_name)
 
     print(80*'-')
     print("If we call the 'calc' methods then the errors are sampled/calculated again:")
-    print(f'calc_measurements:\n{tc_array.calc_measurements()[0,0,-5:]}\n')
-    print(f'calc_truth:\n{tc_array.calc_truth_values()[0,0,-5:]}\n')
-    print(f'calc_systematic_errs:\n{tc_array.calc_systematic_errs()[0,0,-5:]}\n')
-    print(f'calc_random_errs:\n{tc_array.calc_random_errs()[0,0,-5:]}\n')
-    print(80*'-')
+    measurements = tc_array.calc_measurements()
+
+    pyvale.print_measurements(tc_array,
+                              (0,1),
+                              (0,1),
+                              (measurements.shape[2]-5,measurements.shape[2]))
 
     # Plotting the second experiment to visulise the difference in errors
     pyvale.plot_time_traces(tc_array,field_name)
 
-    plt.show()
+    print(80*'-')
+
+    plot_on = False
+    if plot_on:
+        plt.show()
 
 
 if __name__ == '__main__':
