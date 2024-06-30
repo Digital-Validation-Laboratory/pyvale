@@ -30,37 +30,35 @@ def main() -> None:
 
     tc_array = pyvale.PointSensorArray(sens_pos,t_field)
 
-    err_sys1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
-    err_sys2 = pyvale.SysErrNormal(std=20.0)
-    pre_syserr_int = pyvale.ErrorIntegrator([err_sys1,err_sys2],
-                                          tc_array.get_measurement_shape())
-    tc_array.set_pre_sys_err_integrator(pre_syserr_int)
+    pre_syserrs_on = False
+    if pre_syserrs_on:
+        err_sys1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
+        err_sys2 = pyvale.SysErrNormal(std=20.0)
+        pre_syserr_int = pyvale.ErrorIntegrator([err_sys1,err_sys2],
+                                            tc_array.get_measurement_shape())
+        tc_array.set_pre_sys_err_integrator(pre_syserr_int)
 
-    post_syserr1 = pyvale.SysErrRoundOff()
-    post_syserr_int = pyvale.ErrorIntegrator([post_syserr1],
+    #post_syserr1 = pyvale.SysErrRoundOff(method='round',base=5)
+    post_syserr1 = pyvale.SysErrDigitisation(bits_per_unit=(2**8/2560))
+    post_syserr2 = pyvale.SysErrSaturation(meas_min=20.0,meas_max=200.0)
+    post_syserr_int = pyvale.ErrorIntegrator([post_syserr1,post_syserr2],
                                             tc_array.get_measurement_shape())
     tc_array.set_post_sys_err_integrator(post_syserr_int)
 
 
     measurements = tc_array.calc_measurements()
 
-    pre_syserrs_by_func = pre_syserr_int.get_errs_by_func()
-    print('\n'+80*'-')
-    print(f'sys_err_by_func.shape={pre_syserrs_by_func.shape}')
-    print(80*'-'+'\n')
-
-
     print_meas = True
     if print_meas:
         print(80*'-')
         pyvale.print_measurements(tc_array,
+                                (measurements.shape[0]-1,measurements.shape[0]),
                                 (0,1),
-                                (0,1),
-                                (measurements.shape[2]-5,measurements.shape[2]))
+                                (measurements.shape[2]-10,measurements.shape[2]))
         print(80*'-')
 
-        (_,ax) = pyvale.plot_time_traces(tc_array,field_name)
-        #plt.show()
+        pyvale.plot_time_traces(tc_array,field_name)
+        plt.show()
 
 
 if __name__ == '__main__':

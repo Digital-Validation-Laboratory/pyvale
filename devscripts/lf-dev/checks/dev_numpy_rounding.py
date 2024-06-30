@@ -3,11 +3,14 @@ from pprint import pprint
 
 
 def main() -> None:
-    a = np.array([0.1,0.5,0.7,1.0,1.25,1.5,1.75])
+    a = np.linspace(-2.0,2.0,20)
     print(a)
 
-    round_method = np.round
-    print(round_method(a))
+    b = a
+    b[b>1] = 1
+    print(b)
+    b[b<-1] = -1
+    print(b)
 
 if __name__ == '__main__':
     main()

@@ -10,7 +10,7 @@ import numpy as np
 import pyvista as pv
 
 from pyvale.field import Field
-from pyvale.sensors.sensorarray import SensorArray, MeasurementData
+from pyvale.sensors.sensorarray import SensorArray #,MeasurementData
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
 
 
