@@ -54,7 +54,7 @@ def main() -> None:
     # We can also get the truth values, systematic and random errors as numpy
     # arrays
     truth_values = tc_array.get_truth_values()
-    systematic_errs = tc_array.get_systematic_errs()
+    systematic_errs = tc_array.get_pre_systematic_errs()
     random_errs = tc_array.get_random_errs()
 
     # Now we use pyvista to get a 3D interactive labelled plot of the sensor

@@ -16,11 +16,10 @@ class ErrorIntegrator():
                  meas_shape: tuple[int,int,int]) -> None:
 
         self._err_calcs = err_calcs
-        self._meas_shape = meas_shape
         self._errs_by_func = np.zeros((len(err_calcs),
-                            self._meas_shape[0],
-                            self._meas_shape[1],
-                            self._meas_shape[2]))
+                                        meas_shape[0],
+                                        meas_shape[1],
+                                        meas_shape[2]))
 
 
     def set_err_calcs(self, err_calcs: list[ErrCalculator]) -> None:
@@ -29,8 +28,7 @@ class ErrorIntegrator():
 
     def calc_all_errs(self, err_basis: np.ndarray) -> np.ndarray:
         for ii,ff in enumerate(self._err_calcs):
-            self._errs_by_func[ii,:,:,:] = ff.calc_errs(self._meas_shape,
-                                                        err_basis)
+            self._errs_by_func[ii,:,:,:] = ff.calc_errs(err_basis)
         return self._errs_by_func
 
 

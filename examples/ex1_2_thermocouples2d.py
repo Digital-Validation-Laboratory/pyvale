@@ -57,7 +57,7 @@ def main() -> None:
     err_sys2 = pyvale.SysErrNormal(std=20.0)
     sys_err_int = pyvale.ErrorIntegrator([err_sys1,err_sys2],
                                           tc_array.get_measurement_shape())
-    tc_array.set_sys_err_integrator(sys_err_int)
+    tc_array.set_pre_sys_err_integrator(sys_err_int)
 
     # Random errors are also integrated and we can chain objects to calculate
     # multiple random error functions. The random error is sampled repeatedly
@@ -76,7 +76,7 @@ def main() -> None:
     print('\n'+80*'-')
     print('For a sensor: measurement = truth + sysematic error + random error')
     print(f'measurements.shape = {measurements.shape} = (n_sensors,n_field_components,n_timesteps)\n')
-    print('the truth, systematic error and random error arrays have the same shape.')
+    print('The truth, systematic error and random error arrays have the same shape.')
 
     print(80*'-')
     print('Looking at the last 5 time steps (measurements) of sensor 0:')
@@ -84,9 +84,8 @@ def main() -> None:
                               (0,1),
                               (0,1),
                               (measurements.shape[2]-5,measurements.shape[2]))
-    print("We haven't called the 'calc' method yet so the errors are zero.\n")
     print(80*'-')
-    print("If we call the 'calc_measurements' method then the errors are calculated.")
+    print("If we call the 'calc_measurements' method then the errors are (re)calculated.")
     measurements = tc_array.calc_measurements()
 
     pyvale.print_measurements(tc_array,

@@ -56,7 +56,7 @@ def main() -> None:
     # We can also get the truth values, systematic and random errors as numpy
     # arrays
     truth_values = tc_array.get_truth_values()
-    systematic_errs = tc_array.get_systematic_errs()
+    systematic_errs = tc_array.get_pre_systematic_errs()
     random_errs = tc_array.get_random_errs()
 
     # Now we use pyvista to get a 3D interactive labelled plot of the sensor
@@ -98,7 +98,7 @@ def main() -> None:
     # measurements using the specified UQ functions. The sensor traces should
     # have a uniform offset (systematic error) and noise (random error).
     (fig,_) = pyvale.plot_time_traces(tc_array,field_name)
-    
+
     if trace_plot_mode == 'interactive':
         plt.show()
     if trace_plot_mode == 'save_fig':

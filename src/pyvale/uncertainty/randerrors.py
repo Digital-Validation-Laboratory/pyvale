@@ -21,11 +21,10 @@ class RandErrUniform(ErrCalculator):
         self._rng = np.random.default_rng(seed)
 
     def calc_errs(self,
-                  meas_shape: tuple[int,...],
-                  truth_values: np.ndarray) -> np.ndarray:
+                  err_basis: np.ndarray) -> np.ndarray:
         rand_errs = self._rng.uniform(low=self._low,
                                     high=self._high,
-                                    size=meas_shape)
+                                    size=err_basis.shape)
         return rand_errs
 
 
@@ -41,14 +40,13 @@ class RandErrUnifPercent(ErrCalculator):
 
 
     def calc_errs(self,
-                  meas_shape: tuple[int,...],
-                  truth_values: np.ndarray) -> np.ndarray:
+                  err_basis: np.ndarray) -> np.ndarray:
 
         norm_rand = self._rng.uniform(low=self._low/100,
                                     high=self._high/100,
-                                    size=meas_shape)
+                                    size=err_basis.shape)
 
-        rand_errs = truth_values*norm_rand
+        rand_errs = err_basis*norm_rand
         return rand_errs
 
 
@@ -61,11 +59,10 @@ class RandErrNormal(ErrCalculator):
         self._rng = np.random.default_rng(seed)
 
     def calc_errs(self,
-                  meas_shape: tuple[int,...],
-                  truth_values: np.ndarray) -> np.ndarray:
+                  err_basis: np.ndarray) -> np.ndarray:
         rand_errs = self._rng.normal(loc=0.0,
                                     scale=self._std,
-                                    size=meas_shape)
+                                    size=err_basis.shape)
         return rand_errs
 
 
@@ -79,12 +76,11 @@ class RandErrNormPercent(ErrCalculator):
 
 
     def calc_errs(self,
-                  meas_shape: tuple[int,...],
-                  truth_values: np.ndarray) -> np.ndarray:
+                  err_basis: np.ndarray) -> np.ndarray:
 
         norm_rand = self._rng.normal(loc=0.0,
                                     scale=1.0,
-                                    size=meas_shape)
+                                    size=err_basis.shape)
 
-        rand_errs = truth_values*self._std*norm_rand
+        rand_errs = err_basis*self._std*norm_rand
         return rand_errs

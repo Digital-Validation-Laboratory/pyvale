@@ -32,7 +32,7 @@ class SensorArrayFactory():
         err_sys1 = SysErrUniform(low=-10.0,high=10.0)
         sys_err_int = ErrorIntegrator([err_sys1],
                                         sens_array.get_measurement_shape())
-        sens_array.set_sys_err_integrator(sys_err_int)
+        sens_array.set_pre_sys_err_integrator(sys_err_int)
 
         err_rand1 = RandErrNormal(std=10.0)
         rand_err_int = ErrorIntegrator([err_rand1],

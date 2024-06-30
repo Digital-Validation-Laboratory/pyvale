@@ -50,7 +50,6 @@ def main() -> None:
     print(80*'-'+'\n')
 
 
-
     print_meas = True
     if print_meas:
         print(80*'-')
@@ -58,12 +57,6 @@ def main() -> None:
                                 (0,1),
                                 (0,1),
                                 (measurements.shape[2]-5,measurements.shape[2]))
-        print(80*'-')
-        pyvale.print_measurements(tc_array,
-                                (0,1),
-                                (0,1),
-                                (measurements.shape[2]-5,measurements.shape[2]))
-
         print(80*'-')
 
         (_,ax) = pyvale.plot_time_traces(tc_array,field_name)

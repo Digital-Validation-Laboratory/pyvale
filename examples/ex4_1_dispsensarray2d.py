@@ -39,7 +39,7 @@ def main() -> None:
     err_sys1 = pyvale.SysErrUniform(low=-0.01e-3,high=0.01e-3)
     sys_err_int = pyvale.ErrorIntegrator([err_sys1],
                                           disp_sens_array.get_measurement_shape())
-    disp_sens_array.set_sys_err_integrator(sys_err_int)
+    disp_sens_array.set_pre_sys_err_integrator(sys_err_int)
 
     err_rand1 = pyvale.RandErrNormal(std=0.01e-3)
     rand_err_int = pyvale.ErrorIntegrator([err_rand1],

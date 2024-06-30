@@ -21,16 +21,15 @@ class SysErrUniform(ErrCalculator):
         self._rng = np.random.default_rng(seed)
 
     def calc_errs(self,
-                  meas_shape: tuple[int,...],
-                  truth_values: np.ndarray) -> np.ndarray:
+                  err_basis: np.ndarray) -> np.ndarray:
 
-        err_shape = np.array(meas_shape)
+        err_shape = np.array(err_basis.shape)
         err_shape[-1] = 1
         sys_errs = self._rng.uniform(low=self._low,
                                     high=self._high,
                                     size=err_shape)
 
-        tile_shape = np.array(meas_shape)
+        tile_shape = np.array(err_basis.shape)
         tile_shape[0:-1] = 1
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
@@ -47,20 +46,19 @@ class SysErrUnifPercent(ErrCalculator):
         self._rng = np.random.default_rng(seed)
 
     def calc_errs(self,
-                  meas_shape: tuple[int,...],
-                  truth_values: np.ndarray) -> np.ndarray:
+                  err_basis: np.ndarray) -> np.ndarray:
 
-        err_shape = np.array(meas_shape)
+        err_shape = np.array(err_basis.shape)
         err_shape[-1] = 1
         sys_errs = self._rng.uniform(low=self._low,
                                     high=self._high,
                                     size=err_shape)
 
-        tile_shape = np.array(meas_shape)
+        tile_shape = np.array(err_basis.shape)
         tile_shape[0:-1] = 1
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
-        sys_errs = truth_values*sys_errs
+        sys_errs = err_basis*sys_errs
 
         return sys_errs
 
@@ -74,17 +72,16 @@ class SysErrNormal(ErrCalculator):
         self._rng = np.random.default_rng(seed)
 
     def calc_errs(self,
-                  meas_shape: tuple[int,...],
-                  truth_values: np.ndarray,
+                  err_basis: np.ndarray,
                   ) -> np.ndarray:
 
-        err_shape = np.array(meas_shape)
+        err_shape = np.array(err_basis.shape)
         err_shape[-1] = 1
         sys_errs = self._rng.normal(loc=0.0,
                                     scale=self._std,
                                     size=err_shape)
 
-        tile_shape = np.array(meas_shape)
+        tile_shape = np.array(err_basis.shape)
         tile_shape[0:-1] = 1
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
@@ -99,21 +96,20 @@ class SysErrNormPercent(ErrCalculator):
         self._rng = np.random.default_rng(seed)
 
     def calc_errs(self,
-                  meas_shape: tuple[int,...],
-                  truth_values: np.ndarray,
+                  err_basis: np.ndarray,
                   ) -> np.ndarray:
 
-        err_shape = np.array(meas_shape)
+        err_shape = np.array(err_basis.shape)
         err_shape[-1] = 1
         sys_errs = self._rng.normal(loc=0.0,
                                     scale=self._std,
                                     size=err_shape)
 
-        tile_shape = np.array(meas_shape)
+        tile_shape = np.array(err_basis.shape)
         tile_shape[0:-1] = 1
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
-        sys_errs = truth_values*sys_errs
+        sys_errs = err_basis*sys_errs
 
         return sys_errs
 

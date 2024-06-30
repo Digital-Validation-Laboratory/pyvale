@@ -21,7 +21,6 @@ class SysErrRoundOff(ErrCalculator):
             self._method = np.round
 
     def calc_errs(self,
-                  meas_shape: tuple[int,...],
                   err_basis: np.ndarray) -> np.ndarray:
 
         rounded_measurements = self._method(err_basis)
@@ -34,7 +33,6 @@ class SysErrCalibration(ErrCalculator):
         pass
 
     def calc_errs(self,
-                  meas_shape: tuple[int,...],
                   err_basis: np.ndarray) -> np.ndarray:
 
         # Need a calibration function
@@ -50,7 +48,6 @@ class SysErrSaturation(ErrCalculator):
         self._max = meas_max
 
     def calc_errs(self,
-                  meas_shape: tuple[int,...],
                   truth_values: np.ndarray) -> np.ndarray:
 
 
