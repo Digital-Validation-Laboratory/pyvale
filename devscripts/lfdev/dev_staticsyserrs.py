@@ -30,7 +30,7 @@ def main() -> None:
 
     tc_array = pyvale.PointSensorArray(sens_pos,t_field)
 
-    pre_syserrs_on = True
+    pre_syserrs_on = False
     if pre_syserrs_on:
         err_sys1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
         err_sys2 = pyvale.SysErrNormal(std=20.0)
@@ -38,7 +38,7 @@ def main() -> None:
                                             tc_array.get_measurement_shape())
         tc_array.set_pre_sys_err_integrator(pre_syserr_int)
 
-    randerrs_on = True
+    randerrs_on = False
     if randerrs_on:
         err_rand1 = pyvale.RandErrNormal(std=10.0)
         err_rand2 = pyvale.RandErrUniform(low=-10.0,high=10.0)
@@ -48,10 +48,12 @@ def main() -> None:
 
 
     #post_syserr1 = pyvale.SysErrRoundOff(method='round',base=5)
-    post_syserr1 = pyvale.SysErrDigitisation(bits_per_unit=(2**8/2560))
-    post_syserr2 = pyvale.SysErrSaturation(meas_min=50.0,meas_max=300.0)
-    post_syserr_int = pyvale.ErrorIntegrator([post_syserr1,post_syserr2],
-                                            tc_array.get_measurement_shape())
+    post_syserr_ints = [#pyvale.SysErrOffset(offset=5.0),
+                        pyvale.SysErrOffset(offset=5.0),
+                        pyvale.SysErrDigitisation(bits_per_unit=(2**8/2560)),
+                        pyvale.SysErrSaturation(meas_min=50.0,meas_max=300.0)]
+    post_syserr_int = pyvale.ErrorIntegrator(post_syserr_ints,
+                                             tc_array.get_measurement_shape())
     tc_array.set_post_sys_err_integrator(post_syserr_int)
 
 

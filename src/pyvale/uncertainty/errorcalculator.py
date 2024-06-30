@@ -10,9 +10,7 @@ import numpy as np
 
 class ErrCalculator(ABC):
     @abstractmethod
-    def calc_errs(self,
-                  err_basis: np.ndarray,
-                  ) -> np.ndarray:
+    def calc_errs(self,err_basis: np.ndarray) -> np.ndarray:
         pass
 
 

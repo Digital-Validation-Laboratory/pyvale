@@ -45,11 +45,10 @@ class SysErrSaturation(ErrCalculator):
                  meas_max: float) -> None:
 
         if meas_min > meas_max:
-            raise ValueError("")
+            raise ValueError("Minimum must be smaller than maximum for systematic error saturation")
 
         self._min = meas_min
         self._max = meas_max
-
 
 
     def calc_errs(self,
@@ -79,10 +78,8 @@ def select_round_method(method: str) -> Callable:
 
     if method == 'floor':
         return np.floor
-
     if method == 'ceil':
         return np.ceil
-
     return np.round
 
 

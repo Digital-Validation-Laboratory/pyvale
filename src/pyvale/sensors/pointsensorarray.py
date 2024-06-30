@@ -115,7 +115,8 @@ class PointSensorArray(SensorArray):
         self._post_syserr_integ = err_int
 
 
-    def _calc_post_systematic_errs(self, measurements: np.ndarray) -> np.ndarray | None:
+    def _calc_post_systematic_errs(self, measurements: np.ndarray
+                                   ) -> np.ndarray | None:
         if self._post_syserr_integ is None:
             return None
 

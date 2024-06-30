@@ -9,6 +9,17 @@ import numpy as np
 
 from pyvale.uncertainty.errorcalculator import ErrCalculator
 
+class SysErrOffset(ErrCalculator):
+
+    def __init__(self,
+                 offset: float) -> None:
+        self._offset = offset
+
+    def calc_errs(self,
+                  err_basis: np.ndarray) -> np.ndarray:
+
+        return self._offset*np.ones(shape=err_basis.shape)
+
 
 class SysErrUniform(ErrCalculator):
 

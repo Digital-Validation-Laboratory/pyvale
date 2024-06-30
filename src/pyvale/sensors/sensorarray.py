@@ -219,7 +219,7 @@ def print_measurements(sens_array: SensorArray,
                                             time_steps[0]:time_steps[1]]}")
 
     if post_sys_errs is not None:
-        print(f"pre_sys_errs = \n    {post_sys_errs[sensors[0]:sensors[1],
+        print(f"post_sys_errs = \n    {post_sys_errs[sensors[0]:sensors[1],
                                             components[0]:components[1],
                                             time_steps[0]:time_steps[1]]}")
 
