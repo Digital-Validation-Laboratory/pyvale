@@ -27,10 +27,10 @@ class ErrorIntegrator():
         self._err_calcs = err_calcs
 
 
-    def calc_all_errs(self, truth_values: np.ndarray) -> np.ndarray:
+    def calc_all_errs(self, err_basis: np.ndarray) -> np.ndarray:
         for ii,ff in enumerate(self._err_calcs):
             self._errs_by_func[ii,:,:,:] = ff.calc_errs(self._meas_shape,
-                                                    truth_values)
+                                                        err_basis)
         return self._errs_by_func
 
 

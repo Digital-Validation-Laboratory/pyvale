@@ -17,8 +17,9 @@ from pyvale.sensors.sensorarrayfactory import *
 from pyvale.sensors.pointsensorarray import *
 
 from pyvale.uncertainty.errorintegrator import *
-from pyvale.uncertainty.sampledsyserrors import *
-from pyvale.uncertainty.sampledranderrors import *
+from pyvale.uncertainty.randerrors import *
+from pyvale.uncertainty.presyserrors import *
+from pyvale.uncertainty.postsyserrors import *
 
 
 __all__ = ["pyvale"]

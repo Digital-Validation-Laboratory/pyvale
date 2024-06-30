@@ -10,14 +10,23 @@ import numpy as np
 from pyvale.uncertainty.errorcalculator import ErrCalculator
 
 
-class SysErrDigitisation(ErrCalculator):
-    def __init__(self, bits: int) -> None:
-        self._bits = bits
+class SysErrRoundOff(ErrCalculator):
+    def __init__(self, method: str = 'round') -> None:
+
+        if method == 'floor':
+            self._method = np.floor
+        elif method == 'ceil':
+            self._method = np.ceil
+        else:
+            self._method = np.round
 
     def calc_errs(self,
                   meas_shape: tuple[int,...],
-                  truth_values: np.ndarray) -> np.ndarray:
-        return np.array([])
+                  err_basis: np.ndarray) -> np.ndarray:
+
+        rounded_measurements = self._method(err_basis)
+        return rounded_measurements - err_basis
+
 
 
 class SysErrCalibration(ErrCalculator):
@@ -26,7 +35,10 @@ class SysErrCalibration(ErrCalculator):
 
     def calc_errs(self,
                   meas_shape: tuple[int,...],
-                  truth_values: np.ndarray) -> np.ndarray:
+                  err_basis: np.ndarray) -> np.ndarray:
+
+        # Need a calibration function
+
         return np.array([])
 
 
@@ -41,6 +53,6 @@ class SysErrSaturation(ErrCalculator):
                   meas_shape: tuple[int,...],
                   truth_values: np.ndarray) -> np.ndarray:
 
-        
+
         return np.array([])
 

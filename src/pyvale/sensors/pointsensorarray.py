@@ -24,12 +24,16 @@ class PointSensorArray(SensorArray):
         self._positions = positions
         self._field = field
         self._sample_times = sample_times
+
         self._truth = None
+        self._measurements = None
 
-        self._sys_err_int = None
-        self._rand_err_int = None
+        self._pre_syserr_integ = None
+        self._randerr_integ = None
+        self._post_syserr_integ = None
 
-
+    #---------------------------------------------------------------------------
+    # Accesors
     def get_field(self) -> Field:
         return self._field
 
@@ -50,7 +54,8 @@ class PointSensorArray(SensorArray):
                 len(self._field.get_all_components()),
                 self.get_sample_times().shape[0])
 
-
+    #---------------------------------------------------------------------------
+    # truth calculation from simulation
     def calc_truth_values(self) -> np.ndarray:
         return self._field.sample_field(self._positions,
                                         self._sample_times)
@@ -61,75 +66,99 @@ class PointSensorArray(SensorArray):
 
         return self._truth
 
-    def set_sys_err_integrator(self,
+    #---------------------------------------------------------------------------
+    # pre / independent / truth-based  systematic errors
+    def set_pre_sys_err_integrator(self,
                                err_int: ErrorIntegrator) -> None:
-        self._sys_err_int = err_int
+        self._pre_syserr_integ = err_int
 
 
-    def calc_systematic_errs(self) -> np.ndarray | None:
-        if self._sys_err_int is None:
+    def _calc_pre_systematic_errs(self) -> np.ndarray | None:
+        if self._pre_syserr_integ is None:
             return None
 
-        self._sys_err_int.calc_all_errs(self.get_truth_values())
-        return self._sys_err_int.get_errs_tot()
+        self._pre_syserr_integ.calc_all_errs(self.get_truth_values())
+        return self._pre_syserr_integ.get_errs_tot()
 
 
-    def get_systematic_errs(self) -> np.ndarray | None:
-        if self._sys_err_int is None:
+    def get_pre_systematic_errs(self) -> np.ndarray | None:
+        if self._pre_syserr_integ is None:
             return None
 
-        return self._sys_err_int.get_errs_tot()
+        return self._pre_syserr_integ.get_errs_tot()
 
-
+    #---------------------------------------------------------------------------
+    # random errors
     def set_rand_err_integrator(self,
                                 err_int: ErrorIntegrator) -> None:
-        self._rand_err_int = err_int
+        self._randerr_integ = err_int
 
 
-    def calc_random_errs(self)-> np.ndarray | None:
-        if self._rand_err_int is None:
+    def _calc_random_errs(self)-> np.ndarray | None:
+        if self._randerr_integ is None:
             return None
 
-        self._rand_err_int.calc_all_errs(self.get_truth_values())
-        return self._rand_err_int.get_errs_tot()
+        self._randerr_integ.calc_all_errs(self.get_truth_values())
+        return self._randerr_integ.get_errs_tot()
 
 
     def get_random_errs(self) -> np.ndarray | None:
-        if self._rand_err_int is None:
+        if self._randerr_integ is None:
             return None
 
-        return self._rand_err_int.get_errs_tot()
+        return self._randerr_integ.get_errs_tot()
 
+    #---------------------------------------------------------------------------
+    # post / coupled / measurement based systematic errors
+    def set_post_sys_err_integrator(self,
+                               err_int: ErrorIntegrator) -> None:
+        self._post_syserr_integ = err_int
+
+
+    def _calc_post_systematic_errs(self, measurements: np.ndarray) -> np.ndarray | None:
+        if self._post_syserr_integ is None:
+            return None
+
+        self._post_syserr_integ.calc_all_errs(measurements)
+        return self._post_syserr_integ.get_errs_tot()
+
+
+    def get_post_systematic_errs(self) -> np.ndarray | None:
+        if self._post_syserr_integ is None:
+            return None
+
+        return self._post_syserr_integ.get_errs_tot()
+
+    #---------------------------------------------------------------------------
+    # measurements
 
     def calc_measurements(self) -> np.ndarray:
         measurements = self.get_truth_values()
 
-        sys_errs = self.calc_systematic_errs()
-        rand_errs = self.calc_random_errs()
+        pre_sys_errs = self._calc_pre_systematic_errs()
+        if pre_sys_errs is not None:
+            measurements = measurements + pre_sys_errs
 
-        if sys_errs is not None:
-            measurements = measurements + sys_errs
-
+        rand_errs = self._calc_random_errs()
         if rand_errs is not None:
             measurements = measurements + rand_errs
 
-        return measurements
+        post_sys_errs = self._calc_post_systematic_errs(measurements)
+        if post_sys_errs is not None:
+            measurements = measurements + post_sys_errs
+
+        self._measurements = measurements
+        return self._measurements
 
 
     def get_measurements(self) -> np.ndarray:
-        measurements = self.get_truth_values()
-        sys_errs = self.get_systematic_errs()
-        rand_errs = self.get_random_errs()
+        if self._measurements is None:
+            self._measurements = self.calc_measurements()
 
-        if sys_errs is not None:
-            measurements = measurements + sys_errs
-
-        if rand_errs is not None:
-            measurements = measurements + rand_errs
-
-        return measurements
+        return self._measurements
 
 
+    '''
     def calc_measurement_data(self) -> MeasurementData:
         measurement_data = MeasurementData()
         measurement_data.measurements = self.calc_measurements()
@@ -145,10 +174,11 @@ class PointSensorArray(SensorArray):
         measurement_data.random_errs = self.get_random_errs()
         measurement_data.truth_values = self.get_truth_values()
         return measurement_data
+    '''
 
-
+    #---------------------------------------------------------------------------
+    # visualisation tools
     def get_visualiser(self) -> pv.PolyData:
         pv_data = pv.PolyData(self._positions)
-        #pv_data['labels'] = self._sensor_names
         return pv_data
 

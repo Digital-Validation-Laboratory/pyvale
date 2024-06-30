@@ -43,19 +43,19 @@ class SensorArray(ABC):
         pass
 
     @abstractmethod
-    def get_systematic_errs(self) -> np.ndarray:
-        pass
-
-    @abstractmethod
     def get_random_errs(self) -> np.ndarray:
         pass
 
     @abstractmethod
-    def get_measurements(self) -> np.ndarray:
+    def get_pre_systematic_errs(self) -> np.ndarray:
         pass
 
     @abstractmethod
-    def get_measurement_data(self) -> MeasurementData:
+    def get_post_systematic_errs(self) -> np.ndarray:
+        pass
+
+    @abstractmethod
+    def get_measurements(self) -> np.ndarray:
         pass
 
     @abstractmethod
@@ -198,8 +198,9 @@ def print_measurements(sens_array: SensorArray,
 
     measurement =  sens_array.get_measurements()
     truth = sens_array.get_truth_values()
-    sys_errs = sens_array.get_systematic_errs()
+    pre_sys_errs = sens_array.get_pre_systematic_errs()
     rand_errs = sens_array.get_random_errs()
+    post_sys_errs = sens_array.get_post_systematic_errs()
 
     print(f"\nmeasurement.shape = \n    {measurement.shape}")
     print(f"measurement = \n    {measurement[sensors[0]:sensors[1],
@@ -208,13 +209,19 @@ def print_measurements(sens_array: SensorArray,
     print(f"truth = \n    {truth[sensors[0]:sensors[1],
                                 components[0]:components[1],
                                 time_steps[0]:time_steps[1]]}")
-    if sys_errs is not None:
-        print(f"sys_errs = \n    {sys_errs[sensors[0]:sensors[1],
+    if pre_sys_errs is not None:
+        print(f"pre_sys_errs = \n    {pre_sys_errs[sensors[0]:sensors[1],
                                             components[0]:components[1],
                                             time_steps[0]:time_steps[1]]}")
     if rand_errs is not None:
         print(f"rand_errs = \n    {rand_errs[sensors[0]:sensors[1],
                                             components[0]:components[1],
                                             time_steps[0]:time_steps[1]]}")
+
+    if post_sys_errs is not None:
+        print(f"pre_sys_errs = \n    {post_sys_errs[sensors[0]:sensors[1],
+                                            components[0]:components[1],
+                                            time_steps[0]:time_steps[1]]}")
+
     print()
 

@@ -22,7 +22,7 @@ def main() -> None:
     field_name = 'temperature'
     t_field = pyvale.ScalarField(sim_data,field_name,spat_dims)
 
-    n_sens = (3,2,1)
+    n_sens = (4,1,1)
     x_lims = (0.0,2.0)
     y_lims = (0.0,1.0)
     z_lims = (0.0,0.0)
@@ -32,27 +32,42 @@ def main() -> None:
 
     err_sys1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
     err_sys2 = pyvale.SysErrNormal(std=20.0)
-    sys_err_int = pyvale.ErrorIntegrator([err_sys1,err_sys2],
+    pre_syserr_int = pyvale.ErrorIntegrator([err_sys1,err_sys2],
                                           tc_array.get_measurement_shape())
-    tc_array.set_sys_err_integrator(sys_err_int)
+    tc_array.set_pre_sys_err_integrator(pre_syserr_int)
+
+    post_syserr1 = pyvale.SysErrRoundOff()
+    post_syserr_int = pyvale.ErrorIntegrator([post_syserr1],
+                                            tc_array.get_measurement_shape())
+    tc_array.set_post_sys_err_integrator(post_syserr_int)
+
 
     measurements = tc_array.calc_measurements()
 
-    print(80*'-')
-    pyvale.print_measurements(tc_array,
-                              (0,1),
-                              (0,1),
-                              (measurements.shape[2]-5,measurements.shape[2]))
-    print(80*'-')
-    pyvale.print_measurements(tc_array,
-                              (0,1),
-                              (0,1),
-                              (measurements.shape[2]-5,measurements.shape[2]))
+    pre_syserrs_by_func = pre_syserr_int.get_errs_by_func()
+    print('\n'+80*'-')
+    print(f'sys_err_by_func.shape={pre_syserrs_by_func.shape}')
+    print(80*'-'+'\n')
 
-    (_,ax) = pyvale.plot_time_traces(tc_array,field_name)
-    print(80*'-')
 
-    #plt.show()
+
+    print_meas = True
+    if print_meas:
+        print(80*'-')
+        pyvale.print_measurements(tc_array,
+                                (0,1),
+                                (0,1),
+                                (measurements.shape[2]-5,measurements.shape[2]))
+        print(80*'-')
+        pyvale.print_measurements(tc_array,
+                                (0,1),
+                                (0,1),
+                                (measurements.shape[2]-5,measurements.shape[2]))
+
+        print(80*'-')
+
+        (_,ax) = pyvale.plot_time_traces(tc_array,field_name)
+        #plt.show()
 
 
 if __name__ == '__main__':

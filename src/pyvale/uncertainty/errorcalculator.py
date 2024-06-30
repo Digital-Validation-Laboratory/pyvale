@@ -9,10 +9,14 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 class ErrCalculator(ABC):
+
     @abstractmethod
     def calc_errs(self,
                   meas_shape: tuple[int,...],
-                  truth_values: np.ndarray,
+                  err_basis: np.ndarray,
                   ) -> np.ndarray:
         pass
+
+
+
 
