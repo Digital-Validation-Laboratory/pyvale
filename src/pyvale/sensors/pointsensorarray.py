@@ -77,7 +77,7 @@ class PointSensorArray(SensorArray):
         if self._pre_syserr_integ is None:
             return None
 
-        self._pre_syserr_integ.calc_all_errs(self.get_truth_values())
+        self._pre_syserr_integ.calc_errs_static(self.get_truth_values())
         return self._pre_syserr_integ.get_errs_tot()
 
 
@@ -98,7 +98,7 @@ class PointSensorArray(SensorArray):
         if self._randerr_integ is None:
             return None
 
-        self._randerr_integ.calc_all_errs(self.get_truth_values())
+        self._randerr_integ.calc_errs_static(self.get_truth_values())
         return self._randerr_integ.get_errs_tot()
 
 
@@ -119,7 +119,7 @@ class PointSensorArray(SensorArray):
         if self._post_syserr_integ is None:
             return None
 
-        self._post_syserr_integ.calc_all_errs(measurements)
+        self._post_syserr_integ.calc_errs_recursive(measurements)
         return self._post_syserr_integ.get_errs_tot()
 
 

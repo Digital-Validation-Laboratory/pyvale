@@ -26,9 +26,16 @@ class ErrorIntegrator():
         self._err_calcs = err_calcs
 
 
-    def calc_all_errs(self, err_basis: np.ndarray) -> np.ndarray:
+    def calc_errs_static(self, err_basis: np.ndarray) -> np.ndarray:
         for ii,ff in enumerate(self._err_calcs):
             self._errs_by_func[ii,:,:,:] = ff.calc_errs(err_basis)
+        return self._errs_by_func
+
+    def calc_errs_recursive(self, err_basis: np.ndarray) -> np.ndarray:
+        err_accumulated = np.copy(err_basis)
+        for ii,ff in enumerate(self._err_calcs):
+            self._errs_by_func[ii,:,:,:] = ff.calc_errs(err_accumulated)
+            err_accumulated = err_accumulated + np.sum(self._errs_by_func,axis=0)
         return self._errs_by_func
 
 
