@@ -8,9 +8,8 @@ Copyright (C) 2024 The Computer Aided Validation Team
 from dataclasses import dataclass
 import numpy as np
 
-
 @dataclass
-class PlotProps:
+class GeneralPlotOpts:
     """ Helper class to set properties in matplotlib for scaling to use in a
     journal article or report.
     """
@@ -42,15 +41,35 @@ class PlotProps:
     cmap_seq: str = "cividis"
     cmap_div: str = "RdBu"
 
+
 @dataclass
-class SensorPlotProps:
+class SensorPlotOpts:
     legend: bool = True
-    y_label: str = r'Sensor Value, [unit]'
-    x_label: str = r'Time, $t$ [s]'
+    meas_label: str = r'Measured Value, $M_{s}$ [unit]'
+    x_label: str = r'x [m]'
+    y_label: str = r'y [m]'
+    z_label: str = r'z [m]'
+    time_label: str = r'Time, $t$ [s]'
+
     truth_line: str | None = '-'
     sim_line: str | None = '-'
     meas_line: str = '--+'
+
     sensor_tag: str = 'S'
     sensors_to_plot: np.ndarray | None = None
     time_inds: np.ndarray | None = None
 
+
+def create_label_str(descriptors: tuple[str,str,str,str]) -> str:
+    return rf"{descriptors[0]}, {descriptors[1]} [{descriptors[2]}]"
+
+
+def create_sensor_tags(tag: str, n_sensors: int) -> list[str]:
+    z_width = int(np.log10(n_sensors))+1
+
+    sensor_names = list()
+    for ss in range(n_sensors):
+        num_str = f'{ss}'.zfill(z_width)
+        sensor_names.append(f'{tag}{num_str}')
+
+    return sensor_names

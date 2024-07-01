@@ -48,11 +48,11 @@ def main() -> None:
 
     plot_field = 'off'
     if plot_field == 'disp_x':
-        pv_plot = pyvale.plot_sensors(disp_sens_array,'disp_x')
+        pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,'disp_x')
         pv_plot.add_scalar_bar(r'Displacement X [m]')
         pv_plot.show()
     elif plot_field == 'disp_y':
-        pv_plot = pyvale.plot_sensors(disp_sens_array,'disp_y')
+        pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,'disp_y')
         pv_plot.add_scalar_bar(r'Displacement Y [m]')
         pv_plot.show()
 

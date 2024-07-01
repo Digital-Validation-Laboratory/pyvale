@@ -7,7 +7,7 @@ https://en.wikipedia.org/wiki/Test_functions_for_optimization
 from typing import Callable,Any
 import numpy as np
 import matplotlib.pyplot as plt
-from pyvale.plotprops import PlotProps
+from pyvale.visualisation.plotopts import PlotProps
 
 
 def ackley(x: np.ndarray,

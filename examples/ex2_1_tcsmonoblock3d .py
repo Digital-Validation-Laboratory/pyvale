@@ -51,15 +51,9 @@ def main() -> None:
     measurements = tc_array.get_measurements()
     print(f'\nMeasurements for sensor at top of block:\n{measurements[-1,0,:]}\n')
 
-    # We can also get the truth values, systematic and random errors as numpy
-    # arrays
-    truth_values = tc_array.get_truth_values()
-    systematic_errs = tc_array.get_pre_systematic_errs()
-    random_errs = tc_array.get_random_errs()
-
     # Now we use pyvista to get a 3D interactive labelled plot of the sensor
     # locations on our simulation geometry.
-    pv_plot = pyvale.plot_sensors(tc_array,field_name)
+    pv_plot = pyvale.plot_sensors_on_sim(tc_array,field_name)
     # We label the temperature scale bar ourselves
     pv_plot.add_scalar_bar('Temperature, T [degC]')
 

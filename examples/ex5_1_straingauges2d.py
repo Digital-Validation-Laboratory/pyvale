@@ -58,11 +58,11 @@ def main() -> None:
 
     plot_field = 'strain_yy'
     if plot_field == 'strain_xx':
-        pv_plot = pyvale.plot_sensors(straingauge_array,'strain_xx')
+        pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,'strain_xx')
         pv_plot.add_scalar_bar(r'Strain xx [-]')
         pv_plot.show()
     elif plot_field == 'strain_yy':
-        pv_plot = pyvale.plot_sensors(straingauge_array,'strain_yy')
+        pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,'strain_yy')
         pv_plot.add_scalar_bar(r'strain yy [-]')
         pv_plot.show()
 

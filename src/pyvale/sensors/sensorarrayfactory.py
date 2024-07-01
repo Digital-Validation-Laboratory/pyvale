@@ -25,9 +25,14 @@ class SensorArrayFactory():
                                  sample_times: np.ndarray | None = None
                                  ) -> PointSensorArray:
 
+        descriptors = ('Temperature','T',r'$^{\circ}C$','TC')
+
         t_field = ScalarField(sim_data,field_name,spat_dims)
 
-        sens_array = PointSensorArray(positions,t_field,sample_times)
+        sens_array = PointSensorArray(positions,
+                                      t_field,
+                                      sample_times,
+                                      descriptors)
 
         err_sys1 = SysErrUniform(low=-10.0,high=10.0)
         sys_err_int = ErrorIntegrator([err_sys1],

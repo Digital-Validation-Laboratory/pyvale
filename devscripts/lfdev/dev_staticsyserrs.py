@@ -51,7 +51,7 @@ def main() -> None:
     post_syserr_ints = [#pyvale.SysErrOffset(offset=5.0),
                         pyvale.SysErrOffset(offset=5.0),
                         pyvale.SysErrDigitisation(bits_per_unit=(2**8/2560)),
-                        pyvale.SysErrSaturation(meas_min=50.0,meas_max=300.0)]
+                        pyvale.SysErrSaturation(meas_min=20.0,meas_max=300.0)]
     post_syserr_int = pyvale.ErrorIntegrator(post_syserr_ints,
                                              tc_array.get_measurement_shape())
     tc_array.set_post_sys_err_integrator(post_syserr_int)

@@ -114,7 +114,7 @@ The location of the sensors can be interactively viewed in 3D on the simulation 
 ```python
 pv_sens = tc_array.get_visualiser()
 pv_sim = t_field.get_visualiser()
-pv_plot = pyvale.plot_sensors(pv_sim,pv_sens,field_name)
+pv_plot = pyvale.plot_sensors_on_sim(pv_sim,pv_sens,field_name)
 pv_plot.add_scalar_bar('Temperature, T [degC]')
 pv_plot.show()
 ```

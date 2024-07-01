@@ -10,20 +10,24 @@ import numpy as np
 import pyvista as pv
 
 from pyvale.field import Field
-from pyvale.sensors.sensorarray import SensorArray #,MeasurementData
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
 
 
-class PointSensorArray(SensorArray):
+class PointSensorArray():
     def __init__(self,
                  positions: np.ndarray,
                  field: Field,
-                 sample_times: np.ndarray | None = None
+                 sample_times: np.ndarray | None = None,
+                 descriptors: tuple[str,str,str,str] | None = None
                  ) -> None:
 
         self._positions = positions
         self._field = field
         self._sample_times = sample_times
+
+        self._descriptors = ('Measured Var.','','Unit','S')
+        if descriptors is not None:
+            self._descriptors = descriptors
 
         self._truth = None
         self._measurements = None
@@ -46,11 +50,16 @@ class PointSensorArray(SensorArray):
 
         return self._sample_times
 
+    '''
     def get_num_sensors(self) -> int:
         return self._positions.shape[0]
+    '''
+
+    def get_descriptors(self) -> tuple[str,str,str,str]:
+        return self._descriptors
 
     def get_measurement_shape(self) -> tuple[int,int,int]:
-        return (self.get_num_sensors(),
+        return (self._positions.shape[0],
                 len(self._field.get_all_components()),
                 self.get_sample_times().shape[0])
 
