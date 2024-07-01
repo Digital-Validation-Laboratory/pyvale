@@ -10,7 +10,7 @@ from dataclasses import dataclass
 import numpy as np
 
 @dataclass
-class SensorDescriptor():
+class SensorDescriptor:
     name: str = 'Measured Value'
     units: str = r'-'
     symbol: str = r'm'
@@ -59,3 +59,37 @@ class SensorDescriptor():
 
         return sensor_names
 
+class SensorDescriptorFactory:
+    @staticmethod
+    def temperature_descriptor() -> SensorDescriptor:
+        descriptor = SensorDescriptor()
+        descriptor.name = 'Temperature'
+        descriptor.symbol = 'T'
+        descriptor.units = r'^{\circ}C'
+        descriptor.tag = 'TS'
+        return descriptor
+
+    @staticmethod
+    def displacement_descriptor() -> SensorDescriptor:
+        descriptor = SensorDescriptor()
+        descriptor.name = 'Displacement'
+        descriptor.symbol = 'u'
+        descriptor.units = r'm'
+        descriptor.tag = 'DS'
+        descriptor.components = ('x','y','z')
+        return descriptor
+
+    @staticmethod
+    def strain_descriptor(spat_dims: int = 3) -> SensorDescriptor:
+        descriptor = SensorDescriptor()
+        descriptor.name = 'Strain'
+        descriptor.symbol = r'\varepsilon'
+        descriptor.units = r'-'
+        descriptor.tag = 'SG'
+
+        if spat_dims == 2:
+            descriptor.components = ('xx','yy','xy')
+        else:
+            descriptor.components = ('xx','yy','zz','xy','yz','xz')
+
+        return descriptor

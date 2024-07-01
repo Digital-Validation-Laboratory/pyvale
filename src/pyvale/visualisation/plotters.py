@@ -14,18 +14,18 @@ import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
 import pyvista as pv
 
 from pyvale.sensors.pointsensorarray import PointSensorArray
-from pyvale.sensors.sensordescriptor import SensorDescriptor
 from pyvale.visualisation.plotopts import GeneralPlotOpts, SensorPlotOpts
 
 
 def plot_sensors_on_sim(sensor_array: PointSensorArray,
-                        field_to_plot: str,
+                        component: str,
                         time_step: int = -1,
                         plot_opts: SensorPlotOpts | None  = None
                         ) -> Any:
 
     pv_simdata = sensor_array.get_field().get_visualiser()
     pv_sensdata = sensor_array.get_visualiser()
+    comp_ind = sensor_array.get_field().get_component_index(component)
 
     if plot_opts is None:
         plot_opts = SensorPlotOpts()
@@ -46,12 +46,12 @@ def plot_sensors_on_sim(sensor_array: PointSensorArray,
                             )
 
     pv_plot.add_mesh(pv_simdata,
-                     scalars=pv_simdata[field_to_plot][:,time_step],
+                     scalars=pv_simdata[component][:,time_step],
                      label='sim-data',
                      show_edges=True,
                      show_scalar_bar=False)
 
-    pv_plot.add_scalar_bar(descriptor.create_label())
+    pv_plot.add_scalar_bar(descriptor.create_label(comp_ind))
     pv_plot.add_axes_at_origin(labels_off=True)
 
     return pv_plot
@@ -114,7 +114,7 @@ def plot_time_traces(sensor_array: PointSensorArray,
 
     ax.set_xlabel(trace_props.time_label,
                 fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
-    ax.set_ylabel(descriptor.create_label(),
+    ax.set_ylabel(descriptor.create_label(comp_ind),
                 fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
 
     ax.set_xlim([np.min(samp_time),np.max(samp_time)]) # type: ignore

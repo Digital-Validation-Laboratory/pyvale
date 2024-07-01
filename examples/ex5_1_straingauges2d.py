@@ -20,55 +20,29 @@ def main() -> None:
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
-    # Create a Field object that will allow the sensors to interpolate the sim
-    # data field of interest quickly by using the mesh and shape functions
-    spat_dims = 2       # Specify that we only have 2 spatial dimensions
-    field_name = 'strain'
-    norm_components = ('strain_xx','strain_yy')
-    dev_components = ('strain_xy',)
-    strain_field = pyvale.TensorField(sim_data,
-                                    field_name,
-                                    norm_components,
-                                    dev_components,
-                                    spat_dims)
-
-    # This creates a grid of sensors
     n_sens = (2,3,1)    # Number of sensor (x,y,z)
     x_lims = (0.0,100.0)  # Limits for each coord in scaled sim length units
     y_lims = (0.0,150.0)
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    straingauge_array = pyvale.PointSensorArray(sens_pos,strain_field)
-
-    sys_errors_on = False
-    rand_errors_on = True
-
-    if sys_errors_on:
-        err_sys1 = pyvale.SysErrUniform(low=-0.1e-3,high=0.1e-3)
-        sys_err_int = pyvale.ErrorIntegrator([err_sys1],
-                                            straingauge_array.get_measurement_shape())
-        straingauge_array.set_pre_sys_err_integrator(sys_err_int)
-
-    if rand_errors_on:
-        err_rand1 = pyvale.RandErrNormal(std=0.1e-3)
-        rand_err_int = pyvale.ErrorIntegrator([err_rand1],
-                                                straingauge_array.get_measurement_shape())
-        straingauge_array.set_rand_err_integrator(rand_err_int)
+    straingauge_array = pyvale.SensorArrayFactory \
+                            .basic_straingauge_array(sim_data,
+                                                     sens_pos,
+                                                     "strain",
+                                                     spat_dims=2)
 
     plot_field = 'strain_yy'
     if plot_field == 'strain_xx':
         pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,'strain_xx')
-        pv_plot.add_scalar_bar(r'Strain xx [-]')
         pv_plot.show()
     elif plot_field == 'strain_yy':
         pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,'strain_yy')
-        pv_plot.add_scalar_bar(r'strain yy [-]')
         pv_plot.show()
 
-    (fig,_) = pyvale.plot_time_traces(straingauge_array,'strain_xx')
-    (fig,_) = pyvale.plot_time_traces(straingauge_array,'strain_yy')
-    (fig,_) = pyvale.plot_time_traces(straingauge_array,'strain_xy')
+    pyvale.plot_time_traces(straingauge_array,'strain_xx')
+    pyvale.plot_time_traces(straingauge_array,'strain_yy')
+    pyvale.plot_time_traces(straingauge_array,'strain_xy')
     plt.show()
 
 

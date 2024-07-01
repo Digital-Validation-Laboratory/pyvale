@@ -8,7 +8,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 import numpy as np
 import pyvista as pv
 
-from pyvale.field import Field
+from pyvale.physics.field import Field
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
 from pyvale.sensors.sensordescriptor import SensorDescriptor
 

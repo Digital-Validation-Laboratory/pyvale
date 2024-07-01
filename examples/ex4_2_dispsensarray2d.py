@@ -20,6 +20,21 @@ def main() -> None:
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
+    # The SensorDescriptor holds strings used to label plots and visualisations
+    descriptor = pyvale.SensorDescriptor()
+    descriptor.name = 'Displacement'
+    descriptor.symbol = r'u'
+    descriptor.units = r'm'
+    descriptor.tag = 'DS'
+    descriptor.components = ('x','y','z')
+
+    # Create a Field object that will allow the sensors to interpolate the sim
+    # data field of interest quickly by using the mesh and shape functions
+    spat_dims = 2       # Specify that we only have 2 spatial dimensions
+    field_key = 'disp'
+    components = ('disp_x','disp_y')
+    disp_field = pyvale.VectorField(sim_data,field_key,components,spat_dims)
+
     # This creates a grid of sensors
     n_sens = (2,3,1)    # Number of sensor (x,y,z)
     x_lims = (0.0,100.0)  # Limits for each coord in scaled sim length units
@@ -27,11 +42,20 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    disp_sens_array = pyvale.SensorArrayFactory \
-                            .basic_dispsens_array(sim_data,
-                                                sens_pos,
-                                                "displacement",
-                                                spat_dims=2)
+    disp_sens_array = pyvale.PointSensorArray(sens_pos,
+                                              disp_field,
+                                              None,
+                                              descriptor)
+
+    err_sys1 = pyvale.SysErrUniform(low=-0.01e-3,high=0.01e-3)
+    sys_err_int = pyvale.ErrorIntegrator([err_sys1],
+                                          disp_sens_array.get_measurement_shape())
+    disp_sens_array.set_pre_sys_err_integrator(sys_err_int)
+
+    err_rand1 = pyvale.RandErrNormal(std=0.01e-3)
+    rand_err_int = pyvale.ErrorIntegrator([err_rand1],
+                                            disp_sens_array.get_measurement_shape())
+    disp_sens_array.set_rand_err_integrator(rand_err_int)
 
     plot_field = 'disp_x'
     if plot_field == 'disp_x':

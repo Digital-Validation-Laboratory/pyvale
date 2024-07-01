@@ -31,11 +31,18 @@ def main() -> None:
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
+    # The SensorDescriptor holds strings used to label plots and visualisations
+    descriptor = pyvale.SensorDescriptor()
+    descriptor.name = 'Temperature'
+    descriptor.symbol = 'T'
+    descriptor.units = r'^{\circ}C'
+    descriptor.tag = 'TC'
+
     # Create a Field object that will allow the sensors to interpolate the sim
     # data field of interest quickly by using the mesh and shape functions
     spat_dims = 2       # Specify that we only have 2 spatial dimensions
-    field_name = 'temperature'    # Same as in the moose input and SimData node_var key
-    t_field = pyvale.ScalarField(sim_data,field_name,spat_dims)
+    field_key = 'temperature'    # Same as in the moose input and SimData node_var key
+    t_field = pyvale.ScalarField(sim_data,field_key,spat_dims)
 
     # This creates a grid of 3x2 sensors in the xy plane
     n_sens = (5,2,1)    # Number of sensor (x,y,z)
@@ -94,7 +101,7 @@ def main() -> None:
                               (measurements.shape[2]-5,measurements.shape[2]))
 
     # We plot the first experiment for comparison
-    (_,ax) = pyvale.plot_time_traces(tc_array,field_name)
+    (_,ax) = pyvale.plot_time_traces(tc_array,field_key)
     ax.set_title('Exp 1: called calc_measurements()')
 
     print(80*'-')
@@ -107,7 +114,7 @@ def main() -> None:
                               (measurements.shape[2]-5,measurements.shape[2]))
 
     # Plotting the second experiment to visulise the difference in errors
-    (_,ax) = pyvale.plot_time_traces(tc_array,field_name)
+    (_,ax) = pyvale.plot_time_traces(tc_array,field_key)
     ax.set_title('Exp 2: called get_measurements()')
 
     print(80*'-')
@@ -120,7 +127,7 @@ def main() -> None:
                               (measurements.shape[2]-5,measurements.shape[2]))
 
     # Plotting the second experiment to visulise the difference in errors
-    (_,ax) = pyvale.plot_time_traces(tc_array,field_name)
+    (_,ax) = pyvale.plot_time_traces(tc_array,field_key)
     ax.set_title('Exp 3: called calc_measurements()')
 
     print(80*'-')

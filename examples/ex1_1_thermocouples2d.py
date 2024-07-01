@@ -28,7 +28,7 @@ def main() -> None:
     data_path = Path('data/examplesims/plate_2d_thermal_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
-    field_name = list(sim_data.node_vars.keys())[0] # type: ignore
+    field_key = list(sim_data.node_vars.keys())[0] # type: ignore
 
     # This creates a grid of 3x2 sensors in the xy plane
     n_sens = (3,2,1)    # Number of sensor (x,y,z)
@@ -41,10 +41,10 @@ def main() -> None:
 
     # Now we create a thermocouple array with with the sensor positions and the
     # temperature field from the simulation
-    tc_array = pyvale.SensorArrayFactory() \
+    tc_array = pyvale.SensorArrayFactory \
         .basic_thermocouple_array(sim_data,
                                   sens_pos,
-                                  field_name,
+                                  field_key,
                                   spat_dims=2)
 
     # We can get an array of measurements from the sensor array for all time
@@ -61,7 +61,7 @@ def main() -> None:
 
     # Now we use pyvista to get a 3D interactive labelled plot of the sensor
     # locations on our simulation geometry.
-    pv_plot = pyvale.plot_sensors_on_sim(tc_array,field_name)
+    pv_plot = pyvale.plot_sensors_on_sim(tc_array,field_key)
 
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector
@@ -95,7 +95,7 @@ def main() -> None:
     # truth from the simulation and dashed lines with '+' are simulated sensor
     # measurements using the specified UQ functions. The sensor traces should
     # have a uniform offset (systematic error) and noise (random error).
-    (fig,_) = pyvale.plot_time_traces(tc_array,field_name)
+    (fig,_) = pyvale.plot_time_traces(tc_array,field_key)
 
     if trace_plot_mode == 'interactive':
         plt.show()

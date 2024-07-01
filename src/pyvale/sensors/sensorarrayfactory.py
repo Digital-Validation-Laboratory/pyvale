@@ -9,28 +9,26 @@ import numpy as np
 
 import mooseherder as mh
 
-from pyvale.field import ScalarField
-from pyvale.sensors.sensordescriptor import SensorDescriptor
+from pyvale.physics.scalarfield import ScalarField
+from pyvale.physics.vectorfield import VectorField
+from pyvale.physics.tensorfield import TensorField
+from pyvale.sensors.sensordescriptor import SensorDescriptorFactory
 from pyvale.sensors.pointsensorarray import PointSensorArray
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
 from pyvale.uncertainty.presyserrors import SysErrUniform
 from pyvale.uncertainty.randerrors import RandErrNormal
 
 
-class SensorArrayFactory():
-    def basic_thermocouple_array(self,
-                                 sim_data: mh.SimData,
+class SensorArrayFactory:
+    @staticmethod
+    def basic_thermocouple_array(sim_data: mh.SimData,
                                  positions: np.ndarray,
                                  field_name: str = "temperature",
                                  spat_dims: int = 3,
                                  sample_times: np.ndarray | None = None
                                  ) -> PointSensorArray:
 
-        descriptor = SensorDescriptor()
-        descriptor.name = 'Temperature'
-        descriptor.symbol = 'T'
-        descriptor.units = r'^{\circC}'
-        descriptor.tag = 'TC'
+        descriptor = SensorDescriptorFactory.temperature_descriptor()
 
         t_field = ScalarField(sim_data,field_name,spat_dims)
 
@@ -45,6 +43,78 @@ class SensorArrayFactory():
         sens_array.set_pre_sys_err_integrator(sys_err_int)
 
         err_rand1 = RandErrNormal(std=10.0)
+        rand_err_int = ErrorIntegrator([err_rand1],
+                                         sens_array.get_measurement_shape())
+        sens_array.set_rand_err_integrator(rand_err_int)
+
+        return sens_array
+
+    @staticmethod
+    def basic_dispsens_array(sim_data: mh.SimData,
+                            positions: np.ndarray,
+                            field_name: str = "displacement",
+                            spat_dims: int = 3,
+                            sample_times: np.ndarray | None = None
+                            ) -> PointSensorArray:
+
+        descriptor = SensorDescriptorFactory.displacement_descriptor()
+
+        disp_field = VectorField(sim_data,
+                                 field_name,
+                                 ('disp_x','disp_y'),
+                                 spat_dims)
+
+        sens_array = PointSensorArray(positions,
+                                      disp_field,
+                                      sample_times,
+                                      descriptor)
+
+        err_sys1 = SysErrUniform(low=-0.01e-3,high=0.01e-3)
+        sys_err_int = ErrorIntegrator([err_sys1],
+                                        sens_array.get_measurement_shape())
+        sens_array.set_pre_sys_err_integrator(sys_err_int)
+
+        err_rand1 = RandErrNormal(std=0.01e-3)
+        rand_err_int = ErrorIntegrator([err_rand1],
+                                         sens_array.get_measurement_shape())
+        sens_array.set_rand_err_integrator(rand_err_int)
+
+        return sens_array
+
+    @staticmethod
+    def basic_straingauge_array(sim_data: mh.SimData,
+                                positions: np.ndarray,
+                                field_name: str = "strain",
+                                spat_dims: int = 3,
+                                sample_times: np.ndarray | None = None
+                                ) -> PointSensorArray:
+
+        descriptor = SensorDescriptorFactory.strain_descriptor()
+
+        if spat_dims == 2:
+            norm_components = ('strain_xx','strain_yy')
+            dev_components = ('strain_xy',)
+        else:
+            norm_components = ('strain_xx','strain_yy','strain_zz')
+            dev_components = ('strain_xy','strain_yz','strain_xz')
+
+        strain_field = TensorField(sim_data,
+                                 field_name,
+                                 norm_components,
+                                 dev_components,
+                                 spat_dims)
+
+        sens_array = PointSensorArray(positions,
+                                      strain_field,
+                                      sample_times,
+                                      descriptor)
+
+        err_sys1 = SysErrUniform(low=-0.1e-3,high=0.1e-3)
+        sys_err_int = ErrorIntegrator([err_sys1],
+                                        sens_array.get_measurement_shape())
+        sens_array.set_pre_sys_err_integrator(sys_err_int)
+
+        err_rand1 = RandErrNormal(std=0.1e-3)
         rand_err_int = ErrorIntegrator([err_rand1],
                                          sens_array.get_measurement_shape())
         sens_array.set_rand_err_integrator(rand_err_int)

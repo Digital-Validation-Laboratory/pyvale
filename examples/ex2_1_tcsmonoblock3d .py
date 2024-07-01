@@ -40,7 +40,7 @@ def main() -> None:
 
     # Now we create a thermocouple array with with the sensor positions and the
     # temperature field from the simulation
-    tc_array = pyvale.SensorArrayFactory() \
+    tc_array = pyvale.SensorArrayFactory \
         .basic_thermocouple_array(sim_data,
                                   sens_pos,
                                   field_name,
