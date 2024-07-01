@@ -5,12 +5,12 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
-
 import numpy as np
 import pyvista as pv
 
 from pyvale.field import Field
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
+from pyvale.sensors.sensordescriptor import SensorDescriptor
 
 
 class PointSensorArray():
@@ -18,16 +18,16 @@ class PointSensorArray():
                  positions: np.ndarray,
                  field: Field,
                  sample_times: np.ndarray | None = None,
-                 descriptors: tuple[str,str,str,str] | None = None
+                 descriptor: SensorDescriptor | None = None
                  ) -> None:
 
         self._positions = positions
         self._field = field
         self._sample_times = sample_times
 
-        self._descriptors = ('Measured Var.','','Unit','S')
-        if descriptors is not None:
-            self._descriptors = descriptors
+        self._descriptor = SensorDescriptor()
+        if descriptor is not None:
+            self._descriptor = descriptor
 
         self._truth = None
         self._measurements = None
@@ -37,7 +37,7 @@ class PointSensorArray():
         self._post_syserr_integ = None
 
     #---------------------------------------------------------------------------
-    # Accesors
+    # accessors
     def get_field(self) -> Field:
         return self._field
 
@@ -50,13 +50,8 @@ class PointSensorArray():
 
         return self._sample_times
 
-    '''
-    def get_num_sensors(self) -> int:
-        return self._positions.shape[0]
-    '''
-
-    def get_descriptors(self) -> tuple[str,str,str,str]:
-        return self._descriptors
+    def get_descriptor(self) -> SensorDescriptor:
+        return self._descriptor
 
     def get_measurement_shape(self) -> tuple[int,int,int]:
         return (self._positions.shape[0],
@@ -141,7 +136,6 @@ class PointSensorArray():
 
     #---------------------------------------------------------------------------
     # measurements
-
     def calc_measurements(self) -> np.ndarray:
         measurements = self.get_truth_values()
 
@@ -166,25 +160,6 @@ class PointSensorArray():
             self._measurements = self.calc_measurements()
 
         return self._measurements
-
-
-    '''
-    def calc_measurement_data(self) -> MeasurementData:
-        measurement_data = MeasurementData()
-        measurement_data.measurements = self.calc_measurements()
-        measurement_data.systematic_errs = self.get_systematic_errs()
-        measurement_data.random_errs = self.get_random_errs()
-        measurement_data.truth_values = self.get_truth_values()
-        return measurement_data
-
-    def get_measurement_data(self) -> MeasurementData:
-        measurement_data = MeasurementData()
-        measurement_data.measurements = self.get_measurements()
-        measurement_data.systematic_errs = self.get_systematic_errs()
-        measurement_data.random_errs = self.get_random_errs()
-        measurement_data.truth_values = self.get_truth_values()
-        return measurement_data
-    '''
 
     #---------------------------------------------------------------------------
     # visualisation tools

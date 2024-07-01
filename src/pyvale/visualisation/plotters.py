@@ -14,8 +14,8 @@ import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
 import pyvista as pv
 
 from pyvale.sensors.pointsensorarray import PointSensorArray
+from pyvale.sensors.sensordescriptor import SensorDescriptor
 from pyvale.visualisation.plotopts import GeneralPlotOpts, SensorPlotOpts
-from pyvale.visualisation.plotopts import create_label_str, create_sensor_tags
 
 
 def plot_sensors_on_sim(sensor_array: PointSensorArray,
@@ -30,9 +30,9 @@ def plot_sensors_on_sim(sensor_array: PointSensorArray,
     if plot_opts is None:
         plot_opts = SensorPlotOpts()
 
-    descripts = sensor_array.get_descriptors()
-    pv_sensdata['labels'] = create_sensor_tags(tag=descripts[3],
-                                               n_sensors=sensor_array.get_measurement_shape()[0])
+    descriptor = sensor_array.get_descriptor()
+    pv_sensdata['labels'] = descriptor.create_sensor_tags(
+        sensor_array.get_measurement_shape()[0])
 
     pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
 
@@ -51,7 +51,7 @@ def plot_sensors_on_sim(sensor_array: PointSensorArray,
                      show_edges=True,
                      show_scalar_bar=False)
 
-    pv_plot.add_scalar_bar(create_label_str(descripts))
+    pv_plot.add_scalar_bar(descriptor.create_label())
     pv_plot.add_axes_at_origin(labels_off=True)
 
     return pv_plot
@@ -63,6 +63,13 @@ def plot_time_traces(sensor_array: PointSensorArray,
                      plot_opts: GeneralPlotOpts | None = None
                      ) -> tuple[Any,Any]:
 
+    field = sensor_array.get_field()
+    comp_ind = sensor_array.get_field().get_component_index(component)
+    samp_time = sensor_array.get_sample_times()
+    measurements = sensor_array.get_measurements()
+    n_sensors = sensor_array.get_positions().shape[0]
+    descriptor = sensor_array.get_descriptor()
+
     if plot_opts is None:
         plot_opts = GeneralPlotOpts()
 
@@ -72,8 +79,6 @@ def plot_time_traces(sensor_array: PointSensorArray,
     prop_cycle = plt.rcParams['axes.prop_cycle']
     colors = prop_cycle.by_key()['color']
 
-    field = sensor_array.get_field()
-    comp_ind = sensor_array.get_field().get_component_index(component)
 
     fig, ax = plt.subplots(figsize=plot_opts.single_fig_size,
                            layout='constrained')
@@ -83,11 +88,9 @@ def plot_time_traces(sensor_array: PointSensorArray,
         sim_time = field.get_time_steps()
         sim_vals = field.sample_field(sensor_array.get_positions())
 
-        for ii in range(sensor_array.get_positions().shape[0]):
+        for ii in range(n_sensors):
             ax.plot(sim_time,sim_vals[ii,comp_ind,:],trace_props.sim_line,
                 lw=plot_opts.lw/2,ms=plot_opts.ms/2,color=colors[ii])
-
-    samp_time = sensor_array.get_sample_times()
 
     if trace_props.truth_line is not None:
         truth = sensor_array.get_truth_values()
@@ -99,19 +102,19 @@ def plot_time_traces(sensor_array: PointSensorArray,
                     ms=plot_opts.ms/2,
                     color=colors[ii])
 
-    measurements = sensor_array.get_measurements()
+    sensor_tags = descriptor.create_sensor_tags(n_sensors)
     for ii in range(measurements.shape[0]):
         ax.plot(samp_time,
                 measurements[ii,comp_ind,:],
                 trace_props.meas_line,
-                label=trace_props.sensor_tag+str(ii),
+                label=sensor_tags[ii],
                 lw=plot_opts.lw/2,
                 ms=plot_opts.ms/2,
                 color=colors[ii])
 
     ax.set_xlabel(trace_props.time_label,
                 fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
-    ax.set_ylabel(trace_props.meas_label,
+    ax.set_ylabel(descriptor.create_label(),
                 fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
 
     ax.set_xlim([np.min(samp_time),np.max(samp_time)]) # type: ignore

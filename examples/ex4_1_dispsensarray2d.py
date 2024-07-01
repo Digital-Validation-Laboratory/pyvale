@@ -46,7 +46,7 @@ def main() -> None:
                                             disp_sens_array.get_measurement_shape())
     disp_sens_array.set_rand_err_integrator(rand_err_int)
 
-    plot_field = 'off'
+    plot_field = 'disp_x'
     if plot_field == 'disp_x':
         pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,'disp_x')
         pv_plot.add_scalar_bar(r'Displacement X [m]')

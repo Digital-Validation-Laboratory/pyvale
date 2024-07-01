@@ -54,8 +54,6 @@ def main() -> None:
     # Now we use pyvista to get a 3D interactive labelled plot of the sensor
     # locations on our simulation geometry.
     pv_plot = pyvale.plot_sensors_on_sim(tc_array,field_name)
-    # We label the temperature scale bar ourselves
-    pv_plot.add_scalar_bar('Temperature, T [degC]')
 
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector

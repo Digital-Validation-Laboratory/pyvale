@@ -10,11 +10,12 @@ import numpy as np
 import mooseherder as mh
 
 from pyvale.field import ScalarField
+from pyvale.sensors.sensordescriptor import SensorDescriptor
 from pyvale.sensors.pointsensorarray import PointSensorArray
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
 from pyvale.uncertainty.presyserrors import SysErrUniform
-
 from pyvale.uncertainty.randerrors import RandErrNormal
+
 
 class SensorArrayFactory():
     def basic_thermocouple_array(self,
@@ -25,14 +26,18 @@ class SensorArrayFactory():
                                  sample_times: np.ndarray | None = None
                                  ) -> PointSensorArray:
 
-        descriptors = ('Temperature','T',r'$^{\circ}C$','TC')
+        descriptor = SensorDescriptor()
+        descriptor.name = 'Temperature'
+        descriptor.symbol = 'T'
+        descriptor.units = r'^{\circC}'
+        descriptor.tag = 'TC'
 
         t_field = ScalarField(sim_data,field_name,spat_dims)
 
         sens_array = PointSensorArray(positions,
                                       t_field,
                                       sample_times,
-                                      descriptors)
+                                      descriptor)
 
         err_sys1 = SysErrUniform(low=-10.0,high=10.0)
         sys_err_int = ErrorIntegrator([err_sys1],

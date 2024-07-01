@@ -38,7 +38,7 @@ def main() -> None:
     t_field = pyvale.ScalarField(sim_data,field_name,spat_dims)
 
     # This creates a grid of 3x2 sensors in the xy plane
-    n_sens = (3,2,1)    # Number of sensor (x,y,z)
+    n_sens = (5,2,1)    # Number of sensor (x,y,z)
     x_lims = (0.0,2.0)  # Limits for each coord in sim length units
     y_lims = (0.0,1.0)
     z_lims = (0.0,0.0)
@@ -125,7 +125,7 @@ def main() -> None:
 
     print(80*'-')
 
-    plot_on = False
+    plot_on = True
     if plot_on:
         plt.show()
 
