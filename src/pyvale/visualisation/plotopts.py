@@ -46,7 +46,7 @@ class GeneralPlotOpts:
 @dataclass
 class SensorPlotOpts:
     legend: bool = True
-    #meas_label: str = r'Measured Value, $m$ [$unit$]'
+
     x_label: str = r'x [$m$]'
     y_label: str = r'y [$m$]'
     z_label: str = r'z [$m$]'
@@ -55,7 +55,7 @@ class SensorPlotOpts:
     truth_line: str | None = '-'
     sim_line: str | None = '-'
     meas_line: str = '--+'
-    #sensor_tag: str = 'S'
+
     sensors_to_plot: np.ndarray | None = None
     time_inds: np.ndarray | None = None
 

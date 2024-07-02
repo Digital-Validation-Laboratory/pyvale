@@ -24,43 +24,32 @@ def main() -> None:
     using matplotlib.
     """
 
-    # Use mooseherder to read the exodus and get a SimData object
     data_path = Path('data/examplesims/plate_2d_thermal_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     field_key = list(sim_data.node_vars.keys())[0] # type: ignore
 
-    # This creates a grid of 3x2 sensors in the xy plane
-    n_sens = (3,2,1)    # Number of sensor (x,y,z)
-    x_lims = (0.0,2.0)  # Limits for each coord in sim length units
+    n_sens = (3,2,1)
+    x_lims = (0.0,2.0)
     y_lims = (0.0,1.0)
     z_lims = (0.0,0.0)
     # Gives a n_sensx3 array of sensor positions where each row is a sensor with
     # coords (x,y,z) - can also just manually create this array
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    # Now we create a thermocouple array with with the sensor positions and the
-    # temperature field from the simulation
     tc_array = pyvale.SensorArrayFactory \
         .basic_thermocouple_array(sim_data,
                                   sens_pos,
                                   field_key,
                                   spat_dims=2)
-
-    # We can get an array of measurements from the sensor array for all time
-    # steps in the simulation. A measurement is calculated as follows:
-    # measurement = truth + systematic_error + random_error
+    
     measurements = tc_array.get_measurements()
     print(f'\nMeasurements for sensor 0:\n{measurements[0,0,:]}\n')
 
-    # We can also get the truth values, systematic and random errors as numpy
-    # arrays
     truth_values = tc_array.get_truth_values()
     systematic_errs = tc_array.get_pre_systematic_errs()
     random_errs = tc_array.get_random_errs()
 
-    # Now we use pyvista to get a 3D interactive labelled plot of the sensor
-    # locations on our simulation geometry.
     pv_plot = pyvale.plot_sensors_on_sim(tc_array,field_key)
 
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
@@ -69,10 +58,8 @@ def main() -> None:
     pv_plot_mode = 'interactive'
 
     if pv_plot_mode == 'interactive':
-        # Shows the pyvista interactive 3D plot
         pv_plot.show()
-        # Once the window is closed we plot the camera position to use later to
-        # make a nice graphic for a paper/report
+
         pprint('Camera positions = ')
         pprint(pv_plot.camera_position)
     if pv_plot_mode == 'save_fig':
@@ -81,7 +68,6 @@ def main() -> None:
         pv_plot.camera_position = [(-0.295, 1.235, 3.369),
                                 (1.0274, 0.314, 0.0211),
                                 (0.081, 0.969, -0.234)]
-        # Save a vector graphic to file for our selected camera view
         save_render = Path('examples/plate_thermal_2d_sim_view.svg')
         pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
         pv_plot.screenshot(save_render.with_suffix('.png'))
@@ -91,10 +77,6 @@ def main() -> None:
     # to file.
     trace_plot_mode = 'interactive'
 
-    # Plots the sensor time traces using matplotlib, thin solid lines are ground
-    # truth from the simulation and dashed lines with '+' are simulated sensor
-    # measurements using the specified UQ functions. The sensor traces should
-    # have a uniform offset (systematic error) and noise (random error).
     (fig,_) = pyvale.plot_time_traces(tc_array,field_key)
 
     if trace_plot_mode == 'interactive':

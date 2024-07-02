@@ -36,17 +36,21 @@ def main() -> None:
     descriptor.units = r'^{\circ}C'
     descriptor.tag = 'TC'
 
-    spat_dims = 2
     field_key = 'temperature'
-    t_field = pyvale.ScalarField(sim_data,field_key,spat_dims)
+    t_field = pyvale.ScalarField(sim_data,
+                                 field_key=field_key,
+                                 spat_dim=2)
 
-    n_sens = (5,2,1)
+    n_sens = (4,2,1)
     x_lims = (0.0,2.0)
     y_lims = (0.0,1.0)
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    tc_array = pyvale.PointSensorArray(sens_pos,t_field)
+    tc_array = pyvale.PointSensorArray(sens_pos,
+                                       t_field,
+                                       None,
+                                       descriptor)
 
     err_sys1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
     err_sys2 = pyvale.SysErrNormal(std=20.0)
@@ -99,7 +103,6 @@ def main() -> None:
                               (0,1),
                               (measurements.shape[2]-5,measurements.shape[2]))
 
-    # Plotting the second experiment to visulise the difference in errors
     (_,ax) = pyvale.plot_time_traces(tc_array,field_key)
     ax.set_title('Exp 2: called get_measurements()')
 
@@ -113,7 +116,6 @@ def main() -> None:
                               (0,1),
                               (measurements.shape[2]-5,measurements.shape[2]))
 
-    # Plotting the second experiment to visulise the difference in errors
     (_,ax) = pyvale.plot_time_traces(tc_array,field_key)
     ax.set_title('Exp 3: called calc_measurements()')
 
@@ -126,3 +128,4 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+      

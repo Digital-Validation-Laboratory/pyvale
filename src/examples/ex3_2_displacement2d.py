@@ -13,14 +13,12 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
-    # Use mooseherder to read the exodus and get a SimData object
     data_path = Path('simcases/case17/case17_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
-    # The SensorDescriptor holds strings used to label plots and visualisations
     descriptor = pyvale.SensorDescriptor()
     descriptor.name = 'Displacement'
     descriptor.symbol = r'u'
@@ -28,16 +26,13 @@ def main() -> None:
     descriptor.tag = 'DS'
     descriptor.components = ('x','y','z')
 
-    # Create a Field object that will allow the sensors to interpolate the sim
-    # data field of interest quickly by using the mesh and shape functions
-    spat_dims = 2       # Specify that we only have 2 spatial dimensions
+    spat_dims = 2
     field_key = 'disp'
     components = ('disp_x','disp_y')
     disp_field = pyvale.VectorField(sim_data,field_key,components,spat_dims)
 
-    # This creates a grid of sensors
-    n_sens = (2,3,1)    # Number of sensor (x,y,z)
-    x_lims = (0.0,100.0)  # Limits for each coord in scaled sim length units
+    n_sens = (2,3,1)
+    x_lims = (0.0,100.0)
     y_lims = (0.0,150.0)
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)

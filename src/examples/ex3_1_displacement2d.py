@@ -13,16 +13,16 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
-    # Use mooseherder to read the exodus and get a SimData object
+    """pyvale example:
+    """
     data_path = Path('simcases/case17/case17_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
-    # This creates a grid of sensors
-    n_sens = (2,3,1)    # Number of sensor (x,y,z)
-    x_lims = (0.0,100.0)  # Limits for each coord in scaled sim length units
+    n_sens = (2,3,1)
+    x_lims = (0.0,100.0)
     y_lims = (0.0,150.0)
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
