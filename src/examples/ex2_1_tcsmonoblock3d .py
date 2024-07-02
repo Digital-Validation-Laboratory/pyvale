@@ -17,8 +17,7 @@ import pyvale
 
 
 def main() -> None:
-    """pyvale example: this is the same as the first example except we are going
-    to use a 3D simulation of the temperature field on a divertor heatsink.
+    """pyvale example:
     """
     # Use mooseherder to read the exodus and get a SimData object
     data_path = Path('data/examplesims/monoblock_3d_thermal_out.e')
@@ -77,7 +76,7 @@ def main() -> None:
                                     (0.0, 4.0, 5.5),
                                     (-0.190, 0.960, -0.206)]
         # Save a vector graphic to file for our selected camera view
-        save_render = Path('examples/images/monoblock_thermal_sim_view.svg')
+        save_render = Path('examples/monoblock_thermal_sim_view.svg')
         pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
         pv_plot.screenshot(save_render.with_suffix('.png'))
 
@@ -95,7 +94,7 @@ def main() -> None:
     if trace_plot_mode == 'interactive':
         plt.show()
     if trace_plot_mode == 'save_fig':
-        save_traces = Path('examples/images/monoblock_thermal_traces.png')
+        save_traces = Path('examples/monoblock_thermal_traces.png')
         fig.savefig(save_traces, dpi=300, format='png', bbox_inches='tight')
 
 

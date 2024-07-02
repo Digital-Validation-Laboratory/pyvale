@@ -82,7 +82,7 @@ def main() -> None:
                                 (1.0274, 0.314, 0.0211),
                                 (0.081, 0.969, -0.234)]
         # Save a vector graphic to file for our selected camera view
-        save_render = Path('examples/images/plate_thermal_2d_sim_view.svg')
+        save_render = Path('examples/plate_thermal_2d_sim_view.svg')
         pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
         pv_plot.screenshot(save_render.with_suffix('.png'))
 
@@ -100,7 +100,7 @@ def main() -> None:
     if trace_plot_mode == 'interactive':
         plt.show()
     if trace_plot_mode == 'save_fig':
-        save_traces = Path('examples/images/plate_thermal_2d_traces.png')
+        save_traces = Path('examples/plate_thermal_2d_traces.png')
         fig.savefig(save_traces, dpi=300, format='png', bbox_inches='tight')
 
 

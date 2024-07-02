@@ -7,18 +7,14 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
-from pprint import pprint
 from pathlib import Path
-
-import matplotlib.pyplot as plt
 
 import mooseherder as mh
 import pyvale
 
 
 def main() -> None:
-    """pyvale example: this is the same as the first example except we are going
-    to use a 3D simulation of the temperature field on a divertor heatsink.
+    """pyvale example:
     """
     # Use mooseherder to read the exodus and get a SimData object
     data_path = Path('data/examplesims/monoblock_3d_thermal_out.e')
