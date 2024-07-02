@@ -14,17 +14,7 @@ import pyvale
 
 
 def main() -> None:
-    """pyvale example: building a point sensor array applied to a scalar field
-    (temperature) from scratch. Also outlines the sensor conceptual model and
-    how additional experiments can be generated.
-
-    A sensor measurement is defined as:
-    measurement = truth + systematic error + random error.
-
-    Calling the 'get' methods of the sensor array will retrieve the results for
-    the current experiment. Calling the 'calc' methods will generate a new
-    experiment by sampling/calculating the systematic and random errors. The
-    'calc' method must be called to initialise the errors.
+    """pyvale example: specifying a sensor sampling time and controlling plots.
     """
     # Use mooseherder to read the exodus and get a SimData object
     data_path = Path('data/examplesims/plate_2d_thermal_out.e')
@@ -80,61 +70,6 @@ def main() -> None:
     # measurement = truth + systematic_error + random_error
     measurements = tc_array.get_measurements()
 
-    print('\n'+80*'-')
-    print('For a sensor: measurement = truth + sysematic error + random error')
-    print(f'measurements.shape = {measurements.shape} = (n_sensors,n_field_components,n_timesteps)\n')
-    print('The truth, systematic error and random error arrays have the same shape.')
-
-    print(80*'-')
-    print('Looking at the last 5 time steps (measurements) of sensor 0:')
-    pyvale.print_measurements(tc_array,
-                              (0,1),
-                              (0,1),
-                              (measurements.shape[2]-5,measurements.shape[2]))
-    print(80*'-')
-    print("If we call the 'calc_measurements' method then the errors are (re)calculated.")
-    measurements = tc_array.calc_measurements()
-
-    pyvale.print_measurements(tc_array,
-                              (0,1),
-                              (0,1),
-                              (measurements.shape[2]-5,measurements.shape[2]))
-
-    # We plot the first experiment for comparison
-    (_,ax) = pyvale.plot_time_traces(tc_array,field_key)
-    ax.set_title('Exp 1: called calc_measurements()')
-
-    print(80*'-')
-    print("If we call the 'get_measurements' method then the errors are the same:")
-    measurements = tc_array.get_measurements()
-
-    pyvale.print_measurements(tc_array,
-                              (0,1),
-                              (0,1),
-                              (measurements.shape[2]-5,measurements.shape[2]))
-
-    # Plotting the second experiment to visulise the difference in errors
-    (_,ax) = pyvale.plot_time_traces(tc_array,field_key)
-    ax.set_title('Exp 2: called get_measurements()')
-
-    print(80*'-')
-    print("If we call the 'calc_measurements' method again we generate/sample new errors:")
-    measurements = tc_array.calc_measurements()
-
-    pyvale.print_measurements(tc_array,
-                              (0,1),
-                              (0,1),
-                              (measurements.shape[2]-5,measurements.shape[2]))
-
-    # Plotting the second experiment to visulise the difference in errors
-    (_,ax) = pyvale.plot_time_traces(tc_array,field_key)
-    ax.set_title('Exp 3: called calc_measurements()')
-
-    print(80*'-')
-
-    plot_on = True
-    if plot_on:
-        plt.show()
 
 
 if __name__ == '__main__':
