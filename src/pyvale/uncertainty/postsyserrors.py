@@ -8,10 +8,10 @@ Copyright (C) 2024 The Computer Aided Validation Team
 from typing import Callable
 import numpy as np
 
-from pyvale.uncertainty.errorcalculator import ErrCalculator
+from pyvale.uncertainty.errorcalculator import IErrCalculator
 
 
-class SysErrRoundOff(ErrCalculator):
+class SysErrRoundOff(IErrCalculator):
     def __init__(self, method: str = 'round', base: float = 1.0) -> None:
 
         self._base = base
@@ -25,7 +25,7 @@ class SysErrRoundOff(ErrCalculator):
         return rounded_measurements - err_basis
 
 
-class SysErrDigitisation(ErrCalculator):
+class SysErrDigitisation(IErrCalculator):
     def __init__(self, bits_per_unit: float, method: str = 'round') -> None:
 
         self._units_per_bit = 1/float(bits_per_unit)
@@ -39,7 +39,7 @@ class SysErrDigitisation(ErrCalculator):
         return rounded_measurements - err_basis
 
 
-class SysErrSaturation(ErrCalculator):
+class SysErrSaturation(IErrCalculator):
     def __init__(self,
                  meas_min: float,
                  meas_max: float) -> None:
@@ -61,7 +61,7 @@ class SysErrSaturation(ErrCalculator):
 
 
 
-class SysErrCalibration(ErrCalculator):
+class SysErrCalibration(IErrCalculator):
     def __init__(self) -> None:
         pass
 

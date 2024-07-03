@@ -7,10 +7,10 @@ Copyright (C) 2024 The Computer Aided Validation Team
 '''
 import numpy as np
 
-from pyvale.uncertainty.errorcalculator import ErrCalculator
+from pyvale.uncertainty.errorcalculator import IErrCalculator
 
 
-class RandErrUniform(ErrCalculator):
+class RandErrUniform(IErrCalculator):
 
     def __init__(self,
                  low: float,
@@ -28,7 +28,7 @@ class RandErrUniform(ErrCalculator):
         return rand_errs
 
 
-class RandErrUnifPercent(ErrCalculator):
+class RandErrUnifPercent(IErrCalculator):
 
     def __init__(self,
                  low_percent: float,
@@ -50,7 +50,7 @@ class RandErrUnifPercent(ErrCalculator):
         return rand_errs
 
 
-class RandErrNormal(ErrCalculator):
+class RandErrNormal(IErrCalculator):
 
     def __init__(self,
                  std: float,
@@ -66,7 +66,7 @@ class RandErrNormal(ErrCalculator):
         return rand_errs
 
 
-class RandErrNormPercent(ErrCalculator):
+class RandErrNormPercent(IErrCalculator):
 
     def __init__(self,
                  std_percent: float,

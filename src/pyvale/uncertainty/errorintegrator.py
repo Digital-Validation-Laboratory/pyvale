@@ -6,13 +6,13 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 import numpy as np
-from pyvale.uncertainty.errorcalculator import ErrCalculator
+from pyvale.uncertainty.errorcalculator import IErrCalculator
 
 
 class ErrorIntegrator():
 
     def __init__(self,
-                 err_calcs: list[ErrCalculator],
+                 err_calcs: list[IErrCalculator],
                  meas_shape: tuple[int,int,int]) -> None:
 
         self._err_calcs = err_calcs
@@ -23,7 +23,7 @@ class ErrorIntegrator():
         self._errs_tot = np.zeros(meas_shape)
 
 
-    def set_err_calcs(self, err_calcs: list[ErrCalculator]) -> None:
+    def set_err_calcs(self, err_calcs: list[IErrCalculator]) -> None:
         self._err_calcs = err_calcs
 
 

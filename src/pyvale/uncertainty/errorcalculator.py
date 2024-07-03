@@ -8,7 +8,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 from abc import ABC, abstractmethod
 import numpy as np
 
-class ErrCalculator(ABC):
+class IErrCalculator(ABC):
     @abstractmethod
     def calc_errs(self,err_basis: np.ndarray) -> np.ndarray:
         pass

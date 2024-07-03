@@ -6,22 +6,10 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 import numpy as np
-from pyvale.uncertainty.errorcalculator import ErrCalculator
+from pyvale.uncertainty.errorcalculator import IErrCalculator
 
 
-class SysErrOffset(ErrCalculator):
-
-    def __init__(self,
-                 offset: float) -> None:
-        self._offset = offset
-
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
-
-        return self._offset*np.ones(shape=err_basis.shape)
-
-
-class SysErrOffsetPercent(ErrCalculator):
+class SysErrOffset(IErrCalculator):
 
     def __init__(self,
                  offset: float) -> None:
@@ -33,7 +21,20 @@ class SysErrOffsetPercent(ErrCalculator):
         return self._offset*np.ones(shape=err_basis.shape)
 
 
-class SysErrUniform(ErrCalculator):
+class SysErrOffsetPercent(IErrCalculator):
+
+    def __init__(self,
+                 offset_percent: float) -> None:
+        self._offset_percent = offset_percent
+
+    def calc_errs(self,
+                  err_basis: np.ndarray) -> np.ndarray:
+
+        return self._offset_percent/100 * err_basis \
+            *np.ones(shape=err_basis.shape)
+
+
+class SysErrUniform(IErrCalculator):
 
     def __init__(self,
                  low: float,
@@ -59,7 +60,7 @@ class SysErrUniform(ErrCalculator):
         return sys_errs
 
 
-class SysErrUnifPercent(ErrCalculator):
+class SysErrUnifPercent(IErrCalculator):
 
     def __init__(self,
                  low_percent: float,
@@ -87,7 +88,7 @@ class SysErrUnifPercent(ErrCalculator):
         return sys_errs
 
 
-class SysErrNormal(ErrCalculator):
+class SysErrNormal(IErrCalculator):
 
     def __init__(self,
                  std: float,
@@ -112,7 +113,7 @@ class SysErrNormal(ErrCalculator):
         return sys_errs
 
 
-class SysErrNormPercent(ErrCalculator):
+class SysErrNormPercent(IErrCalculator):
 
     def __init__(self,
                  std_percent: float,

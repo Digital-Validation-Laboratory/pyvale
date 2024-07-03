@@ -60,13 +60,15 @@ def main() -> None:
 
 
     pre_sys_err1 = pyvale.SysErrOffset(offset=-10.0)
-    pre_sys_err1 = pyvale.SysErrOffset(offset=-10.0)
-    pre_sys_err_int = pyvale.ErrorIntegrator([pre_sys_err1],
+    pre_sys_err2 = pyvale.SysErrUnifPercent(low_percent=-10.0,
+                                            high_percent=10.0)
+    pre_sys_err_int = pyvale.ErrorIntegrator([pre_sys_err1,pre_sys_err2],
                                           tc_array.get_measurement_shape())
     tc_array.set_pre_sys_err_integrator(pre_sys_err_int)
-    '''
-    rand_err1 = pyvale.RandErrNormal(std=10.0)
-    rand_err2 = pyvale.RandErrUniform(low=-10.0,high=10.0)
+
+    rand_err1 = pyvale.RandErrNormPercent(std_percent=5.0)
+    rand_err2 = pyvale.RandErrUnifPercent(low_percent=-5.0,
+                                          high_percent=5.0)
     rand_err_int = pyvale.ErrorIntegrator([rand_err1,rand_err2],
                                             tc_array.get_measurement_shape())
     tc_array.set_rand_err_integrator(rand_err_int)
@@ -76,7 +78,6 @@ def main() -> None:
     post_sys_err_int = pyvale.ErrorIntegrator([post_sys_err1,post_sys_err2],
                                         tc_array.get_measurement_shape())
     tc_array.set_post_sys_err_integrator(post_sys_err_int)
-    '''
 
     measurements = tc_array.get_measurements()
 
