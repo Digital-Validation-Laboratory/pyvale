@@ -37,9 +37,9 @@ def print_measurements(sens_array: PointSensorArray,
 
     measurement =  sens_array.get_measurements()
     truth = sens_array.get_truth_values()
-    pre_sys_errs = sens_array.get_pre_systematic_errs()
+    indep_sys_errs = sens_array.get_pre_systematic_errs()
     rand_errs = sens_array.get_random_errs()
-    post_sys_errs = sens_array.get_post_systematic_errs()
+    dep_sys_errs = sens_array.get_dep_systematic_errs()
 
     print(f"\nmeasurement.shape = \n    {measurement.shape}")
     print(f"measurement = \n    {measurement[sensors[0]:sensors[1],
@@ -48,8 +48,8 @@ def print_measurements(sens_array: PointSensorArray,
     print(f"truth = \n    {truth[sensors[0]:sensors[1],
                                 components[0]:components[1],
                                 time_steps[0]:time_steps[1]]}")
-    if pre_sys_errs is not None:
-        print(f"pre_sys_errs = \n    {pre_sys_errs[sensors[0]:sensors[1],
+    if indep_sys_errs is not None:
+        print(f"indep_sys_errs = \n    {indep_sys_errs[sensors[0]:sensors[1],
                                             components[0]:components[1],
                                             time_steps[0]:time_steps[1]]}")
     if rand_errs is not None:
@@ -57,8 +57,8 @@ def print_measurements(sens_array: PointSensorArray,
                                             components[0]:components[1],
                                             time_steps[0]:time_steps[1]]}")
 
-    if post_sys_errs is not None:
-        print(f"post_sys_errs = \n    {post_sys_errs[sensors[0]:sensors[1],
+    if dep_sys_errs is not None:
+        print(f"dep_sys_errs = \n    {dep_sys_errs[sensors[0]:sensors[1],
                                             components[0]:components[1],
                                             time_steps[0]:time_steps[1]]}")
 

@@ -8,7 +8,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 import numpy as np
 import pyvista as pv
 
-from pyvale.physics.field import Field
+from pyvale.physics.field import IField
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
 from pyvale.sensors.sensordescriptor import SensorDescriptor
 
@@ -16,7 +16,7 @@ from pyvale.sensors.sensordescriptor import SensorDescriptor
 class PointSensorArray():
     def __init__(self,
                  positions: np.ndarray,
-                 field: Field,
+                 field: IField,
                  sample_times: np.ndarray | None = None,
                  descriptor: SensorDescriptor | None = None
                  ) -> None:
@@ -38,7 +38,7 @@ class PointSensorArray():
 
     #---------------------------------------------------------------------------
     # accessors
-    def get_field(self) -> Field:
+    def get_field(self) -> IField:
         return self._field
 
     def get_positions(self) -> np.ndarray:
@@ -72,7 +72,7 @@ class PointSensorArray():
 
     #---------------------------------------------------------------------------
     # pre / independent / truth-based  systematic errors
-    def set_pre_sys_err_integrator(self,
+    def set_indep_sys_err_integrator(self,
                                err_int: ErrorIntegrator) -> None:
         self._pre_syserr_integ = err_int
 
@@ -114,12 +114,12 @@ class PointSensorArray():
 
     #---------------------------------------------------------------------------
     # post / coupled / measurement based systematic errors
-    def set_post_sys_err_integrator(self,
+    def set_dep_sys_err_integrator(self,
                                err_int: ErrorIntegrator) -> None:
         self._post_syserr_integ = err_int
 
 
-    def _calc_post_systematic_errs(self, measurements: np.ndarray
+    def _calc_dep_systematic_errs(self, measurements: np.ndarray
                                    ) -> np.ndarray | None:
         if self._post_syserr_integ is None:
             return None
@@ -128,7 +128,7 @@ class PointSensorArray():
         return self._post_syserr_integ.get_errs_tot()
 
 
-    def get_post_systematic_errs(self) -> np.ndarray | None:
+    def get_dep_systematic_errs(self) -> np.ndarray | None:
         if self._post_syserr_integ is None:
             return None
 
@@ -139,17 +139,17 @@ class PointSensorArray():
     def calc_measurements(self) -> np.ndarray:
         measurements = self.get_truth_values()
 
-        pre_sys_errs = self._calc_pre_systematic_errs()
-        if pre_sys_errs is not None:
-            measurements = measurements + pre_sys_errs
+        indep_sys_errs = self._calc_pre_systematic_errs()
+        if indep_sys_errs is not None:
+            measurements = measurements + indep_sys_errs
 
         rand_errs = self._calc_random_errs()
         if rand_errs is not None:
             measurements = measurements + rand_errs
 
-        post_sys_errs = self._calc_post_systematic_errs(measurements)
-        if post_sys_errs is not None:
-            measurements = measurements + post_sys_errs
+        dep_sys_errs = self._calc_dep_systematic_errs(measurements)
+        if dep_sys_errs is not None:
+            measurements = measurements + dep_sys_errs
 
         self._measurements = measurements
         return self._measurements

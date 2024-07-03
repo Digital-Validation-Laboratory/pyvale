@@ -96,7 +96,7 @@ A sensor should have:
 - A digitisation
 
 ### Thermocouples
-https://www.mstarlabs.com/sensors/thermocouple-calibration.html  
+https://www.mstarlabs.com/sensors/thermocouple-calibration.html
 T  =  -0.01897 + 25.41881 V - 0.42456 V^2 + 0.04365 V^3
 where V is voltage in units of millivolts
 and   T is temperature in degrees C
@@ -115,3 +115,5 @@ Comes from many sources:
 ## Random errors
 Comes from sensors noise, need a way to specify a probability distribution to sample from.
 
+## Numba
+https://www.youtube.com/watch?v=6oXedk2tGfk

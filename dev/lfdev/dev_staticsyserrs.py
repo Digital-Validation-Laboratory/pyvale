@@ -32,11 +32,11 @@ def main() -> None:
 
     pre_syserrs_on = False
     if pre_syserrs_on:
-        pre_sys_err1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
-        pre_sys_err2 = pyvale.SysErrNormal(std=20.0)
-        pre_syserr_int = pyvale.ErrorIntegrator([pre_sys_err1,pre_sys_err2],
+        indep_sys_err1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
+        indep_sys_err2 = pyvale.SysErrNormal(std=20.0)
+        pre_syserr_int = pyvale.ErrorIntegrator([indep_sys_err1,indep_sys_err2],
                                             tc_array.get_measurement_shape())
-        tc_array.set_pre_sys_err_integrator(pre_syserr_int)
+        tc_array.set_indep_sys_err_integrator(pre_syserr_int)
 
     randerrs_on = False
     if randerrs_on:
@@ -54,7 +54,7 @@ def main() -> None:
                         pyvale.SysErrSaturation(meas_min=20.0,meas_max=300.0)]
     post_syserr_int = pyvale.ErrorIntegrator(post_syserr_ints,
                                              tc_array.get_measurement_shape())
-    tc_array.set_post_sys_err_integrator(post_syserr_int)
+    tc_array.set_dep_sys_err_integrator(post_syserr_int)
 
 
     measurements = tc_array.calc_measurements()

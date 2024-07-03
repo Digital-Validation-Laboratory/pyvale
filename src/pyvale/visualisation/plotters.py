@@ -59,7 +59,7 @@ def plot_sensors_on_sim(sensor_array: PointSensorArray,
 
 def plot_time_traces(sensor_array: PointSensorArray,
                      component: str,
-                     trace_props: SensorPlotOpts | None = None,
+                     trace_opts: SensorPlotOpts | None = None,
                      plot_opts: GeneralPlotOpts | None = None
                      ) -> tuple[Any,Any]:
 
@@ -73,53 +73,63 @@ def plot_time_traces(sensor_array: PointSensorArray,
     if plot_opts is None:
         plot_opts = GeneralPlotOpts()
 
-    if trace_props is None:
-        trace_props = SensorPlotOpts()
+    if trace_opts is None:
+        trace_opts = SensorPlotOpts()
 
-    prop_cycle = plt.rcParams['axes.prop_cycle']
-    colors = prop_cycle.by_key()['color']
+    if trace_opts.sensors_to_plot is None:
+        trace_opts.sensors_to_plot = np.arange(0,n_sensors)
 
 
     fig, ax = plt.subplots(figsize=plot_opts.single_fig_size,
                            layout='constrained')
     fig.set_dpi(plot_opts.resolution)
 
-    if trace_props.sim_line is not None:
+    if trace_opts.sim_line is not None:
         sim_time = field.get_time_steps()
         sim_vals = field.sample_field(sensor_array.get_positions())
 
-        for ii in range(n_sensors):
-            ax.plot(sim_time,sim_vals[ii,comp_ind,:],trace_props.sim_line,
-                lw=plot_opts.lw/2,ms=plot_opts.ms/2,color=colors[ii])
+        for ss in range(n_sensors):
+            if ss in trace_opts.sensors_to_plot:
+                ax.plot(sim_time,
+                        sim_vals[ss,comp_ind,:],
+                        trace_opts.sim_line,
+                        lw=plot_opts.lw,
+                        ms=plot_opts.ms,
+                        color=plot_opts.colors[ss])
 
-    if trace_props.truth_line is not None:
+    if trace_opts.truth_line is not None:
         truth = sensor_array.get_truth_values()
-        for ii in range(truth.shape[0]):
-            ax.plot(samp_time,
-                    truth[ii,comp_ind,:],
-                    trace_props.truth_line,
-                    lw=plot_opts.lw/2,
-                    ms=plot_opts.ms/2,
-                    color=colors[ii])
+        for ss in range(n_sensors):
+            if ss in trace_opts.sensors_to_plot:
+                ax.plot(samp_time,
+                        truth[ss,comp_ind,:],
+                        trace_opts.truth_line,
+                        lw=plot_opts.lw,
+                        ms=plot_opts.ms,
+                        color=plot_opts.colors[ss])
 
     sensor_tags = descriptor.create_sensor_tags(n_sensors)
-    for ii in range(measurements.shape[0]):
-        ax.plot(samp_time,
-                measurements[ii,comp_ind,:],
-                trace_props.meas_line,
-                label=sensor_tags[ii],
-                lw=plot_opts.lw/2,
-                ms=plot_opts.ms/2,
-                color=colors[ii])
+    for ss in range(n_sensors):
+        if ss in trace_opts.sensors_to_plot:
+            ax.plot(samp_time,
+                    measurements[ss,comp_ind,:],
+                    trace_opts.meas_line,
+                    label=sensor_tags[ss],
+                    lw=plot_opts.lw,
+                    ms=plot_opts.ms,
+                    color=plot_opts.colors[ss])
 
-    ax.set_xlabel(trace_props.time_label,
+    ax.set_xlabel(trace_opts.time_label,
                 fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
     ax.set_ylabel(descriptor.create_label(comp_ind),
                 fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
 
-    ax.set_xlim([np.min(samp_time),np.max(samp_time)]) # type: ignore
+    if trace_opts.time_min_max is None:
+        ax.set_xlim((np.min(samp_time),np.max(samp_time))) # type: ignore
+    else:
+        ax.set_xlim(trace_opts.time_min_max)
 
-    if trace_props.legend:
+    if trace_opts.legend:
         ax.legend(prop={"size":plot_opts.font_leg_size},loc='best')
 
     plt.grid(True)

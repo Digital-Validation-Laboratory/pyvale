@@ -15,7 +15,7 @@ class SysErrRoundOff(IErrCalculator):
     def __init__(self, method: str = 'round', base: float = 1.0) -> None:
 
         self._base = base
-        self._method = select_round_method(method)
+        self._method = _select_round_method(method)
 
 
     def calc_errs(self,
@@ -29,7 +29,7 @@ class SysErrDigitisation(IErrCalculator):
     def __init__(self, bits_per_unit: float, method: str = 'round') -> None:
 
         self._units_per_bit = 1/float(bits_per_unit)
-        self._method = select_round_method(method)
+        self._method = _select_round_method(method)
 
     def calc_errs(self,
                   err_basis: np.ndarray) -> np.ndarray:
@@ -59,8 +59,6 @@ class SysErrSaturation(IErrCalculator):
         saturated[saturated < self._min] = self._min
         return saturated - err_basis
 
-
-
 class SysErrCalibration(IErrCalculator):
     def __init__(self) -> None:
         pass
@@ -74,8 +72,7 @@ class SysErrCalibration(IErrCalculator):
 
 
 
-def select_round_method(method: str) -> Callable:
-
+def _select_round_method(method: str) -> Callable:
     if method == 'floor':
         return np.floor
     if method == 'ceil':

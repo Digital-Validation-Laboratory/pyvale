@@ -7,7 +7,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 '''
 from dataclasses import dataclass
 import numpy as np
-
+import matplotlib as plt
 
 @dataclass
 class GeneralPlotOpts:
@@ -36,11 +36,13 @@ class GeneralPlotOpts:
     font_ax_size: float = 11
     font_leg_size: float = 9
 
-    ms: float = 5.0
-    lw: float = 1.2
+    ms: float = 2.4
+    lw: float = 0.8
 
     cmap_seq: str = "cividis"
     cmap_div: str = "RdBu"
+
+    colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
 
 @dataclass
@@ -57,5 +59,5 @@ class SensorPlotOpts:
     meas_line: str = '--o'
 
     sensors_to_plot: np.ndarray | None = None
-    time_inds: np.ndarray | None = None
+    time_min_max: tuple[float,float] | None = None
 

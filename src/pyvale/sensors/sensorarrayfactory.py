@@ -15,9 +15,9 @@ from pyvale.physics.tensorfield import TensorField
 from pyvale.sensors.sensordescriptor import SensorDescriptorFactory
 from pyvale.sensors.pointsensorarray import PointSensorArray
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
-from pyvale.uncertainty.presyserrors import SysErrUnifPercent
+from pyvale.uncertainty.syserrors import SysErrUnifPercent
 from pyvale.uncertainty.randerrors import RandErrNormPercent
-from pyvale.uncertainty.postsyserrors import (SysErrDigitisation,
+from pyvale.uncertainty.depsyserrors import (SysErrDigitisation,
                                               SysErrSaturation)
 
 
@@ -41,11 +41,11 @@ class SensorArrayFactory:
 
         sens_array = init_basic_errs(sens_array)
 
-        post_sys_err1 = SysErrDigitisation(bits_per_unit=1/5)
-        post_sys_err2 = SysErrSaturation(meas_min=0.0,meas_max=1000.0)
-        post_sys_err_int = ErrorIntegrator([post_sys_err1,post_sys_err2],
+        dep_sys_err1 = SysErrDigitisation(bits_per_unit=1/5)
+        dep_sys_err2 = SysErrSaturation(meas_min=0.0,meas_max=1000.0)
+        dep_sys_err_int = ErrorIntegrator([dep_sys_err1,dep_sys_err2],
                                             sens_array.get_measurement_shape())
-        sens_array.set_post_sys_err_integrator(post_sys_err_int)
+        sens_array.set_dep_sys_err_integrator(dep_sys_err_int)
 
         return sens_array
 
@@ -106,11 +106,11 @@ class SensorArrayFactory:
         return sens_array
 
 
-def init_basic_errs(sens_array: PointSensorArray, err_pc: float = 6.0) -> PointSensorArray:
+def init_basic_errs(sens_array: PointSensorArray, err_pc: float = 5.0) -> PointSensorArray:
 
-    pre_sys_err_int = ErrorIntegrator([SysErrUnifPercent(-err_pc,err_pc)],
+    indep_sys_err_int = ErrorIntegrator([SysErrUnifPercent(-err_pc,err_pc)],
                                     sens_array.get_measurement_shape())
-    sens_array.set_pre_sys_err_integrator(pre_sys_err_int)
+    sens_array.set_indep_sys_err_integrator(indep_sys_err_int)
 
     rand_err_int = ErrorIntegrator([RandErrNormPercent(err_pc)],
                                         sens_array.get_measurement_shape())

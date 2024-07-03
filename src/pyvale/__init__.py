@@ -22,8 +22,8 @@ from pyvale.sensors.pointsensorarray import *
 
 from pyvale.uncertainty.errorintegrator import *
 from pyvale.uncertainty.randerrors import *
-from pyvale.uncertainty.presyserrors import *
-from pyvale.uncertainty.postsyserrors import *
+from pyvale.uncertainty.syserrors import *
+from pyvale.uncertainty.depsyserrors import *
 
 from pyvale.visualisation.plotopts import *
 from pyvale.visualisation.plotters import *

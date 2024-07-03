@@ -18,22 +18,38 @@ def main() -> None:
     """Pyvale example: Point sensors on a 2D thermal simulation
     ----------------------------------------------------------------------------
     - Full construction of a point sensor array from scratch
-    - Explanation of the different
+    - Explanation of the different types of error models
+    - There are flags throughout the example allowing the user to toggle on/off
+      parts of the sensor array construction
 
+    NOTES:
+    - Systematic  errors are assumed to be constant for all time steps for point
+      sensors
+    - Random errors are sampled for all sensors (i.e. positions) and times when
+      the `calc` methods are called
+    - Independent systematic errors are calculated from the truth value if
+      required
+    - Random errors calculated based on the truth value if required
+    - Dependent systematic errors calculated based on the current integrated
+      measurement value at that step
+    -
     """
     data_path = Path('data/examplesims/plate_2d_thermal_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
+    
 
-    use_auto_descriptor = True
-    if use_auto_descriptor:
+    use_auto_descriptor = 'blank'
+    if use_auto_descriptor == 'factory':
         descriptor = pyvale.SensorDescriptorFactory.temperature_descriptor()
-    else:
+    elif use_auto_descriptor == 'manual':
         descriptor = pyvale.SensorDescriptor()
         descriptor.name = 'Temperature'
         descriptor.symbol = 'T'
         descriptor.units = r'^{\circ}C'
         descriptor.tag = 'TC'
+    else:
+        descriptor = pyvale.SensorDescriptor()
 
     field_key = 'temperature'
     t_field = pyvale.ScalarField(sim_data,
@@ -50,7 +66,7 @@ def main() -> None:
     if use_sim_time:
         sample_times = None
     else:
-        sample_times = np.linspace(0.0,np.max(sim_data.time),10)
+        sample_times = np.linspace(0.0,np.max(sim_data.time),50)
 
 
     tc_array = pyvale.PointSensorArray(sens_pos,
@@ -58,26 +74,32 @@ def main() -> None:
                                        sample_times,
                                        descriptor)
 
+    errors_on = {'indep_sys': False,
+                 'rand': False,
+                 'dep_sys': True}
 
-    pre_sys_err1 = pyvale.SysErrOffset(offset=-10.0)
-    pre_sys_err2 = pyvale.SysErrUnifPercent(low_percent=-10.0,
-                                            high_percent=10.0)
-    pre_sys_err_int = pyvale.ErrorIntegrator([pre_sys_err1,pre_sys_err2],
-                                          tc_array.get_measurement_shape())
-    tc_array.set_pre_sys_err_integrator(pre_sys_err_int)
-
-    rand_err1 = pyvale.RandErrNormPercent(std_percent=5.0)
-    rand_err2 = pyvale.RandErrUnifPercent(low_percent=-5.0,
-                                          high_percent=5.0)
-    rand_err_int = pyvale.ErrorIntegrator([rand_err1,rand_err2],
+    if errors_on['indep_sys']:
+        indep_sys_err1 = pyvale.SysErrOffset(offset=-5.0)
+        indep_sys_err2 = pyvale.SysErrUniform(low=-10.0,
+                                            high=10.0)
+        indep_sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1,indep_sys_err2],
                                             tc_array.get_measurement_shape())
-    tc_array.set_rand_err_integrator(rand_err_int)
+        tc_array.set_indep_sys_err_integrator(indep_sys_err_int)
 
-    post_sys_err1 = pyvale.SysErrDigitisation(bits_per_unit=1/10)
-    post_sys_err2 = pyvale.SysErrSaturation(meas_min=0.0,meas_max=350.0)
-    post_sys_err_int = pyvale.ErrorIntegrator([post_sys_err1,post_sys_err2],
-                                        tc_array.get_measurement_shape())
-    tc_array.set_post_sys_err_integrator(post_sys_err_int)
+    if errors_on['rand']:
+        rand_err1 = pyvale.RandErrNormPercent(std_percent=5.0)
+        rand_err2 = pyvale.RandErrUnifPercent(low_percent=-5.0,
+                                            high_percent=5.0)
+        rand_err_int = pyvale.ErrorIntegrator([rand_err1,rand_err2],
+                                                tc_array.get_measurement_shape())
+        tc_array.set_rand_err_integrator(rand_err_int)
+
+    if errors_on['dep_sys']:
+        dep_sys_err1 = pyvale.SysErrDigitisation(bits_per_unit=1/10)
+        dep_sys_err2 = pyvale.SysErrSaturation(meas_min=0.0,meas_max=300.0)
+        dep_sys_err_int = pyvale.ErrorIntegrator([dep_sys_err1,dep_sys_err2],
+                                            tc_array.get_measurement_shape())
+        tc_array.set_dep_sys_err_integrator(dep_sys_err_int)
 
     measurements = tc_array.get_measurements()
 
@@ -96,13 +118,8 @@ def main() -> None:
                               (measurements.shape[2]-5,measurements.shape[2]))
     print(80*'-')
 
-    plot_on = True
-    if plot_on:
-        trace_props = pyvale.SensorPlotOpts()
-        trace_props.truth_line = '-^'
-        trace_props.sim_line = '-x'
-        pyvale.plot_time_traces(tc_array,field_key,trace_props)
-        plt.show()
+    pyvale.plot_time_traces(tc_array,field_key)
+    plt.show()
 
 
 if __name__ == '__main__':
