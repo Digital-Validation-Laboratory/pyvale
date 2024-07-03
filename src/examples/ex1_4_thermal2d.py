@@ -53,7 +53,10 @@ def main() -> None:
                               (measurements.shape[2]-5,measurements.shape[2]))
     print(80*'-')
 
-    trace_props = pyvale.SensorPlotOpts()
+
+
+
+    trace_props = pyvale.SensorTraceOpts()
 
     trace_props.truth_line = None
     trace_props.sim_line = None
@@ -72,7 +75,15 @@ def main() -> None:
     trace_props.time_min_max = (5.0,25.0)
     pyvale.plot_time_traces(tc_array,field_key,trace_props)
 
-    plt.show()
+    #plt.show()
+
+
+    pv_plot = pyvale.plot_sensors_on_sim(tc_array,field_key)
+    pv_plot.camera_position = [(-0.295, 1.235, 3.369),
+                                (1.0274, 0.314, 0.0211),
+                                (0.081, 0.969, -0.234)]
+    pv_plot.show()
+
 
 if __name__ == '__main__':
     main()

@@ -46,7 +46,7 @@ class GeneralPlotOpts:
 
 
 @dataclass
-class SensorPlotOpts:
+class SensorTraceOpts:
     legend: bool = True
 
     x_label: str = r'x [$m$]'

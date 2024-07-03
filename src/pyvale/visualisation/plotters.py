@@ -9,26 +9,22 @@ from typing import Any
 
 import numpy as np
 import matplotlib.pyplot as plt
-#import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
+import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
 # See: https://github.com/pyvista/pyvista/discussions/2928
 import pyvista as pv
 
 from pyvale.sensors.pointsensorarray import PointSensorArray
-from pyvale.visualisation.plotopts import GeneralPlotOpts, SensorPlotOpts
+from pyvale.visualisation.plotopts import GeneralPlotOpts, SensorTraceOpts
 
 
 def plot_sensors_on_sim(sensor_array: PointSensorArray,
                         component: str,
                         time_step: int = -1,
-                        plot_opts: SensorPlotOpts | None  = None
                         ) -> Any:
 
     pv_simdata = sensor_array.get_field().get_visualiser()
     pv_sensdata = sensor_array.get_visualiser()
     comp_ind = sensor_array.get_field().get_component_index(component)
-
-    if plot_opts is None:
-        plot_opts = SensorPlotOpts()
 
     descriptor = sensor_array.get_descriptor()
     pv_sensdata['labels'] = descriptor.create_sensor_tags(
@@ -59,7 +55,7 @@ def plot_sensors_on_sim(sensor_array: PointSensorArray,
 
 def plot_time_traces(sensor_array: PointSensorArray,
                      component: str,
-                     trace_opts: SensorPlotOpts | None = None,
+                     trace_opts: SensorTraceOpts | None = None,
                      plot_opts: GeneralPlotOpts | None = None
                      ) -> tuple[Any,Any]:
 
@@ -74,7 +70,7 @@ def plot_time_traces(sensor_array: PointSensorArray,
         plot_opts = GeneralPlotOpts()
 
     if trace_opts is None:
-        trace_opts = SensorPlotOpts()
+        trace_opts = SensorTraceOpts()
 
     if trace_opts.sensors_to_plot is None:
         trace_opts.sensors_to_plot = np.arange(0,n_sensors)
