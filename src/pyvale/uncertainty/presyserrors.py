@@ -6,10 +6,22 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 import numpy as np
-
 from pyvale.uncertainty.errorcalculator import ErrCalculator
 
+
 class SysErrOffset(ErrCalculator):
+
+    def __init__(self,
+                 offset: float) -> None:
+        self._offset = offset
+
+    def calc_errs(self,
+                  err_basis: np.ndarray) -> np.ndarray:
+
+        return self._offset*np.ones(shape=err_basis.shape)
+
+
+class SysErrOffsetPercent(ErrCalculator):
 
     def __init__(self,
                  offset: float) -> None:
@@ -45,6 +57,7 @@ class SysErrUniform(ErrCalculator):
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
         return sys_errs
+
 
 class SysErrUnifPercent(ErrCalculator):
 
@@ -97,6 +110,7 @@ class SysErrNormal(ErrCalculator):
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
         return sys_errs
+
 
 class SysErrNormPercent(ErrCalculator):
 

@@ -51,14 +51,14 @@ def main() -> None:
     rand_errors_on = True
 
     if sys_errors_on:
-        err_sys1 = pyvale.SysErrUniform(low=-0.1e-3,high=0.1e-3)
-        sys_err_int = pyvale.ErrorIntegrator([err_sys1],
+        pre_sys_err1 = pyvale.SysErrUniform(low=-0.1e-3,high=0.1e-3)
+        sys_err_int = pyvale.ErrorIntegrator([pre_sys_err1],
                                             straingauge_array.get_measurement_shape())
         straingauge_array.set_pre_sys_err_integrator(sys_err_int)
 
     if rand_errors_on:
-        err_rand1 = pyvale.RandErrNormal(std=0.1e-3)
-        rand_err_int = pyvale.ErrorIntegrator([err_rand1],
+        rand_err1 = pyvale.RandErrNormal(std=0.1e-3)
+        rand_err_int = pyvale.ErrorIntegrator([rand_err1],
                                                 straingauge_array.get_measurement_shape())
         straingauge_array.set_rand_err_integrator(rand_err_int)
 

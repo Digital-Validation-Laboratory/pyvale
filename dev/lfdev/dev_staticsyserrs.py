@@ -32,17 +32,17 @@ def main() -> None:
 
     pre_syserrs_on = False
     if pre_syserrs_on:
-        err_sys1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
-        err_sys2 = pyvale.SysErrNormal(std=20.0)
-        pre_syserr_int = pyvale.ErrorIntegrator([err_sys1,err_sys2],
+        pre_sys_err1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
+        pre_sys_err2 = pyvale.SysErrNormal(std=20.0)
+        pre_syserr_int = pyvale.ErrorIntegrator([pre_sys_err1,pre_sys_err2],
                                             tc_array.get_measurement_shape())
         tc_array.set_pre_sys_err_integrator(pre_syserr_int)
 
     randerrs_on = False
     if randerrs_on:
-        err_rand1 = pyvale.RandErrNormal(std=10.0)
-        err_rand2 = pyvale.RandErrUniform(low=-10.0,high=10.0)
-        rand_err_int = pyvale.ErrorIntegrator([err_rand1,err_rand2],
+        rand_err1 = pyvale.RandErrNormal(std=10.0)
+        rand_err2 = pyvale.RandErrUniform(low=-10.0,high=10.0)
+        rand_err_int = pyvale.ErrorIntegrator([rand_err1,rand_err2],
                                                 tc_array.get_measurement_shape())
         tc_array.set_rand_err_integrator(rand_err_int)
 

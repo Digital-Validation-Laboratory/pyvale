@@ -7,11 +7,8 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
-from pprint import pprint
 from pathlib import Path
-
 import matplotlib.pyplot as plt
-
 import mooseherder as mh
 import pyvale
 
@@ -54,15 +51,15 @@ def main() -> None:
                                     (0.0, 4.0, 5.5),
                                     (-0.190, 0.960, -0.206)]
         pv_plot.show()
-        pprint('Camera positions = ')
-        pprint(pv_plot.camera_position)
+        print('Camera positions = ')
+        print(pv_plot.camera_position)
     if pv_plot_mode == 'save_fig':
         # Determined manually by moving camera and then dumping camera position
         # to console after window close - see 'interactive above'
         pv_plot.camera_position = [(52.198, 26.042, 60.099),
                                     (0.0, 4.0, 5.5),
                                     (-0.190, 0.960, -0.206)]
-        save_render = Path('examples/monoblock_thermal_sim_view.svg')
+        save_render = Path('src/examples/monoblock_thermal_sim_view.svg')
         pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
         pv_plot.screenshot(save_render.with_suffix('.png'))
 
@@ -76,7 +73,7 @@ def main() -> None:
     if trace_plot_mode == 'interactive':
         plt.show()
     if trace_plot_mode == 'save_fig':
-        save_traces = Path('examples/monoblock_thermal_traces.png')
+        save_traces = Path('src/examples/monoblock_thermal_traces.png')
         fig.savefig(save_traces, dpi=300, format='png', bbox_inches='tight')
 
 

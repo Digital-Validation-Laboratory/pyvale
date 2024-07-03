@@ -16,7 +16,7 @@ import mooseherder as mh
 class FieldError(Exception):
     pass
 
-class Field(ABC):
+class IField(ABC):
     @abstractmethod
     def get_time_steps(self) -> np.ndarray:
         pass
@@ -127,7 +127,7 @@ def sample_pyvista(components: tuple,
     sample_at_spec_time = np.empty((n_sensors,n_comps,n_time_steps))
 
     for ii,cc in enumerate(components):
-        sample_at_spec_time[:,ii,:] = np.apply_along_axis(sample_time_interp,1,
-                                                        sample_at_sim_time[cc])
+        sample_at_spec_time[:,ii,:] = np.apply_along_axis(sample_time_interp,-1,
+                                                    sample_at_sim_time[:,ii,:])
 
     return sample_at_spec_time

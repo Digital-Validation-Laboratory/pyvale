@@ -14,55 +14,36 @@ import pyvale
 
 
 def main() -> None:
-    """pyvale example: building a point sensor array applied to a scalar field
-    (temperature) from scratch. Also outlines the sensor conceptual model and
-    how additional experiments can be generated.
+    """Pyvale example: Point sensors on a 2D thermal simulation
+    ----------------------------------------------------------------------------
+    - Explanation of the usage of 'get_measurements()' and 'calc_measurements()'
 
-    A sensor measurement is defined as:
-    measurement = truth + systematic error + random error.
+    NOTES:
+    - A sensor measurement is defined as:
+        measurement = truth + systematic error + random error.
+    - Calling the 'get' methods of the sensor array will retrieve the results
+      for the current experiment.
+    - Calling the 'calc' methods will generate a new
+      experiment by sampling/calculating the systematic and random errors.
 
-    Calling the 'get' methods of the sensor array will retrieve the results for
-    the current experiment. Calling the 'calc' methods will generate a new
-    experiment by sampling/calculating the systematic and random errors. The
-    'calc' method must be called to initialise the errors.
     """
     data_path = Path('data/examplesims/plate_2d_thermal_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
+    field_key = list(sim_data.node_vars.keys())[0] # type: ignore
 
-    descriptor = pyvale.SensorDescriptor()
-    descriptor.name = 'Temperature'
-    descriptor.symbol = 'T'
-    descriptor.units = r'^{\circ}C'
-    descriptor.tag = 'TC'
-
-    field_key = 'temperature'
-    t_field = pyvale.ScalarField(sim_data,
-                                 field_key=field_key,
-                                 spat_dim=2)
-
-    n_sens = (4,2,1)
+    n_sens = (4,1,1)
     x_lims = (0.0,2.0)
     y_lims = (0.0,1.0)
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    tc_array = pyvale.PointSensorArray(sens_pos,
-                                       t_field,
-                                       None,
-                                       descriptor)
+    tc_array = pyvale.SensorArrayFactory \
+        .basic_thermocouple_array(sim_data,
+                                  sens_pos,
+                                  field_key,
+                                  spat_dims=2)
 
-    err_sys1 = pyvale.SysErrUniform(low=-20.0,high=20.0)
-    err_sys2 = pyvale.SysErrNormal(std=20.0)
-    sys_err_int = pyvale.ErrorIntegrator([err_sys1,err_sys2],
-                                          tc_array.get_measurement_shape())
-    tc_array.set_pre_sys_err_integrator(sys_err_int)
-
-    err_rand1 = pyvale.RandErrNormal(std=10.0)
-    err_rand2 = pyvale.RandErrUniform(low=-10.0,high=10.0)
-    rand_err_int = pyvale.ErrorIntegrator([err_rand1,err_rand2],
-                                            tc_array.get_measurement_shape())
-    tc_array.set_rand_err_integrator(rand_err_int)
 
     measurements = tc_array.get_measurements()
 
@@ -89,7 +70,7 @@ def main() -> None:
                               (0,1),
                               (measurements.shape[2]-5,measurements.shape[2]))
 
-    # We plot the first experiment for comparison
+
     (_,ax) = pyvale.plot_time_traces(tc_array,field_key)
     ax.set_title('Exp 1: called calc_measurements()')
 
@@ -128,4 +109,3 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
-      

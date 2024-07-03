@@ -15,8 +15,10 @@ from pyvale.physics.tensorfield import TensorField
 from pyvale.sensors.sensordescriptor import SensorDescriptorFactory
 from pyvale.sensors.pointsensorarray import PointSensorArray
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
-from pyvale.uncertainty.presyserrors import SysErrUniform
-from pyvale.uncertainty.randerrors import RandErrNormal
+from pyvale.uncertainty.presyserrors import SysErrUnifPercent
+from pyvale.uncertainty.randerrors import RandErrNormPercent
+from pyvale.uncertainty.postsyserrors import (SysErrDigitisation,
+                                              SysErrSaturation)
 
 
 class SensorArrayFactory:
@@ -37,15 +39,13 @@ class SensorArrayFactory:
                                       sample_times,
                                       descriptor)
 
-        err_sys1 = SysErrUniform(low=-10.0,high=10.0)
-        sys_err_int = ErrorIntegrator([err_sys1],
-                                        sens_array.get_measurement_shape())
-        sens_array.set_pre_sys_err_integrator(sys_err_int)
+        sens_array = init_basic_errs(sens_array)
 
-        err_rand1 = RandErrNormal(std=10.0)
-        rand_err_int = ErrorIntegrator([err_rand1],
-                                         sens_array.get_measurement_shape())
-        sens_array.set_rand_err_integrator(rand_err_int)
+        post_sys_err1 = SysErrDigitisation(bits_per_unit=1/5)
+        post_sys_err2 = SysErrSaturation(meas_min=0.0,meas_max=1000.0)
+        post_sys_err_int = ErrorIntegrator([post_sys_err1,post_sys_err2],
+                                            sens_array.get_measurement_shape())
+        sens_array.set_post_sys_err_integrator(post_sys_err_int)
 
         return sens_array
 
@@ -69,15 +69,7 @@ class SensorArrayFactory:
                                       sample_times,
                                       descriptor)
 
-        err_sys1 = SysErrUniform(low=-0.01e-3,high=0.01e-3)
-        sys_err_int = ErrorIntegrator([err_sys1],
-                                        sens_array.get_measurement_shape())
-        sens_array.set_pre_sys_err_integrator(sys_err_int)
-
-        err_rand1 = RandErrNormal(std=0.01e-3)
-        rand_err_int = ErrorIntegrator([err_rand1],
-                                         sens_array.get_measurement_shape())
-        sens_array.set_rand_err_integrator(rand_err_int)
+        sens_array = init_basic_errs(sens_array)
 
         return sens_array
 
@@ -109,14 +101,19 @@ class SensorArrayFactory:
                                       sample_times,
                                       descriptor)
 
-        err_sys1 = SysErrUniform(low=-0.1e-3,high=0.1e-3)
-        sys_err_int = ErrorIntegrator([err_sys1],
-                                        sens_array.get_measurement_shape())
-        sens_array.set_pre_sys_err_integrator(sys_err_int)
-
-        err_rand1 = RandErrNormal(std=0.1e-3)
-        rand_err_int = ErrorIntegrator([err_rand1],
-                                         sens_array.get_measurement_shape())
-        sens_array.set_rand_err_integrator(rand_err_int)
+        sens_array = init_basic_errs(sens_array)
 
         return sens_array
+
+
+def init_basic_errs(sens_array: PointSensorArray, err_pc: float = 6.0) -> PointSensorArray:
+
+    pre_sys_err_int = ErrorIntegrator([SysErrUnifPercent(-err_pc,err_pc)],
+                                    sens_array.get_measurement_shape())
+    sens_array.set_pre_sys_err_integrator(pre_sys_err_int)
+
+    rand_err_int = ErrorIntegrator([RandErrNormPercent(err_pc)],
+                                        sens_array.get_measurement_shape())
+    sens_array.set_rand_err_integrator(rand_err_int)
+
+    return sens_array

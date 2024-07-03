@@ -10,12 +10,12 @@ import pyvista as pv
 
 import mooseherder as mh
 
-from pyvale.physics.field import (Field,
+from pyvale.physics.field import (IField,
                                   FieldError,
                                   conv_simdata_to_pyvista,
                                   sample_pyvista)
 
-class TensorField(Field):
+class TensorField(IField):
     def __init__(self,
                  sim_data: mh.SimData,
                  field_key: str,

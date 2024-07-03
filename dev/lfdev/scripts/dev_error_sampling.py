@@ -34,8 +34,8 @@ def main() -> None:
 
     tc_array = pyvale.PointSensorArray(sens_pos,t_field)
 
-    err_rand1 = pyvale.RandErrNormPercent(std_percent=10.0)
-    rand_err_int = pyvale.ErrorIntegrator([err_rand1],
+    rand_err1 = pyvale.RandErrNormPercent(std_percent=10.0)
+    rand_err_int = pyvale.ErrorIntegrator([rand_err1],
                                             tc_array.get_measurement_shape())
     tc_array.set_rand_err_integrator(rand_err_int)
 

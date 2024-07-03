@@ -32,12 +32,12 @@ class GeneralPlotOpts:
     font_def_weight: str = 'normal'
     font_def_size: float = 10
     font_tick_size: float = 9
-    font_head_size: float = 12
+    font_head_size: float = 11
     font_ax_size: float = 11
     font_leg_size: float = 9
 
-    ms: float = 6.0
-    lw: float = 1.0
+    ms: float = 5.0
+    lw: float = 1.2
 
     cmap_seq: str = "cividis"
     cmap_div: str = "RdBu"
@@ -54,7 +54,7 @@ class SensorPlotOpts:
 
     truth_line: str | None = '-'
     sim_line: str | None = '-'
-    meas_line: str = '--+'
+    meas_line: str = '--o'
 
     sensors_to_plot: np.ndarray | None = None
     time_inds: np.ndarray | None = None

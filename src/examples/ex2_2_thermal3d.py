@@ -8,7 +8,6 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 from pathlib import Path
-
 import mooseherder as mh
 import pyvale
 

@@ -9,7 +9,7 @@ from typing import Any
 
 import numpy as np
 import matplotlib.pyplot as plt
-import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
+#import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
 # See: https://github.com/pyvista/pyvista/discussions/2928
 import pyvista as pv
 
