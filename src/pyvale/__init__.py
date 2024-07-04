@@ -7,11 +7,24 @@ Copyright (C) 2024 The Computer Aided Validation Team
 '''
 
 from pyvale.pyvale import *
-from pyvale.sensorarray import *
-from pyvale.field import *
-from pyvale.plotprops import PlotProps
+
 from pyvale.imagesim import *
 
-from pyvale.sensorlibrary.thermocouplearray import *
+from pyvale.physics.field import *
+from pyvale.physics.scalarfield import *
+from pyvale.physics.vectorfield import *
+from pyvale.physics.tensorfield import *
 
-__all__ = ["pyvale"]
+from pyvale.sensors.sensordescriptor import *
+from pyvale.sensors.sensortools import *
+from pyvale.sensors.sensorarrayfactory import *
+from pyvale.sensors.pointsensorarray import *
+
+from pyvale.uncertainty.errorintegrator import *
+from pyvale.uncertainty.randerrors import *
+from pyvale.uncertainty.syserrors import *
+from pyvale.uncertainty.depsyserrors import *
+
+from pyvale.visualisation.plotopts import *
+from pyvale.visualisation.plotters import *
+

@@ -12,27 +12,27 @@ from mooseherder import (MooseConfig,
                          MooseRunner,
                          GmshRunner)
 
+#======================================
+# Change this to run a different case
+CASE_STR = 'case17'
+#======================================
 
-NUM_CASES = 17
+CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')
+CASE_DIR = Path('simcases/'+CASE_STR+'/')
+
 USER_DIR = Path.home()
+
 FORCE_GMSH = False
 
-def run_one_case(case_str: str) -> None:
-    print(80*'=')
-    print(f'Running: {case_str}')
-    print(80*'=')
-
-    case_files = (case_str+'.geo',case_str+'.i')
-    case_dir = Path('simcases/'+case_str+'/')
-
+def main() -> None:
     # NOTE: if the msh file exists then gmsh will not run
-    if (((case_dir / case_files[0]).is_file() and not
-        (case_dir / case_files[0]).with_suffix('.msh').is_file()) or
+    if (((CASE_DIR / CASE_FILES[0]).is_file() and not
+        (CASE_DIR / CASE_FILES[0]).with_suffix('.msh').is_file()) or
         FORCE_GMSH):
         gmsh_runner = GmshRunner(USER_DIR / 'gmsh/bin/gmsh')
 
         gmsh_start = time.perf_counter()
-        gmsh_runner.run(case_dir / case_files[0])
+        gmsh_runner.run(CASE_DIR / CASE_FILES[0])
         gmsh_run_time = time.perf_counter()-gmsh_start
     else:
         print('Bypassing gmsh.')
@@ -50,7 +50,7 @@ def run_one_case(case_str: str) -> None:
                               redirect_out = False)
 
     moose_start_time = time.perf_counter()
-    moose_runner.run(case_dir / case_files[1])
+    moose_runner.run(CASE_DIR / CASE_FILES[1])
     moose_run_time = time.perf_counter() - moose_start_time
 
     print()
@@ -59,14 +59,6 @@ def run_one_case(case_str: str) -> None:
     print(f'MOOSE run time = {moose_run_time:.3f} seconds')
     print("="*80)
     print()
-
-
-
-def main() -> None:
-    for ss in range(NUM_CASES):
-        case_str = 'case' + str(ss+1).zfill(2)
-        run_one_case(case_str)
-
 
 if __name__ == '__main__':
     main()

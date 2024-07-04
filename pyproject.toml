@@ -7,13 +7,13 @@ name = "pyvale"
 version = "0.0.1"
 description = "A python validation engine (pyvale)"
 authors = [
-  { name = "thescepticalrabbit", email = "thescepticalrabbit@gmail.com" },
+  { name = "scepticalrabbit", email = "thescepticalrabbit@gmail.com" },
 ]
 license = { file = "LICENSE" }
 readme = "README.md"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: GNU LGPL",
+    "License :: MIT",
     "Operating System :: OS Independent",
 ]
 requires-python = ">=3.11"

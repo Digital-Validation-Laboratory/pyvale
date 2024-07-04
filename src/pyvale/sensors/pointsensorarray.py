@@ -1,0 +1,169 @@
+'''
+================================================================================
+pyvale: the python validation engine
+License: MIT
+Copyright (C) 2024 The Computer Aided Validation Team
+================================================================================
+'''
+import numpy as np
+import pyvista as pv
+
+from pyvale.physics.field import IField
+from pyvale.uncertainty.errorintegrator import ErrorIntegrator
+from pyvale.sensors.sensordescriptor import SensorDescriptor
+
+
+class PointSensorArray():
+    def __init__(self,
+                 positions: np.ndarray,
+                 field: IField,
+                 sample_times: np.ndarray | None = None,
+                 descriptor: SensorDescriptor | None = None
+                 ) -> None:
+
+        self._positions = positions
+        self._field = field
+        self._sample_times = sample_times
+
+        self._descriptor = SensorDescriptor()
+        if descriptor is not None:
+            self._descriptor = descriptor
+
+        self._truth = None
+        self._measurements = None
+
+        self._pre_syserr_integ = None
+        self._randerr_integ = None
+        self._post_syserr_integ = None
+
+    #---------------------------------------------------------------------------
+    # accessors
+    def get_field(self) -> IField:
+        return self._field
+
+    def get_positions(self) -> np.ndarray:
+        return self._positions
+
+    def get_sample_times(self) -> np.ndarray:
+        if self._sample_times is None:
+            return self._field.get_time_steps()
+
+        return self._sample_times
+
+    def get_descriptor(self) -> SensorDescriptor:
+        return self._descriptor
+
+    def get_measurement_shape(self) -> tuple[int,int,int]:
+        return (self._positions.shape[0],
+                len(self._field.get_all_components()),
+                self.get_sample_times().shape[0])
+
+    #---------------------------------------------------------------------------
+    # truth calculation from simulation
+    def calc_truth_values(self) -> np.ndarray:
+        return self._field.sample_field(self._positions,
+                                        self._sample_times)
+
+    def get_truth_values(self) -> np.ndarray:
+        if self._truth is None:
+            self._truth = self.calc_truth_values()
+
+        return self._truth
+
+    #---------------------------------------------------------------------------
+    # pre / independent / truth-based  systematic errors
+    def set_indep_sys_err_integrator(self,
+                               err_int: ErrorIntegrator) -> None:
+        self._pre_syserr_integ = err_int
+
+
+    def _calc_pre_systematic_errs(self) -> np.ndarray | None:
+        if self._pre_syserr_integ is None:
+            return None
+
+        self._pre_syserr_integ.calc_errs_static(self.get_truth_values())
+        return self._pre_syserr_integ.get_errs_tot()
+
+
+    def get_pre_systematic_errs(self) -> np.ndarray | None:
+        if self._pre_syserr_integ is None:
+            return None
+
+        return self._pre_syserr_integ.get_errs_tot()
+
+    #---------------------------------------------------------------------------
+    # random errors
+    def set_rand_err_integrator(self,
+                                err_int: ErrorIntegrator) -> None:
+        self._randerr_integ = err_int
+
+
+    def _calc_random_errs(self)-> np.ndarray | None:
+        if self._randerr_integ is None:
+            return None
+
+        self._randerr_integ.calc_errs_static(self.get_truth_values())
+        return self._randerr_integ.get_errs_tot()
+
+
+    def get_random_errs(self) -> np.ndarray | None:
+        if self._randerr_integ is None:
+            return None
+
+        return self._randerr_integ.get_errs_tot()
+
+    #---------------------------------------------------------------------------
+    # post / coupled / measurement based systematic errors
+    def set_dep_sys_err_integrator(self,
+                               err_int: ErrorIntegrator) -> None:
+        self._post_syserr_integ = err_int
+
+
+    def _calc_dep_systematic_errs(self, measurements: np.ndarray
+                                   ) -> np.ndarray | None:
+        if self._post_syserr_integ is None:
+            return None
+
+        self._post_syserr_integ.calc_errs_recursive(measurements)
+        return self._post_syserr_integ.get_errs_tot()
+
+
+    def get_dep_systematic_errs(self) -> np.ndarray | None:
+        if self._post_syserr_integ is None:
+            return None
+
+        return self._post_syserr_integ.get_errs_tot()
+
+    #---------------------------------------------------------------------------
+    # measurements
+    def calc_measurements(self) -> np.ndarray:
+        measurements = self.get_truth_values()
+
+        indep_sys_errs = self._calc_pre_systematic_errs()
+        if indep_sys_errs is not None:
+            measurements = measurements + indep_sys_errs
+
+        rand_errs = self._calc_random_errs()
+        if rand_errs is not None:
+            measurements = measurements + rand_errs
+
+        dep_sys_errs = self._calc_dep_systematic_errs(measurements)
+        if dep_sys_errs is not None:
+            measurements = measurements + dep_sys_errs
+
+        self._measurements = measurements
+        return self._measurements
+
+
+    def get_measurements(self) -> np.ndarray:
+        if self._measurements is None:
+            self._measurements = self.calc_measurements()
+
+        return self._measurements
+
+    #---------------------------------------------------------------------------
+    # visualisation tools
+    def get_visualiser(self) -> pv.PolyData:
+        pv_data = pv.PolyData(self._positions)
+        return pv_data
+
