@@ -101,9 +101,9 @@ A sensor should have:
 
 ### Thermocouples
 https://www.mstarlabs.com/sensors/thermocouple-calibration.html
+
 T  =  -0.01897 + 25.41881 V - 0.42456 V^2 + 0.04365 V^3
-where V is voltage in units of millivolts
-and   T is temperature in degrees C
+where V is voltage in units of millivolts and T is temperature in degrees C.
 
 ## Systematic errors
 Comes from many sources:
