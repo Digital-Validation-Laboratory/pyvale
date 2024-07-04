@@ -3,15 +3,18 @@
 ## TODO: `pyvale`
 
 **General**
-- Future: Allow user to specify sideset to locate sensors
+- Calibration errors
+- Field based errors:
+    - Positioning error
+    - Spatial averaging error
+        - Set an integration area
+        - Set a weighting function
+    - Temporal averaging error
+        - Set an integration time
+        - Set a weighting function
 
 **Examples**
-- Restructure examples to make things a bit easier to understand
-- Controlling plot options
-- Setting sensor temporal sampling
-- Post systematic error setting: digitisation and saturation
-- The random error library
-- The systematic error library pre and post
+- Done for now - move on to new features
 
 **Systematic error handling**
 - Add spatial and temporal averaging errors:
@@ -21,6 +24,7 @@
 - Add calibration error
 
 **Future: Experiment Simulation & Workflow**
+- Future: Allow user to specify sideset to locate sensors
 - Need an simulated experiment generator with mooseherder
     - Build monoblock models of increasing fidelity (thermal -> thermo-mech, single value mat props -> temp dependence)
     - Monte Carlo or Latin Hypercube sampling

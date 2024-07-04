@@ -59,9 +59,10 @@ class SysErrSaturation(IErrCalculator):
         saturated[saturated < self._min] = self._min
         return saturated - err_basis
 
+
 class SysErrCalibration(IErrCalculator):
-    def __init__(self) -> None:
-        pass
+    def __init__(self, cal_func: Callable) -> None:
+        self._cal_func = cal_func
 
     def calc_errs(self,
                   err_basis: np.ndarray) -> np.ndarray:
@@ -69,7 +70,6 @@ class SysErrCalibration(IErrCalculator):
         # Need a calibration function
 
         return np.array([])
-
 
 
 def _select_round_method(method: str) -> Callable:
