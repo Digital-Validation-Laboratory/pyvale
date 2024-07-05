@@ -18,13 +18,19 @@ class SysErrPosition(IErrCalculator):
                  field: IField,
                  sens_pos: np.ndarray,
                  std_by_ax: tuple[float | None,float | None,float | None],
+                 sample_times: np.ndarray | None = None,
                  seed: int | None = None) -> None:
 
         self._field = field
         self._sens_pos_original = np.copy(sens_pos)
         self._sens_pos_perturbed = np.copy(sens_pos)
         self._std_by_ax = std_by_ax
+        self._sample_times = sample_times
         self._rng = np.random.default_rng(seed)
+
+    def get_perturbed_pos(self) -> np.ndarray:
+        
+        return self._sens_pos_perturbed
 
     def calc_errs(self,
                   err_basis: np.ndarray) -> np.ndarray:
@@ -38,11 +44,8 @@ class SysErrPosition(IErrCalculator):
                                         scale=ss,
                                         size=self._sens_pos_perturbed.shape[0])
 
-
-        print(f'{self._sens_pos_perturbed=}')
-
-        sys_errs = np.zeros_like(err_basis)
-
+        sys_errs = self._field.sample_field(self._sens_pos_perturbed,
+                                            self._sample_times) - err_basis
         return sys_errs
 
 

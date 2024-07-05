@@ -20,9 +20,9 @@ The scope of the deliverables for this project will be adjusted to take advantag
 2. Enhanced uncertainty function generation for systematic errors, with a focus on point sensors, including:
     - **COMPLETE**: Calibration errors
     - **COMPLETE**: Digitisation errors
-    - Positioning errors
-    - Spatial averaging errors
-    - Temporal averaging errors
+    - *In-progress*: Positioning errors
+    - *In-progress*: Spatial averaging errors
+    - *In-progress*: Temporal averaging errors
     - **COMPLETE**: Ability to collapse all of the above into a single function
 3. Developement of library sensor models to include:
     - **COMPLETE**: Measurement of a vector field. *TODO*: accounting for sensor orientation
@@ -30,7 +30,7 @@ The scope of the deliverables for this project will be adjusted to take advantag
     - Developement of simplified camera sensor models for:
         - Infrared cameras measuring temperature fields
         - **COMPLETE**: Digital image correlation measuring displacement field on a surface
-4. A toolbox for calculating validation metrics from sensor data (simulated or real).
+4. *In-progress*: A toolbox for calculating validation metrics from sensor data (simulated or real).
 5. Software tests using `pytest` for point sensor functionality after completion of the additional features.
 6. Automated documentation generation and worked examples using the following test cases:
     - Thermo-mechanical analysis of a simple 2D plate
@@ -38,6 +38,6 @@ The scope of the deliverables for this project will be adjusted to take advantag
 
 **Extension Deliverables:**
 - An application of `pyvale` to optimise placement of neutronics sensors for LIBRTI. Set as extension as dependent on provision of a relevant neutronics simulation.
-- A toolbox for simulation parameter calibration using optimisers from the multi-objective optimisation library `pymoo`.
+- *In-progress*: A toolbox for simulation parameter calibration using optimisers from the multi-objective optimisation library `pymoo`.
 - A journal article in SoftwareX detailing the implementation of the first version of `pyvale`.
 - A journal article detailing the application of `pyvale` to the simulations and experimental data generated as part of the EPSRC Key Challenge 4 'simple test case'.
