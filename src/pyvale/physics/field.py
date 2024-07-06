@@ -98,6 +98,7 @@ def get_cell_type(nodes_per_elem: int, spat_dim: int) -> int:
     return cell_type
 
 
+# NOTE: sampling outside the bounds of the sample returns a value of 0
 def sample_pyvista(components: tuple,
                 pyvista_grid: pv.UnstructuredGrid,
                 time_steps: np.ndarray,

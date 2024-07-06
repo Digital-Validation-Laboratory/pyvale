@@ -13,6 +13,9 @@
         - Set an integration time
         - Set a weighting function
 
+Gauss Quadrature for the Unit Disc
+http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubature-formulas-for-the-unit-disk/
+
 **Examples**
 - Done for now - move on to new features
 

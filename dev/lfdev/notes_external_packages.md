@@ -179,6 +179,8 @@ except AttributeError:
 ```
 
 ## Interpolating using an FE mesh
+https://docs.pyvista.org/version/stable/examples/01-filter/interpolate.html
+https://docs.pyvista.org/version/stable/api/core/_autosummary/pyvista.datasetfilters.sample#pyvista.DataSetFilters.sample
 
 Syntax is:
 
