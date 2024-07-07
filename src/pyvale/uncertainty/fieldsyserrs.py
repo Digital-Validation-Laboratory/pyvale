@@ -29,7 +29,7 @@ class SysErrPosition(IErrCalculator):
         self._rng = np.random.default_rng(seed)
 
     def get_perturbed_pos(self) -> np.ndarray:
-        
+
         return self._sens_pos_perturbed
 
     def calc_errs(self,
@@ -51,22 +51,36 @@ class SysErrPosition(IErrCalculator):
 
 class SysErrSpatialAverage(IErrCalculator):
 
-    def __init__(self, field: IField) -> None:
+    def __init__(self,
+                 field: IField,
+                 sens_pos: np.ndarray,
+                 sens_dims: np.ndarray,
+                 sample_times: np.ndarray | None = None,
+                 ) -> None:
+
         self._field = field
+        self._sens_pos = sens_pos
+        self._sens_dims = sens_dims
+
+        self._sens_area = self._sens_dims[0]*self._sens_dims[1]
+
+        self._sample_times = sample_times
+
+        self._gauss_pts = self._sens_dims * 1/np.sqrt(3)* np.array([[-1,-1,0],
+                                                                    [-1,1,0],
+                                                                    [1,-1,0],
+                                                                    [1,1,0]])
+        print(f'{self._gauss_pts.shape=}')
+        print(f'{self._gauss_pts}')
+
+    def get_gauss_points(self) -> np.ndarray:
+        return np.array([])
 
     def calc_errs(self,
                   err_basis: np.ndarray) -> np.ndarray:
 
-        return np.array([])
-
-
-class SysErrTemporalAverage(IErrCalculator):
-
-    def __init__(self, field: IField) -> None:
-        self._field = field
-
-
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
+        # Create the gauss points
 
         return np.array([])
+
+

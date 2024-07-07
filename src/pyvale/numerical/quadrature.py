@@ -13,10 +13,16 @@ import numpy as np
 #   - Calculate the area
 # The orientation of the quad - assume aligned for now
 #   - Assume unit normal perpendicular to the plane
+#
 # The number of points to sample: can default
 class Quad2D:
-    def __init__(self) -> None:
-        pass
+    def __init__(self,
+                 sens_pos: np.ndarray,
+                 dims: tuple[float,float]) -> None:
+        self._sens_pos = sens_pos
+        self._dims = dims
+
+
 
 
 class Disc2D:

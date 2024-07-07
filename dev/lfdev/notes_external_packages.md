@@ -221,7 +221,7 @@ pv_plot.save_graphic('save_image.svg')
 
 # Notes: pymoo
 
-## GA: Genetic Alogorithm
+## pymoo: GA, Genetic Alogorithm
 
 ```python
 class GA(GeneticAlgorithm):
@@ -239,7 +239,7 @@ class GA(GeneticAlgorithm):
 
 ```
 
-## PSO: Particle Swarm Optimisation
+## pymoo: PSO, Particle Swarm Optimisation
 
 ```python
 class PSO(Algorithm):
@@ -258,7 +258,7 @@ class PSO(Algorithm):
                  **kwargs):
 ```
 
-## Problem with constraints
+##  pymoo: Problem with constraints
 ```python
 class SphereWithConstraint(Problem):
     def __init__(self):
@@ -269,7 +269,7 @@ class SphereWithConstraint(Problem):
         out["G"] = 0.1 - out["F"]
 ```
 
-## Parallelisation:
+## pymoo: Parallelisation:
 https://pymoo.org/problems/parallelization.html
 Example:
 ```python
@@ -302,3 +302,8 @@ res = minimize(problem, GA(), termination=("n_gen", 200), seed=1)
 print('Threads:', res.exec_time)
 pool.close()
 ```
+
+# Notes: Scipy
+
+## Scipy, rotation
+https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.transform.Rotation.html
