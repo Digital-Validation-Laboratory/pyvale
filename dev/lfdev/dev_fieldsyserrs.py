@@ -23,7 +23,7 @@ def main() -> None:
     field_name = 'temperature'
     t_field = pyvale.ScalarField(sim_data,field_name,spat_dims)
 
-    n_sens = (5,1,1)
+    n_sens = (3,2,1)
     x_lims = (0.0,2.0)
     y_lims = (0.0,1.0)
     z_lims = (0.0,0.0)
@@ -37,12 +37,11 @@ def main() -> None:
                                            (0.01,0.01,None))
     field_sys_err2 = pyvale.SysErrSpatialAverage(t_field,
                                                  sens_pos,
-                                                 np.array((0.1,0.1)))
+                                                 np.array((0.1,0.1,0.0)))
 
     pre_syserr_int = pyvale.ErrorIntegrator([field_sys_err2],
                                             tc_array.get_measurement_shape())
     tc_array.set_indep_sys_err_integrator(pre_syserr_int)
-
     return
     measurements = tc_array.calc_measurements()
 
@@ -56,8 +55,8 @@ def main() -> None:
                                 (measurements.shape[2]-10,measurements.shape[2]))
         print(80*'-')
 
-        pyvale.plot_time_traces(tc_array,field_name)
-        plt.show()
+        #pyvale.plot_time_traces(tc_array,field_name)
+        #plt.show()
 
 
 if __name__ == '__main__':

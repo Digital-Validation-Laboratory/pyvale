@@ -70,17 +70,22 @@ class SysErrSpatialAverage(IErrCalculator):
                                                                     [-1,1,0],
                                                                     [1,-1,0],
                                                                     [1,1,0]])
-        print(f'{self._gauss_pts.shape=}')
-        print(f'{self._gauss_pts}')
+        self._gauss_pos = np.apply_along_axis(np.multiply,0,
+                                              self._gauss_pts[0,:],
+                                              self._sens_pos)
+        print(f'{self._gauss_pos.shape=}')
+        print(f'{self._gauss_pos}')
+
+
 
     def get_gauss_points(self) -> np.ndarray:
-        return np.array([])
+        return self._gauss_pts
 
     def calc_errs(self,
                   err_basis: np.ndarray) -> np.ndarray:
 
         # Create the gauss points
 
-        return np.array([])
+        return np.zeros_like(err_basis)
 
 
