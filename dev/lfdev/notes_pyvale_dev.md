@@ -124,3 +124,16 @@ Comes from sensors noise, need a way to specify a probability distribution to sa
 
 ## Numba
 https://www.youtube.com/watch?v=6oXedk2tGfk
+
+## Gauss Quadrature
+
+## Gauss Quadrature: Change of Interval
+https://stackoverflow.com/questions/33457880/different-intervals-for-gauss-legendre-quadrature-in-numpy
+
+To change the interval, translate the x values from [-1, 1] to [a, b] using, say,
+
+t = 0.5*(x + 1)*(b - a) + a
+
+and then scale the quadrature formula by (b - a)/2:
+
+gauss = sum(w * f(t)) * 0.5*(b - a)

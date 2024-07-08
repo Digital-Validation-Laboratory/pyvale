@@ -61,31 +61,38 @@ class SysErrSpatialAverage(IErrCalculator):
         self._field = field
         self._sens_pos = sens_pos
         self._sens_dims = sens_dims
-
         self._sens_area = self._sens_dims[0]*self._sens_dims[1]
 
         self._sample_times = sample_times
 
-        self._gauss_pts = self._sens_dims * 1/np.sqrt(3)* np.array([[-1,-1,0],
-                                                                    [-1,1,0],
-                                                                    [1,-1,0],
-                                                                    [1,1,0]])
-        self._gauss_pos = np.apply_along_axis(np.multiply,0,
-                                              self._gauss_pts[0,:],
-                                              self._sens_pos)
-        print(f'{self._gauss_pos.shape=}')
-        print(f'{self._gauss_pos}')
+        self._n_gauss_pts = 4
+        gauss_pts = self._sens_dims * 1/np.sqrt(3)* np.array([[-1,-1,0],
+                                                            [-1,1,0],
+                                                            [1,-1,0],
+                                                            [1,1,0]])
 
-
-
-    def get_gauss_points(self) -> np.ndarray:
-        return self._gauss_pts
+        gauss_pos = np.repeat(self._sens_pos,self._n_gauss_pts,axis=0)
+        gauss_pts = np.tile(gauss_pts,(sens_pos.shape[0],1))
+        self._sens_gauss_pos = gauss_pts + gauss_pos
 
     def calc_errs(self,
                   err_basis: np.ndarray) -> np.ndarray:
 
-        # Create the gauss points
+        gauss_vals = self._field.sample_field(self._sens_gauss_pos,
+                                                self._sample_times)
 
-        return np.zeros_like(err_basis)
+        gauss_vals = gauss_vals.reshape((self._n_gauss_pts,
+                                         self._sens_pos.shape[0],
+                                         gauss_vals.shape[1],
+                                         gauss_vals.shape[2]),
+                                         order='F')
+
+        # NOTE: coeff comes from changing gauss interval from [-1,1] to [a,b] -
+        # so (a-b)/2 * (a-b)/2 = sensor_area / 4, then need to divide by the
+        # sensor area to convert to an average. So, coeff=1/4.
+        sens_vals = (1/4)*np.sum(gauss_vals,axis=0)
+
+        sys_errs = sens_vals - err_basis
+        return sys_errs
 
 
