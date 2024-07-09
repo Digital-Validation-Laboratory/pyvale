@@ -34,9 +34,11 @@ def main() -> None:
     field_sys_err1 = pyvale.SysErrPosition(t_field,
                                            sens_pos,
                                            (0.1,0.1,None))
+    spatial_int = pyvale.Quad2D4Points(t_field,
+                                       sens_pos,
+                                       np.array((0.1,0.1,0.0)))
     field_sys_err2 = pyvale.SysErrSpatialAverage(t_field,
-                                                 sens_pos,
-                                                 np.array((0.1,0.1,0.0)))
+                                                 spatial_int)
 
     pre_syserr_int = pyvale.ErrorIntegrator([field_sys_err2],
                                             tc_array.get_measurement_shape())

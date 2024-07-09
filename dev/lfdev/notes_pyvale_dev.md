@@ -3,6 +3,9 @@
 ## TODO: `pyvale`
 
 **General**
+- Need to build analytical test cases
+    - Temperature field in 2D and 3D with a multi-directional gradient
+    - Displacement fields in 2D and 3D with multi directional gradient
 - Calibration errors
 - Field based errors:
     - Positioning error
