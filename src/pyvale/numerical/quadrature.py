@@ -14,13 +14,14 @@ from pyvale.numerical.spatialintegrator import ISpatialIntegrator
 def create_gauss_pt_array(gauss_pt_offsets: np.ndarray,
                         cent_pos: np.ndarray,
                         ) -> np.ndarray:
-        offset_array = np.tile(gauss_pt_offsets,(cent_pos.shape[0],1))
-        gauss_pt_array = np.repeat(cent_pos,gauss_pt_offsets.shape[0],axis=0)
-        return gauss_pt_array + offset_array
+    offset_array = np.tile(gauss_pt_offsets,(cent_pos.shape[0],1))
+    gauss_pt_array = np.repeat(cent_pos,gauss_pt_offsets.shape[0],axis=0)
+    return gauss_pt_array + offset_array
 
 
-class Quad2D4Points(ISpatialIntegrator):
+class Quad2D(ISpatialIntegrator):
     def __init__(self,
+                 gauss_pt_offsets: np.ndarray,
                  field: IField,
                  cent_pos: np.ndarray,
                  dims: np.ndarray,
@@ -87,4 +88,21 @@ class Disc2D:
                  rad: float) -> None:
         self._pos = pos
         self._rad = rad
+
+
+class QuadratureFactory:
+    @staticmethod
+    def quad_2d_4points(field: IField,
+                 cent_pos: np.ndarray,
+                 dims: np.ndarray,
+                 sample_times: np.ndarray | None = None) -> Quad2D:
+
+        gauss_pt_offsets = dims * 1/np.sqrt(3)* np.array([[-1,-1,0],
+                                                        [-1,1,0],
+                                                        [1,-1,0],
+                                                        [1,1,0]])
+        quadrature = Quad2D(gauss_pt_offsets,field,cent_pos,dims,sample_times)
+        return quadrature
+
+
 

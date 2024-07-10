@@ -31,14 +31,21 @@ def main() -> None:
 
     tc_array = pyvale.PointSensorArray(sens_pos,t_field)
 
-    field_sys_err1 = pyvale.SysErrPosition(t_field,
+    field_sys_err1 = pyvale.SysErrPointPosition(t_field,
                                            sens_pos,
                                            (0.1,0.1,None))
+
     spatial_int = pyvale.Quad2D4Points(t_field,
                                        sens_pos,
                                        np.array((0.1,0.1,0.0)))
-    field_sys_err2 = pyvale.SysErrSpatialAverage(t_field,
+
+    field_sys_err2 = pyvale.SysErrStaticSpatialAverage(t_field,
                                                  spatial_int)
+
+    field_sys_err3 = pyvale.SysErrDynamicSpatialAverage(t_field,
+                                                 spatial_int,
+                                                 sens_pos,
+                                                 (0.1,0.1,None))
 
     pre_syserr_int = pyvale.ErrorIntegrator([field_sys_err2],
                                             tc_array.get_measurement_shape())
@@ -54,6 +61,7 @@ def main() -> None:
                                 (0,1),
                                 (measurements.shape[2]-10,measurements.shape[2]))
         print(80*'-')
+
 
         #pyvale.plot_time_traces(tc_array,field_name)
         #plt.show()
