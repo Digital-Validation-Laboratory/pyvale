@@ -35,9 +35,9 @@ def main() -> None:
                                            sens_pos,
                                            (0.1,0.1,None))
 
-    spatial_int = pyvale.Quad2D4Points(t_field,
-                                       sens_pos,
-                                       np.array((0.1,0.1,0.0)))
+    spatial_int = pyvale.QuadratureFactory.quad_2d_9points(t_field,
+                                                        sens_pos,
+                                                        np.array((0.1,0.1,0.0)))
 
     field_sys_err2 = pyvale.SysErrStaticSpatialAverage(t_field,
                                                  spatial_int)
