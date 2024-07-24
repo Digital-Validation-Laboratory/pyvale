@@ -10,20 +10,13 @@ from typing import Callable
 import numpy as np
 
 from pyvale.physics.field import IField
-from pyvale.numerical.spatialintegrator import ISpatialIntegrator
-
-
-def create_gauss_pt_array(gauss_pt_offsets: np.ndarray,
-                            cent_pos: np.ndarray,
-                            ) -> np.ndarray:
-    offset_array = np.tile(gauss_pt_offsets,(cent_pos.shape[0],1))
-    gauss_pt_array = np.repeat(cent_pos,gauss_pt_offsets.shape[0],axis=0)
-    # shape=(n_sens*n_gauss_pts,n_dims)
-    return gauss_pt_array + offset_array
+from pyvale.numerical.spatialintegrator import (ISpatialIntegrator,
+                                                create_int_pt_array)
 
 
 def create_gauss_weights_2d_4pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
     return np.ones((4,)+meas_shape)
+
 
 def create_gauss_weights_2d_9pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
     # shape=(9,)+meas_shape
@@ -33,7 +26,7 @@ def create_gauss_weights_2d_9pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
     return gauss_weights
 
 
-class Quad2D(ISpatialIntegrator):
+class Quadrature2D(ISpatialIntegrator):
     def __init__(self,
                  gauss_pt_offsets: np.ndarray,
                  gauss_weight_func: Callable,
@@ -53,8 +46,8 @@ class Quad2D(ISpatialIntegrator):
         self._gauss_pt_offsets = gauss_pt_offsets
         self._gauss_weight_func = gauss_weight_func
 
-        self._gauss_pts = create_gauss_pt_array(self._gauss_pt_offsets,
-                                                cent_pos)
+        self._gauss_pts = create_int_pt_array(self._gauss_pt_offsets,
+                                              cent_pos)
 
         self._integrals = self.calc_integrals(None, sample_times)
 
@@ -65,8 +58,8 @@ class Quad2D(ISpatialIntegrator):
 
         if cent_pos is not None:
             # shape=(n_sens*n_gauss_pts,n_dims)
-            self._gauss_pts = create_gauss_pt_array(self._gauss_pt_offsets,
-                                                    cent_pos)
+            self._gauss_pts = create_int_pt_array(self._gauss_pt_offsets,
+                                                  cent_pos)
 
         # shape=(n_gauss_pts*n_sens,n_comps,n_timesteps)
         gauss_vals = self._field.sample_field(self._gauss_pts,
@@ -103,21 +96,13 @@ class Quad2D(ISpatialIntegrator):
         return (1/self._area)*self._integrals
 
 
-class Disc2D:
-    def __init__(self,
-                 pos: np.ndarray,
-                 rad: float) -> None:
-        self._pos = pos
-        self._rad = rad
-
-
 class QuadratureFactory:
 
     @staticmethod
     def quad_2d_4points(field: IField,
                         cent_pos: np.ndarray,
                         dims: np.ndarray,
-                        sample_times: np.ndarray | None = None) -> Quad2D:
+                        sample_times: np.ndarray | None = None) -> Quadrature2D:
 
         gauss_pt_offsets = dims * 1/np.sqrt(3)* np.array([[-1,-1,0],
                                                         [-1,1,0],
@@ -126,7 +111,7 @@ class QuadratureFactory:
 
         gauss_weight_func = create_gauss_weights_2d_4pts
 
-        quadrature = Quad2D(gauss_pt_offsets,
+        quadrature = Quadrature2D(gauss_pt_offsets,
                             gauss_weight_func,
                             field,
                             cent_pos,
@@ -138,7 +123,7 @@ class QuadratureFactory:
     def quad_2d_9points(field: IField,
                         cent_pos: np.ndarray,
                         dims: np.ndarray,
-                        sample_times: np.ndarray | None = None) -> Quad2D:
+                        sample_times: np.ndarray | None = None) -> Quadrature2D:
 
 
         gauss_pt_offsets = dims * np.array([[-np.sqrt(0.6),-np.sqrt(0.6),0],
@@ -153,7 +138,7 @@ class QuadratureFactory:
 
         gauss_weight_func = create_gauss_weights_2d_9pts
 
-        quadrature = Quad2D(gauss_pt_offsets,
+        quadrature = Quadrature2D(gauss_pt_offsets,
                             gauss_weight_func,
                             field,
                             cent_pos,
