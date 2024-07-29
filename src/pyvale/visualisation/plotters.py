@@ -13,8 +13,46 @@ import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
 # See: https://github.com/pyvista/pyvista/discussions/2928
 import pyvista as pv
 
+import mooseherder as mh
+
+from pyvale.physics.field import conv_simdata_to_pyvista
 from pyvale.sensors.pointsensorarray import PointSensorArray
 from pyvale.visualisation.plotopts import GeneralPlotOpts, SensorTraceOpts
+
+
+def plot_sim_mesh(sim_data: mh.SimData) -> Any:
+    pv_simdata = conv_simdata_to_pyvista(sim_data,
+                                         None,
+                                         sim_data.num_spat_dims)
+
+    pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
+
+    pv_plot.add_mesh(pv_simdata,
+                     label='sim-data',
+                     show_edges=True,
+                     show_scalar_bar=False)
+
+    pv_plot.add_axes_at_origin(labels_off=True)
+    return pv_plot
+
+def plot_sim_data(sim_data: mh.SimData,
+                  component: str,
+                  time_step: int = -1) -> Any:
+    pv_simdata = conv_simdata_to_pyvista(sim_data,
+                                        (component,),
+                                         sim_data.num_spat_dims)
+
+    pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
+
+    pv_plot.add_mesh(pv_simdata,
+                     scalars=pv_simdata[component][:,time_step],
+                     label='sim-data',
+                     show_edges=True,
+                     show_scalar_bar=False)
+
+    pv_plot.add_scalar_bar(component)
+    pv_plot.add_axes_at_origin(labels_off=True)
+    return pv_plot
 
 
 def plot_sensors_on_sim(sensor_array: PointSensorArray,

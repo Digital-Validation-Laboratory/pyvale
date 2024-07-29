@@ -4,6 +4,9 @@
 # vscode
 .vscode/
 
+# My temp code for checks
+check/
+
 # MOOSE / gmsh
 *-opt
 *.e

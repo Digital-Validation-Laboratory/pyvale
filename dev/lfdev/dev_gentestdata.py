@@ -8,13 +8,28 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 import numpy as np
-
+import matplotlib.pyplot as plt
 import mooseherder as mh
+import pyvale
+import pyvale.visualisation
+import pyvale.visualisation.plotters
 
-def scalar_linear(coords: np.ndarray) -> np.ndarray:
-    (x_min,x_max) = (np.min(coords[:,0]),np.max(coords[:,0]))
-    (y_min,y_max) = (np.min(coords[:,1]),np.max(coords[:,1]))
-    return np.array([])
+def scalar_linear(coords: np.ndarray,
+                  time_steps: np.ndarray) -> np.ndarray:
+    xi = 0
+    yi = 1
+    leng_x = np.max(coords[:,xi]) - np.min(coords[:,xi])
+    leng_y = np.max(coords[:,yi]) - np.min(coords[:,yi])
+
+    # shape=(n_nodes,n_timesteps)
+    coord_x = np.repeat(np.atleast_2d(coords[:,xi]),time_steps.shape[0],axis=0).T
+    coord_y = np.repeat(np.atleast_2d(coords[:,yi]),time_steps.shape[0],axis=0).T
+    time_steps = np.repeat(np.atleast_2d(time_steps),coords.shape[0],axis=0)
+
+
+    f = ((10/(leng_x)*coord_x + 10/(leng_y)*coord_y)*time_steps)+20
+    print(f)
+    return f
 
 
 def main() -> None:
@@ -42,9 +57,9 @@ def main() -> None:
     coord_z = np.zeros_like(coord_x)
     coords = np.hstack((coord_x,coord_y,coord_z))
 
-    node_nums = np.arange(0,n_nodes)+1
+    time_steps = np.linspace(0.0,10.0,11)
 
-    connect = np.zeros((n_elems,nodes_per_elem))
+    connect = np.zeros((n_elems,nodes_per_elem)).astype(np.int64)
     row = 1
     nn = 0
     for ee in range(n_elems):
@@ -55,13 +70,27 @@ def main() -> None:
 
         connect[ee,:] = np.array([nn,nn+1,nn+n_node_x+1,nn+n_node_x])
 
-        print(f'connect e{ee+1} = {connect[ee,:]}')
-
-    for nn in range(n_nodes):
-        print(f'n{nn+1}={coords[nn,:]}')
-
     sim_data = mh.SimData()
+    sim_data.num_spat_dims = 2
     sim_data.coords = coords
+    sim_data.connect = dict()
+    sim_data.connect['connect1'] = connect.T
+
+    #pv_plot = pyvale.visualisation.plotters.plot_sim_mesh(sim_data)
+    #pv_plot.show()
+
+    temp = scalar_linear(coords,time_steps)
+    print(temp[:,0])
+    temp_grid = np.reshape(temp[:,-1],coord_grid_x.shape)
+
+    fig, ax = plt.subplots()
+    cs = ax.contourf(coord_grid_x,
+                     coord_grid_y,
+                     temp_grid)
+    cbar = fig.colorbar(cs)
+    plt.show()
+
+
 
 
 if __name__ == '__main__':

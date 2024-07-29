@@ -43,7 +43,7 @@ class IField(ABC):
 
 #-------------------------------------------------------------------------------
 def conv_simdata_to_pyvista(sim_data: mh.SimData,
-                            components: tuple[str,...],
+                            components: tuple[str,...] | None,
                             spat_dim: int) -> pv.UnstructuredGrid:
 
     flat_connect = np.array([],dtype=np.int64)
@@ -51,8 +51,6 @@ def conv_simdata_to_pyvista(sim_data: mh.SimData,
 
     if sim_data.connect is None:
         raise FieldError("SimData does not have a connectivity table, unable to convert to pyvista")
-    if sim_data.node_vars is None:
-        raise FieldError("SimData does not contain node_vars.")
 
     for cc in sim_data.connect:
         # NOTE: need the -1 here to make element numbers 0 indexed!
@@ -71,8 +69,9 @@ def conv_simdata_to_pyvista(sim_data: mh.SimData,
     points = sim_data.coords
     pv_grid = pv.UnstructuredGrid(cells, cell_types, points)
 
-    for cc in components:
-        pv_grid[cc] = sim_data.node_vars[cc]
+    if components is not None and sim_data.node_vars is not None:
+        for cc in components:
+            pv_grid[cc] = sim_data.node_vars[cc]
 
     return pv_grid
 

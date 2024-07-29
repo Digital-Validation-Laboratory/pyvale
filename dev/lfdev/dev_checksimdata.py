@@ -25,7 +25,8 @@ def main() -> None:
     print()
     for ii in range(12):
         print(f'e{ii+1}={sim_data.connect['connect1'][:,ii]}')
-
+    print(sim_data.coords.shape)
+    print(sim_data.connect['connect1'].shape)
 
 
 if __name__ == '__main__':
