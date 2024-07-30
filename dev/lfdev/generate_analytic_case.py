@@ -9,7 +9,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 '''
 import numpy as np
 import matplotlib.pyplot as plt
-from sympy import *
+import sympy as sym
 import scipy.integrate
 import mooseherder as mh
 import pyvale
@@ -86,6 +86,9 @@ def scalar_quad2d(coord_y: np.ndarray | float,
               (coord_y - roots_y[0]) * (coord_y - roots_y[1]))*time + offset
     return f_eval
 
+def scalar_fun(f_x,f_y,f_t):
+    return 0
+
 
 def main() -> None:
     #===========================================================================
@@ -150,12 +153,12 @@ def main() -> None:
                                                           time_step=-1)
     #pv_plot.show()
 
-
-    x = Symbol('x')
-    y = Symbol('y')
+    # Integration
+    x = sym.Symbol('x')
+    y = sym.Symbol('y')
     sympy_f = ((x-roots_x[0])*(x-roots_x[1])*(y-roots_y[0])*(y-roots_y[1]) + # type: ignore
                field_offset)
-    sympy_int = integrate(integrate(sympy_f,y), x)
+    sympy_int = sym.integrate(sym.integrate(sympy_f,y), x)
     sympy_int_eval = (sympy_int.subs([(x,leng_x),(y,leng_y)]).evalf() - # type: ignore
                       sympy_int.subs([(x,0.0),(y,0.0)]).evalf())        # type: ignore
 
@@ -167,6 +170,14 @@ def main() -> None:
                                               roots_y,
                                               field_offset))
     print(f'Scipy integral = {scipy_int[0]}')
+
+    print()
+    print(f'{type(x)=}')
+    print(f'{type(sympy_f)=}')
+    print(f'{type(sympy_int)=}')
+    print(f'{type(sympy_int_eval)=}')
+    print(isinstance(sympy_f,sym.Expr))
+    print()
 
 
 

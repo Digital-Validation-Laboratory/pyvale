@@ -32,3 +32,6 @@ from pyvale.uncertainty.fieldsyserrs import *
 from pyvale.visualisation.plotopts import *
 from pyvale.visualisation.plotters import *
 
+from pyvale.analyticdata.meshgen import *
+from pyvale.analyticdata.datagen import *
+
