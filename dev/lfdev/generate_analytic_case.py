@@ -179,8 +179,5 @@ def main() -> None:
     print(isinstance(sympy_f,sym.Expr))
     print()
 
-
-
-
 if __name__ == '__main__':
     main()
