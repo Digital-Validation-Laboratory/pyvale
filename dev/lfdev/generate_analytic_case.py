@@ -19,7 +19,7 @@ import pyvale.visualisation.plotters
 def rectangle_mesh_2d(leng_x: float,
                       leng_y: float,
                       n_elem_x: int,
-                      n_elem_y) -> tuple[np.ndarray,np.ndarray]:
+                      n_elem_y: int) -> tuple[np.ndarray,np.ndarray]:
 
     n_elems = n_elem_x*n_elem_y
     n_node_x = n_elem_x+1

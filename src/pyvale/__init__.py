@@ -33,5 +33,6 @@ from pyvale.visualisation.plotopts import *
 from pyvale.visualisation.plotters import *
 
 from pyvale.analyticdata.meshgen import *
-from pyvale.analyticdata.datagen import *
+from pyvale.analyticdata.simdatagen import *
+from pyvale.analyticdata.fieldfuncs import *
 

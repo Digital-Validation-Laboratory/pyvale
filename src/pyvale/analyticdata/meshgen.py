@@ -5,14 +5,13 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
-
 import numpy as np
 
 
 def rectangle_mesh_2d(leng_x: float,
                       leng_y: float,
                       n_elem_x: int,
-                      n_elem_y) -> tuple[np.ndarray,np.ndarray]:
+                      n_elem_y: int) -> tuple[np.ndarray,np.ndarray]:
 
     n_elems = n_elem_x*n_elem_y
     n_node_x = n_elem_x+1
@@ -41,3 +40,18 @@ def rectangle_mesh_2d(leng_x: float,
     connect = connect.T
 
     return (coords,connect)
+
+def fill_dims(coord_x: np.ndarray,
+              coord_y: np.ndarray,
+              time: np.ndarray) -> tuple[np.ndarray,np.ndarray,np.ndarray]:
+
+    full_x = np.repeat(np.atleast_2d(coord_x).T,
+                       time.shape[0],
+                       axis=1)
+    full_y = np.repeat(np.atleast_2d(coord_y).T,
+                       time.shape[0],
+                       axis=1)
+    full_time = np.repeat(np.atleast_2d(time),
+                          coord_x.shape[0],
+                          axis=0)
+    return (full_x,full_y,full_time)
