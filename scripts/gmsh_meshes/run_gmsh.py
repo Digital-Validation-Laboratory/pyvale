@@ -11,11 +11,11 @@ import time
 import mooseherder as mh
 
 def main() -> None:
-    gmsh_path = Path().home() / 'gmsh/bin/gmsh'
+    gmsh_path = Path().home() / 'gmsh/gmsh/bin/gmsh'
     gmsh_runner = mh.GmshRunner(gmsh_path)
 
     base_dir = Path('scripts/gmsh_meshes/')
-    gmsh_in = base_dir / 'ai_mesh.geo'
+    gmsh_in = base_dir / 'monoblock_3d.geo'
     #base_dir = Path('simcases/case10/')
     #gmsh_in = base_dir / 'case10.geo'
     gmsh_runner.set_input_file(gmsh_in)

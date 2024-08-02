@@ -13,11 +13,11 @@ from mooseherder import (MooseConfig,
                         GmshRunner)
 
 USER_DIR = Path.home()
-DATA_DIR = Path('data/thermal_with_gmsh/')
+DATA_DIR = Path('scripts/moosegmsh_thermal/')
 
 def main() -> None:
 
-    gmsh_path = USER_DIR / 'gmsh/bin/gmsh'
+    gmsh_path = USER_DIR / 'gmsh/gmsh/bin/gmsh'
     gmsh_runner = GmshRunner(gmsh_path)
 
     gmsh_input = DATA_DIR / 'monoblock_3d.geo'

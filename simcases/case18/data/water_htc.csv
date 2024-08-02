@@ -1,0 +1,8 @@
+# Heat transfer coefficient data for water
+# Temp. (C), HTC (W.m^-2.K^-1)
+1,4
+100,109100.0
+150,115900.0
+200,121010.0
+250,128800.0
+295,208200.0

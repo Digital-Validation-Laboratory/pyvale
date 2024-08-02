@@ -1,5 +1,5 @@
 //==============================================================================
-// Gmsh 3D Monoblock
+// Gmsh 3D Monoblock Tutorial
 // author: Lloyd Fletcher (scepticalrabbit)
 //==============================================================================
 SetFactory("OpenCASCADE");
@@ -19,69 +19,45 @@ Geometry.VolumeLabels = 0;
 
 //------------------------------------------------------------------------------
 // Variable Definitions
+file_name = "monoblock_3d.msh";
 
-//------------------------------------------------------------------------------
-//_* MOOSEHERDER VARIABLES - START
-file_name = "case11.msh";
-num_threads = 7;
-
-// Specified Geometry variables
+// Geometry variables
 pipe_rad_int = 6e-3;
 pipe_thick = 1.5e-3;
+pipe_rad_ext = pipe_rad_int+pipe_thick;
 
 interlayer_thick = 2e-3;
+interlayer_rad_int = pipe_rad_ext;
+interlayer_rad_ext = interlayer_rad_int+interlayer_thick;
 
 monoblock_depth = 12e-3;
 monoblock_side = 3e-3;
 monoblock_arm_height = 8e-3;
-
-// Specified Mesh variables
-base_divs = 1;
-mesh_ref = 1; //  Must be an integer greater than 0
-
-//_* MOOSEHERDER VARIABLES - END
-//------------------------------------------------------------------------------
-
-// Calculated Geometry Variables
-pipe_rad_ext = pipe_rad_int+pipe_thick;
-
-interlayer_rad_int = pipe_rad_ext;
-interlayer_rad_ext = interlayer_rad_int+interlayer_thick;
-
 monoblock_width = 2*interlayer_rad_ext + 2*monoblock_side;
 monoblock_height = monoblock_width + monoblock_arm_height;
 
 pipe_cent_x = 0.0;
 pipe_cent_y = interlayer_rad_ext + monoblock_side;
 
-// Calculated Mesh Variables
-/*
-pipe_sect_nodes = Round(mesh_ref*5); // Must be odd
-pipe_rad_nodes = Round(mesh_ref*5);
-interlayer_rad_nodes = Round(mesh_ref*5);
-monoblock_side_nodes = Round(mesh_ref*5);
-monoblock_arm_nodes = Round(mesh_ref*5);
-monoblock_depth_nodes = Round(mesh_ref*2);
-monoblock_width_nodes = Floor((pipe_sect_nodes-1)/2)+1;
-*/
-
-// This is a more reasonable mesh refinement for the monoblock but solve time
-// is much longer
+// Mesh variables
+mesh_ref = 1;
 pipe_sect_nodes = Round(mesh_ref*11); // Must be odd
 pipe_rad_nodes = Round(mesh_ref*7);
 interlayer_rad_nodes = Round(mesh_ref*7);
 monoblock_side_nodes = Round(mesh_ref*9);
 monoblock_arm_nodes = Round(mesh_ref*11);
-monoblock_depth_nodes = Round(mesh_ref*5);
+monoblock_depth_nodes = Round(mesh_ref*9);
 monoblock_width_nodes = Floor((pipe_sect_nodes-1)/2)+1;
-
 
 // Calculate approx element size by dividing the circumference
 elem_size = 2*Pi*pipe_rad_int/(4*(pipe_sect_nodes-1));
 tol = elem_size/4; // Used for selection tolerance of bounding boxes
 
+
 //------------------------------------------------------------------------------
 // Geometry Definition
+
+
 s1 = news;
 Rectangle(s1) =
     {-monoblock_width/2,0.0,0.0,
@@ -319,9 +295,10 @@ Physical Volume("armour-w") = {1,2,8,11,3,12};
 
 //------------------------------------------------------------------------------
 // Global Mesh controls
-Mesh.Algorithm = 5;
+Mesh.Algorithm = 6;
 Mesh.Algorithm3D = 10;
 
+num_threads = 4;
 General.NumThreads = num_threads;
 Mesh.MaxNumThreads1D = num_threads;
 Mesh.MaxNumThreads2D = num_threads;
@@ -334,6 +311,6 @@ Mesh 3;
 //------------------------------------------------------------------------------
 // Save and exit
 Save Str(file_name);
-//Exit;
+Exit;
 
 

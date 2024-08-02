@@ -12,6 +12,7 @@ from mooseherder.mooseconfig import MooseConfig
 from mooseherder.mooserunner import MooseRunner
 
 USER_DIR = Path.home()
+print(USER_DIR)
 
 def main() -> None:
     config = {'main_path': USER_DIR / 'moose',
