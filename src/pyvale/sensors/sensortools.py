@@ -43,25 +43,26 @@ def print_measurements(sens_array: PointSensorArray,
 
     print(f"\nmeasurement.shape = \n    {measurement.shape}")
     print(f"measurement = \n    {measurement[sensors[0]:sensors[1],
-                                components[0]:components[1],
-                                time_steps[0]:time_steps[1]]}")
+                                 components[0]:components[1],
+                                 time_steps[0]:time_steps[1]]}")
     
     print(f"truth = \n    {truth[sensors[0]:sensors[1],
-                                components[0]:components[1],
-                                time_steps[0]:time_steps[1]]}")
+                           components[0]:components[1],
+                           time_steps[0]:time_steps[1]]}")
+    
     if indep_sys_errs is not None:
         print(f"indep_sys_errs = \n    {indep_sys_errs[sensors[0]:sensors[1],
                                         components[0]:components[1],
                                         time_steps[0]:time_steps[1]]}")
     if rand_errs is not None:
         print(f"rand_errs = \n    {rand_errs[sensors[0]:sensors[1],
-                                    components[0]:components[1],
-                                    time_steps[0]:time_steps[1]]}")
+                                   components[0]:components[1],
+                                   time_steps[0]:time_steps[1]]}")
 
     if dep_sys_errs is not None:
         print(f"dep_sys_errs = \n    {dep_sys_errs[sensors[0]:sensors[1],
-                                        components[0]:components[1],
-                                        time_steps[0]:time_steps[1]]}")
+                                      components[0]:components[1],
+                                      time_steps[0]:time_steps[1]]}")
 
     print()
 
