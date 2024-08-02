@@ -1,0 +1,33 @@
+'''
+================================================================================
+pyvale: the python validation engine
+License: MIT
+Copyright (C) 2024 The Computer Aided Validation Team
+================================================================================
+'''
+import numpy as np
+import sympy
+import mooseherder as mh
+
+from pyvale.analyticdata.simdatagenerator import (AnalyticCaseData2D,
+                                                  AnalyticSimDataGenerator)
+
+def standard_case_2d() -> AnalyticCaseData2D:
+    case_data = AnalyticCaseData2D()
+    case_data.length_x = 10
+    case_data.length_y = 7.5
+    n_elem_mult = 10
+    case_data.num_elem_x = 4*n_elem_mult
+    case_data.num_elem_y = 3*n_elem_mult
+    case_data.time_steps = np.linspace(0.0,1.0,11)
+    return case_data
+
+
+class AnalyticCaseFactory:
+    @staticmethod
+    def linear_2d() -> mh.SimData:
+        case_data = standard_case_2d()
+        (sym_y,sym_x,sym_t) = sympy.symbols("y,x,t")
+        case_data.funcs_x = (1.0,)
+        case_data.funcs_y = (1.0,)
+        case_data.funcs_t = (1.0,)

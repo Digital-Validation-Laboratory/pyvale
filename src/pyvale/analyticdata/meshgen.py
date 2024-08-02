@@ -41,6 +41,7 @@ def rectangle_mesh_2d(leng_x: float,
 
     return (coords,connect)
 
+
 def fill_dims(coord_x: np.ndarray,
               coord_y: np.ndarray,
               time: np.ndarray) -> tuple[np.ndarray,np.ndarray,np.ndarray]:

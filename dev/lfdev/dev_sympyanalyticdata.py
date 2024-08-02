@@ -23,35 +23,37 @@ def main() -> None:
 
     case_data.length_x = 10
     case_data.length_y = 7.5
-    case_data.num_elem_x = 4
-    case_data.num_elem_y = 3
+    case_data.num_elem_x = 4*10
+    case_data.num_elem_y = 3*10
     case_data.time_steps = np.linspace(0.0,1.0,11)
     case_data.field_keys = ('temperature',)
 
     sym_x = sympy.Symbol("x")
     sym_y = sympy.Symbol("y")
     sym_t = sympy.Symbol("t")
-    case_data.funcs_x = (sym_x*(sym_x - case_data.length_x),)
-    case_data.funcs_y = (sym_y*(sym_y - case_data.length_y),)
+    #case_data.funcs_x = (sym_x*(sym_x - case_data.length_x),)
+    #case_data.funcs_y = (sym_y*(sym_y - case_data.length_y),)
+    case_data.funcs_x = (50.0*sympy.sin( 2*sympy.pi/(case_data.length_x/10) * sym_x)+50,)
+    case_data.funcs_y = (1.0,)
     case_data.funcs_t = (1.0,)
     #===========================================================================
 
     data_gen = pyvale.AnalyticSimDataGenerator(case_data)
     sim_data = data_gen.generate_sim_data()
+    (grid_x,grid_y,grid_field) = data_gen.get_visualisation_grid()
 
-    (full_x,full_y,full_time) = pyvale.fill_dims(sim_data.coords[:,0],
-                                                 sim_data.coords[:,1],
-                                                 sim_data.time)
+    fig, ax = plt.subplots()
+    cs = ax.contourf(grid_x,
+                     grid_y,
+                     grid_field)
+    cbar = fig.colorbar(cs)
+    plt.axis('scaled')
+    #plt.show()
 
-    print()
-    print(f'{full_x.shape=}')
-    print(f'{full_y.shape=}')
-    print(f'{full_time.shape=}')
+    (sym_y,sym_x,sym_t) = sympy.symbols("y,x,t")
 
-    print(full_x)
-    print(full_y)
 
-    print(sim_data.node_vars['temperature'][:,-1])
+
 
 if __name__ == '__main__':
     main()

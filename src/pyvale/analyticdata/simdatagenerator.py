@@ -55,7 +55,8 @@ class AnalyticSimDataGenerator:
             self._field_lam_funcs[kk] = sympy.lambdify(case_data.symbols,
                                                 self._field_sym_funcs[kk],
                                                 'numpy')
-        #self._field_eval = np.zeros()
+        self._field_eval = dict()
+
 
     def evaluate_fields(self) -> dict[str,np.ndarray]:
         (x_eval,y_eval,t_eval) = fill_dims(self._coords[:,0],
@@ -66,28 +67,48 @@ class AnalyticSimDataGenerator:
             eval_comps[kk] = self._field_lam_funcs[kk](y_eval,
                                                         x_eval,
                                                         t_eval)
-        return eval_comps
+        self._field_eval = eval_comps
+        return self._field_eval
+
 
     def generate_sim_data(self) -> mh.SimData:
+
         sim_data = mh.SimData()
         sim_data.num_spat_dims = 2
         sim_data.time = self._case_data.time_steps
         sim_data.coords = self._coords
         sim_data.connect = {'connect1': self._connect}
-        sim_data.node_vars = eval_comps
+
+        if not self._field_eval:
+            self.evaluate_fields()
+        sim_data.node_vars = self._field_eval
+
         return sim_data
 
 
     def get_visualisation_grid(self,
+                               field_key: str | None = None,
                                time_step: int = -1
                                ) -> tuple[np.ndarray,np.ndarray,np.ndarray]:
+        
+        if field_key is None:
+            field_key = self._case_data.field_keys[0]
 
         grid_shape = (self._case_data.num_elem_y+1,
                       self._case_data.num_elem_x+1)
+
         grid_x = np.atleast_2d(self._coords[:,0]).T.reshape(grid_shape)
         grid_y = np.atleast_2d(self._coords[:,1]).T.reshape(grid_shape)
-        #scalar_grid = np.reshape(scalar_vals[:,time_step],grid_shape)
 
-        return (grid_x,grid_y)
+        if not self._field_eval:
+            self.evaluate_fields()
+
+        scalar_grid = np.reshape(self._field_eval[field_key][:,time_step],grid_shape)
+
+        return (grid_x,grid_y,scalar_grid)
+    
+
+
+
 
 
