@@ -46,7 +46,7 @@ def main() -> None:
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector
     # graphic using a specified camera position.
-    pv_plot_mode = 'interactive'
+    pv_plot_mode = 'off'
 
     if pv_plot_mode == 'interactive':
         pv_plot.camera_position = [(-0.295, 1.235, 3.369),

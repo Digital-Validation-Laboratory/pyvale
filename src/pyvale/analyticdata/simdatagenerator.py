@@ -16,7 +16,7 @@ from pyvale.analyticdata.meshgen import rectangle_mesh_2d, fill_dims
 
 @dataclass
 class AnalyticCaseData2D:
-    length_x: float = 10.0
+    length_x: float = 10.0x
     length_y: float = 7.5
     num_elem_x: int = 4
     num_elem_y: int = 3
