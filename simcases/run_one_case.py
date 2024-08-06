@@ -6,6 +6,9 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
+
+# NOTE: Run from pyvale, NOT from simcases!
+
 import time
 from pathlib import Path
 from mooseherder import (MooseConfig,
@@ -14,13 +17,13 @@ from mooseherder import (MooseConfig,
 
 #======================================
 # Change this to run a different case
-CASE_STR = 'case01'
+CASE_STR = 'case07'
 #======================================
 
 CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')
 CASE_DIR = Path('simcases/'+CASE_STR+'/')
 
-USER_DIR = Path.home()
+USER_DIR = Path(str(Path.home()) + '/git/herding-moose/')
 
 FORCE_GMSH = False
 

@@ -8,11 +8,17 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 from pprint import pprint
+from typing import Any
 from pathlib import Path
 import matplotlib.pyplot as plt
 import mooseherder as mh
 import pyvale
+import numpy as np
+import pandas as pd
 
+
+def print_attrs(in_obj: Any) -> None:
+    _ = [print(aa) for aa in dir(in_obj) if '__' not in aa]
 
 def main() -> None:
     # Use mooseherder to read the exodus and get a SimData object
@@ -59,12 +65,44 @@ def main() -> None:
     pv_plot = pyvale.plot_sensors(pv_sim,pv_sens,field_name)
     # We label the temperature scale bar ourselves and can
     pv_plot.add_scalar_bar('Temperature, T [degC]')
+    
+    save_vals = True
+    
+    if save_vals:
+        print_attrs(sim_data)
+        print()
+        read_config = data_reader.get_read_config()
+        print()
+        print('Attributes of SimReadConfig:')
+        print_attrs(read_config)
+        print()
+        sim_data = data_reader.read_sim_data(read_config)
+        #print(measurements)
+        #print(f'sim_data.time = {sim_data.time}')
+        #print(f'sim_data.coords = {sim_data.coords}')
+        #print(f'sim_data.connect = {sim_data.connect}')
+        #print(sim_data.connect['connect1'])
+        #print()
+        #print(sens_pos.shape)
+        #print(measurements.shape)
+        #print(sim_data.time.shape)
+        sens_pos_df = pd.DataFrame(sens_pos)
+        sens_data = np.concatenate([np.reshape(sim_data.time,(1,len(sim_data.time))),measurements])
+        sens_data = np.transpose(sens_data)
+        columns = ["time"]
+        for i in range(measurements.shape[0]):
+            columns.append(f"s{i+1}")
+        sens_data_df = pd.DataFrame(sens_data,columns=columns)
+        print(sens_data_df)
+        file_path = Path('examples/images/sim_data.csv')
+        sens_data_df.to_csv(file_path,columns=columns,index=False)
+        
 
 
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector
     # graphic using a specified camera position.
-    pv_plot_mode = 'interactive'
+    pv_plot_mode = None#'interactive'#
 
     if pv_plot_mode == 'interactive':
         # Shows the pyvista interactive 3D plot
@@ -83,11 +121,13 @@ def main() -> None:
         save_render = Path('examples/images/plate_thermal_2d_sim_view.svg')
         pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
         pv_plot.screenshot(save_render.with_suffix('.png'))
+    if pv_plot_mode == None:
+        pv_plot.close()
 
     # Set this to 'interactive' to get a matplotlib.pyplot with the sensor
     # traces plotted over time. Set to 'save_fig' to save an image of the plot
     # to file.
-    trace_plot_mode = 'interactive'
+    trace_plot_mode = None#'interactive'#
 
     # Plots the sensor time traces using matplotlib, thin solid lines are ground
     # truth from the simulation and dashed lines with '+' are simulated sensor
@@ -99,6 +139,8 @@ def main() -> None:
     if trace_plot_mode == 'save_fig':
         save_traces = Path('examples/images/plate_thermal_2d_traces.png')
         fig.savefig(save_traces, dpi=300, format='png', bbox_inches='tight')
+    if trace_plot_mode == None:
+        plt.close()
 
 
 if __name__ == '__main__':
