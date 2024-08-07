@@ -85,7 +85,8 @@ def plot_sensors_on_sim(sensor_array: PointSensorArray,
                      show_edges=True,
                      show_scalar_bar=False)
 
-    pv_plot.add_scalar_bar(descriptor.create_label(comp_ind))
+    pv_plot.add_scalar_bar(descriptor.create_label(comp_ind),
+                           vertical=True)
     pv_plot.add_axes_at_origin(labels_off=True)
 
     return pv_plot

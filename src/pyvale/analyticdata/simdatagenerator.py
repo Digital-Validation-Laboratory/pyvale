@@ -16,7 +16,7 @@ from pyvale.analyticdata.meshgen import rectangle_mesh_2d, fill_dims
 
 @dataclass
 class AnalyticCaseData2D:
-    length_x: float = 10.0x
+    length_x: float = 10.0
     length_y: float = 7.5
     num_elem_x: int = 4
     num_elem_y: int = 3
@@ -90,7 +90,7 @@ class AnalyticSimDataGenerator:
                                field_key: str | None = None,
                                time_step: int = -1
                                ) -> tuple[np.ndarray,np.ndarray,np.ndarray]:
-        
+
         if field_key is None:
             field_key = self._case_data.field_keys[0]
 
@@ -106,7 +106,7 @@ class AnalyticSimDataGenerator:
         scalar_grid = np.reshape(self._field_eval[field_key][:,time_step],grid_shape)
 
         return (grid_x,grid_y,scalar_grid)
-    
+
 
 
 

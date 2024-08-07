@@ -22,6 +22,7 @@ class SensorDescriptor:
         if self.name != "":
             label = label + rf"{self.name} "
 
+
         symbol = rf"${self.symbol}$ "
         if comp_ind is not None and self.components is not None:
             symbol = rf"${self.symbol}_{{{self.components[comp_ind]}}}$ "
@@ -63,16 +64,16 @@ class SensorDescriptorFactory:
     @staticmethod
     def temperature_descriptor() -> SensorDescriptor:
         descriptor = SensorDescriptor()
-        descriptor.name = 'Temperature'
+        descriptor.name = 'Temp.'
         descriptor.symbol = 'T'
         descriptor.units = r'^{\circ}C'
-        descriptor.tag = 'TS'
+        descriptor.tag = 'TC'
         return descriptor
 
     @staticmethod
     def displacement_descriptor() -> SensorDescriptor:
         descriptor = SensorDescriptor()
-        descriptor.name = 'Displacement'
+        descriptor.name = 'Disp.'
         descriptor.symbol = 'u'
         descriptor.units = r'm'
         descriptor.tag = 'DS'

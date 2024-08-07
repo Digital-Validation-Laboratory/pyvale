@@ -75,8 +75,7 @@ def main() -> None:
     trace_props.time_min_max = (5.0,25.0)
     pyvale.plot_time_traces(tc_array,field_key,trace_props)
 
-    #plt.show()
-
+    plt.show()
 
     pv_plot = pyvale.plot_sensors_on_sim(tc_array,field_key)
     pv_plot.camera_position = [(-0.295, 1.235, 3.369),

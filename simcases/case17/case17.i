@@ -11,7 +11,7 @@ endTime = 60
 timeStep = 5
 
 # Mechanical Loads/BCs
-topDispRate = ${fparse 1e-3 / 60}  # m/s
+topDispRate = ${fparse 10e-3 / 60}  # m/s
 
 # Material Properties: OFHC Copper 250degC
 cuEMod= 108e9   # Pa

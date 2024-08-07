@@ -130,6 +130,8 @@ plotter.show()
 
 https://docs.pyvista.org/version/stable/examples/02-plot/scalar-bars#sphx-glr-examples-02-plot-scalar-bars-py
 
+https://docs.pyvista.org/api/plotting/_autosummary/pyvista.plotter.add_scalar_bar 
+
 ```python
 pv_plot.add_scalar_bar('Temperature, T [degC]')
 ```

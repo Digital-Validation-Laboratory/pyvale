@@ -35,7 +35,6 @@ def main() -> None:
                                   field_name,
                                   spat_dims=3)
 
-
     measurements = tc_array.get_measurements()
     print(f'\nMeasurements for sensor at top of block:\n{measurements[-1,0,:]}\n')
 
@@ -44,7 +43,7 @@ def main() -> None:
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector
     # graphic using a specified camera position.
-    pv_plot_mode = 'interactive'
+    pv_plot_mode = 'save_fig'
 
     if pv_plot_mode == 'interactive':
         pv_plot.camera_position = [(52.198, 26.042, 60.099),
@@ -66,7 +65,7 @@ def main() -> None:
     # Set this to 'interactive' to get a matplotlib.pyplot with the sensor
     # traces plotted over time. Set to 'save_fig' to save an image of the plot
     # to file.
-    trace_plot_mode = 'interactive'
+    trace_plot_mode = 'save_fig'
 
     (fig,_) = pyvale.plot_time_traces(tc_array,field_name)
 
