@@ -119,15 +119,6 @@ class RectangleIntegratorFactory:
                     dims: np.ndarray,
                     sample_times: np.ndarray | None = None) -> Rectangle2D:
 
-        '''
-        (coords_x,coords_y) = np.meshgrid(np.array([-1/3,0,1/3]),
-                                          np.array([-1/3,0,1/3]))
-        coords_x = np.atleast_2d(coords_x.flatten()).T
-        coords_y = np.atleast_2d(coords_y.flatten()).T
-        coords_z = np.zeros_like(coords_x)
-        int_pt_offsets
-        '''
-        
         int_pt_offsets = dims * np.array([[-1/3,-1/3,0],
                                           [-1/3,0,0],
                                           [-1/3,1/3,0],

@@ -58,7 +58,54 @@ class AnalyticSimDataGenerator:
         self._field_eval = dict()
 
 
-    def evaluate_fields(self) -> dict[str,np.ndarray]:
+    def evaluate_field_truth(self,
+                       field_key: str,
+                       coords: np.ndarray,
+                       time_steps: np.ndarray | None = None) -> np.ndarray:
+
+        if time_steps is None:
+            time_steps = self._case_data.time_steps
+
+        (x_eval,y_eval,t_eval) = fill_dims(coords[:,0],
+                                            coords[:,1],
+                                            time_steps)
+
+        field_vals = self._field_lam_funcs[field_key](y_eval,
+                                                x_eval,
+                                                t_eval)
+        return field_vals
+
+
+    def evaluate_all_fields_truth(self,
+                       coords: np.ndarray,
+                       time_steps: np.ndarray | None = None) -> np.ndarray:
+
+        if time_steps is None:
+            time_steps = self._case_data.time_steps
+
+        (x_eval,y_eval,t_eval) = fill_dims(coords[:,0],
+                                            coords[:,1],
+                                            time_steps)
+
+        eval_comps = dict()
+        for kk in  self._case_data.field_keys:
+            eval_comps[kk] = self._field_lam_funcs[kk](y_eval,
+                                                        x_eval,
+                                                        t_eval)
+        return eval_comps
+
+
+    def evaluate_field_at_nodes(self, field_key: str) -> np.ndarray:
+        (x_eval,y_eval,t_eval) = fill_dims(self._coords[:,0],
+                                           self._coords[:,1],
+                                           self._case_data.time_steps)
+
+        self._field_eval[field_key] = self._field_lam_funcs[field_key](y_eval,
+                                                                        x_eval,
+                                                                        t_eval)
+        return self._field_eval[field_key]
+
+    def evaluate_all_fields_at_nodes(self) -> dict[str,np.ndarray]:
         (x_eval,y_eval,t_eval) = fill_dims(self._coords[:,0],
                                            self._coords[:,1],
                                            self._case_data.time_steps)
@@ -80,7 +127,7 @@ class AnalyticSimDataGenerator:
         sim_data.connect = {'connect1': self._connect}
 
         if not self._field_eval:
-            self.evaluate_fields()
+            self.evaluate_all_fields_at_nodes()
         sim_data.node_vars = self._field_eval
 
         return sim_data
@@ -101,7 +148,7 @@ class AnalyticSimDataGenerator:
         grid_y = np.atleast_2d(self._coords[:,1]).T.reshape(grid_shape)
 
         if not self._field_eval:
-            self.evaluate_fields()
+            self.evaluate_all_fields_at_nodes()
 
         scalar_grid = np.reshape(self._field_eval[field_key][:,time_step],grid_shape)
 
