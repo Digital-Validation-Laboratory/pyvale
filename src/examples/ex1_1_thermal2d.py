@@ -27,7 +27,7 @@ def main() -> None:
     sim_data = data_reader.read_all_sim_data()
     field_key = list(sim_data.node_vars.keys())[0] # type: ignore
 
-    n_sens = (3,2,1)
+    n_sens = (10,2,1)
     x_lims = (0.0,2.0)
     y_lims = (0.0,1.0)
     z_lims = (0.0,0.0)
@@ -46,7 +46,7 @@ def main() -> None:
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector
     # graphic using a specified camera position.
-    pv_plot_mode = 'interactive'
+    pv_plot_mode = 'off'
 
     if pv_plot_mode == 'interactive':
         pv_plot.camera_position = [(-0.295, 1.235, 3.369),

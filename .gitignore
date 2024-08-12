@@ -19,6 +19,9 @@ check/
 # Example output images
 src/examples/*.png
 src/examples/*.svg
+src/examples/figuregen/*.png
+src/examples/figuregen/*.svg
+
 
 # Image deformation test cases
 *.pkl

@@ -27,7 +27,7 @@ from pyvale.uncertainty.errorintegrator import *
 from pyvale.uncertainty.randerrors import *
 from pyvale.uncertainty.syserrors import *
 from pyvale.uncertainty.depsyserrors import *
-from pyvale.uncertainty.fieldsyserrs import *
+from pyvale.uncertainty.fieldsyserrors import *
 
 from pyvale.visualisation.plotopts import *
 from pyvale.visualisation.plotters import *

@@ -44,7 +44,7 @@ def main() -> None:
 
     sim_path = Path.cwd()
     if read_exodus:
-        case_str = 'case14'
+        case_str = 'case17'
         sim_path = Path(f'simcases/{case_str}')
         sim_file = f'{case_str}_out.e'
 

@@ -124,6 +124,7 @@ def plot_time_traces(sensor_array: PointSensorArray,
         sim_time = field.get_time_steps()
         sim_vals = field.sample_field(sensor_array.get_positions())
 
+
         for ss in range(n_sensors):
             if ss in trace_opts.sensors_to_plot:
                 ax.plot(sim_time,
@@ -131,7 +132,7 @@ def plot_time_traces(sensor_array: PointSensorArray,
                         trace_opts.sim_line,
                         lw=plot_opts.lw,
                         ms=plot_opts.ms,
-                        color=plot_opts.colors[ss])
+                        color=plot_opts.colors[ss % plot_opts.n_colors])
 
     if trace_opts.truth_line is not None:
         truth = sensor_array.get_truth_values()
@@ -142,7 +143,7 @@ def plot_time_traces(sensor_array: PointSensorArray,
                         trace_opts.truth_line,
                         lw=plot_opts.lw,
                         ms=plot_opts.ms,
-                        color=plot_opts.colors[ss])
+                        color=plot_opts.colors[ss % plot_opts.n_colors])
 
     sensor_tags = descriptor.create_sensor_tags(n_sensors)
     for ss in range(n_sensors):
@@ -153,7 +154,7 @@ def plot_time_traces(sensor_array: PointSensorArray,
                     label=sensor_tags[ss],
                     lw=plot_opts.lw,
                     ms=plot_opts.ms,
-                    color=plot_opts.colors[ss])
+                    color=plot_opts.colors[ss % plot_opts.n_colors])
 
     ax.set_xlabel(trace_opts.time_label,
                 fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
