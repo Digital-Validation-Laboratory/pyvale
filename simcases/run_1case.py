@@ -42,6 +42,8 @@ def main() -> None:
             'app_path': USER_DIR / 'proteus',
             'app_name': 'proteus-opt'}
 
+    print(config['main_path'])
+
     moose_config = MooseConfig(config)
     moose_runner = MooseRunner(moose_config)
 

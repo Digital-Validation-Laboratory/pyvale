@@ -62,7 +62,7 @@ def main() -> None:
                               (measurements.shape[2]-5,measurements.shape[2]))
     print(80*'-')
     print("If we call the 'calc_measurements' method then the errors are "+
-          "(re)calculated.")
+          "(re)calculated or sampled.")
     measurements = tc_array.calc_measurements()
 
     pyvale.print_measurements(tc_array,

@@ -62,13 +62,10 @@ def main() -> None:
                                                 straingauge_array.get_measurement_shape())
         straingauge_array.set_rand_err_integrator(rand_err_int)
 
+
     plot_field = 'strain_yy'
-    if plot_field == 'strain_xx':
-        pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,'strain_xx')
-        pv_plot.show()
-    elif plot_field == 'strain_yy':
-        pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,'strain_yy')
-        pv_plot.show()
+    pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,plot_field)
+    pv_plot.show()
 
     pyvale.plot_time_traces(straingauge_array,'strain_xx')
     pyvale.plot_time_traces(straingauge_array,'strain_yy')

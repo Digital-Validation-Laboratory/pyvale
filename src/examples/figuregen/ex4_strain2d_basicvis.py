@@ -32,8 +32,12 @@ def main() -> None:
                                                      spat_dims=2)
 
     plot_field = 'strain_yy'
-    pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,plot_field)
-    pv_plot.show()
+    if plot_field == 'strain_xx':
+        pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,'strain_xx')
+        pv_plot.show()
+    elif plot_field == 'strain_yy':
+        pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,'strain_yy')
+        pv_plot.show()
 
     pyvale.plot_time_traces(straingauge_array,'strain_xx')
     pyvale.plot_time_traces(straingauge_array,'strain_yy')

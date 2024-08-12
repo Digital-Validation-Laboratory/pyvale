@@ -1,6 +1,6 @@
 '''
 ================================================================================
-example: strain gauges on a 2d plate
+example: displacement sensors on a 2d plate
 
 pyvale: the python validation engine
 License: MIT
@@ -13,6 +13,8 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
+    """pyvale example:
+    """
     data_path = Path('simcases/case17/case17_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
@@ -25,19 +27,22 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    straingauge_array = pyvale.SensorArrayFactory \
-                            .basic_straingauge_array(sim_data,
-                                                     sens_pos,
-                                                     "strain",
-                                                     spat_dims=2)
+    disp_sens_array = pyvale.SensorArrayFactory \
+                            .basic_dispsens_array(sim_data,
+                                                sens_pos,
+                                                "displacement",
+                                                spat_dims=2)
 
-    plot_field = 'strain_yy'
-    pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,plot_field)
-    pv_plot.show()
+    plot_field = 'disp_x'
+    if plot_field == 'disp_x':
+        pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,'disp_x')
+        pv_plot.show()
+    elif plot_field == 'disp_y':
+        pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,'disp_y')
+        pv_plot.show()
 
-    pyvale.plot_time_traces(straingauge_array,'strain_xx')
-    pyvale.plot_time_traces(straingauge_array,'strain_yy')
-    pyvale.plot_time_traces(straingauge_array,'strain_xy')
+    pyvale.plot_time_traces(disp_sens_array,'disp_x')
+    pyvale.plot_time_traces(disp_sens_array,'disp_y')
     plt.show()
 
 
