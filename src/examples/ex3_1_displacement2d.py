@@ -37,7 +37,6 @@ def main() -> None:
     pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,plot_field)
     pv_plot.show()
 
-
     pyvale.plot_time_traces(disp_sens_array,'disp_x')
     pyvale.plot_time_traces(disp_sens_array,'disp_y')
     plt.show()

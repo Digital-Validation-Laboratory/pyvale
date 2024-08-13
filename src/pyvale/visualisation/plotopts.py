@@ -22,7 +22,7 @@ class GeneralPlotOpts:
     a4_print_width: float = a4_width-2*a4_margin_width
     a4_print_height: float = a4_height-2*a4_margin_height
 
-    single_fig_scale: float = 1.0
+    single_fig_scale: float = 0.75
     single_fig_size: tuple[float,float] = (a4_print_width*single_fig_scale,
                         a4_print_width*single_fig_scale/aspect_ratio)
 

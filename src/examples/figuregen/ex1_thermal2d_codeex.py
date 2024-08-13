@@ -41,6 +41,8 @@ thermocouple_array = pyvale.PointSensorArray(sens_pos,
                                             sample_times,
                                             descriptor)
 
+print(thermocouple_array._field)
+
 #===============================================================================
 # PART 2: Create an error chain
 #===============================================================================
@@ -62,7 +64,7 @@ thermocouple_array.set_indep_sys_err_integrator(indep_sys_err_int)
 # Calculated based on the sensor 'truth' value
 rand_err1 = pyvale.RandErrNormPercent(std_percent=5.0)
 rand_err_int = pyvale.ErrorIntegrator([rand_err1,],
-                                        thermocouple_array.get_measurement_shape())
+                                    thermocouple_array.get_measurement_shape())
 thermocouple_array.set_rand_err_integrator(rand_err_int)
 
 # Calculated based on the accumulated error in the error chain
@@ -100,13 +102,21 @@ pyvale.print_measurements(thermocouple_array,
                         (measurements.shape[2]-5,measurements.shape[2]))
 
 (fig,_) = pyvale.plot_time_traces(thermocouple_array,FIELD_KEY)
+#plt.show()
 
-plt.show()
+pv_plot = pyvale.plot_sensors_on_sim(thermocouple_array,FIELD_KEY)
+pv_plot.camera_position = [(-0.295, 1.235, 3.369),
+                            (1.0274, 0.314, 0.0211),
+                            (0.081, 0.969, -0.234)]
+#pv_plot.show()
 
 #===============================================================================
 # PART 4: Visualise Sensor Positions
 #===============================================================================
 
+save_render = Path('src/examples/figuregen/codex_sensvis.svg')
+pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
+pv_plot.screenshot(save_render.with_suffix('.png'))
 
 
 #===============================================================================

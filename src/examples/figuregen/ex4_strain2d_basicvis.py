@@ -32,17 +32,27 @@ def main() -> None:
                                                      spat_dims=2)
 
     plot_field = 'strain_yy'
-    if plot_field == 'strain_xx':
-        pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,'strain_xx')
-        pv_plot.show()
-    elif plot_field == 'strain_yy':
-        pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,'strain_yy')
-        pv_plot.show()
+    pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,plot_field)
 
-    pyvale.plot_time_traces(straingauge_array,'strain_xx')
-    pyvale.plot_time_traces(straingauge_array,'strain_yy')
-    pyvale.plot_time_traces(straingauge_array,'strain_xy')
-    plt.show()
+    save_render = Path('src/examples/figuregen/strain2d_sensvis.svg')
+    pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
+    pv_plot.screenshot(save_render.with_suffix('.png'))
+
+    #pv_plot.show()
+
+    (fig,_) = pyvale.plot_time_traces(straingauge_array,'strain_xx')
+    save_traces = Path('src/examples/figuregen/strain2d_traces_exx.png')
+    fig.savefig(save_traces, dpi=300, format='png', bbox_inches='tight')
+
+    (fig,_) =pyvale.plot_time_traces(straingauge_array,'strain_yy')
+    save_traces = Path('src/examples/figuregen/strain2d_traces_eyy.png')
+    fig.savefig(save_traces, dpi=300, format='png', bbox_inches='tight')
+
+    (fig,_) =pyvale.plot_time_traces(straingauge_array,'strain_xy')
+    save_traces = Path('src/examples/figuregen/strain2d_traces_exy.png')
+    fig.savefig(save_traces, dpi=300, format='png', bbox_inches='tight')
+
+    #plt.show()
 
 
 if __name__ == "__main__":

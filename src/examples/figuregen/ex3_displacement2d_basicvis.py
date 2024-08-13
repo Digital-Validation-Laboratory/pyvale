@@ -33,17 +33,21 @@ def main() -> None:
                                                 "displacement",
                                                 spat_dims=2)
 
-    plot_field = 'disp_x'
-    if plot_field == 'disp_x':
-        pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,'disp_x')
-        pv_plot.show()
-    elif plot_field == 'disp_y':
-        pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,'disp_y')
-        pv_plot.show()
+    plot_field = 'disp_y'
+    pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,plot_field)
+    #pv_plot.show()
+    save_render = Path('src/examples/figuregen/disp2d_sensvis.svg')
+    pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
+    pv_plot.screenshot(save_render.with_suffix('.png'))
 
-    pyvale.plot_time_traces(disp_sens_array,'disp_x')
-    pyvale.plot_time_traces(disp_sens_array,'disp_y')
-    plt.show()
+    (fig,_) = pyvale.plot_time_traces(disp_sens_array,'disp_x')
+    save_traces = Path('src/examples/figuregen/disp2d_traces_ux.png')
+    fig.savefig(save_traces, dpi=300, format='png', bbox_inches='tight')
+
+    (fig,_) = pyvale.plot_time_traces(disp_sens_array,'disp_y')
+    save_traces = Path('src/examples/figuregen/disp2d_traces_uy.png')
+    fig.savefig(save_traces, dpi=300, format='png', bbox_inches='tight')
+    #plt.show()
 
 
 if __name__ == "__main__":
