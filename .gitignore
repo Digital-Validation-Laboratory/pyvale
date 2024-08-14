@@ -22,6 +22,10 @@ src/examples/*.svg
 src/examples/figuregen/*.png
 src/examples/figuregen/*.svg
 
+dev/lfdev/*/*.png
+dev/lfdev/*/*.svg
+dev/lfdev/*.png
+dev/lfdev/*.svg
 
 # Image deformation test cases
 *.pkl
