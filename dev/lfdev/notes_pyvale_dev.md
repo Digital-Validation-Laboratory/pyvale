@@ -6,13 +6,13 @@
 - Need to build analytical test cases
     - Temperature field in 2D and 3D with a multi-directional gradient
     - Displacement fields in 2D and 3D with multi directional gradient
-- Calibration errors
+- TODO: Calibration errors
 - Field based errors:
-    - Positioning error
-    - Spatial averaging error
+    - DONE: Positioning error
+    - HALF DONE: Spatial averaging error
         - Set an integration area
         - Set a weighting function
-    - Temporal averaging error
+    - TODO: Temporal averaging error
         - Set an integration time
         - Set a weighting function
 
@@ -20,7 +20,8 @@ Gauss Quadrature for the Unit Disc
 http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubature-formulas-for-the-unit-disk/
 
 **Examples**
-- Done for now - move on to new features
+- Positioning error, spatial integration error
+- Spatial integration truth
 
 **Systematic error handling**
 - Add spatial and temporal averaging errors:

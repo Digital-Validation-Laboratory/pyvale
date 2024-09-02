@@ -12,8 +12,8 @@ Copyright (C) 2024 The Computer Aided Validation Team
 #===============================================================================
 
 from pathlib import Path
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import mooseherder as mh
 import pyvale
 
@@ -40,8 +40,6 @@ thermocouple_array = pyvale.PointSensorArray(sens_pos,
                                             temperature_field,
                                             sample_times,
                                             descriptor)
-
-print(thermocouple_array._field)
 
 #===============================================================================
 # PART 2: Create an error chain
@@ -102,13 +100,13 @@ pyvale.print_measurements(thermocouple_array,
                         (measurements.shape[2]-5,measurements.shape[2]))
 
 (fig,_) = pyvale.plot_time_traces(thermocouple_array,FIELD_KEY)
-#plt.show()
+plt.show()
 
 pv_plot = pyvale.plot_sensors_on_sim(thermocouple_array,FIELD_KEY)
 pv_plot.camera_position = [(-0.295, 1.235, 3.369),
                             (1.0274, 0.314, 0.0211),
                             (0.081, 0.969, -0.234)]
-#pv_plot.show()
+pv_plot.show()
 
 #===============================================================================
 # PART 4: Visualise Sensor Positions
@@ -151,7 +149,7 @@ pyvale.print_measurements(thermocouple_array,
 (fig,_) = pyvale.plot_time_traces(thermocouple_array,FIELD_KEY)
 
 save_traces = Path('src/examples/figuregen/'+
-                f'codex_traces_exp0.png')
+                  f'codex_traces_exp0.png')
 fig.savefig(save_traces, dpi=300, format='png', bbox_inches='tight')
 
 

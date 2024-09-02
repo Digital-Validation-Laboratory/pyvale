@@ -63,8 +63,8 @@ def main() -> None:
         # Determined manually by moving camera and then dumping camera position
         # to console after window close - see 'interactive above'
         pv_plot.camera_position = [(-0.295, 1.235, 3.369),
-                                (1.0274, 0.314, 0.0211),
-                                (0.081, 0.969, -0.234)]
+                                   (1.0274, 0.314, 0.0211),
+                                   (0.081, 0.969, -0.234)]
         save_render = Path('src/examples/plate_thermal_2d_sim_view.svg')
         pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
         pv_plot.screenshot(save_render.with_suffix('.png'))
