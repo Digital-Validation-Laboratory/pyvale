@@ -5,10 +5,6 @@
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
-# NOTE: only used for transient solves
-#endTime = 20
-#timeStep = 5
-
 coolantTemp=100.0      # degC
 heatTransCoeff=125.0e3 # W.m^-2.K^-1
 surfHeatFlux=10.0e6    # W.m^-2

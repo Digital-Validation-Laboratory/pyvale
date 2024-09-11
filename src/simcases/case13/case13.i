@@ -11,11 +11,11 @@ timeStep = 0.5
 
 # Geometric Properties
 lengX = 100e-3  # m
-lengY = 75e-3   # m
+lengY = 50e-3   # m
 
 # Mesh Properties
-nElemX = 40
-nElemY = 30
+nElemX = 20
+nElemY = 10
 eType = QUAD4 # QUAD4 for 1st order, QUAD8 for 2nd order
 
 # Thermal Loads/BCs

@@ -30,10 +30,10 @@ hole_loc_y = plate_height/2;
 hole_circ = 2*Pi*hole_rad;
 
 // Mesh variables
-hole_sect_nodes = 9*2+1; // Must be odd
-plate_rad_nodes = 9*2+1;
-plate_diff_nodes = 5*2; // numbers of nodes along the rectangular extension
-plate_thick_divs = 2*2; // using quadratic elements so 2 through thickness should be ok
+hole_sect_nodes = 9; // Must be odd
+plate_rad_nodes = 9;
+plate_diff_nodes = 5; // numbers of nodes along the rectangular extension
+plate_thick_divs = 2; // using quadratic elements so 2 through thickness should be ok
 
 plate_edge_nodes = Floor((hole_sect_nodes-1)/2)+1;
 elem_size = hole_circ/(4*(hole_sect_nodes-1));

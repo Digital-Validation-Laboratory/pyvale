@@ -5,9 +5,8 @@
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
-# NOTE: only used for transient solves
 endTime = 30
-timeStep = 0.5
+timeStep = 5
 
 coolantTemp=100.0      # degC
 heatTransCoeff=125.0e3 # W.m^-2.K^-1
@@ -76,10 +75,6 @@ mesh_file = 'case16.msh'
     type = HeatConduction
     variable = temperature
   []
-  [time_derivative]
-    type = HeatConductionTimeDerivative
-    variable = temperature
-  []
 []
 
 [Modules/TensorMechanics/Master]
@@ -95,92 +90,92 @@ mesh_file = 'case16.msh'
 []
 
 [Materials]
-  [cucrzr_thermal]
-    type = HeatConductionMaterial
-    thermal_conductivity = ${cucrzrThermCond}
-    specific_heat = ${cucrzrSpecHeat}
-    block = 'pipe-cucrzr'
-  []
-  [cucrzr_density]
-    type = GenericConstantMaterial
-    prop_names = 'density'
-    prop_values = ${cucrzrDensity}
-    block = 'pipe-cucrzr'
-  []
-  [cucrzr_elasticity]
-    type = ComputeIsotropicElasticityTensor
-    youngs_modulus = ${cucrzrEMod}
-    poissons_ratio = ${cucrzrPRatio}
-    block = 'pipe-cucrzr'
-  []
-  [cucrzr_expansion]
-    type = ComputeThermalExpansionEigenstrain
-    temperature = temperature
-    stress_free_temperature = ${stressFreeTemp}
-    thermal_expansion_coeff = ${cucrzrThermExp}
-    eigenstrain_name = thermal_expansion_eigenstrain
-    block = 'pipe-cucrzr'
-  []
+    [cucrzr_thermal]
+        type = HeatConductionMaterial
+        thermal_conductivity = ${cucrzrThermCond}
+        specific_heat = ${cucrzrSpecHeat}
+        block = 'pipe-cucrzr'
+    []
+    [cucrzr_density]
+        type = GenericConstantMaterial
+        prop_names = 'density'
+        prop_values = ${cucrzrDensity}
+        block = 'pipe-cucrzr'
+    []
+    [cucrzr_elasticity]
+        type = ComputeIsotropicElasticityTensor
+        youngs_modulus = ${cucrzrEMod}
+        poissons_ratio = ${cucrzrPRatio}
+        block = 'pipe-cucrzr'
+    []
+    [cucrzr_expansion]
+        type = ComputeThermalExpansionEigenstrain
+        temperature = temperature
+        stress_free_temperature = ${stressFreeTemp}
+        thermal_expansion_coeff = ${cucrzrThermExp}
+        eigenstrain_name = thermal_expansion_eigenstrain
+        block = 'pipe-cucrzr'
+    []
 
 
-  [copper_thermal]
-    type = HeatConductionMaterial
-    thermal_conductivity = ${cuThermCond}
-    specific_heat = ${cuSpecHeat}
-    block = 'interlayer-cu'
-  []
-  [copper_density]
-    type = GenericConstantMaterial
-    prop_names = 'density'
-    prop_values = ${cuDensity}
-    block = 'interlayer-cu'
-  []
-  [copper_elasticity]
-    type = ComputeIsotropicElasticityTensor
-    youngs_modulus = ${cuEMod}
-    poissons_ratio = ${cuPRatio}
-    block = 'interlayer-cu'
-  []
-  [copper_expansion]
-    type = ComputeThermalExpansionEigenstrain
-    temperature = temperature
-    stress_free_temperature = ${stressFreeTemp}
-    thermal_expansion_coeff = ${cuThermExp}
-    eigenstrain_name = thermal_expansion_eigenstrain
-    block = 'interlayer-cu'
-  []
+    [copper_thermal]
+        type = HeatConductionMaterial
+        thermal_conductivity = ${cuThermCond}
+        specific_heat = ${cuSpecHeat}
+        block = 'interlayer-cu'
+    []
+    [copper_density]
+        type = GenericConstantMaterial
+        prop_names = 'density'
+        prop_values = ${cuDensity}
+        block = 'interlayer-cu'
+    []
+    [copper_elasticity]
+        type = ComputeIsotropicElasticityTensor
+        youngs_modulus = ${cuEMod}
+        poissons_ratio = ${cuPRatio}
+        block = 'interlayer-cu'
+    []
+    [copper_expansion]
+        type = ComputeThermalExpansionEigenstrain
+        temperature = temperature
+        stress_free_temperature = ${stressFreeTemp}
+        thermal_expansion_coeff = ${cuThermExp}
+        eigenstrain_name = thermal_expansion_eigenstrain
+        block = 'interlayer-cu'
+    []
 
 
-  [tungsten_thermal]
-    type = HeatConductionMaterial
-    thermal_conductivity = ${wThermCond}
-    specific_heat = ${wSpecHeat}
-    block = 'armour-w'
-  []
-  [tungsten_density]
-    type = GenericConstantMaterial
-    prop_names = 'density'
-    prop_values = ${wDensity}
-    block = 'armour-w'
-  []
-  [tungsten_elasticity]
-    type = ComputeIsotropicElasticityTensor
-    youngs_modulus = ${wEMod}
-    poissons_ratio = ${wPRatio}
-    block = 'armour-w'
-  []
-  [tungsten_expansion]
-    type = ComputeThermalExpansionEigenstrain
-    temperature = temperature
-    stress_free_temperature = ${stressFreeTemp}
-    thermal_expansion_coeff = ${wThermExp}
-    eigenstrain_name = thermal_expansion_eigenstrain
-    block = 'armour-w'
-  []
+    [tungsten_thermal]
+        type = HeatConductionMaterial
+        thermal_conductivity = ${wThermCond}
+        specific_heat = ${wSpecHeat}
+        block = 'armour-w'
+    []
+    [tungsten_density]
+        type = GenericConstantMaterial
+        prop_names = 'density'
+        prop_values = ${wDensity}
+        block = 'armour-w'
+    []
+    [tungsten_elasticity]
+        type = ComputeIsotropicElasticityTensor
+        youngs_modulus = ${wEMod}
+        poissons_ratio = ${wPRatio}
+        block = 'armour-w'
+    []
+    [tungsten_expansion]
+        type = ComputeThermalExpansionEigenstrain
+        temperature = temperature
+        stress_free_temperature = ${stressFreeTemp}
+        thermal_expansion_coeff = ${wThermExp}
+        eigenstrain_name = thermal_expansion_eigenstrain
+        block = 'armour-w'
+    []
 
-  [stress]
-    type = ComputeFiniteStrainElasticStress # ComputeLinearElasticStress or ComputeFiniteStrainElasticStress
-  []
+    [stress]
+        type = ComputeFiniteStrainElasticStress # ComputeLinearElasticStress or ComputeFiniteStrainElasticStress
+    []
 []
 
 [BCs]
@@ -189,6 +184,7 @@ mesh_file = 'case16.msh'
     variable = temperature
     boundary = 'bc-top-heatflux'
     function = '${fparse surfHeatFlux}*(1-exp(-(1/${timeConst})*t))'
+    #function = '${fparse surfHeatFlux}*(t/${fparse endTime/2})'
   []
   [heat_flux_out]
     type = ConvectiveHeatFluxBC
@@ -201,83 +197,83 @@ mesh_file = 'case16.msh'
   # Lock disp_y for base
     # NOTE: if locking y on base need to comment all disp_y conditions below
     [mech_bc_c_dispy]
-      type = DirichletBC
-     variable = disp_y
-      boundary = 'bc-base-disp'
-      value = 0.0
-  []
+        type = DirichletBC
+       variable = disp_y
+        boundary = 'bc-base-disp'
+        value = 0.0
+    []
 
-  # Lock all disp DOFs at the center of the block
-  [mech_bc_c_dispx]
-      type = DirichletBC
-      variable = disp_x
-      boundary = 'bc-c-point-xyz-mech'
-      value = 0.0
-  []
-  #[mech_bc_c_dispy]
-  #    type = DirichletBC
-  #    variable = disp_y
-  #    boundary = 'bc-c-point-xyz-mech'
-  #    value = 0.0
-  #[]
-  [mech_bc_c_dispz]
-      type = DirichletBC
-      variable = disp_z
-      boundary = 'bc-c-point-xyz-mech'
-      value = 0.0
-  []
+    # Lock all disp DOFs at the center of the block
+    [mech_bc_c_dispx]
+        type = DirichletBC
+        variable = disp_x
+        boundary = 'bc-c-point-xyz-mech'
+        value = 0.0
+    []
+    #[mech_bc_c_dispy]
+    #    type = DirichletBC
+    #    variable = disp_y
+    #    boundary = 'bc-c-point-xyz-mech'
+    #    value = 0.0
+    #[]
+    [mech_bc_c_dispz]
+        type = DirichletBC
+        variable = disp_z
+        boundary = 'bc-c-point-xyz-mech'
+        value = 0.0
+    []
 
-  # Lock disp yz along the x (left-right) axis
-  #[mech_bc_l_dispy]
-  #    type = DirichletBC
-  #    variable = disp_y
-  #    boundary = 'bc-l-point-yz-mech'
-  #    value = 0.0
-  #[]
-  [mech_bc_l_dispz]
-      type = DirichletBC
-      variable = disp_z
-      boundary = 'bc-l-point-yz-mech'
-      value = 0.0
-  []
-  #[mech_bc_r_dispy]
-  #    type = DirichletBC
-  #    variable = disp_y
-  #    boundary = 'bc-r-point-yz-mech'
-  #    value = 0.0
-  #[]
-  [mech_bc_r_dispz]
-      type = DirichletBC
-      variable = disp_z
-      boundary = 'bc-r-point-yz-mech'
-      value = 0.0
-  []
+    # Lock disp yz along the x (left-right) axis
+    #[mech_bc_l_dispy]
+    #    type = DirichletBC
+    #    variable = disp_y
+    #    boundary = 'bc-l-point-yz-mech'
+    #    value = 0.0
+    #[]
+    [mech_bc_l_dispz]
+        type = DirichletBC
+        variable = disp_z
+        boundary = 'bc-l-point-yz-mech'
+        value = 0.0
+    []
+    #[mech_bc_r_dispy]
+    #    type = DirichletBC
+    #    variable = disp_y
+    #    boundary = 'bc-r-point-yz-mech'
+    #    value = 0.0
+    #[]
+    [mech_bc_r_dispz]
+        type = DirichletBC
+        variable = disp_z
+        boundary = 'bc-r-point-yz-mech'
+        value = 0.0
+    []
 
-  # Lock disp xy along the z (front-back) axis
-  [mech_bc_f_dispx]
-      type = DirichletBC
-      variable = disp_x
-      boundary = 'bc-f-point-xy-mech'
-      value = 0.0
-  []
-  #[mech_bc_f_dispy]
-  #    type = DirichletBC
-  #    variable = disp_y
-  #    boundary = 'bc-f-point-xy-mech'
-  #    value = 0.0
-  #[]
-  [mech_bc_b_dispx]
-      type = DirichletBC
-      variable = disp_x
-      boundary = 'bc-b-point-xy-mech'
-      value = 0.0
-  []
-  #[mech_bc_b_dispy]
-  #    type = DirichletBC
-  #    variable = disp_y
-  #    boundary = 'bc-b-point-xy-mech'
-  #    value = 0.0
-  #[]
+    # Lock disp xy along the z (front-back) axis
+    [mech_bc_f_dispx]
+        type = DirichletBC
+        variable = disp_x
+        boundary = 'bc-f-point-xy-mech'
+        value = 0.0
+    []
+    #[mech_bc_f_dispy]
+    #    type = DirichletBC
+    #    variable = disp_y
+    #    boundary = 'bc-f-point-xy-mech'
+    #    value = 0.0
+    #[]
+    [mech_bc_b_dispx]
+        type = DirichletBC
+        variable = disp_x
+        boundary = 'bc-b-point-xy-mech'
+        value = 0.0
+    []
+    #[mech_bc_b_dispy]
+    #    type = DirichletBC
+    #    variable = disp_y
+    #    boundary = 'bc-b-point-xy-mech'
+    #    value = 0.0
+    #[]
 []
 
 [Preconditioning]
@@ -289,11 +285,26 @@ mesh_file = 'case16.msh'
 
 [Executioner]
   type = Transient
-  solve_type = 'PJFNK'
+
+  solve_type = NEWTON   #'PJFNK'
+  l_max_its = 100       # default = 1000
+  l_tol = 1e-4          # default = 1e-5
+  nl_abs_tol = 1e-6     # default = 1e-50
+  nl_rel_tol = 1e-6     # default = 1e-8
+
+  line_search = none # TODO: check this helps
   petsc_options_iname = '-pc_type -pc_hypre_type'
-  petsc_options_value = 'hypre    boomeramg'
+  petsc_options_value = 'hypre boomeramg'
+
+
+  start_time=0.0
   end_time = ${endTime}
   dt = ${timeStep}
+
+  [Predictor]
+    type = SimplePredictor
+    scale = 1
+  []
 []
 
 

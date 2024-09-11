@@ -24,7 +24,7 @@ http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubatur
 - Spatial integration truth
 - Change examples to use simcases:
     - Thermal 2D, Transient = case13 - plate / moose only
-    - Thermal 3D, Transient = case15 - monoblock+gmsh
+    - Thermal 3D, Transient = case15 - monoblock+gmsh - use 16 with mech data as well
     - Mechanical 2D, Transient = case17 - plate with hole 2D+gmsh
     - Mechanical 3D = **TODO**
     - Thermomechanical 3D = case16 - monoblock+gmsh

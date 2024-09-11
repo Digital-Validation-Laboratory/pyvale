@@ -5,17 +5,13 @@
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
-# NOTE: only used for transient solves
-#endTime = 1
-#timeStep = 1
-
 # Geometric Properties
 lengX = 100e-3  # m
-lengY = 75e-3   # m
+lengY = 50e-3   # m
 
 # Mesh Properties
-nElemX = 40
-nElemY = 30
+nElemX = 20
+nElemY = 10
 eType = QUAD4 # QUAD4 for 1st order, QUAD8 for 2nd order
 
 # Thermal Loads/BCs
@@ -122,8 +118,6 @@ wSpecHeat = 147.0  # J.kg^-1.K^-1
 
 [Executioner]
   type = Steady
-  #end_time= ${endTime}
-  #dt = ${timeStep}
 []
 
 [Postprocessors]

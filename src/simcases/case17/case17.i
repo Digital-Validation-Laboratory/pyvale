@@ -6,7 +6,6 @@
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
-# NOTE: only used for transient solves
 endTime = 60
 timeStep = 5
 

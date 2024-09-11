@@ -5,9 +5,6 @@
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
-#endTime= 1
-#timeStep = 1
-
 # Thermal Loads/BCs
 coolantTemp = 100.0      # degC
 heatTransCoeff = 125.0e3 # W.m^-2.K^-1

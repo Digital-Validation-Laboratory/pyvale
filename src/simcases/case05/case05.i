@@ -5,17 +5,13 @@
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
-# NOTE: only used for transient solves
-#endTime= 1
-#timeStep = 1
-
 # Geometric Properties
 lengX = 100e-3  # m
 lengY = 50e-3   # m
 
 # Mesh Properties
-nElemX = 40
-nElemY = 20
+nElemX = 20
+nElemY = 10
 eType = QUAD4 # QUAD4 for 1st order, QUAD8 for 2nd order
 
 # Thermal Loads/BCs

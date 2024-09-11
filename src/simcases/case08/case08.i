@@ -6,10 +6,6 @@
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
-# NOTE: only used for transient solves
-#endTime = 1
-#timeStep = 1
-
 # Mechanical Loads/BCs
 topDisp = 0.1e-3  # m
 # tensLoad = 10e6 # Pa
