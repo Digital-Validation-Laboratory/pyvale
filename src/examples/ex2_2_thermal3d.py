@@ -16,18 +16,18 @@ def main() -> None:
     """pyvale example:
     """
     # Use mooseherder to read the exodus and get a SimData object
-    data_path = Path('data/examplesims/monoblock_3d_thermal_out.e')
+    data_path = Path('src/simcases/case16/case16_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
-    field_name = list(sim_data.node_vars.keys())[0] # type: ignore
+    field_name = 'temperature'
 
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
     n_sens = (1,4,1)
     x_lims = (11.5,11.5)
-    y_lims = (-11.5,19.5)
-    z_lims = (0.0,12.0)
+    y_lims = (0,31.0)
+    z_lims = (0.0,12.5)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
     tc_array = pyvale.SensorArrayFactory() \

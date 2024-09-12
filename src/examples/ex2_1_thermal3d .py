@@ -55,7 +55,7 @@ def main() -> None:
         print('Camera positions = ')
         print(pv_plot.camera_position)
         print(80*"="+"\n")
-        
+
     if pv_plot_mode == 'save_fig':
         # Determined manually by moving camera and then dumping camera position
         # to console after window close - see 'interactive above'

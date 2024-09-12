@@ -15,7 +15,7 @@ import pyvale
 def main() -> None:
     """pyvale example:
     """
-    data_path = Path('simcases/case17/case17_out.e')
+    data_path = Path('src/simcases/case17/case17_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier

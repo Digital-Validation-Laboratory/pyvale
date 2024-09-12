@@ -18,7 +18,7 @@ import pyvale
 def main() -> None:
     """pyvale example:
     """
-    data_path = Path('data/examplesims/plate_2d_thermal_out.e')
+    data_path = Path('src/data/case13_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 

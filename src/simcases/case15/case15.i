@@ -5,8 +5,8 @@
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
-endTime = 30
-timeStep = 0.5
+endTime = 25
+timeStep = 1
 
 coolantTemp=100.0      # degC
 heatTransCoeff=125.0e3 # W.m^-2.K^-1

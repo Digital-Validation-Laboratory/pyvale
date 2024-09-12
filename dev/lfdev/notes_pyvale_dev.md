@@ -118,6 +118,12 @@ https://www.mstarlabs.com/sensors/thermocouple-calibration.html
 T  =  -0.01897 + 25.41881 V - 0.42456 V^2 + 0.04365 V^3
 where V is voltage in units of millivolts and T is temperature in degrees C.
 
+- Thermocouple amplifier card:
+https://www.ni.com/docs/en-US/bundle/ni-9213-specs/page/specs.html
+
+- App note on thermocouple amplifier chip:
+https://www.analog.com/en/resources/app-notes/an-1087.html
+
 ## Systematic errors
 Comes from many sources:
 - Positioning error

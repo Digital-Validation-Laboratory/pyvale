@@ -13,7 +13,7 @@ from mooseherder import (MooseConfig,
                          GmshRunner)
 
 
-EXAMPLE_CASES = [13,15,16,17]
+EXAMPLE_CASES = [13,16,17]
 USER_DIR = Path.home()
 FORCE_GMSH = False
 CASES_DIR = Path('src/simcases/')

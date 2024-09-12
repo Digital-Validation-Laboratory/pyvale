@@ -5,8 +5,8 @@
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
 
-endTime = 30
-timeStep = 5
+endTime = 25
+timeStep = 1
 
 coolantTemp=100.0      # degC
 heatTransCoeff=125.0e3 # W.m^-2.K^-1
@@ -75,6 +75,10 @@ mesh_file = 'case16.msh'
     type = HeatConduction
     variable = temperature
   []
+  [time_derivative]
+    type = HeatConductionTimeDerivative
+    variable = temperature
+  []
 []
 
 [Modules/TensorMechanics/Master]
@@ -85,7 +89,7 @@ mesh_file = 'case16.msh'
       material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
       material_output_order = FIRST       # CONSTANT, FIRST, SECOND,
       automatic_eigenstrain_names = true
-      generate_output = 'vonmises_stress strain_xx strain_xy strain_xz strain_yx strain_yy strain_yz strain_zx strain_zy strain_zz stress_xx stress_xy stress_xz stress_yx stress_yy stress_yz stress_zx stress_zy stress_zz max_principal_strain mid_principal_strain min_principal_strain'
+      generate_output = 'strain_xx strain_xy strain_xz strain_yx strain_yy strain_yz strain_zx strain_zy strain_zz'
   []
 []
 
@@ -286,16 +290,15 @@ mesh_file = 'case16.msh'
 [Executioner]
   type = Transient
 
-  solve_type = NEWTON   #'PJFNK'
+  solve_type = PJFNK   # PJNFK or NEWTON
   l_max_its = 100       # default = 1000
-  l_tol = 1e-4          # default = 1e-5
+  l_tol = 1e-6          # default = 1e-5
   nl_abs_tol = 1e-6     # default = 1e-50
   nl_rel_tol = 1e-6     # default = 1e-8
 
   line_search = none # TODO: check this helps
   petsc_options_iname = '-pc_type -pc_hypre_type'
   petsc_options_value = 'hypre boomeramg'
-
 
   start_time=0.0
   end_time = ${endTime}

@@ -6,8 +6,8 @@
 #_* MOOSEHERDER VARIABLES - START
 
 # NOTE: only used for transient solves
-endTime = 30
-timeStep = 0.5
+endTime = 300
+timeStep = 5
 
 # Geometric Properties
 lengX = 100e-3  # m
@@ -92,8 +92,25 @@ cuSpecHeat = 406.0  # J.kg^-1.K^-1
 
 [Executioner]
     type = Transient
-    end_time= ${endTime}
+
+    solve_type = PJFNK   # PJNFK or NEWTON
+    l_max_its = 100       # default = 1000
+    l_tol = 1e-6          # default = 1e-5
+    nl_abs_tol = 1e-6     # default = 1e-50
+    nl_rel_tol = 1e-6     # default = 1e-8
+
+    line_search = none # TODO: check this helps
+    petsc_options_iname = '-pc_type -pc_hypre_type'
+    petsc_options_value = 'hypre boomeramg'
+
+    start_time=0.0
+    end_time = ${endTime}
     dt = ${timeStep}
+
+    [Predictor]
+      type = SimplePredictor
+      scale = 1
+    []
 []
 
 [Postprocessors]
