@@ -8,7 +8,7 @@ from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.optimize import minimize
 
-from pyvale.visualisation.plotopts import PlotProps
+from pyvale.visualisation.plotopts import GeneralPlotOpts
 import pyvale.optimisers.checkfuncs as cf
 
 #-------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ def main() -> None:
     print("Best solution found: \nX = %s\nF = %s" % (res.X, res.F))
     print(80*'=')
 
-    pp = PlotProps()
+    pp = GeneralPlotOpts()
     (fig,ax) = cf.plot_fun_2d(f'Min with {alg}',
                               cost_func,(xl,xu),(xl,xu),100)
     plt.plot(res.X[0],res.X[1],'+r',lw=pp.lw,ms=pp.ms)

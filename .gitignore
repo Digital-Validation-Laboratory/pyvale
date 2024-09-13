@@ -30,6 +30,7 @@ dev/lfdev/*.svg
 *.pkl
 imdefcase*_*/
 deformed_images/
+src/deformed_images/
 
 #-------------------------------------------------------------------------------
 # Python Standard Ignore

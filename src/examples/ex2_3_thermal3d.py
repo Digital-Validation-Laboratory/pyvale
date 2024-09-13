@@ -17,10 +17,9 @@ import pyvale
 def main() -> None:
     """pyvale example:
     """
-    data_path = Path('data/examplesims/monoblock_3d_thermal_out.e')
+    data_path = Path('src/data/case16_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
-    field_name = list(sim_data.node_vars.keys())[0] # type: ignore
 
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
@@ -44,8 +43,8 @@ def main() -> None:
                                  spat_dim=3)
 
     n_sens = (1,4,1)
-    x_lims = (11.5,11.5)
-    y_lims = (-11.5,19.5)
+    x_lims = (12.5,12.5)
+    y_lims = (0.0,33.0)
     z_lims = (0.0,12.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 

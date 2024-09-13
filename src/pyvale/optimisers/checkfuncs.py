@@ -7,7 +7,7 @@ https://en.wikipedia.org/wiki/Test_functions_for_optimization
 from typing import Callable,Any
 import numpy as np
 import matplotlib.pyplot as plt
-from pyvale.visualisation.plotopts import PlotProps
+from pyvale.visualisation.plotopts import GeneralPlotOpts
 
 
 def ackley(x: np.ndarray,
@@ -134,7 +134,7 @@ def plot_fun_2d(tStr: str,
     (xm1,xm2) = get_mesh_x_2d(xlim1,xlim2,n)
     f_mesh = f_mesh_2d(fun,xlim1,xlim2,n)
     # Plot the function
-    pp = PlotProps()
+    pp = GeneralPlotOpts()
     fig, ax = plt.subplots(figsize=pp.single_fig_size, layout='constrained')
     fig.set_dpi(pp.resolution)
 

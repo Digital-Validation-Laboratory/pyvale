@@ -16,7 +16,7 @@ def main() -> None:
     """pyvale example:
     """
     # Use mooseherder to read the exodus and get a SimData object
-    data_path = Path('src/simcases/case16/case16_out.e')
+    data_path = Path('src/data/case16_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     field_name = 'temperature'
@@ -25,7 +25,7 @@ def main() -> None:
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
     n_sens = (1,4,1)
-    x_lims = (11.5,11.5)
+    x_lims = (12.5,12.5)
     y_lims = (0,31.0)
     z_lims = (0.0,12.5)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
@@ -41,9 +41,9 @@ def main() -> None:
     print(f'\nMeasurements for sensor at top of block:\n{measurements[-1,0,:]}\n')
 
     pv_plot = pyvale.plot_sensors_on_sim(tc_array,field_name)
-    pv_plot.camera_position = [(52.198, 26.042, 60.099),
-                                (0.0, 4.0, 5.5),
-                                (-0.190, 0.960, -0.206)]
+    pv_plot.camera_position = [(59.354, 43.428, 69.946),
+                                (-2.858, 13.189, 4.523),
+                                (-0.215, 0.948, -0.233)]
     pv_plot.show()
 
 

@@ -28,9 +28,8 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # Load image - expects a *.tiff or *.bmp that is grayscale
-    im_path = Path('data/speckleimages')
-    #im_file = 'OptimisedSpeckle_500_500_width3.0_16bit_GBlur1.tiff'
-    im_file = 'OptimisedSpeckle_2464_2056_width5.0_8bit_GBlur1.tiff'
+    im_path = Path('src/data/')
+    im_file = 'optspeckle_2464x2056px_spec5px_8bit_gblur1px.tiff'
     im_path = im_path / im_file
     print('\nLoading speckle image from path:')
     print(im_path)
@@ -44,9 +43,8 @@ def main() -> None:
 
     sim_path = Path.cwd()
     if read_exodus:
-        case_str = 'case17'
-        sim_path = Path(f'simcases/{case_str}')
-        sim_file = f'{case_str}_out.e'
+        sim_path = Path('src/data/')
+        sim_file = 'case17_out.e'
 
         print(f'\nLoading SimData from exodus in path:\n{sim_path}')
 
