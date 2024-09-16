@@ -1,10 +1,11 @@
 #-------------------------------------------------------------------------
-# pyvale: simple,2Dplate,1mat,thermomechanical,steady
+# pyvale: simple,2Dplate,1mat,thermomechanical,transient
 #-------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
-
+endTime = 300
+timeStep = 5
 
 # Geometric Properties
 lengX = 100e-3  # m
@@ -23,7 +24,7 @@ surfHeatFlux = 500.0e3    # W.m^-2
 # Material Properties:
 # Thermal Props:OFHC) Copper at 250degC
 cuDensity = 8829.0  # kg.m^-3
-cuThermCond = 384.0 # W.m^-1.K^-1
+cuThermCond = ${fparse 384.0 * 1.0} # W.m^-1.K^-1
 cuSpecHeat = 406.0  # J.kg^-1.K^-1
 
 # Mechanical Props: OFHC Copper 250degC
@@ -113,7 +114,7 @@ sTol = ${fparse lengX/(nElemX*4)}
         material_output_family = MONOMIAL   # MONOMIAL, LAGRANGE
         material_output_order = FIRST       # CONSTANT, FIRST, SECOND,
         automatic_eigenstrain_names = true
-        generate_output = 'vonmises_stress strain_xx strain_xy strain_xz strain_yx strain_yy strain_yz strain_zx strain_zy strain_zz stress_xx stress_xy stress_xz stress_yx stress_yy stress_yz stress_zx stress_zy stress_zz max_principal_strain mid_principal_strain min_principal_strain'
+        generate_output = 'strain_xx strain_xy strain_xz strain_yx strain_yy strain_yz strain_zx strain_zy strain_zz'
     []
 []
 
@@ -182,12 +183,26 @@ sTol = ${fparse lengX/(nElemX*4)}
 []
 
 [Executioner]
-    type = Steady
-    solve_type = 'PJFNK'
+    type = Transient
+
+    solve_type = PJFNK   # PJNFK or NEWTON
+    l_max_its = 100       # default = 1000
+    l_tol = 1e-6          # default = 1e-5
+    nl_abs_tol = 1e-6     # default = 1e-50
+    nl_rel_tol = 1e-6     # default = 1e-8
+
+    line_search = none
     petsc_options_iname = '-pc_type -pc_hypre_type'
-    petsc_options_value = 'hypre    boomeramg'
-    #end_time= ${endTime}
-    #dt = ${timeStep}
+    petsc_options_value = 'hypre boomeramg'
+
+    start_time = 0.0
+    end_time = ${endTime}
+    dt = ${timeStep}
+
+    [Predictor]
+      type = SimplePredictor
+      scale = 1
+    []
 []
 
 

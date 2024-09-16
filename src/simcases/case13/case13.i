@@ -4,8 +4,6 @@
 
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
-
-# NOTE: only used for transient solves
 endTime = 300
 timeStep = 5
 
@@ -103,7 +101,7 @@ cuSpecHeat = 406.0  # J.kg^-1.K^-1
     petsc_options_iname = '-pc_type -pc_hypre_type'
     petsc_options_value = 'hypre boomeramg'
 
-    start_time=0.0
+    start_time = 0.0
     end_time = ${endTime}
     dt = ${timeStep}
 

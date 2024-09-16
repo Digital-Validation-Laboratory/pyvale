@@ -27,7 +27,8 @@ class SensorArrayFactory:
                                  positions: np.ndarray,
                                  field_name: str = "temperature",
                                  spat_dims: int = 3,
-                                 sample_times: np.ndarray | None = None
+                                 sample_times: np.ndarray | None = None,
+                                 errs_pc: float = 1.0
                                  ) -> PointSensorArray:
 
         descriptor = SensorDescriptorFactory.temperature_descriptor()
@@ -39,7 +40,7 @@ class SensorArrayFactory:
                                       sample_times,
                                       descriptor)
 
-        sens_array = init_basic_errs(sens_array)
+        sens_array = init_basic_errs(sens_array,errs_pc)
 
         # Normal thermcouple amp = 5mV / K
         dep_sys_err1 = SysErrDigitisation(bits_per_unit=2**16/1000)
@@ -55,7 +56,8 @@ class SensorArrayFactory:
                             positions: np.ndarray,
                             field_name: str = "displacement",
                             spat_dims: int = 3,
-                            sample_times: np.ndarray | None = None
+                            sample_times: np.ndarray | None = None,
+                            errs_pc: float = 1
                             ) -> PointSensorArray:
 
         descriptor = SensorDescriptorFactory.displacement_descriptor()
@@ -70,7 +72,7 @@ class SensorArrayFactory:
                                       sample_times,
                                       descriptor)
 
-        sens_array = init_basic_errs(sens_array)
+        sens_array = init_basic_errs(sens_array,errs_pc)
 
         return sens_array
 
@@ -79,7 +81,8 @@ class SensorArrayFactory:
                                 positions: np.ndarray,
                                 field_name: str = "strain",
                                 spat_dims: int = 3,
-                                sample_times: np.ndarray | None = None
+                                sample_times: np.ndarray | None = None,
+                                errs_pc: float = 1.0
                                 ) -> PointSensorArray:
 
         descriptor = SensorDescriptorFactory.strain_descriptor()
@@ -102,18 +105,18 @@ class SensorArrayFactory:
                                       sample_times,
                                       descriptor)
 
-        sens_array = init_basic_errs(sens_array)
+        sens_array = init_basic_errs(sens_array,errs_pc)
 
         return sens_array
 
 
-def init_basic_errs(sens_array: PointSensorArray, err_pc: float = 1.0) -> PointSensorArray:
+def init_basic_errs(sens_array: PointSensorArray, errs_pc: float = 1.0) -> PointSensorArray:
 
-    indep_sys_err_int = ErrorIntegrator([SysErrUnifPercent(-err_pc,err_pc)],
+    indep_sys_err_int = ErrorIntegrator([SysErrUnifPercent(-errs_pc,errs_pc)],
                                     sens_array.get_measurement_shape())
     sens_array.set_indep_sys_err_integrator(indep_sys_err_int)
 
-    rand_err_int = ErrorIntegrator([RandErrNormPercent(err_pc)],
+    rand_err_int = ErrorIntegrator([RandErrNormPercent(errs_pc)],
                                         sens_array.get_measurement_shape())
     sens_array.set_rand_err_integrator(rand_err_int)
 
