@@ -19,6 +19,7 @@
         - Set a weighting function
     - TODO Allow Gauss Quad as Truth with other as Err
     - TODO Allow Gauss Quad with position and temporal drift
+- IMAGE DEF: allow upsampled image to be generated once and retained.
 
 
 Gauss Quadrature for the Unit Disc

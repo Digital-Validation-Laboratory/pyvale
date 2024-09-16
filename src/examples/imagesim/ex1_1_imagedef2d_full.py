@@ -97,7 +97,7 @@ def main() -> None:
     # Calculates the m/px value based on fitting the specimen/ROI within the camera
     # FOV and leaving a set number of pixels as a border on the longest edge
     id_opts.calc_res_from_fe = True
-    id_opts.calc_res_border_px = 10
+    id_opts.calc_res_border_px = 5
 
     # Set this to true to create an undeformed masked image
     if read_exodus:

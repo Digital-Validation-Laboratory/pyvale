@@ -57,7 +57,7 @@ class ImageDefOpts:
     subsample: int = 3
 
     # Interpolation used to upsample the input image: scipy-interp2d
-    image_upsamp_interp: str = 'cubic'
+    # image_upsamp_interp: str = 'cubic'
 
     # Order of interpolant used to deform the image: scipy.ndimage.map_coords
     image_def_order: int = 3

@@ -14,7 +14,7 @@ import numpy as np
 from shapely.geometry import Point
 from scipy.signal import convolve2d
 from scipy.interpolate import griddata
-from scipy.interpolate import interp2d
+from scipy.interpolate import RectBivariateSpline
 from scipy import ndimage
 import matplotlib.image as mplim
 from PIL import Image
@@ -57,7 +57,7 @@ def get_pixel_vec_in_m(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
     mppx = camera.m_per_px
     px_vec_xm = np.arange(mppx/2,camera.fov[XI],mppx)
     px_vec_ym = np.arange(mppx/2,camera.fov[YI],mppx)
-    px_vec_ym = px_vec_ym[::-1] # flip
+    #px_vec_ym = px_vec_ym[::-1] # flip
     return (px_vec_xm,px_vec_ym)
 
 
@@ -88,7 +88,7 @@ def get_subpixel_vec(camera: CameraData, subsample: int = 3
     mppx = camera.m_per_px
     subpx_vec_xm = np.arange(mppx/(2*subsample),camera.fov[XI],mppx/subsample)
     subpx_vec_ym = np.arange(mppx/(2*subsample),camera.fov[YI],mppx/subsample)
-    subpx_vec_ym = subpx_vec_ym[::-1] #flip
+    #subpx_vec_ym = subpx_vec_ym[::-1] #flip
     return (subpx_vec_xm,subpx_vec_ym)
 
 
@@ -249,12 +249,23 @@ def upsample_image(camera: CameraData,
     # Get grid of sub-pixel centroid locations
     (subpx_vec_xm,subpx_vec_ym) = get_subpixel_vec(camera, id_opts.subsample)
 
-    upsampled_image_interp = interp2d(px_vec_xm, px_vec_ym, input_im,
-                                      kind=id_opts.image_upsamp_interp)
+    print(80*"=")
+    print(f"{px_vec_xm.shape=}")
+    print(f"{px_vec_ym.shape=}")
+    print(px_vec_ym)
+    print(80*"=")
+
+    # NOTE: See Scipy transition from interp2d docs here:
+    # https://scipy.github.io/devdocs/tutorial/interpolate/interp_transition_guide.html
+    spline_interp = RectBivariateSpline(px_vec_xm,
+                                        px_vec_ym,
+                                        input_im.T)
+    upsampled_image_interp = lambda x_new, y_new: spline_interp(x_new, y_new).T
+
     # This function will flip the image regardless of the y vector input so flip it
     # back to FE coords
     upsampled_image = upsampled_image_interp(subpx_vec_xm,subpx_vec_ym)
-    upsampled_image = upsampled_image[::-1,:]
+    #upsampled_image = upsampled_image[::-1,:]
 
     return upsampled_image
 
@@ -493,6 +504,10 @@ def deform_one_image(upsampled_image: np.ndarray,
 
     else:
         def_mask = None
+
+    # Need to flip the image as all processing above is done with y axis down
+    # from the top left hand corner
+    def_image = def_image[::-1,:]
 
     return (def_image,def_image_subpx,subpx_disp_x,subpx_disp_y,def_mask)
 
