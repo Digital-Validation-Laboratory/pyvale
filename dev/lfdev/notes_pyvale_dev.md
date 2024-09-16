@@ -3,18 +3,23 @@
 ## TODO: `pyvale`
 
 **General**
-- Need to build analytical test cases
-    - Temperature field in 2D and 3D with a multi-directional gradient
-    - Displacement fields in 2D and 3D with multi directional gradient
+- TODO: Experiment generator/ runner
+    - NOTE: assume user provides mooseherder like array of simulations
+    - TODO: visualisation tools for multiple experiments on multiple simulations
 - TODO: Calibration errors
+- TODO function based temporal drift
 - Field based errors:
     - DONE: Positioning error
+    - TODO: Temporal position error allow drift of +/- X s
     - HALF DONE: Spatial averaging error
         - Set an integration area
         - Set a weighting function
     - TODO: Temporal averaging error
         - Set an integration time
         - Set a weighting function
+    - TODO Allow Gauss Quad as Truth with other as Err
+    - TODO Allow Gauss Quad with position and temporal drift
+
 
 Gauss Quadrature for the Unit Disc
 http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubature-formulas-for-the-unit-disk/
