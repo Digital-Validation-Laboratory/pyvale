@@ -18,6 +18,10 @@ class FieldError(Exception):
 
 class IField(ABC):
     @abstractmethod
+    def set_sim_data(self,sim_data: mh.SimData) -> None:
+        pass
+
+    @abstractmethod
     def get_time_steps(self) -> np.ndarray:
         pass
 

@@ -61,11 +61,11 @@ def plot_sensors_on_sim(sensor_array: PointSensorArray,
                         time_step: int = -1,
                         ) -> Any:
 
-    pv_simdata = sensor_array.get_field().get_visualiser()
+    pv_simdata = sensor_array.field.get_visualiser()
     pv_sensdata = sensor_array.get_visualiser()
-    comp_ind = sensor_array.get_field().get_component_index(component)
+    comp_ind = sensor_array.field.get_component_index(component)
 
-    descriptor = sensor_array.get_descriptor()
+    descriptor = sensor_array.descriptor
     pv_sensdata['labels'] = descriptor.create_sensor_tags(
         sensor_array.get_measurement_shape()[0])
 
@@ -99,12 +99,12 @@ def plot_time_traces(sensor_array: PointSensorArray,
                      plot_opts: GeneralPlotOpts | None = None
                      ) -> tuple[Any,Any]:
 
-    field = sensor_array.get_field()
-    comp_ind = sensor_array.get_field().get_component_index(component)
+    field = sensor_array.field
+    comp_ind = sensor_array.field.get_component_index(component)
     samp_time = sensor_array.get_sample_times()
     measurements = sensor_array.get_measurements()
-    n_sensors = sensor_array.get_positions().shape[0]
-    descriptor = sensor_array.get_descriptor()
+    n_sensors = sensor_array.positions.shape[0]
+    descriptor = sensor_array.descriptor
 
     if plot_opts is None:
         plot_opts = GeneralPlotOpts()
@@ -122,7 +122,7 @@ def plot_time_traces(sensor_array: PointSensorArray,
 
     if trace_opts.sim_line is not None:
         sim_time = field.get_time_steps()
-        sim_vals = field.sample_field(sensor_array.get_positions())
+        sim_vals = field.sample_field(sensor_array.positions)
 
 
         for ss in range(n_sensors):

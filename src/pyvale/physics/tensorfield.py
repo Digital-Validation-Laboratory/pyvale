@@ -11,7 +11,6 @@ import pyvista as pv
 import mooseherder as mh
 
 from pyvale.physics.field import (IField,
-                                  FieldError,
                                   conv_simdata_to_pyvista,
                                   sample_pyvista)
 
@@ -26,17 +25,22 @@ class TensorField(IField):
         self._field_key = field_key
         self._norm_components = norm_components
         self._dev_components = dev_components
+        self._spat_dim = spat_dim
 
         #TODO: do some checking to make sure norm/dev components are consistent
         # based on the spatial dimensions
 
-        if sim_data.time is None:
-            raise(FieldError("SimData.time is None. SimData does not have time steps"))
         self._time_steps = sim_data.time
-
         self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
                                             norm_components+dev_components,
                                             spat_dim)
+
+    def set_sim_data(self, sim_data: mh.SimData) -> None:
+        self._time_steps = sim_data.time
+        self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
+                                            self._norm_components+
+                                            self._dev_components,
+                                            self._spat_dim)
 
     def get_time_steps(self) -> np.ndarray:
         return self._time_steps

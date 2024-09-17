@@ -24,16 +24,19 @@ class VectorField(IField):
 
         self._field_key = field_key
         self._components = components
+        self._spat_dim = spat_dim
 
-        self.all_components = self._components
-
-        if sim_data.time is None:
-            raise(FieldError("SimData.time is None. SimData does not have time steps"))
         self._time_steps = sim_data.time
-
         self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
                                                     components,
                                                     spat_dim)
+
+    def set_sim_data(self, sim_data: mh.SimData) -> None:
+        self._time_steps = sim_data.time
+        self._time_steps = sim_data.time
+        self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
+                                                    self._components,
+                                                    self._spat_dim)
 
     def get_time_steps(self) -> np.ndarray:
         return self._time_steps

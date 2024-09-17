@@ -21,13 +21,14 @@ class PointSensorArray():
                  descriptor: SensorDescriptor | None = None
                  ) -> None:
 
-        self._positions = positions
-        self._field = field
+        self.positions = positions
+        self.field = field
+
         self._sample_times = sample_times
 
-        self._descriptor = SensorDescriptor()
+        self.descriptor = SensorDescriptor()
         if descriptor is not None:
-            self._descriptor = descriptor
+            self.descriptor = descriptor
 
         self._truth = None
         self._measurements = None
@@ -38,30 +39,24 @@ class PointSensorArray():
 
     #---------------------------------------------------------------------------
     # accessors
-    def get_field(self) -> IField:
-        return self._field
-
-    def get_positions(self) -> np.ndarray:
-        return self._positions
+    def set_sample_times(self, sample_times: np.ndarray | None) -> None:
+        self._sample_times = sample_times
 
     def get_sample_times(self) -> np.ndarray:
         if self._sample_times is None:
-            return self._field.get_time_steps()
+            return self.field.get_time_steps()
 
         return self._sample_times
 
-    def get_descriptor(self) -> SensorDescriptor:
-        return self._descriptor
-
     def get_measurement_shape(self) -> tuple[int,int,int]:
-        return (self._positions.shape[0],
-                len(self._field.get_all_components()),
+        return (self.positions.shape[0],
+                len(self.field.get_all_components()),
                 self.get_sample_times().shape[0])
 
     #---------------------------------------------------------------------------
     # truth calculation from simulation
     def calc_truth_values(self) -> np.ndarray:
-        return self._field.sample_field(self._positions,
+        return self.field.sample_field(self.positions,
                                         self._sample_times)
 
     def get_truth_values(self) -> np.ndarray:
@@ -164,6 +159,6 @@ class PointSensorArray():
     #---------------------------------------------------------------------------
     # visualisation tools
     def get_visualiser(self) -> pv.PolyData:
-        pv_data = pv.PolyData(self._positions)
+        pv_data = pv.PolyData(self.positions)
         return pv_data
 

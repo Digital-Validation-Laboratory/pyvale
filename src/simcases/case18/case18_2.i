@@ -25,7 +25,7 @@ timeConst = 1
 # Material Properties:
 # Thermal Props:OFHC) Copper at 250degC
 cuDensity = 8829.0  # kg.m^-3
-cuThermCond = 384.0 # W.m^-1.K^-1
+cuThermCond = 480.0 # W.m^-1.K^-1
 cuSpecHeat = 406.0  # J.kg^-1.K^-1
 
 # Mechanical Props: OFHC Copper 250degC

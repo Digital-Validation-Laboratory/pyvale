@@ -22,10 +22,11 @@ def main() -> None:
       wrapper for pyvista and matplotlib.
     """
 
+    #data_path = Path('src/simcases/case18/case18_1_out.e')
     data_path = Path('src/data/case13_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
-    field_key = list(sim_data.node_vars.keys())[0] # type: ignore
+    field_key = 'temperature'
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
@@ -74,7 +75,7 @@ def main() -> None:
     # Set this to 'interactive' to get a matplotlib.pyplot with the sensor
     # traces plotted over time. Set to 'save_fig' to save an image of the plot
     # to file.
-    trace_plot_mode = 'off'
+    trace_plot_mode = 'interactive'
 
     (fig,_) = pyvale.plot_time_traces(tc_array,field_key)
 
