@@ -14,27 +14,6 @@ import matplotlib.pyplot as plt
 import pyvale
 import mooseherder as mh
 
-""" TODO
-An experiment should be able to:
-- Perturb simulation input paramaters
-    - Some might need to be sampled from a p-dist
-    - Some as grid search
-- Run simulation sweep
-
-- Apply sensor array to each simulation combination
-    - Generate 'N' experiments for each combination
-
-- Plot error intervals for sensor traces
-
-- Pickle the data for later use
-
-An experiment has:
-- A simulation / simulation workflow manager
-    - The variables to perturb and how to perturb them
-- A series of sensors of different types
-- Simulation variables to analyse
-- The number of experiments to run for each simulation
- """
 
 @dataclass
 class ExperimentConfig:
@@ -43,7 +22,21 @@ class ExperimentConfig:
 
 @dataclass
 class ExperimentData:
-    pass
+    exp_config: ExperimentConfig | None = None
+    exp_data: list[np.ndarray] | None  = None
+    exp_stats: list[np.ndarray] | None = None
+
+@dataclass
+class ExperimentStats:
+    avg: np.ndarray | None = None
+    std: np.ndarray | None = None
+    cov: np.ndarray | None = None
+    max: np.ndarray | None = None
+    min: np.ndarray | None = None
+    med: np.ndarray | None = None
+    q25: np.ndarray | None = None
+    q75: np.ndarray | None = None
+    mad: np.ndarray | None = None
 
 class ExperimentSimulator:
     def __init__(self,
@@ -55,7 +48,9 @@ class ExperimentSimulator:
         self._exp_data = None
 
     def run_experiments(self) -> None:
+        pass
 
+    def calc_stats(self) -> None:
         pass
 
 
@@ -94,7 +89,7 @@ def main() -> None:
                                   tc_field,
                                   spat_dims=2,
                                   sample_times=None,
-                                  errs_pc=5.0)
+                                  errs_pc=1.0)
 
     sg_field = 'strain'
     sg_array = pyvale.SensorArrayFactory \
@@ -103,7 +98,7 @@ def main() -> None:
                                   sg_field,
                                   spat_dims=2,
                                   sample_times=None,
-                                  errs_pc=5.0)
+                                  errs_pc=1.0)
 
     sensor_arrays = [tc_array,sg_array]
 
@@ -113,13 +108,14 @@ def main() -> None:
     #===========================================================================
     # CREATE & RUN THE SIMULATED EXPERIMENT
     num_exp_per_sim = 1000
-    # shape=(n_arrays,...,n_sims,n_exps,n_sens,n_comps,n_time_steps)
     n_arrays = len(sensor_arrays)
     n_sims = len(sim_list)
+    # shape=list[n_arrays](n_sims,n_exps,n_sens,n_comps,n_time_steps)
     exp_data = [None]*n_arrays
 
     for ii,aa in enumerate(sensor_arrays):
-        meas_array = np.ones((n_sims,num_exp_per_sim)+aa.get_measurement_shape())
+        meas_array = np.zeros((n_sims,num_exp_per_sim)+
+                               aa.get_measurement_shape())
 
         for jj,ss in enumerate(sim_list):
             aa.field.set_sim_data(ss)
@@ -130,15 +126,46 @@ def main() -> None:
         exp_data[ii] = meas_array
 
     #===========================================================================
+    # ANALYSE EXPERIMENTAL DATA
+    # Fix Sim, Fix Sensor, Stats over Exp
+
+    # shape=list[n_arrays](n_sims,n_exps,n_sens,n_comps,n_time_steps)
+    exp_stats = [None]*n_arrays
+    for ii,aa in enumerate(sensor_arrays):
+        array_stats = ExperimentStats()
+        array_stats.max = np.max(exp_data[ii],axis=1)
+        array_stats.min = np.min(exp_data[ii],axis=1)
+        array_stats.avg = np.mean(exp_data[ii],axis=1)
+        array_stats.std = np.std(exp_data[ii],axis=1)
+        array_stats.med = np.median(exp_data[ii],axis=1)
+        array_stats.q25 = np.quantile(exp_data[ii],0.25,axis=1)
+        array_stats.q75 = np.quantile(exp_data[ii],0.75,axis=1)
+        array_stats.mad = np.median(np.abs(exp_data[ii] - np.median(exp_data[ii],axis=1,keepdims=True)),axis=1)
+        exp_stats[ii] = array_stats
+
+    print(80*"=")
+    print(f"{exp_data[0].shape=}")
+    print(f"{exp_stats[0].max.shape=}")
+    print(f"{exp_data[1].shape=}")
+    print(f"{exp_stats[1].max.shape=}")
+    print(exp_stats[0].max[0,-1,0,:])
+    print(80*"=")
+
+    #===========================================================================
     # VISUALISE RESULTS
     component = 'temperature'
     sens_array_num = 0
-    sens_num = -1
+    sens_to_plot = None
     sim_num = 0
+    plot_all_exp_points = False
 
-    descriptor = sensor_arrays[0].descriptor
-    comp_ind = sensor_arrays[0].field.get_component_index(component)
-    samp_time = sensor_arrays[0].get_sample_times()
+    descriptor = sensor_arrays[sens_array_num].descriptor
+    comp_ind = sensor_arrays[sens_array_num].field.get_component_index(component)
+    samp_time = sensor_arrays[sens_array_num].get_sample_times()
+    num_sens = sensor_arrays[sens_array_num].get_measurement_shape()[0]
+
+    if sens_to_plot is None:
+        sens_to_plot = range(num_sens)
 
     plot_opts = pyvale.GeneralPlotOpts()
     trace_opts = pyvale.SensorTraceOpts()
@@ -147,13 +174,29 @@ def main() -> None:
                            layout='constrained')
     fig.set_dpi(plot_opts.resolution)
 
-    for ee in range(num_exp_per_sim):
+    if plot_all_exp_points:
+        for ss in sens_to_plot:
+            for ee in range(num_exp_per_sim):
+                ax.plot(samp_time,
+                        exp_data[sens_array_num][sim_num,ee,ss,comp_ind,:],
+                        "o",
+                        lw=plot_opts.lw,
+                        ms=plot_opts.ms,
+                        color=plot_opts.colors[ss % plot_opts.n_colors])
+
+    for ss in sens_to_plot:
         ax.plot(samp_time,
-                exp_data[sens_array_num][sim_num,ee,sens_num,comp_ind,:],
-                "o",
+                exp_stats[sens_array_num].avg[sim_num,ss,comp_ind,:],
+                "-",
                 lw=plot_opts.lw,
                 ms=plot_opts.ms,
-                color=plot_opts.colors[0 % plot_opts.n_colors])
+                color=plot_opts.colors[ss % plot_opts.n_colors])
+        ax.fill_between(samp_time,
+                exp_stats[sens_array_num].min[sim_num,ss,comp_ind,:],
+                exp_stats[sens_array_num].max[sim_num,ss,comp_ind,:],
+                color=plot_opts.colors[ss % plot_opts.n_colors],
+                alpha=0.2)
+
 
     ax.set_xlabel(trace_opts.time_label,
                 fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
