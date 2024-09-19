@@ -157,7 +157,7 @@ def main() -> None:
     sens_array_num = 0
     sens_to_plot = None
     sim_num = 0
-    plot_all_exp_points = False
+    plot_all_exp_points = True
 
     descriptor = sensor_arrays[sens_array_num].descriptor
     comp_ind = sensor_arrays[sens_array_num].field.get_component_index(component)
@@ -216,9 +216,6 @@ def main() -> None:
     plt.draw()
 
     plt.show()
-
-
-
 
 if __name__ == "__main__":
     main()
