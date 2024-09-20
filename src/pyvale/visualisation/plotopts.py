@@ -62,3 +62,22 @@ class SensorTraceOpts:
     sensors_to_plot: np.ndarray | None = None
     time_min_max: tuple[float,float] | None = None
 
+
+@dataclass
+class ExpTraceOpts:
+    legend: bool = True
+
+    x_label: str = r'x [$m$]'
+    y_label: str = r'y [$m$]'
+    z_label: str = r'z [$m$]'
+    time_label: str = r'Time, $t$ [$s$]'
+
+    truth_line: str | None = '-'
+    sim_line: str | None = '-'
+    meas_line: str = '--o'
+
+    sensors_to_plot: np.ndarray | None = None
+    time_min_max: tuple[float,float] | None = None
+    plot_all_exp_points = False
+
+

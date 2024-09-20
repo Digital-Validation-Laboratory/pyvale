@@ -17,7 +17,7 @@ from mooseherder import (MooseConfig,
 CASE_STR = 'case18'
 #======================================
 
-CASE_FILES = (CASE_STR+'.geo',CASE_STR+'_1.i')
+CASE_FILES = (CASE_STR+'.geo',CASE_STR+'_3.i')
 CASE_DIR = Path('src/simcases/'+CASE_STR+'/')
 
 USER_DIR = Path.home()

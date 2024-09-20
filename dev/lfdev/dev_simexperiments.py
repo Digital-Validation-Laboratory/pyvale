@@ -15,50 +15,12 @@ import pyvale
 import mooseherder as mh
 
 
-@dataclass
-class ExperimentConfig:
-    num_exp_per_sim: int = 30
-    variables: dict[str,(float,float)] | None = None
-
-@dataclass
-class ExperimentData:
-    exp_config: ExperimentConfig | None = None
-    exp_data: list[np.ndarray] | None  = None
-    exp_stats: list[np.ndarray] | None = None
-
-@dataclass
-class ExperimentStats:
-    avg: np.ndarray | None = None
-    std: np.ndarray | None = None
-    cov: np.ndarray | None = None
-    max: np.ndarray | None = None
-    min: np.ndarray | None = None
-    med: np.ndarray | None = None
-    q25: np.ndarray | None = None
-    q75: np.ndarray | None = None
-    mad: np.ndarray | None = None
-
-class ExperimentSimulator:
-    def __init__(self,
-                 exp_config: ExperimentConfig,
-                 sensor_arrays: list[pyvale.PointSensorArray]
-                 ) -> None:
-        self._exp_config = exp_config
-        self._sensor_arrays = sensor_arrays
-        self._exp_data = None
-
-    def run_experiments(self) -> None:
-        pass
-
-    def calc_stats(self) -> None:
-        pass
-
 
 
 def main() -> None:
     #===========================================================================
     # LOAD SIMULATION(S)
-    base_path = Path("src/simcases/case18")
+    base_path = Path("src/data")
     data_paths = [base_path / 'case18_1_out.e',
                   base_path / 'case18_2_out.e',
                   base_path / 'case18_3_out.e']
@@ -107,41 +69,17 @@ def main() -> None:
 
     #===========================================================================
     # CREATE & RUN THE SIMULATED EXPERIMENT
-    num_exp_per_sim = 1000
-    n_arrays = len(sensor_arrays)
-    n_sims = len(sim_list)
-    # shape=list[n_arrays](n_sims,n_exps,n_sens,n_comps,n_time_steps)
-    exp_data = [None]*n_arrays
+    exp_sim = pyvale.ExperimentSimulator(sim_list,
+                                  sensor_arrays,
+                                  num_exp_per_sim=1000)
 
-    for ii,aa in enumerate(sensor_arrays):
-        meas_array = np.zeros((n_sims,num_exp_per_sim)+
-                               aa.get_measurement_shape())
+    exp_data = exp_sim.run_experiments()
+    exp_stats = exp_sim.calc_stats()
 
-        for jj,ss in enumerate(sim_list):
-            aa.field.set_sim_data(ss)
-
-            for ee in range(num_exp_per_sim):
-                meas_array[jj,ee,:,:,:] = aa.calc_measurements()
-
-        exp_data[ii] = meas_array
 
     #===========================================================================
     # ANALYSE EXPERIMENTAL DATA
     # Fix Sim, Fix Sensor, Stats over Exp
-
-    # shape=list[n_arrays](n_sims,n_exps,n_sens,n_comps,n_time_steps)
-    exp_stats = [None]*n_arrays
-    for ii,aa in enumerate(sensor_arrays):
-        array_stats = ExperimentStats()
-        array_stats.max = np.max(exp_data[ii],axis=1)
-        array_stats.min = np.min(exp_data[ii],axis=1)
-        array_stats.avg = np.mean(exp_data[ii],axis=1)
-        array_stats.std = np.std(exp_data[ii],axis=1)
-        array_stats.med = np.median(exp_data[ii],axis=1)
-        array_stats.q25 = np.quantile(exp_data[ii],0.25,axis=1)
-        array_stats.q75 = np.quantile(exp_data[ii],0.75,axis=1)
-        array_stats.mad = np.median(np.abs(exp_data[ii] - np.median(exp_data[ii],axis=1,keepdims=True)),axis=1)
-        exp_stats[ii] = array_stats
 
     print(80*"=")
     print(f"{exp_data[0].shape=}")
@@ -153,6 +91,13 @@ def main() -> None:
 
     #===========================================================================
     # VISUALISE RESULTS
+    (fig,ax) = pyvale.plot_exp_traces(exp_sim,
+                                      component="temperature",
+                                      sens_array_num=0,
+                                      sim_num=0)
+    plt.show()
+    
+    '''
     component = 'temperature'
     sens_array_num = 0
     sens_to_plot = None
@@ -176,7 +121,7 @@ def main() -> None:
 
     if plot_all_exp_points:
         for ss in sens_to_plot:
-            for ee in range(num_exp_per_sim):
+            for ee in range(exp_sim.num_exp_per_sim):
                 ax.plot(samp_time,
                         exp_data[sens_array_num][sim_num,ee,ss,comp_ind,:],
                         "o",
@@ -214,8 +159,7 @@ def main() -> None:
 
     plt.grid(True)
     plt.draw()
-
-    plt.show()
+    '''
 
 if __name__ == "__main__":
     main()

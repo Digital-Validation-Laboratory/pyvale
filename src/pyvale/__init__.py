@@ -36,3 +36,4 @@ from pyvale.analyticdata.meshgen import *
 from pyvale.analyticdata.simdatagenerator import *
 from pyvale.analyticdata.simdatafactory import *
 
+from pyvale.experimentsimulator import *
