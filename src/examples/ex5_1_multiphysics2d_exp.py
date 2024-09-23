@@ -97,6 +97,11 @@ def main() -> None:
                                       component="temperature",
                                       sens_array_num=0,
                                       sim_num=0)
+
+    (fig,ax) = pyvale.plot_exp_traces(exp_sim,
+                                    component="strain_xx",
+                                    sens_array_num=1,
+                                    sim_num=2)
     plt.show()
 
 

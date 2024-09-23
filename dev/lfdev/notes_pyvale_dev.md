@@ -4,10 +4,10 @@
 
 **General**
 - TODO: Experiment generator/ runner
-    - NOTE: assume user provides mooseherder like array of simulations
-    - TODO: visualisation tools for multiple experiments on multiple simulations
+    - NOTE: assume user provides `mooseherder` like array of simulations
+    - TODO: Create example connecting to `mooseherder`
 - TODO: Calibration errors
-- TODO function based temporal drift
+- TODO: function based temporal drift
 - Field based errors:
     - DONE: Positioning error
     - TODO: Temporal position error allow drift of +/- X s

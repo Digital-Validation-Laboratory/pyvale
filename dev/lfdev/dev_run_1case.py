@@ -14,10 +14,10 @@ from mooseherder import (MooseConfig,
 
 #======================================
 # Change this to run a different case
-CASE_STR = 'case18'
+CASE_STR = 'case16'
 #======================================
 
-CASE_FILES = (CASE_STR+'.geo',CASE_STR+'_3.i')
+CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')
 CASE_DIR = Path('src/simcases/'+CASE_STR+'/')
 
 USER_DIR = Path.home()
@@ -47,8 +47,8 @@ def main() -> None:
     moose_config = MooseConfig(config)
     moose_runner = MooseRunner(moose_config)
 
-    moose_runner.set_run_opts(n_tasks = 8,
-                              n_threads = 1,
+    moose_runner.set_run_opts(n_tasks = 3,
+                              n_threads = 2,
                               redirect_out = False)
 
     moose_start_time = time.perf_counter()

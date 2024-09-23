@@ -5,6 +5,7 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
+from typing import Callable
 from dataclasses import dataclass
 import numpy as np
 from pyvale.sensors.pointsensorarray import PointSensorArray
@@ -13,7 +14,7 @@ import mooseherder as mh
 
 @dataclass
 class ExperimentStats:
-    avg: np.ndarray | None = None
+    mean: np.ndarray | None = None
     std: np.ndarray | None = None
     cov: np.ndarray | None = None
     max: np.ndarray | None = None
@@ -66,11 +67,11 @@ class ExperimentSimulator:
     def calc_stats(self) -> list[np.ndarray]:
         # shape=list[n_arrays](n_sims,n_exps,n_sens,n_comps,n_time_steps)
         self._exp_stats = [None]*len(self.sensor_arrays)
-        for ii,aa in enumerate(self.sensor_arrays):
+        for ii,_ in enumerate(self.sensor_arrays):
             array_stats = ExperimentStats()
             array_stats.max = np.max(self._exp_data[ii],axis=1)
             array_stats.min = np.min(self._exp_data[ii],axis=1)
-            array_stats.avg = np.mean(self._exp_data[ii],axis=1)
+            array_stats.mean = np.mean(self._exp_data[ii],axis=1)
             array_stats.std = np.std(self._exp_data[ii],axis=1)
             array_stats.med = np.median(self._exp_data[ii],axis=1)
             array_stats.q25 = np.quantile(self._exp_data[ii],0.25,axis=1)
@@ -80,4 +81,12 @@ class ExperimentSimulator:
             self._exp_stats[ii] = array_stats
 
         return self._exp_stats
+
+    '''
+    def apply_over_experiment(func: Callable[[np.ndarray],np.ndarray]
+                              ) -> list[np.ndarray]:
+    '''
+
+
+
 

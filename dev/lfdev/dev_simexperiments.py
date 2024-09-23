@@ -15,8 +15,6 @@ import pyvale
 import mooseherder as mh
 
 
-
-
 def main() -> None:
     #===========================================================================
     # LOAD SIMULATION(S)
@@ -96,70 +94,7 @@ def main() -> None:
                                       sens_array_num=0,
                                       sim_num=0)
     plt.show()
-    
-    '''
-    component = 'temperature'
-    sens_array_num = 0
-    sens_to_plot = None
-    sim_num = 0
-    plot_all_exp_points = True
 
-    descriptor = sensor_arrays[sens_array_num].descriptor
-    comp_ind = sensor_arrays[sens_array_num].field.get_component_index(component)
-    samp_time = sensor_arrays[sens_array_num].get_sample_times()
-    num_sens = sensor_arrays[sens_array_num].get_measurement_shape()[0]
-
-    if sens_to_plot is None:
-        sens_to_plot = range(num_sens)
-
-    plot_opts = pyvale.GeneralPlotOpts()
-    trace_opts = pyvale.SensorTraceOpts()
-
-    fig, ax = plt.subplots(figsize=plot_opts.single_fig_size,
-                           layout='constrained')
-    fig.set_dpi(plot_opts.resolution)
-
-    if plot_all_exp_points:
-        for ss in sens_to_plot:
-            for ee in range(exp_sim.num_exp_per_sim):
-                ax.plot(samp_time,
-                        exp_data[sens_array_num][sim_num,ee,ss,comp_ind,:],
-                        "o",
-                        lw=plot_opts.lw,
-                        ms=plot_opts.ms,
-                        color=plot_opts.colors[ss % plot_opts.n_colors])
-
-    for ss in sens_to_plot:
-        ax.plot(samp_time,
-                exp_stats[sens_array_num].avg[sim_num,ss,comp_ind,:],
-                "-",
-                lw=plot_opts.lw,
-                ms=plot_opts.ms,
-                color=plot_opts.colors[ss % plot_opts.n_colors])
-        ax.fill_between(samp_time,
-                exp_stats[sens_array_num].min[sim_num,ss,comp_ind,:],
-                exp_stats[sens_array_num].max[sim_num,ss,comp_ind,:],
-                color=plot_opts.colors[ss % plot_opts.n_colors],
-                alpha=0.2)
-
-
-    ax.set_xlabel(trace_opts.time_label,
-                fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
-    ax.set_ylabel(descriptor.create_label(comp_ind),
-                fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
-
-    if trace_opts.time_min_max is None:
-        ax.set_xlim((np.min(samp_time),np.max(samp_time))) # type: ignore
-    else:
-        ax.set_xlim(trace_opts.time_min_max)
-
-    trace_opts.legend = False
-    if trace_opts.legend:
-        ax.legend(prop={"size":plot_opts.font_leg_size},loc='best')
-
-    plt.grid(True)
-    plt.draw()
-    '''
 
 if __name__ == "__main__":
     main()

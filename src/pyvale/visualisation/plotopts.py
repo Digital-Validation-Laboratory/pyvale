@@ -36,7 +36,7 @@ class GeneralPlotOpts:
     font_ax_size: float = 10
     font_leg_size: float = 9
 
-    ms: float = 2.4
+    ms: float = 3.2
     lw: float = 0.8
 
     cmap_seq: str = "cividis"
@@ -50,14 +50,14 @@ class GeneralPlotOpts:
 class SensorTraceOpts:
     legend: bool = True
 
-    x_label: str = r'x [$m$]'
-    y_label: str = r'y [$m$]'
-    z_label: str = r'z [$m$]'
-    time_label: str = r'Time, $t$ [$s$]'
+    x_label: str = r"x [$m$]"
+    y_label: str = r"y [$m$]"
+    z_label: str = r"z [$m$]"
+    time_label: str = r"Time, $t$ [$s$]"
 
-    truth_line: str | None = '-'
-    sim_line: str | None = '-'
-    meas_line: str = '--o'
+    truth_line: str | None = "-"
+    sim_line: str | None = "-"
+    meas_line: str = "--o"
 
     sensors_to_plot: np.ndarray | None = None
     time_min_max: tuple[float,float] | None = None
@@ -67,17 +67,21 @@ class SensorTraceOpts:
 class ExpTraceOpts:
     legend: bool = True
 
-    x_label: str = r'x [$m$]'
-    y_label: str = r'y [$m$]'
-    z_label: str = r'z [$m$]'
-    time_label: str = r'Time, $t$ [$s$]'
+    x_label: str = r"x [$m$]"
+    y_label: str = r"y [$m$]"
+    z_label: str = r"z [$m$]"
+    time_label: str = r"Time, $t$ [$s$]"
 
-    truth_line: str | None = '-'
-    sim_line: str | None = '-'
-    meas_line: str = '--o'
+    truth_line: str | None = None
+    sim_line: str | None = None
+    exp_mean_line: str = "-"
+    exp_marker_line: str = "+"
 
     sensors_to_plot: np.ndarray | None = None
     time_min_max: tuple[float,float] | None = None
+
+    centre = "mean"
     plot_all_exp_points = False
+    fill_between: str | None = "3std"
 
 
