@@ -4,13 +4,15 @@
 
 **General**
 - TODO: Experiment generator/ runner
-    - NOTE: assume user provides `mooseherder` like array of simulations
-    - TODO: Create example connecting to `mooseherder`
+    - TODO: Create example connecting to `mooseherder`, assume user provides `mooseherder` like array of simulations
+    - TODO: Increase plotting capabilities to compare over simulations as well as all sensors on experiments
+- TODO: visualisation tools for presentation animations
+    - TODO: create pyvista animation synced to matplotlib traces
 - TODO: Calibration errors
-- TODO: function based temporal drift
 - Field based errors:
     - DONE: Positioning error
     - TODO: Temporal position error allow drift of +/- X s
+    - TODO: function based temporal drift
     - HALF DONE: Spatial averaging error
         - Set an integration area
         - Set a weighting function
