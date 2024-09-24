@@ -3,18 +3,37 @@
 ## TODO: `pyvale`
 
 **General**
-- Calibration errors
+- TODO: Experiment generator/ runner
+    - NOTE: assume user provides `mooseherder` like array of simulations
+    - TODO: Create example connecting to `mooseherder`
+- TODO: Calibration errors
+- TODO: function based temporal drift
 - Field based errors:
-    - Positioning error
-    - Spatial averaging error
+    - DONE: Positioning error
+    - TODO: Temporal position error allow drift of +/- X s
+    - HALF DONE: Spatial averaging error
         - Set an integration area
         - Set a weighting function
-    - Temporal averaging error
+    - TODO: Temporal averaging error
         - Set an integration time
         - Set a weighting function
+    - TODO Allow Gauss Quad as Truth with other as Err
+    - TODO Allow Gauss Quad with position and temporal drift
+- IMAGE DEF: allow upsampled image to be generated once and retained.
+
+
+Gauss Quadrature for the Unit Disc
+http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubature-formulas-for-the-unit-disk/
 
 **Examples**
-- Done for now - move on to new features
+- Positioning error, spatial integration error
+- Spatial integration truth
+- Change examples to use simcases:
+    - Thermal 2D, Transient = case13 - plate / moose only
+    - Thermal 3D, Transient = case15 - monoblock+gmsh - use 16 with mech data as well
+    - Mechanical 2D, Transient = case17 - plate with hole 2D+gmsh
+    - Mechanical 3D = **TODO**
+    - Thermomechanical 3D = case16 - monoblock+gmsh
 
 **Systematic error handling**
 - Add spatial and temporal averaging errors:
@@ -101,9 +120,15 @@ A sensor should have:
 
 ### Thermocouples
 https://www.mstarlabs.com/sensors/thermocouple-calibration.html
+
 T  =  -0.01897 + 25.41881 V - 0.42456 V^2 + 0.04365 V^3
-where V is voltage in units of millivolts
-and   T is temperature in degrees C
+where V is voltage in units of millivolts and T is temperature in degrees C.
+
+- Thermocouple amplifier card:
+https://www.ni.com/docs/en-US/bundle/ni-9213-specs/page/specs.html
+
+- App note on thermocouple amplifier chip:
+https://www.analog.com/en/resources/app-notes/an-1087.html
 
 ## Systematic errors
 Comes from many sources:
@@ -121,3 +146,16 @@ Comes from sensors noise, need a way to specify a probability distribution to sa
 
 ## Numba
 https://www.youtube.com/watch?v=6oXedk2tGfk
+
+## Gauss Quadrature
+
+## Gauss Quadrature: Change of Interval
+https://stackoverflow.com/questions/33457880/different-intervals-for-gauss-legendre-quadrature-in-numpy
+
+To change the interval, translate the x values from [-1, 1] to [a, b] using, say,
+
+t = 0.5*(x + 1)*(b - a) + a
+
+and then scale the quadrature formula by (b - a)/2:
+
+gauss = sum(w * f(t)) * 0.5*(b - a)

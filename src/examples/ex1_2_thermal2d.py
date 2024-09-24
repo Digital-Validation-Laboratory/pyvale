@@ -27,14 +27,16 @@ def main() -> None:
       experiment by sampling/calculating the systematic and random errors.
 
     """
-    data_path = Path('data/examplesims/plate_2d_thermal_out.e')
+    data_path = Path('src/data/case13_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     field_key = list(sim_data.node_vars.keys())[0] # type: ignore
+    # Scale to mm to make 3D visualisation scaling easier
+    sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
     n_sens = (4,1,1)
-    x_lims = (0.0,2.0)
-    y_lims = (0.0,1.0)
+    x_lims = (0.0,100.0)
+    y_lims = (0.0,50.0)
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
@@ -62,7 +64,7 @@ def main() -> None:
                               (measurements.shape[2]-5,measurements.shape[2]))
     print(80*'-')
     print("If we call the 'calc_measurements' method then the errors are "+
-          "(re)calculated.")
+          "(re)calculated or sampled.")
     measurements = tc_array.calc_measurements()
 
     pyvale.print_measurements(tc_array,

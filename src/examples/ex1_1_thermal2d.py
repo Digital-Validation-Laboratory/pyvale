@@ -22,14 +22,17 @@ def main() -> None:
       wrapper for pyvista and matplotlib.
     """
 
-    data_path = Path('data/examplesims/plate_2d_thermal_out.e')
+    #data_path = Path('src/simcases/case18/case18_1_out.e')
+    data_path = Path('src/data/case13_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
-    field_key = list(sim_data.node_vars.keys())[0] # type: ignore
+    field_key = 'temperature'
+    # Scale to mm to make 3D visualisation scaling easier
+    sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
     n_sens = (3,2,1)
-    x_lims = (0.0,2.0)
-    y_lims = (0.0,1.0)
+    x_lims = (0.0,100.0)
+    y_lims = (0.0,50.0)
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
@@ -49,20 +52,22 @@ def main() -> None:
     pv_plot_mode = 'interactive'
 
     if pv_plot_mode == 'interactive':
-        pv_plot.camera_position = [(-0.295, 1.235, 3.369),
-                                    (1.0274, 0.314, 0.0211),
-                                    (0.081, 0.969, -0.234)]
+        pv_plot.camera_position = [(-7.547, 59.753, 134.52),
+                                   (41.916, 25.303, 9.297),
+                                   (0.0810, 0.969, -0.234)]
         pv_plot.show()
 
+        print(80*"=")
         print('Camera positions = ')
         print(pv_plot.camera_position)
+        print(80*"="+"\n")
 
     if pv_plot_mode == 'save_fig':
         # Determined manually by moving camera and then dumping camera position
         # to console after window close - see 'interactive above'
-        pv_plot.camera_position = [(-0.295, 1.235, 3.369),
-                                (1.0274, 0.314, 0.0211),
-                                (0.081, 0.969, -0.234)]
+        pv_plot.camera_position = [(-7.547, 59.753, 134.52),
+                                   (41.916, 25.303, 9.297),
+                                   (0.0810, 0.969, -0.234)]
         save_render = Path('src/examples/plate_thermal_2d_sim_view.svg')
         pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
         pv_plot.screenshot(save_render.with_suffix('.png'))

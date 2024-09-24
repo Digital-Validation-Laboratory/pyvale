@@ -15,7 +15,7 @@ import pyvale
 def main() -> None:
     """pyvale example:
     """
-    data_path = Path('simcases/case17/case17_out.e')
+    data_path = Path('src/data/case17_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier
@@ -34,12 +34,8 @@ def main() -> None:
                                                 spat_dims=2)
 
     plot_field = 'disp_x'
-    if plot_field == 'disp_x':
-        pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,'disp_x')
-        pv_plot.show()
-    elif plot_field == 'disp_y':
-        pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,'disp_y')
-        pv_plot.show()
+    pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,plot_field)
+    pv_plot.show()
 
     pyvale.plot_time_traces(disp_sens_array,'disp_x')
     pyvale.plot_time_traces(disp_sens_array,'disp_y')

@@ -34,10 +34,12 @@ def main() -> None:
       measurement value at that step
     -
     """
-    data_path = Path('data/examplesims/plate_2d_thermal_out.e')
+    data_path = Path('src/data/case13_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
-    
+    # Scale to mm to make 3D visualisation scaling easier
+    sim_data.coords = sim_data.coords*1000.0 # type: ignore
+
 
     use_auto_descriptor = 'blank'
     if use_auto_descriptor == 'factory':
@@ -57,8 +59,8 @@ def main() -> None:
                                  spat_dim=2)
 
     n_sens = (4,1,1)
-    x_lims = (0.0,2.0)
-    y_lims = (0.0,1.0)
+    x_lims = (0.0,100.0)
+    y_lims = (0.0,50.0)
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
@@ -74,16 +76,23 @@ def main() -> None:
                                        sample_times,
                                        descriptor)
 
-    errors_on = {'indep_sys': False,
-                 'rand': False,
+    errors_on = {'indep_sys': True,
+                 'rand': True,
                  'dep_sys': True}
 
     if errors_on['indep_sys']:
         indep_sys_err1 = pyvale.SysErrOffset(offset=-5.0)
         indep_sys_err2 = pyvale.SysErrUniform(low=-10.0,
                                             high=10.0)
-        indep_sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1,indep_sys_err2],
+        indep_sys_err3 = pyvale.SysErrPointPosition(t_field,
+                                            sens_pos,
+                                            (0.05,0.05,None),
+                                            sample_times)
+        indep_sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1,
+                                                    indep_sys_err2,
+                                                    indep_sys_err3],
                                             tc_array.get_measurement_shape())
+
         tc_array.set_indep_sys_err_integrator(indep_sys_err_int)
 
     if errors_on['rand']:
@@ -95,7 +104,7 @@ def main() -> None:
         tc_array.set_rand_err_integrator(rand_err_int)
 
     if errors_on['dep_sys']:
-        dep_sys_err1 = pyvale.SysErrDigitisation(bits_per_unit=1/10)
+        dep_sys_err1 = pyvale.SysErrDigitisation(bits_per_unit=2**8/100)
         dep_sys_err2 = pyvale.SysErrSaturation(meas_min=0.0,meas_max=300.0)
         dep_sys_err_int = pyvale.ErrorIntegrator([dep_sys_err1,dep_sys_err2],
                                             tc_array.get_measurement_shape())

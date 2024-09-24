@@ -4,18 +4,33 @@
 # vscode
 .vscode/
 
+# My temp code for checks
+check/
+
 # MOOSE / gmsh
 *-opt
 *.e
 *.msh
+
 # Keep these as they are used for examples
-!scripts/moose_thermal/*.e
-!data/examplesims/*.e
+!src/data/*.e
+
+# Example output images
+src/examples/*.png
+src/examples/*.svg
+src/examples/figuregen/*.png
+src/examples/figuregen/*.svg
+
+dev/lfdev/*/*.png
+dev/lfdev/*/*.svg
+dev/lfdev/*.png
+dev/lfdev/*.svg
 
 # Image deformation test cases
 *.pkl
 imdefcase*_*/
 deformed_images/
+src/deformed_images/
 
 #-------------------------------------------------------------------------------
 # Python Standard Ignore

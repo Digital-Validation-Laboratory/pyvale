@@ -13,7 +13,7 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
-    data_path = Path('simcases/case17/case17_out.e')
+    data_path = Path('src/data/case17_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier
@@ -32,12 +32,8 @@ def main() -> None:
                                                      spat_dims=2)
 
     plot_field = 'strain_yy'
-    if plot_field == 'strain_xx':
-        pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,'strain_xx')
-        pv_plot.show()
-    elif plot_field == 'strain_yy':
-        pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,'strain_yy')
-        pv_plot.show()
+    pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,plot_field)
+    pv_plot.show()
 
     pyvale.plot_time_traces(straingauge_array,'strain_xx')
     pyvale.plot_time_traces(straingauge_array,'strain_yy')

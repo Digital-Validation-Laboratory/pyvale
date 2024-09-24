@@ -28,15 +28,15 @@ def main() -> None:
     # needs to be generated from a full speckled image using the simulation data.
     # This example also deals with complex geometry including holes and notches
 
-    im_path = Path('data/speckleimages')
-    im_file = 'OptimisedSpeckle_2464_2056_width5.0_8bit_GBlur1.tiff'
+    im_path = Path('src/data')
+    im_file = 'optspeckle_2464x2056px_spec5px_8bit_gblur1px.tiff'
     im_path = im_path / im_file
 
     print(f'\nLoading image to deform from path:{im_path}\n')
     input_im = sid.load_image(im_path)
 
     case_str = 'case17'
-    sim_path = Path(f'simcases/{case_str}')
+    sim_path = Path('src/data')
     sim_file = f'{case_str}_out.e'
 
     print(f'\nLoading SimData from exodus in path:\n{sim_path}')

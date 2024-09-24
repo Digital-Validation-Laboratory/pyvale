@@ -42,25 +42,32 @@ def print_measurements(sens_array: PointSensorArray,
     dep_sys_errs = sens_array.get_dep_systematic_errs()
 
     print(f"\nmeasurement.shape = \n    {measurement.shape}")
-    print(f"measurement = \n    {measurement[sensors[0]:sensors[1],
-                                             components[0]:components[1],
-                                             time_steps[0]:time_steps[1]]}")
-    print(f"truth = \n    {truth[sensors[0]:sensors[1],
-                                components[0]:components[1],
-                                time_steps[0]:time_steps[1]]}")
+    print_meas = measurement[sensors[0]:sensors[1],
+                             components[0]:components[1],
+                             time_steps[0]:time_steps[1]]
+    print(f"measurement = \n    {print_meas}")
+
+    print_truth = truth[sensors[0]:sensors[1],
+                        components[0]:components[1],
+                        time_steps[0]:time_steps[1]]
+    print(f"truth = \n    {print_truth}")
+
     if indep_sys_errs is not None:
-        print(f"indep_sys_errs = \n    {indep_sys_errs[sensors[0]:sensors[1],
-                                            components[0]:components[1],
-                                            time_steps[0]:time_steps[1]]}")
+        print_isyserrs = indep_sys_errs[sensors[0]:sensors[1],
+                                        components[0]:components[1],
+                                        time_steps[0]:time_steps[1]]
+        print(f"indep_sys_errs = \n    {print_isyserrs}")
     if rand_errs is not None:
-        print(f"rand_errs = \n    {rand_errs[sensors[0]:sensors[1],
-                                            components[0]:components[1],
-                                            time_steps[0]:time_steps[1]]}")
+        print_randerrs = rand_errs[sensors[0]:sensors[1],
+                                   components[0]:components[1],
+                                   time_steps[0]:time_steps[1]]
+        print(f"rand_errs = \n    {print_randerrs}")
 
     if dep_sys_errs is not None:
-        print(f"dep_sys_errs = \n    {dep_sys_errs[sensors[0]:sensors[1],
-                                            components[0]:components[1],
-                                            time_steps[0]:time_steps[1]]}")
+        print_dsyserrs = dep_sys_errs[sensors[0]:sensors[1],
+                                      components[0]:components[1],
+                                      time_steps[0]:time_steps[1]]
+        print(f"dep_sys_errs = \n    {print_dsyserrs}")
 
     print()
 
