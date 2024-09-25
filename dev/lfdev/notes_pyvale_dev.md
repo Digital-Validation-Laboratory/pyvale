@@ -3,6 +3,9 @@
 ## TODO: `pyvale`
 
 **General**
+- TODO: allow errors to be **sampled** or **static** so when `calc` is called it doesn't do any extra calculations
+- TODO: for sampled errors create an enum and pass this to generate the sampler
+
 - TODO: Experiment generator/ runner
     - TODO: Create example connecting to `mooseherder`, assume user provides `mooseherder` like array of simulations
     - TODO: Increase plotting capabilities to compare over simulations as well as all sensors on experiments

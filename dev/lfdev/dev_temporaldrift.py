@@ -45,11 +45,26 @@ def main() -> None:
                                        descriptor)
 
 
-    indep_sys_err1 = pyvale.SysErrPointPosition(t_field,
-                                                sens_pos,
-                                                (1.0,1.0,None),
-                                                sample_times)
-    indep_sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1,],
+    drift_1 = pyvale.ConstantDrift(offset=0.0)
+    indep_sys_err1 = pyvale.SysErrTimeDrift(t_field,
+                                            sens_pos,
+                                            drift_1,
+                                            sample_times)
+
+    drift_2 = pyvale.LinearDrift(slope=0.0)
+    indep_sys_err2 = pyvale.SysErrTimeDrift(t_field,
+                                            sens_pos,
+                                            drift_2,
+                                            sample_times)
+
+    indep_sys_err3 = pyvale.SysErrTimeRand(t_field,
+                                            sens_pos,
+                                            time_std=5.0,
+                                            sample_times=sample_times)
+
+    indep_sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1,
+                                                indep_sys_err2,
+                                                indep_sys_err3],
                                         tc_array.get_measurement_shape())
 
     tc_array.set_indep_sys_err_integrator(indep_sys_err_int)

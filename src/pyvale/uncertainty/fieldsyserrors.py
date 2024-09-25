@@ -11,9 +11,10 @@ import numpy as np
 from pyvale.physics.field import IField
 from pyvale.numerical.spatialintegrator import ISpatialIntegrator
 from pyvale.uncertainty.errorcalculator import IErrCalculator
+from pyvale.uncertainty.driftcalculator import IDriftCalculator
 
 
-class SysErrPointPosition(IErrCalculator):
+class SysErrRandPosition(IErrCalculator):
 
     def __init__(self,
                  field: IField,
@@ -49,7 +50,7 @@ class SysErrPointPosition(IErrCalculator):
         return sys_errs
 
 
-class SysErrStaticSpatialAverage(IErrCalculator):
+class SysErrSpatialAverage(IErrCalculator):
 
     def __init__(self,
                  field: IField,
@@ -68,7 +69,7 @@ class SysErrStaticSpatialAverage(IErrCalculator):
         return sys_errs
 
 
-class SysErrDynamicSpatialAverage(IErrCalculator):
+class SysErrSpatialAverageRandPos(IErrCalculator):
 
     def __init__(self,
                  field: IField,
@@ -105,3 +106,83 @@ class SysErrDynamicSpatialAverage(IErrCalculator):
                                             self._sample_times) - err_basis
         return sys_errs
 
+
+class SysErrTimeRand(IErrCalculator):
+
+    def __init__(self,
+                field: IField,
+                sens_pos: np.ndarray,
+                time_std: float,
+                sample_times: np.ndarray | None = None,
+                seed: int | None = None) -> None:
+
+        self._field = field
+        self._sens_pos = sens_pos
+        self._time_std = time_std
+
+        if sample_times is None:
+            original_times = field.get_time_steps()
+        else:
+            original_times = sample_times
+
+        self._time_original = np.copy(original_times)
+        self._time_perturbed = np.copy(original_times)
+
+        self._rng = np.random.default_rng(seed)
+
+    def get_perturbed_time(self) -> np.ndarray:
+        return self._time_perturbed
+
+    def calc_errs(self,
+                err_basis: np.ndarray) -> np.ndarray:
+
+        self._time_perturbed = self._time_original + \
+                                self._rng.normal(loc=0.0,
+                                                scale=self._time_std,
+                                                size=self._time_original.shape)
+
+        sys_errs = self._field.sample_field(self._sens_pos,
+                            self._time_perturbed) - err_basis
+
+        return sys_errs
+
+
+
+class SysErrTimeDrift(IErrCalculator):
+
+    def __init__(self,
+                field: IField,
+                sens_pos: np.ndarray,
+                drift: IDriftCalculator,
+                sample_times: np.ndarray | None = None) -> None:
+
+        self._field = field
+        self._sens_pos = sens_pos
+        self._drift = drift
+
+        if sample_times is None:
+            original_times = field.get_time_steps()
+        else:
+            original_times = sample_times
+
+        self._time_original = np.copy(original_times)
+        self._time_perturbed = np.copy(original_times)
+
+
+    def get_perturbed_time(self) -> np.ndarray:
+        return self._time_perturbed
+
+    def calc_errs(self,
+                  err_basis: np.ndarray) -> np.ndarray:
+
+        self._time_perturbed = self._time_original + \
+            self._drift.calc_drift(self._time_original)
+
+        print(80*"=")
+        print(f"{self._time_perturbed=}")
+        print(80*"=")
+
+        sys_errs = self._field.sample_field(self._sens_pos,
+                                    self._time_perturbed) - err_basis
+
+        return sys_errs
