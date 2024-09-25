@@ -10,7 +10,7 @@ import numpy as np
 
 from pyvale.physics.field import IField
 from pyvale.numerical.spatialintegrator import ISpatialIntegrator
-from pyvale.uncertainty.errorcalculator import IErrCalculator
+from pyvale.uncertainty.errorcalculator import IErrCalculator, ErrorData
 from pyvale.uncertainty.driftcalculator import IDriftCalculator
 
 
@@ -33,8 +33,7 @@ class SysErrRandPosition(IErrCalculator):
     def get_perturbed_pos(self) -> np.ndarray:
         return self._sens_pos_perturbed
 
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
+    def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
 
         self._sens_pos_perturbed = np.copy(self._sens_pos_original)
 
@@ -47,7 +46,10 @@ class SysErrRandPosition(IErrCalculator):
 
         sys_errs = self._field.sample_field(self._sens_pos_perturbed,
                                             self._sample_times) - err_basis
-        return sys_errs
+
+        err_data = ErrorData(error_array=sys_errs,
+                             positions=self._sens_pos_perturbed)
+        return err_data
 
 
 class SysErrSpatialAverage(IErrCalculator):
@@ -62,11 +64,12 @@ class SysErrSpatialAverage(IErrCalculator):
         self._spatial_average = spatial_average
         self._sample_times = sample_times
 
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
+    def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
 
         sys_errs = self._spatial_average.get_averages() - err_basis
-        return sys_errs
+
+        err_data = ErrorData(error_array=sys_errs)
+        return err_data
 
 
 class SysErrSpatialAverageRandPos(IErrCalculator):
@@ -90,8 +93,7 @@ class SysErrSpatialAverageRandPos(IErrCalculator):
     def get_perturbed_pos(self) -> np.ndarray:
         return self._sens_pos_perturbed
 
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
+    def calc_errs(self, err_basis: np.ndarray) -> np.ndarray:
 
         self._sens_pos_perturbed = np.copy(self._sens_pos_original)
 
@@ -104,7 +106,10 @@ class SysErrSpatialAverageRandPos(IErrCalculator):
 
         sys_errs = self._spatial_average.calc_averages(self._sens_pos_perturbed,
                                             self._sample_times) - err_basis
-        return sys_errs
+
+        err_data = ErrorData(error_array=sys_errs,
+                             positions=self._sens_pos_perturbed)
+        return err_data
 
 
 class SysErrTimeRand(IErrCalculator):
@@ -133,8 +138,7 @@ class SysErrTimeRand(IErrCalculator):
     def get_perturbed_time(self) -> np.ndarray:
         return self._time_perturbed
 
-    def calc_errs(self,
-                err_basis: np.ndarray) -> np.ndarray:
+    def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
 
         self._time_perturbed = self._time_original + \
                                 self._rng.normal(loc=0.0,
@@ -144,8 +148,9 @@ class SysErrTimeRand(IErrCalculator):
         sys_errs = self._field.sample_field(self._sens_pos,
                             self._time_perturbed) - err_basis
 
-        return sys_errs
-
+        err_data = ErrorData(error_array=sys_errs,
+                             time_steps=self._time_perturbed)
+        return err_data
 
 
 class SysErrTimeDrift(IErrCalculator):
@@ -172,17 +177,14 @@ class SysErrTimeDrift(IErrCalculator):
     def get_perturbed_time(self) -> np.ndarray:
         return self._time_perturbed
 
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
+    def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
 
         self._time_perturbed = self._time_original + \
             self._drift.calc_drift(self._time_original)
 
-        print(80*"=")
-        print(f"{self._time_perturbed=}")
-        print(80*"=")
-
         sys_errs = self._field.sample_field(self._sens_pos,
                                     self._time_perturbed) - err_basis
 
-        return sys_errs
+        err_data = ErrorData(error_array=sys_errs,
+                             time_steps=self._time_perturbed)
+        return err_data

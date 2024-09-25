@@ -9,7 +9,7 @@ import numpy as np
 from pyvale.uncertainty.errorcalculator import IErrCalculator
 
 
-class ErrorIntegrator():
+class ErrorIntegrator:
 
     def __init__(self,
                  err_calcs: list[IErrCalculator],
@@ -30,7 +30,7 @@ class ErrorIntegrator():
     def calc_errs_static(self, err_basis: np.ndarray) -> np.ndarray:
 
         for ii,ff in enumerate(self._err_calcs):
-            self._errs_by_func[ii,:,:,:] = ff.calc_errs(err_basis)
+            self._errs_by_func[ii,:,:,:] = ff.calc_errs(err_basis).error_array
 
         self._errs_tot = np.sum(self._errs_by_func,axis=0)
         return self._errs_tot
@@ -39,7 +39,7 @@ class ErrorIntegrator():
 
         current_basis = np.copy(err_basis)
         for ii,ff in enumerate(self._err_calcs):
-            self._errs_by_func[ii,:,:,:] = ff.calc_errs(current_basis)
+            self._errs_by_func[ii,:,:,:] = ff.calc_errs(current_basis).error_array
             current_basis = current_basis + self._errs_by_func[ii,:,:,:]
 
         self._errs_tot = np.sum(self._errs_by_func,axis=0)

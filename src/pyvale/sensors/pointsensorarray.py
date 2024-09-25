@@ -33,9 +33,9 @@ class PointSensorArray():
         self._truth = None
         self._measurements = None
 
-        self._pre_syserr_integ = None
-        self._randerr_integ = None
-        self._post_syserr_integ = None
+        self._pre_syserr_integrator = None
+        self._randerr_integrator = None
+        self._post_syserr_integrator = None
 
     #---------------------------------------------------------------------------
     # accessors
@@ -69,65 +69,65 @@ class PointSensorArray():
     # pre / independent / truth-based  systematic errors
     def set_indep_sys_err_integrator(self,
                                err_int: ErrorIntegrator) -> None:
-        self._pre_syserr_integ = err_int
+        self._pre_syserr_integrator = err_int
 
 
     def _calc_pre_systematic_errs(self) -> np.ndarray | None:
-        if self._pre_syserr_integ is None:
+        if self._pre_syserr_integrator is None:
             return None
 
-        self._pre_syserr_integ.calc_errs_static(self.get_truth_values())
-        return self._pre_syserr_integ.get_errs_tot()
+        self._pre_syserr_integrator.calc_errs_static(self.get_truth_values())
+        return self._pre_syserr_integrator.get_errs_tot()
 
 
     def get_pre_systematic_errs(self) -> np.ndarray | None:
-        if self._pre_syserr_integ is None:
+        if self._pre_syserr_integrator is None:
             return None
 
-        return self._pre_syserr_integ.get_errs_tot()
+        return self._pre_syserr_integrator.get_errs_tot()
 
     #---------------------------------------------------------------------------
     # random errors
     def set_rand_err_integrator(self,
                                 err_int: ErrorIntegrator) -> None:
-        self._randerr_integ = err_int
+        self._randerr_integrator = err_int
 
 
     def _calc_random_errs(self)-> np.ndarray | None:
-        if self._randerr_integ is None:
+        if self._randerr_integrator is None:
             return None
 
-        self._randerr_integ.calc_errs_static(self.get_truth_values())
-        return self._randerr_integ.get_errs_tot()
+        self._randerr_integrator.calc_errs_static(self.get_truth_values())
+        return self._randerr_integrator.get_errs_tot()
 
 
     def get_random_errs(self) -> np.ndarray | None:
-        if self._randerr_integ is None:
+        if self._randerr_integrator is None:
             return None
 
-        return self._randerr_integ.get_errs_tot()
+        return self._randerr_integrator.get_errs_tot()
 
     #---------------------------------------------------------------------------
     # post / coupled / measurement based systematic errors
     def set_dep_sys_err_integrator(self,
                                err_int: ErrorIntegrator) -> None:
-        self._post_syserr_integ = err_int
+        self._post_syserr_integrator = err_int
 
 
     def _calc_dep_systematic_errs(self, measurements: np.ndarray
                                    ) -> np.ndarray | None:
-        if self._post_syserr_integ is None:
+        if self._post_syserr_integrator is None:
             return None
 
-        self._post_syserr_integ.calc_errs_recursive(measurements)
-        return self._post_syserr_integ.get_errs_tot()
+        self._post_syserr_integrator.calc_errs_recursive(measurements)
+        return self._post_syserr_integrator.get_errs_tot()
 
 
     def get_dep_systematic_errs(self) -> np.ndarray | None:
-        if self._post_syserr_integ is None:
+        if self._post_syserr_integrator is None:
             return None
 
-        return self._post_syserr_integ.get_errs_tot()
+        return self._post_syserr_integrator.get_errs_tot()
 
     #---------------------------------------------------------------------------
     # measurements

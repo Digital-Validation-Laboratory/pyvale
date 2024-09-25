@@ -6,7 +6,7 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 import numpy as np
-from pyvale.uncertainty.errorcalculator import IErrCalculator
+from pyvale.uncertainty.errorcalculator import IErrCalculator, ErrorData
 
 
 class SysErrOffset(IErrCalculator):
@@ -15,10 +15,11 @@ class SysErrOffset(IErrCalculator):
                  offset: float) -> None:
         self._offset = offset
 
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
+    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
 
-        return self._offset*np.ones(shape=err_basis.shape)
+        err_data = ErrorData(error_array=
+                             self._offset*np.ones(shape=err_basis.shape))
+        return err_data
 
 
 class SysErrOffsetPercent(IErrCalculator):
@@ -27,11 +28,11 @@ class SysErrOffsetPercent(IErrCalculator):
                  offset_percent: float) -> None:
         self._offset_percent = offset_percent
 
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
+    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
 
-        return self._offset_percent/100 * err_basis \
-            *np.ones(shape=err_basis.shape)
+        err_data = ErrorData(error_array=self._offset_percent/100*err_basis*
+                             np.ones(shape=err_basis.shape))
+        return err_data
 
 
 class SysErrUniform(IErrCalculator):
@@ -44,8 +45,7 @@ class SysErrUniform(IErrCalculator):
         self._high = high
         self._rng = np.random.default_rng(seed)
 
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
+    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
 
         err_shape = np.array(err_basis.shape)
         err_shape[-1] = 1
@@ -57,7 +57,8 @@ class SysErrUniform(IErrCalculator):
         tile_shape[0:-1] = 1
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
-        return sys_errs
+        err_data = ErrorData(error_array=sys_errs)
+        return err_data
 
 
 class SysErrUnifPercent(IErrCalculator):
@@ -70,8 +71,7 @@ class SysErrUnifPercent(IErrCalculator):
         self._high = high_percent/100
         self._rng = np.random.default_rng(seed)
 
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
+    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
 
         err_shape = np.array(err_basis.shape)
         err_shape[-1] = 1
@@ -83,9 +83,9 @@ class SysErrUnifPercent(IErrCalculator):
         tile_shape[0:-1] = 1
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
-        sys_errs = err_basis*sys_errs
+        err_data = ErrorData(error_array=err_basis*sys_errs)
+        return err_data
 
-        return sys_errs
 
 
 class SysErrNormal(IErrCalculator):
@@ -96,9 +96,7 @@ class SysErrNormal(IErrCalculator):
         self._std = std
         self._rng = np.random.default_rng(seed)
 
-    def calc_errs(self,
-                  err_basis: np.ndarray,
-                  ) -> np.ndarray:
+    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
 
         err_shape = np.array(err_basis.shape)
         err_shape[-1] = 1
@@ -110,7 +108,8 @@ class SysErrNormal(IErrCalculator):
         tile_shape[0:-1] = 1
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
-        return sys_errs
+        err_data = ErrorData(error_array=sys_errs)
+        return err_data
 
 
 class SysErrNormPercent(IErrCalculator):
@@ -121,9 +120,7 @@ class SysErrNormPercent(IErrCalculator):
         self._std = std_percent/100
         self._rng = np.random.default_rng(seed)
 
-    def calc_errs(self,
-                  err_basis: np.ndarray,
-                  ) -> np.ndarray:
+    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
 
         err_shape = np.array(err_basis.shape)
         err_shape[-1] = 1
@@ -135,9 +132,10 @@ class SysErrNormPercent(IErrCalculator):
         tile_shape[0:-1] = 1
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
-        sys_errs = err_basis*sys_errs
+        err_data = ErrorData(error_array=err_basis*sys_errs)
+        return err_data
 
-        return sys_errs
+
 
 
 
