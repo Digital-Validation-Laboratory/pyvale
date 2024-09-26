@@ -28,7 +28,7 @@ def main() -> None:
         sim_list.append(sim_data)
 
     #===========================================================================
-    # Creaet pyvale sensor arrays for thermal and mechanical data
+    # Create pyvale sensor arrays for thermal and mechanical data
     sim_data = sim_list[0]
 
     n_sens = (4,1,1)

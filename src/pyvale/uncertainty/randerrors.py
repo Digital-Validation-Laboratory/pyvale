@@ -8,6 +8,7 @@ Copyright (C) 2024 The Digital Validation Team
 import numpy as np
 
 from pyvale.uncertainty.errorcalculator import IErrCalculator, ErrorData
+from pyvale.uncertainty.randomgenerator import IRandomGenerator
 
 
 class RandErrUniform(IErrCalculator):
@@ -20,12 +21,11 @@ class RandErrUniform(IErrCalculator):
         self._high = high
         self._rng = np.random.default_rng(seed)
 
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> ErrorData:
+    def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
 
         rand_errs = self._rng.uniform(low=self._low,
-                                        high=self._high,
-                                        size=err_basis.shape)
+                                    high=self._high,
+                                    size=err_basis.shape)
 
         err_data = ErrorData(error_array=rand_errs)
         return err_data
@@ -88,4 +88,18 @@ class RandErrNormPercent(IErrCalculator):
                                     size=err_basis.shape)
 
         err_data = ErrorData(error_array=err_basis*self._std*norm_rand)
+        return err_data
+
+class RandErrGenerator(IErrCalculator):
+
+    def __init__(self,
+                 generator: IRandomGenerator) -> None:
+        self._generator = generator
+
+    def calc_errs(self,
+                  err_basis: np.ndarray) -> ErrorData:
+
+        rand_errs = self._generator.generate(size=err_basis.shape)
+        
+        err_data = ErrorData(error_array=rand_errs)
         return err_data

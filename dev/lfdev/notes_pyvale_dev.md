@@ -3,8 +3,6 @@
 ## TODO: `pyvale`
 
 **General**
-- TODO: allow errors to be **sampled** or **static** so when `calc` is called it doesn't do any extra calculations for static errors - it just returns them
-- TODO: for sampled errors create an enum and pass this to generate the sampler
 
 - TODO: Experiment generator/ runner
     - TODO: Allow user to extract all sources of error for each experiment, need to dig out of `ErrorIntegrator`

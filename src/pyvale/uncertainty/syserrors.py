@@ -7,6 +7,7 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 import numpy as np
 from pyvale.uncertainty.errorcalculator import IErrCalculator, ErrorData
+from pyvale.uncertainty.randomgenerator import IRandomGenerator
 
 
 class SysErrOffset(IErrCalculator):
@@ -136,6 +137,26 @@ class SysErrNormPercent(IErrCalculator):
         return err_data
 
 
+class SysErrGenerator(IErrCalculator):
+
+    def __init__(self,
+                 generator: IRandomGenerator) -> None:
+        self._generator = generator
+
+    def calc_errs(self,
+                  err_basis: np.ndarray) -> ErrorData:
+
+        err_shape = np.array(err_basis.shape)
+        err_shape[-1] = 1
+
+        sys_errs = self._generator.generate(size=err_shape)
+
+        tile_shape = np.array(err_basis.shape)
+        tile_shape[0:-1] = 1
+        sys_errs = np.tile(sys_errs,tuple(tile_shape))
+
+        err_data = ErrorData(error_array=sys_errs)
+        return err_data
 
 
 
