@@ -15,7 +15,7 @@ from pyvale.physics.tensorfield import TensorField
 from pyvale.sensors.sensordescriptor import SensorDescriptorFactory
 from pyvale.sensors.pointsensorarray import PointSensorArray
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
-from pyvale.uncertainty.syserrors import SysErrUnifPercent
+from pyvale.uncertainty.syserrors import SysErrUniformPercent
 from pyvale.uncertainty.randerrors import RandErrNormPercent
 from pyvale.uncertainty.depsyserrors import (SysErrDigitisation,
                                               SysErrSaturation)
@@ -157,7 +157,7 @@ class SensorArrayFactory:
 
 def init_basic_errs(sens_array: PointSensorArray, errs_pc: float = 1.0) -> PointSensorArray:
 
-    indep_sys_err_int = ErrorIntegrator([SysErrUnifPercent(-errs_pc,errs_pc)],
+    indep_sys_err_int = ErrorIntegrator([SysErrUniformPercent(-errs_pc,errs_pc)],
                                     sens_array.get_measurement_shape())
     sens_array.set_indep_sys_err_integrator(indep_sys_err_int)
 

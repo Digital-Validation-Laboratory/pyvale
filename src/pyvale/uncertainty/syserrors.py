@@ -62,7 +62,7 @@ class SysErrUniform(IErrCalculator):
         return err_data
 
 
-class SysErrUnifPercent(IErrCalculator):
+class SysErrUniformPercent(IErrCalculator):
 
     def __init__(self,
                  low_percent: float,
