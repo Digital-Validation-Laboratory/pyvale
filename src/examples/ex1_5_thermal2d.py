@@ -31,7 +31,7 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    sample_times = np.linspace(0.0,np.max(sim_data.time),12)
+    sample_times = np.linspace(0.0,np.max(sim_data.time),50)
 
     tc_array = pyvale.SensorArrayFactory \
         .plain_thermocouple_array(sim_data,
@@ -44,40 +44,57 @@ def main() -> None:
     # Examples of full error library
 
     #---------------------------------------------------------------------------
-    sys_errs = []
-    sys_errs.append(pyvale.SysErrOffset(offset=-1.0))
-    sys_errs.append(pyvale.SysErrOffsetPercent(offset_percent=-1.0))
+    pre_sys_errs = []
+    pre_sys_errs.append(pyvale.SysErrOffset(offset=-1.0))
+    pre_sys_errs.append(pyvale.SysErrOffsetPercent(offset_percent=-1.0))
 
-    sys_errs.append(pyvale.SysErrUniform(low=-2.0,
+    pre_sys_errs.append(pyvale.SysErrUniform(low=-2.0,
                                         high=2.0))
-    sys_errs.append(pyvale.SysErrUniformPercent(low_percent=-2.0,
+    pre_sys_errs.append(pyvale.SysErrUniformPercent(low_percent=-2.0,
                                                 high_percent=2.0))
 
-    sys_errs.append(pyvale.SysErrNormal(std=1.0))
-    sys_errs.append(pyvale.SysErrRandPosition(tc_array.field,
-                                               sens_pos,
-                                               (1.0,1.0,None),
-                                               sample_times))#
+    pre_sys_errs.append(pyvale.SysErrNormal(std=1.0))
+    pre_sys_errs.append(pyvale.SysErrNormPercent(std_percent=2.0))
 
+    sys_gen = pyvale.TriangularGenerator(left=-1.0,
+                                          mode=0.0,
+                                          right=1.0)
+    pre_sys_errs.append(pyvale.SysErrGenerator(rand_gen))
 
-    indep_sys_err_int = pyvale.ErrorIntegrator(sys_errs,
+    pre_sys_errs.append(pyvale.SysErrRandPosition(tc_array.field,
+                                                  sens_pos,
+                                                  (1.0,1.0,None),
+                                                  sample_times))
+
+    indep_sys_err_int = pyvale.ErrorIntegrator(pre_sys_errs,
                         tc_array.get_measurement_shape())
     tc_array.set_indep_sys_err_integrator(indep_sys_err_int)
 
     #---------------------------------------------------------------------------
-    rand_err1 = pyvale.RandErrNormPercent(std_percent=5.0)
-    rand_err2 = pyvale.RandErrUnifPercent(low_percent=-5.0,
-                                        high_percent=5.0)
-    rand_err_int = pyvale.ErrorIntegrator([rand_err1,rand_err2],
+    rand_errs = []
+    rand_errs.append(pyvale.RandErrNormal(std = 2.0))
+    rand_errs.append(pyvale.RandErrNormPercent(std_percent=2.0))
 
-                                            tc_array.get_measurement_shape())
+    rand_errs.append(pyvale.RandErrUniform(low=-2.0,high=2.0))
+    rand_errs.append(pyvale.RandErrUnifPercent(low_percent=-2.0,
+                                               high_percent=2.0))
+
+    rand_gen = pyvale.TriangularGenerator(left=-5.0,
+                                          mode=0.0,
+                                          right=5.0)
+    rand_errs.append(pyvale.RandErrGenerator(rand_gen))
+
+    rand_err_int = pyvale.ErrorIntegrator(rand_errs,
+                                          tc_array.get_measurement_shape())
     tc_array.set_rand_err_integrator(rand_err_int)
 
     #---------------------------------------------------------------------------
-    dep_sys_err1 = pyvale.SysErrDigitisation(bits_per_unit=2**8/100)
-    dep_sys_err2 = pyvale.SysErrSaturation(meas_min=0.0,meas_max=300.0)
-    dep_sys_err_int = pyvale.ErrorIntegrator([dep_sys_err1,dep_sys_err2],
-                                        tc_array.get_measurement_shape())
+    post_sys_errs = []
+    post_sys_errs.append(pyvale.SysErrDigitisation(bits_per_unit=2**8/100))
+    post_sys_errs.append(pyvale.SysErrSaturation(meas_min=0.0,meas_max=300.0))
+
+    dep_sys_err_int = pyvale.ErrorIntegrator(post_sys_errs,
+                                             tc_array.get_measurement_shape())
     tc_array.set_dep_sys_err_integrator(dep_sys_err_int)
 
 
