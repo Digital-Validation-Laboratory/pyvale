@@ -44,6 +44,7 @@ def main() -> None:
     # Examples of full error library
 
     #---------------------------------------------------------------------------
+    # Standard independent systematic errors
     pre_sys_errs = []
     pre_sys_errs.append(pyvale.SysErrOffset(offset=-1.0))
     pre_sys_errs.append(pyvale.SysErrOffsetPercent(offset_percent=-1.0))
@@ -59,12 +60,15 @@ def main() -> None:
     sys_gen = pyvale.TriangularGenerator(left=-1.0,
                                           mode=0.0,
                                           right=1.0)
-    pre_sys_errs.append(pyvale.SysErrGenerator(rand_gen))
+    pre_sys_errs.append(pyvale.SysErrGenerator(sys_gen))
 
+    # Field based errors
+    pos_gen = pyvale.NormalGenerator(std=1.0)
     pre_sys_errs.append(pyvale.SysErrRandPosition(tc_array.field,
                                                   sens_pos,
-                                                  (1.0,1.0,None),
+                                                  (pos_gen,pos_gen,None),
                                                   sample_times))
+
 
     indep_sys_err_int = pyvale.ErrorIntegrator(pre_sys_errs,
                         tc_array.get_measurement_shape())
@@ -112,9 +116,6 @@ def main() -> None:
 
     pyvale.plot_time_traces(tc_array,field_key)
     plt.show()
-
-
-
 
 
 if __name__ == '__main__':

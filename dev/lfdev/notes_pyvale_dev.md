@@ -3,61 +3,32 @@
 ## TODO: `pyvale`
 
 **General**
-
 - TODO: Experiment generator/ runner
     - TODO: Allow user to extract all sources of error for each experiment, need to dig out of `ErrorIntegrator`
     - TODO: Create example connecting to `mooseherder`, assume user provides `mooseherder` like array of simulations
     - TODO: Increase plotting capabilities to compare over simulations as well as all sensors on experiments
-- TODO: visualisation tools for presentation animations
-    - TODO: create pyvista animation synced to matplotlib traces
+
+- TODO: visualisation tools for:
+    - TODO: presentation animations - create pyvista animation synced to matplotlib traces
+    - TODO: visualisation of perturbed time / sensor locations
+    - TODO: experiment - allow extraction of different conditions for comparison plots
+
 - TODO: Calibration errors
-- Field based errors:
-    - DONE: Positioning error
-    - TODO: Temporal position error allow drift of +/- X s
-    - TODO: function based temporal drift
+
+- TODO: Field based errors:
     - HALF DONE: Spatial averaging error
         - Set an integration area
         - Set a weighting function
     - TODO: Temporal averaging error
         - Set an integration time
         - Set a weighting function
-    - TODO Allow Gauss Quad as Truth with other as Err
-    - TODO Allow Gauss Quad with position and temporal drift
-- IMAGE DEF: allow upsampled image to be generated once and retained.
+    - **TODO Allow Gauss Quad as Truth with other as Err**
+    - TODO: Allow Gauss Quad with position and temporal drift
 
+- IMAGE DEF: allow upsampled image to be generated once and retained.
 
 Gauss Quadrature for the Unit Disc
 http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubature-formulas-for-the-unit-disk/
-
-**Examples**
-- Positioning error, spatial integration error
-- Spatial integration truth
-- Change examples to use simcases:
-    - Thermal 2D, Transient = case13 - plate / moose only
-    - Thermal 3D, Transient = case15 - monoblock+gmsh - use 16 with mech data as well
-    - Mechanical 2D, Transient = case17 - plate with hole 2D+gmsh
-    - Mechanical 3D = **TODO**
-    - Thermomechanical 3D = case16 - monoblock+gmsh
-
-**Systematic error handling**
-- Add spatial and temporal averaging errors:
-    - Based on the `Field` object
-- Add positioning errors to the sensors
-    - Based on the `Field` object
-- Add calibration error
-
-**Future: Experiment Simulation & Workflow**
-- Future: Allow user to specify sideset to locate sensors
-- Need an simulated experiment generator with mooseherder
-    - Build monoblock models of increasing fidelity (thermal -> thermo-mech, single value mat props -> temp dependence)
-    - Monte Carlo or Latin Hypercube sampling
-    - Experiments that just perturb one parameter
-        - Material Properties
-        - Load and BCs
-        - Geometry
-    - Look at sensitivity maps? - how does this work with a geometric perturbation
-    - Start with the purely thermal case with thermocouples
-
 
 ## Python coding pinciples:
 - Use git, vscode and pylint (PEP8)
@@ -110,10 +81,7 @@ http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubatur
     - Based on Adel's thermocouple optimiser
     - Optimiser wraps `pymoo`
 
-
-
 ## Sensors
-
 A sensor should have:
 - A spatial measurement geometry: point, line, area, volume
 - A measurement position, centroid of the measurement geometry

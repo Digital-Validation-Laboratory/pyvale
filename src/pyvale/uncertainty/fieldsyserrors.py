@@ -12,6 +12,7 @@ from pyvale.physics.field import IField
 from pyvale.numerical.spatialintegrator import ISpatialIntegrator
 from pyvale.uncertainty.errorcalculator import IErrCalculator, ErrorData
 from pyvale.uncertainty.driftcalculator import IDriftCalculator
+from pyvale.uncertainty.randomgenerator import IRandomGenerator
 
 
 class SysErrRandPosition(IErrCalculator):
@@ -19,16 +20,16 @@ class SysErrRandPosition(IErrCalculator):
     def __init__(self,
                  field: IField,
                  sens_pos: np.ndarray,
-                 std_by_ax: tuple[float | None,float | None,float | None],
-                 sample_times: np.ndarray | None = None,
-                 seed: int | None = None) -> None:
+                 rand_by_ax: tuple[IRandomGenerator | None,
+                                   IRandomGenerator | None,
+                                   IRandomGenerator | None],
+                 sample_times: np.ndarray | None = None) -> None:
 
         self._field = field
         self._sens_pos_original = np.copy(sens_pos)
         self._sens_pos_perturbed = np.copy(sens_pos)
-        self._std_by_ax = std_by_ax
+        self._rand_by_ax = rand_by_ax
         self._sample_times = sample_times
-        self._rng = np.random.default_rng(seed)
 
     def get_perturbed_pos(self) -> np.ndarray:
         return self._sens_pos_perturbed
@@ -37,12 +38,10 @@ class SysErrRandPosition(IErrCalculator):
 
         self._sens_pos_perturbed = np.copy(self._sens_pos_original)
 
-        for ii,ss in enumerate(self._std_by_ax):
-            if ss is not None:
+        for ii,rng in enumerate(self._rand_by_ax):
+            if rng is not None:
                 self._sens_pos_perturbed[:,ii] = self._sens_pos_perturbed[:,ii]\
-                    + self._rng.normal(loc=0.0,
-                                        scale=ss,
-                                        size=self._sens_pos_perturbed.shape[0])
+                    + rng.generate(size=self._sens_pos_perturbed.shape[0])
 
         sys_errs = self._field.sample_field(self._sens_pos_perturbed,
                                             self._sample_times) - err_basis
@@ -78,17 +77,17 @@ class SysErrSpatialAverageRandPos(IErrCalculator):
                  field: IField,
                  spatial_average: ISpatialIntegrator,
                  sens_pos: np.ndarray,
-                 std_by_ax: tuple[float | None,float | None,float | None],
-                 sample_times: np.ndarray | None = None,
-                 seed: int | None = None) -> None:
+                 rand_by_ax: tuple[IRandomGenerator | None,
+                                   IRandomGenerator | None,
+                                   IRandomGenerator | None],
+                 sample_times: np.ndarray | None = None) -> None:
 
         self._field = field
         self._spatial_average = spatial_average
         self._sens_pos_original = np.copy(sens_pos)
         self._sens_pos_perturbed = np.copy(sens_pos)
-        self._std_by_ax = std_by_ax
+        self._rand_by_ax = rand_by_ax
         self._sample_times = sample_times
-        self._rng = np.random.default_rng(seed)
 
     def get_perturbed_pos(self) -> np.ndarray:
         return self._sens_pos_perturbed
@@ -97,12 +96,10 @@ class SysErrSpatialAverageRandPos(IErrCalculator):
 
         self._sens_pos_perturbed = np.copy(self._sens_pos_original)
 
-        for ii,ss in enumerate(self._std_by_ax):
-            if ss is not None:
+        for ii,rng in enumerate(self._rand_by_ax):
+            if rng is not None:
                 self._sens_pos_perturbed[:,ii] = self._sens_pos_perturbed[:,ii]\
-                    + self._rng.normal(loc=0.0,
-                                        scale=ss,
-                                        size=self._sens_pos_perturbed.shape[0])
+                    + rng.generate(size=self._sens_pos_perturbed.shape[0])
 
         sys_errs = self._spatial_average.calc_averages(self._sens_pos_perturbed,
                                             self._sample_times) - err_basis
@@ -117,13 +114,12 @@ class SysErrTimeRand(IErrCalculator):
     def __init__(self,
                 field: IField,
                 sens_pos: np.ndarray,
-                time_std: float,
-                sample_times: np.ndarray | None = None,
-                seed: int | None = None) -> None:
+                rand_time: IRandomGenerator,
+                sample_times: np.ndarray | None = None) -> None:
 
         self._field = field
         self._sens_pos = sens_pos
-        self._time_std = time_std
+        self._rand_time = rand_time
 
         if sample_times is None:
             original_times = field.get_time_steps()
@@ -133,7 +129,6 @@ class SysErrTimeRand(IErrCalculator):
         self._time_original = np.copy(original_times)
         self._time_perturbed = np.copy(original_times)
 
-        self._rng = np.random.default_rng(seed)
 
     def get_perturbed_time(self) -> np.ndarray:
         return self._time_perturbed
@@ -141,9 +136,8 @@ class SysErrTimeRand(IErrCalculator):
     def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
 
         self._time_perturbed = self._time_original + \
-                                self._rng.normal(loc=0.0,
-                                                scale=self._time_std,
-                                                size=self._time_original.shape)
+                                self._rand_time.generate(
+                                    size=self._time_original.shape)
 
         sys_errs = self._field.sample_field(self._sens_pos,
                             self._time_perturbed) - err_basis

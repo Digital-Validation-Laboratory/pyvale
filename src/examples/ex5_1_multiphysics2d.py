@@ -40,7 +40,7 @@ def main() -> None:
     # Create pyvale sensor arrays for thermal and mechanical data
     tc_field = 'temperature'
     tc_array = pyvale.SensorArrayFactory \
-        .plain_thermocouple_array(sim_data,
+        .basic_thermocouple_array(sim_data,
                                   sens_pos,
                                   tc_field,
                                   spat_dims=2,
@@ -48,30 +48,11 @@ def main() -> None:
 
     sg_field = 'strain'
     sg_array = pyvale.SensorArrayFactory \
-        .plain_straingauge_array(sim_data,
+        .basic_straingauge_array(sim_data,
                                   sens_pos,
                                   sg_field,
                                   spat_dims=2,
                                   sample_times=None)
-
-    #===========================================================================
-    # Create all errors
-    indep_sys_err1 = pyvale.SysErrOffset(offset=-5.0)
-    indep_sys_err2 = pyvale.SysErrUniform(low=-10.0,
-                                          high=10.0)
-
-    indep_sys_err3 = pyvale.SysErrRandPosition(tc_array.field,
-                                               sens_pos,
-                                               (1.0,1.0,None),
-                                               sample_times)
-
-    indep_sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1,
-                                                indep_sys_err2,
-                                                indep_sys_err3],
-                                        tc_array.get_measurement_shape())
-
-    tc_array.set_indep_sys_err_integrator(indep_sys_err_int)
-
 
     #===========================================================================
     # Visualise Traces
