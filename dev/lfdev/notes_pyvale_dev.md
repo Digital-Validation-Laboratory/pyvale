@@ -1,8 +1,9 @@
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
+- TODO: EXAMPLES
+    - Example showing area averaging as ground truth
 
-**General**
 - TODO: Experiment generator/ runner
     - TODO: Allow user to extract all sources of error for each experiment, need to dig out of `ErrorIntegrator`
     - TODO: Create example connecting to `mooseherder`, assume user provides `mooseherder` like array of simulations

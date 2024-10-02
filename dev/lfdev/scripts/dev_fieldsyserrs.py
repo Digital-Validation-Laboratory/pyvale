@@ -35,7 +35,7 @@ def main() -> None:
                                            sens_pos,
                                            (0.1,0.1,None))
 
-    spatial_int = pyvale.QuadratureFactory.quad_2d_9points(t_field,
+    spatial_int = pyvale.QuadratureFactory.quad_2d_9pt(t_field,
                                                         sens_pos,
                                                         np.array((0.1,0.1,0.0)))
 

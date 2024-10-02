@@ -11,14 +11,16 @@ import pyvista as pv
 from pyvale.physics.field import IField
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
 from pyvale.sensors.sensordescriptor import SensorDescriptor
+from pyvale.numerical.spatialintegrator import ISpatialIntegrator
 
 
-class PointSensorArray():
+class PointSensorArray:
     def __init__(self,
                  positions: np.ndarray,
                  field: IField,
                  sample_times: np.ndarray | None = None,
-                 descriptor: SensorDescriptor | None = None
+                 descriptor: SensorDescriptor | None = None,
+                 area_avg: ISpatialIntegrator | None = None
                  ) -> None:
 
         self.positions = positions
@@ -29,6 +31,8 @@ class PointSensorArray():
         self.descriptor = SensorDescriptor()
         if descriptor is not None:
             self.descriptor = descriptor
+
+        self._area_avg = area_avg
 
         self._truth = None
         self._measurements = None
@@ -56,8 +60,12 @@ class PointSensorArray():
     #---------------------------------------------------------------------------
     # truth calculation from simulation
     def calc_truth_values(self) -> np.ndarray:
-        return self.field.sample_field(self.positions,
-                                        self._sample_times)
+        if self._area_avg is None:
+            return self.field.sample_field(self.positions,
+                                            self._sample_times)
+
+        return self._area_avg.calc_averages(self.positions,
+                                                      self._sample_times)
 
     def get_truth_values(self) -> np.ndarray:
         if self._truth is None:

@@ -55,17 +55,17 @@ class SysErrSpatialAverage(IErrCalculator):
 
     def __init__(self,
                  field: IField,
-                 spatial_average: ISpatialIntegrator,
+                 spatial_averager: ISpatialIntegrator,
                  sample_times: np.ndarray | None = None,
                  ) -> None:
 
         self._field = field
-        self._spatial_average = spatial_average
+        self._spatial_averager = spatial_averager
         self._sample_times = sample_times
 
     def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
 
-        sys_errs = self._spatial_average.get_averages() - err_basis
+        sys_errs = self._spatial_averager.get_averages() - err_basis
 
         err_data = ErrorData(error_array=sys_errs)
         return err_data
