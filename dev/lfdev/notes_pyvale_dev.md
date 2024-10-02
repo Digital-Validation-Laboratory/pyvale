@@ -1,6 +1,8 @@
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
+NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
+
 - TODO: EXAMPLES
     - Example showing area averaging as ground truth
 

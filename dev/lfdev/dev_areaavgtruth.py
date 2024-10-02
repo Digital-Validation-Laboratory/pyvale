@@ -39,10 +39,16 @@ def main() -> None:
     else:
         sample_times = np.linspace(0.0,np.max(sim_data.time),50)
 
+
+    spat_int = pyvale.SpatialIntegratorFactory.quad_2d_4pt(t_field,
+                                                           sens_pos,
+                                                           np.array((2.0,2.0,0.0)))
+
     tc_array = pyvale.PointSensorArray(sens_pos,
                                        t_field,
                                        sample_times,
-                                       descriptor)
+                                       descriptor,
+                                       spat_int)
 
     errors_on = {'indep_sys': False,
                  'rand': False,

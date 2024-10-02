@@ -17,6 +17,8 @@ from pyvale.physics.tensorfield import *
 
 from pyvale.numerical.spatialintegrator import *
 from pyvale.numerical.quadratureintegrator import *
+from pyvale.numerical.rectangleintegrator import *
+from pyvale.numerical.integratorfactory import *
 
 from pyvale.sensors.sensordescriptor import *
 from pyvale.sensors.sensortools import *
