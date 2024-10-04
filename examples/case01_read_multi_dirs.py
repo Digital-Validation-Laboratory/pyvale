@@ -16,54 +16,140 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import pandas as pd
-import seaborn as sns
 
 USER_DIR = Path.home() / 'git/herding-moose/'
-PLOT_RES = 1#0#
+PLOT_RES = 1#
 
 
-def main() -> None:
+class Dataset:
+
+    def __init__(self,name,output_dir,skip=None):
+    
+        self.name = name
+        self.sens_pos,self.data = self.read_files(output_dir,skip=skip)
+        
+        return None
+        
+    def read_files(self,output_dir,skip=None):
+        file_list = os.listdir(output_dir)
+
+        pos_files = list([])
+        out_files = list([])
+    
+        for ff,file in enumerate(file_list):
+            if file[:8] == "sens_pos":
+                pos_files.append(file)
+            if file[:8] == "sim_data":
+                out_files.append(file)
+
+        sens_pos = list([])
+        sim_data = list([])
+    
+        for ff in range(len(pos_files)):
+    
+            pos_file_path = output_dir / f"sens_pos_{ff+1:03}.csv"
+            pos_data = pd.read_csv(pos_file_path)
+            sens_pos.append(pos_data)
+        
+            out_file_path = output_dir / f"sim_data_{ff+1:03}.csv"
+            out_data = pd.read_csv(out_file_path)
+            sim_data.append(np.array([list(out_data[f"s{yy+1}"])[-1] for yy in range(len(out_data.columns)-1)]))
+        
+        sens_pos = np.array(sens_pos)
+        sim_data = np.array(sim_data)
+        
+        if skip != None:
+            sens_pos = sens_pos[::skip]
+            sim_data = sim_data[::skip]
+    
+        return sens_pos, sim_data
+
+
+def main():
     
     # Set super-directory for examples
     OUTPUT_SUPDIR = USER_DIR / 'pyvale/examples/'
+    datasets = dict()
+    
+    # run matrix?
+    runMatrix = 0#1#
 
     # Read different examples
-    OUTPUT_DIR = OUTPUT_SUPDIR / 'case01_no_err/'
-    perf_sp, perf_data = read_files(OUTPUT_DIR)
+    print("Reading example cases...",end=" ")
     
-    OUTPUT_DIR = OUTPUT_SUPDIR / 'case01_sim_err_only/'
-    sim_err_sp, sim_err_data = read_files(OUTPUT_DIR)
+    dataset_names = ["no_err","sim_err","rand_err","sys_err","pos_err"]
     
-    OUTPUT_DIR = OUTPUT_SUPDIR / 'case01_rand_err_only/'
-    rand_err_sp, rand_err_data = read_files(OUTPUT_DIR)
+    for dataset_name in dataset_names:
+        OUTPUT_DIR = OUTPUT_SUPDIR / f"case01_{dataset_name}/"
+        if dataset_name in ("no_err","sim_err"):
+            datasets[dataset_name] = Dataset(dataset_name,OUTPUT_DIR)
+        else:
+            datasets[dataset_name] = Dataset(dataset_name,OUTPUT_DIR,skip=100)
     
-    OUTPUT_DIR = OUTPUT_SUPDIR / 'case01_sys_err_only/'
-    sys_err_sp, sys_err_data = read_files(OUTPUT_DIR)
+    print("Done.")
     
-    OUTPUT_DIR = OUTPUT_SUPDIR / 'case01_pos_err_only/'
-    pos_err_sp, pos_err_data = read_files(OUTPUT_DIR)
+    # Pick datasets to compare
     
-    print(perf_data.shape,np.array(range(len(perf_data))).shape)
+    data1 = datasets["sys_err"].data
+    data1_label=datasets["sys_err"].name
+    
+    data2 = datasets["sim_err"].data
+    data2_label = datasets["sim_err"].name
+    
+    # Plot two datasets against each other
     
     if PLOT_RES:
         fig,axs = plt.subplots(1,1)
-        axs.boxplot(perf_data,sym="",
-                  positions=np.array(range(perf_data.shape[1]))*2.0-0.5,
-                  boxprops=dict(color="green"))
-        axs.boxplot(sim_err_data,sym="",
-                  positions=np.array(range(sim_err_data.shape[1]))*2.0+0.5,
-                  boxprops=dict(color="red"))
-        #axs.set_xticklabels(["Perfect data","Material parameter error"])
+        bp1 = axs.boxplot(data1,sym="",
+                          positions=np.array(range(data1.shape[1]))*2.0-0.5,
+                          boxprops=dict(color="green"),medianprops=dict(color="green"))
+        bp2 = axs.boxplot(data2,sym="",
+                          positions=np.array(range(data2.shape[1]))*2.0+0.5,
+                          boxprops=dict(color="red"),medianprops=dict(color="red"))
+        axs.legend([bp1["boxes"][0], bp2["boxes"][0]], [data1_label,data2_label])
         axs.set_xticklabels([])
         axs.set_xticks([])
         axs.set_xlabel("Sensor #")
         axs.set_ylabel(r"Temperature [$\degree$C]")
         plt.show()
         
+    # Test validation metrics
+    
+    #avm(sim_data[:,-1],noise_data[:,-1])
+    mavm(data1[:,-1],data2[:,-1])
+    #avu(sim_data[:,-1],noise_data[:,-1])
+    
+    # Create matrix
+    # Note: columns are considered to be model data; rows as synthetic experiments
+    
+    if runMatrix:
+        # Get d+ table
+        print("d+")
+        comp_table = {"Datasets":[ds_name for ds_name in datasets.keys()]}
         
-    #avm(sim_data[:,-1],noise_data[:,-1][::100])
-    mavm(sim_err_data[:,-1],rand_err_data[:,-1][::100])
-    #avu(sim_data[:,-1],noise_data[:,-1][::100])
+        for ds1_name in datasets.keys():
+            comp_list = []
+            for ds2_name in datasets.keys():
+                ds1 = datasets[ds1_name]
+                ds2 = datasets[ds2_name]
+                comp_list.append(mavm(ds1.data[:,-1],ds2.data[:,-1])["d+"])
+            comp_table[ds1_name] = comp_list
+        comp_panda = pd.DataFrame(data=comp_table)
+        print(comp_panda)
+        
+        # Get d- table
+        print("d-")
+        comp_table = {"Datasets":[ds_name for ds_name in datasets.keys()]}
+        
+        for ds1_name in datasets.keys():
+            comp_list = []
+            for ds2_name in datasets.keys():
+                ds1 = datasets[ds1_name]
+                ds2 = datasets[ds2_name]
+                comp_list.append(mavm(ds1.data[:,-1],ds2.data[:,-1])["d-"])
+            comp_table[ds1_name] = comp_list
+        comp_panda = pd.DataFrame(data=comp_table)
+        print(comp_panda)
     
     
 def read_files(file_directory):
@@ -78,7 +164,6 @@ def read_files(file_directory):
             pos_files.append(file)
         if file[:8] == "sim_data":
             out_files.append(file)
-
 
     sens_pos = list([])
     sim_data = list([])
@@ -216,13 +301,11 @@ def mavm(model_data,exp_data):
     
     
     df = len(Sn_)-1
-    t_alph = stats.t.ppf(0.95,df)#stats.t.interval(0.95,df)[1]#stats.t(0.025)#.pdf(0)
-    print(t_alph)
+    t_alph = stats.t.ppf(0.95,df)
+    
     Sn_conf = [Sn_ - t_alph*(np.nanstd(Sn_)/np.sqrt(len(Sn_))),
                Sn_ + t_alph*(np.nanstd(Sn_)/np.sqrt(len(Sn_)))]
     
-    
-    #print(Sn_conf)
     
     Sn_Y = exp_cdf.probabilities
     F_Y = model_cdf.probabilities
@@ -231,9 +314,8 @@ def mavm(model_data,exp_data):
     if PLOT_RES:
         # plot empirical cdf with conf. int. cdfs
         fig,axs=plt.subplots(1,1)
-        model_cdf.plot(axs,label="model")
-        #exp_cdf.plot(axs,label="sensor sim")
-        axs.ecdf(exp_cdf.quantiles,label="sensor sim")
+        axs.ecdf(model_cdf.quantiles,label="model")
+        axs.ecdf(exp_cdf.quantiles,label="synthetic experiment")
         axs.ecdf(Sn_conf[0],ls="dashed",color="k",label="95% C.I.")
         axs.ecdf(Sn_conf[1],ls="dashed",color="k")
         axs.legend()
@@ -256,7 +338,6 @@ def mavm(model_data,exp_data):
         d_plus = 0
         d_minus = 0
         
-        plot_nice = []
         
         Sn = Sn_conf[k]
         
@@ -271,12 +352,13 @@ def mavm(model_data,exp_data):
                     else:
                         d_minus += d_
                     ii += 1
-                while jj*P_F > ii*P_Sn:
+                while (jj+1)*P_F > (ii+1)*P_Sn:
                     d_ = (Sn[ii] - F_[jj])*P_F
                     if d_ > 0:
                         d_plus += d_
                     else:
                         d_minus += d_
+                    
                     ii += 1
                 d_rem = (Sn[ii]-F_[jj])*(P_F*(jj+1) - P_Sn*ii)
                 if d_rem > 0:
@@ -303,8 +385,6 @@ def mavm(model_data,exp_data):
                         d_plus += d_
                     else:
                         d_minus += d_
-                        
-                    plot_nice.append([Sn[jj],F_[ii],P_F*(ii+1)])
                     
                     ii += 1
                     
@@ -313,26 +393,6 @@ def mavm(model_data,exp_data):
                     d_plus += d_rem
                 else:
                     d_minus += d_rem
-                
-        plot_nice = np.array(plot_nice)
-        
-        if PLOT_RES:
-            
-            fig,axs = plt.subplots(1,1)
-            model_cdf.plot(axs,label="model")
-            exp_cdf.plot(axs,label="sensor sim")
-            axs.ecdf(Sn_conf[0],color="k",ls="dashed",label="95% C.I.")
-            axs.ecdf(Sn_conf[1],color="k",ls="dashed")
-            axs.fill_betweenx(plot_nice[:,2],plot_nice[:,0],plot_nice[:,1],
-                              where=plot_nice[:,0]<=plot_nice[:,1],color="b",alpha=0.2,
-                              label="Upper C.I., area below")
-            axs.fill_betweenx(plot_nice[:,2],plot_nice[:,0],plot_nice[:,1],
-                              where=plot_nice[:,0]>plot_nice[:,1],color="r",alpha=0.2, 
-                              label="Upper C.I., area above")
-            axs.legend()
-            axs.set_xlabel(r"Temperature [$\degree$C]")
-            axs.set_ylabel("Probability")
-            plt.show()
                 
         d_conf_plus.append(np.abs(d_plus))
         d_conf_minus.append(np.abs(d_minus))

@@ -54,9 +54,6 @@ def main() -> None:
         read_results = False
         save_vals = False
     
-
-    # set up uncertainty on model parameters
-    
     
     # edit moose file
     moose_input = Path('examples/' + CASE_STR + '/' + CASE_STR + '.i')
@@ -78,7 +75,6 @@ def main() -> None:
     herd.set_num_para_sims(n_para=1)
 
      # Send all the output to the examples directory and clear out old output
-    #dir_manager.set_base_dir(Path('examples/'))
     dir_manager.set_base_dir(OUTPUT_DIR)
     dir_manager.clear_dirs()
     dir_manager.create_dirs()
@@ -86,7 +82,7 @@ def main() -> None:
     # Create variables to sweep
     
     numRandPars = 1000
-    stdDevPerc = 0.1
+    stdDevPerc = 0.1 # 10% std dev in material parameters
     
     cuDensity = np.random.normal(loc=8829.0, scale=stdDevPerc*8829.0, size=numRandPars)
     cuThermCond = np.random.normal(loc=384.0, scale=stdDevPerc*384.0, size=numRandPars)
@@ -115,7 +111,6 @@ def main() -> None:
         
         print("-"*80)
         print('EXAMPLE: Run MOOSE in sequence')
-        #print('EXAMPLE: Run MOOSE in parallel')
         print("-"*80)
         
         herd.run_sequential(moose_vars)
@@ -130,7 +125,7 @@ def main() -> None:
         for nn in range(len(moose_vars)):
     
             # Use mooseherder to read the exodus and get a SimData object
-            data_path = OUTPUT_DIR / f'sim-workdir-1/sim-1-{nn+1}_out.e' #Path('data/examplesims/plate_2d_thermal_out.e')
+            data_path = OUTPUT_DIR / f'sim-workdir-1/sim-1-{nn+1}_out.e'
             data_reader = ExodusReader(data_path)
             sim_data = data_reader.read_all_sim_data()
 
@@ -164,7 +159,6 @@ def main() -> None:
                 # save sensor positions
                 columns = [f"s{i+1}" for i in range(sens_pos.shape[0])]
                 sens_pos_df = pd.DataFrame(np.transpose(sens_pos),columns=columns)
-                #print(sens_pos_df)
                 pos_path = OUTPUT_DIR / f'sens_pos_{nn+1:03}.csv'
                 sens_pos_df.to_csv(pos_path,columns=columns,index=False)
             
