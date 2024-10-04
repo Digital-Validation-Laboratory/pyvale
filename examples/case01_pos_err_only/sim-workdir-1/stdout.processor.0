@@ -1,0 +1,78 @@
+Framework Information:
+MOOSE Version:           git commit bd59058cf0 on 2024-06-19
+LibMesh Version:         
+PETSc Version:           3.20.3
+SLEPc Version:           3.20.1
+Current Time:            Tue Oct  1 11:44:21 2024
+Executable Timestamp:    Mon Jun 24 14:44:17 2024
+
+Parallelism:
+  Num Processors:          1
+  Num Threads:             2
+
+Mesh: 
+  Parallel Type:           replicated
+  Mesh Dimension:          2
+  Spatial Dimension:       2
+  Nodes:                   66
+  Elems:                   50
+  Num Subdomains:          1
+
+Nonlinear System:
+  Num DOFs:                66
+  Num Local DOFs:          66
+  Variables:               "temperature" 
+  Finite Element Types:    "LAGRANGE" 
+  Approximation Orders:    "FIRST" 
+
+Execution Information:
+  Executioner:             Steady
+  Solver Mode:             Preconditioned JFNK
+
+[31mLEGACY MODES ENABLED:[39m
+ This application uses the legacy initial residual evaluation behavior. The legacy behavior performs an often times redundant residual evaluation before the solution modifying objects are executed prior to the initial (0th nonlinear iteration) residual evaluation. The new behavior skips that redundant residual evaluation unless the parameter Executioner/use_pre_smo_residual is set to true. To remove this message and enable the new behavior, set the parameter 'use_legacy_initial_residual_evaluation_behavior' to false in *App.C. Some tests that rely on the side effects of the legacy behavior may fail/diff and should be re-golded.
+[39m
+
+Postprocessor Values:
++----------------+----------------+----------------+
+| time           | avg_temp       | max_temp       |
++----------------+----------------+----------------+
+|   0.000000e+00 |   0.000000e+00 |   0.000000e+00 |
++----------------+----------------+----------------+
+
+Pre-SMO residual: 10606.6
+ 0 Nonlinear |R| = [32m1.060660e+04[39m
+      0 Linear |R| = [32m1.060660e+04[39m
+      1 Linear |R| = [32m5.624516e+03[39m
+      2 Linear |R| = [32m3.878774e+03[39m
+      3 Linear |R| = [32m3.284762e+03[39m
+      4 Linear |R| = [32m1.742014e+03[39m
+      5 Linear |R| = [32m2.815159e+02[39m
+      6 Linear |R| = [32m3.745571e+01[39m
+      7 Linear |R| = [32m4.995169e+00[39m
+      8 Linear |R| = [32m1.136492e+00[39m
+      9 Linear |R| = [32m1.465229e-01[39m
+     10 Linear |R| = [32m1.921995e-02[39m
+ 1 Nonlinear |R| = [32m2.597945e-02[39m
+      0 Linear |R| = [32m2.597945e-02[39m
+      1 Linear |R| = [32m3.187887e-03[39m
+      2 Linear |R| = [32m9.641773e-04[39m
+      3 Linear |R| = [32m7.342731e-04[39m
+      4 Linear |R| = [32m5.815178e-04[39m
+      5 Linear |R| = [32m1.782192e-04[39m
+      6 Linear |R| = [32m3.722088e-05[39m
+      7 Linear |R| = [32m8.813866e-06[39m
+      8 Linear |R| = [32m2.163276e-06[39m
+      9 Linear |R| = [32m3.707002e-07[39m
+     10 Linear |R| = [32m4.006132e-08[39m
+ 2 Nonlinear |R| = [32m4.234525e-08[39m
+[32m Solve Converged![39m
+
+Postprocessor Values:
++----------------+----------------+----------------+
+| time           | avg_temp       | max_temp       |
++----------------+----------------+----------------+
+|   0.000000e+00 |   0.000000e+00 |   0.000000e+00 |
+|   1.000000e+00 |   8.910417e+01 |   1.542083e+02 |
++----------------+----------------+----------------+
+
