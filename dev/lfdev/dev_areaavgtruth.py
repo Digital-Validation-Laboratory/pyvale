@@ -40,49 +40,30 @@ def main() -> None:
         sample_times = np.linspace(0.0,np.max(sim_data.time),50)
 
 
-    spat_int = pyvale.SpatialIntegratorFactory.quad_2d_4pt(t_field,
+    sens_size = 10.0
+    spat_int_truth = pyvale.SpatialIntegratorFactory.quad_2d_4pt(t_field,
                                                            sens_pos,
-                                                           np.array((2.0,2.0,0.0)))
+                                                           np.array((sens_size,sens_size,0.0)))
 
     tc_array = pyvale.PointSensorArray(sens_pos,
                                        t_field,
                                        sample_times,
                                        descriptor,
-                                       spat_int)
+                                       area_avg=spat_int_truth)
 
-    errors_on = {'indep_sys': False,
-                 'rand': False,
-                 'dep_sys': False}
+    spat_int_err = pyvale.SpatialIntegratorFactory.rect_2d_1pt(t_field,
+                                                           sens_pos,
+                                                           np.array((sens_size,sens_size,0.0)))
 
-    if errors_on['indep_sys']:
-        indep_sys_err1 = pyvale.SysErrOffset(offset=-5.0)
-        indep_sys_err2 = pyvale.SysErrUniform(low=-10.0,
-                                            high=10.0)
-        indep_sys_err3 = pyvale.SysErrRandPosition(t_field,
-                                            sens_pos,
-                                            (1.0,1.0,None),
-                                            sample_times)
-        indep_sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1,
-                                                    indep_sys_err2,
-                                                    indep_sys_err3],
-                                            tc_array.get_measurement_shape())
+    sys_errs = []
+    sys_errs.append(pyvale.SysErrSpatialAverage(t_field,
+                                                spat_int_err,
+                                                sample_times))
 
-        tc_array.set_indep_sys_err_integrator(indep_sys_err_int)
+    indep_sys_err_int = pyvale.ErrorIntegrator(sys_errs,
+                                        tc_array.get_measurement_shape())
 
-    if errors_on['rand']:
-        rand_err1 = pyvale.RandErrNormPercent(std_percent=5.0)
-        rand_err2 = pyvale.RandErrUnifPercent(low_percent=-5.0,
-                                            high_percent=5.0)
-        rand_err_int = pyvale.ErrorIntegrator([rand_err1,rand_err2],
-                                                tc_array.get_measurement_shape())
-        tc_array.set_rand_err_integrator(rand_err_int)
-
-    if errors_on['dep_sys']:
-        dep_sys_err1 = pyvale.SysErrDigitisation(bits_per_unit=2**8/100)
-        dep_sys_err2 = pyvale.SysErrSaturation(meas_min=0.0,meas_max=300.0)
-        dep_sys_err_int = pyvale.ErrorIntegrator([dep_sys_err1,dep_sys_err2],
-                                            tc_array.get_measurement_shape())
-        tc_array.set_dep_sys_err_integrator(dep_sys_err_int)
+    tc_array.set_indep_sys_err_integrator(indep_sys_err_int)
 
     measurements = tc_array.get_measurements()
 
@@ -98,7 +79,7 @@ def main() -> None:
     pyvale.print_measurements(tc_array,
                               (0,1),
                               (0,1),
-                              (measurements.shape[2]-5,measurements.shape[2]))
+                              (0,10))
     print(80*'-')
 
     pyvale.plot_time_traces(tc_array,field_key)

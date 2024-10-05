@@ -7,11 +7,10 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 import numpy as np
 import pyvista as pv
-
+from scipy.spatial.transform import Rotation
 import mooseherder as mh
 
 from pyvale.physics.field import (IField,
-                                  FieldError,
                                   conv_simdata_to_pyvista,
                                   sample_pyvista)
 
@@ -51,13 +50,23 @@ class VectorField(IField):
         return self._components.index(comp)
 
     def sample_field(self,
-                sample_points: np.ndarray,
-                sample_times: np.ndarray | None = None
-                ) -> np.ndarray:
+                    points: np.ndarray,
+                    times: np.ndarray | None = None,
+                    orientations: tuple[Rotation,...] | None = None,
+                    ) -> np.ndarray:
 
-        return sample_pyvista(self._components,
+        field_data = sample_pyvista(self._components,
                                 self._pyvista_grid,
                                 self._time_steps,
-                                sample_points,
-                                sample_times)
+                                points,
+                                times)
+
+        if orientations is None:
+            return field_data
+
+        print(80*"=")
+        print(f"{field_data.shape=}")
+        print(80*"=")
+
+        return field_data
 

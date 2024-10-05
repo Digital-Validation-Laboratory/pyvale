@@ -7,7 +7,7 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 import numpy as np
 import pyvista as pv
-
+from scipy.spatial.transform import Rotation
 import mooseherder as mh
 
 from pyvale.physics.field import (IField,
@@ -55,13 +55,14 @@ class TensorField(IField):
         return self.get_all_components().index(comp)
 
     def sample_field(self,
-                sample_points: np.ndarray,
-                sample_times: np.ndarray | None = None
-                ) -> np.ndarray:
+                    points: np.ndarray,
+                    times: np.ndarray | None = None,
+                    orientations: tuple[Rotation,...] | None = None,
+                    ) -> np.ndarray:
 
         return sample_pyvista(self._norm_components+self._dev_components,
                                 self._pyvista_grid,
                                 self._time_steps,
-                                sample_points,
-                                sample_times)
+                                points,
+                                times)
 
