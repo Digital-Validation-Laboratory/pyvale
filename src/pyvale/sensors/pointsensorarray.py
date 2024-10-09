@@ -34,7 +34,8 @@ class PointSensorArray:
         if descriptor is not None:
             self.descriptor = descriptor
 
-        self._orientations = orientations
+        self.orientations = orientations
+
         self._area_avg = area_avg
 
         self._truth = None
@@ -66,7 +67,7 @@ class PointSensorArray:
         if self._area_avg is None:
             return self.field.sample_field(self.positions,
                                            self._sample_times,
-                                           self._orientations)
+                                           self.orientations)
 
         return self._area_avg.calc_averages(self.positions,
                                             self._sample_times)

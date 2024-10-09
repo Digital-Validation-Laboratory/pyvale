@@ -64,9 +64,23 @@ class VectorField(IField):
         if orientations is None:
             return field_data
 
-        print(80*"=")
-        print(f"{field_data.shape=}")
-        print(80*"=")
+        # NOTE
+        # ROTATION= object rotates with coords fixed
+        # For Z rotation: sin negative in row 1.
+        # TRANSFORMATION= coords rotate with object fixed
+        # For Z transformation: sin negative in row 2, transpose scipy mat.
+
+
+        assert points.shape[0] == len(orientations), "Each sample point must have a corresponding orientation."
+
+        #  Need to rotate each sensor individually = loop :(
+        for ii,rr in enumerate(orientations):
+            rmat = rr.as_matrix().T
+
+            if self._spat_dim == 2:
+                rmat = rmat[:2,:2]
+
+            field_data[ii,:,:] = np.matmul(rmat,field_data[ii,:,:])
 
         return field_data
 

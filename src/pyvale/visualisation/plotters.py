@@ -128,7 +128,9 @@ def plot_time_traces(sensor_array: PointSensorArray,
     # Plot simulation and truth lines
     if trace_opts.sim_line is not None:
         sim_time = field.get_time_steps()
-        sim_vals = field.sample_field(sensor_array.positions)
+        sim_vals = field.sample_field(sensor_array.positions,
+                                      None,
+                                      sensor_array.orientations)
 
         for ss in range(n_sensors):
             if ss in trace_opts.sensors_to_plot:
