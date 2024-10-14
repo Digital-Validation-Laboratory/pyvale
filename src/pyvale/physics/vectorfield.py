@@ -73,7 +73,7 @@ class VectorField(IField):
 
         assert points.shape[0] == len(orientations), "Each sample point must have a corresponding orientation."
 
-        #  Need to rotate each sensor individually = loop :(
+        #  Need to rotate each sensor using individual rotation = loop :(
         for ii,rr in enumerate(orientations):
             rmat = rr.as_matrix().T
 

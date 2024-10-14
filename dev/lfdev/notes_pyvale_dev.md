@@ -34,17 +34,21 @@ Gauss Quadrature for the Unit Disc
 http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubature-formulas-for-the-unit-disk/
 
 ## Python coding pinciples:
-- Use git, vscode and pylint (PEP8)
-- Use descriptive variable names, no single letter variables
+- Use git, a decent editor (vscode is good for MOOSE/Gmsh syntax) and the Ruff linter
+- Use descriptive variable names, no single letter variables (double letters for iterators in numpy style are ok)
 - Avoid comments unless needed to explain something weird (like 1 vs 0 indexing) – the code and variable names should speak for themselves
-- Work in your own 'feature' branch, pull to 'dev' - don't push to main!
+- Work in your own 'feature' branch, pull to 'dev' - don't push to main (at least it should be protected)!
 - Type hint everything: e.g. 'def add_ints(a: int, b: int) -> int:'
 - Default mutable data types to None
-- Numpy is your friend - no for/while loops!
-- No inheritance unless it is an interface / ABC - use composition
-- Use a mixture of functions and classes with methods where they make sense
+- Numpy is your friend - avoid for/while loops
+- No inheritance unless it is an interface (python ABC or protocol) - use composition
+- Only have one layer of abstraction - don't inherit from multiple layers of interfaces and don't use mix ins.
+- Only use abstraction/interfaces when if/else or switch has at least 3 layers and/or becomes annoying
+- Use a mixture of plain functions and classes with methods where and when they make sense
+- Avoid decorators unless absolutely necessary
 - Write good docstrings when the code is ready for sharing – use auto docstring to help.
-- Use code reviews to help each other but be nice!
+- Write some good quickstart examples so people can easily use your code
+- Use code reviews to help each other and be nice / constructive as we are not all software engineers!
 
 ## `pyvale` architecture
 - Module: `ExperimentWorkflow`
