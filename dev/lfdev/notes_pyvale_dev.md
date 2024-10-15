@@ -34,7 +34,7 @@ Gauss Quadrature for the Unit Disc
 http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubature-formulas-for-the-unit-disk/
 
 ## Python coding pinciples:
-- Use git, a decent editor (vscode is good for MOOSE/Gmsh syntax) and the Ruff linter
+- Use git and the Ruff linter
 - Use descriptive variable names, no single letter variables (double letters for iterators in numpy style are ok)
 - Avoid comments unless needed to explain something weird (like 1 vs 0 indexing) – the code and variable names should speak for themselves
 - Work in your own 'feature' branch, pull to 'dev' - don't push to main (at least it should be protected)!
