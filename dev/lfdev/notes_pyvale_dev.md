@@ -4,6 +4,7 @@
 NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
 
 - TODO: EXAMPLES
+    - Example showing sensor orientation
     - Example showing area averaging as ground truth
 
 - TODO: Experiment generator/ runner
@@ -17,11 +18,17 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
     - TODO: experiment - allow extraction of different conditions for comparison plots
 
 - TODO: Calibration errors
+    - Need to define a ground-truth calibration function
+    - Need to define an assumed calibration function
+    - Error is the difference?
 
 - TODO: Field based errors:
+    - TODO: vector/tensor rotations
     - HALF DONE: Spatial averaging error
         - Set an integration area
         - Set a weighting function
+    - TODO: combine spatial averaging with rotation errors
+        - Need to rotate (not transform!) sensor local coords befor eval
     - TODO: Temporal averaging error
         - Set an integration time
         - Set a weighting function
