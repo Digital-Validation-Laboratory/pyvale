@@ -14,6 +14,7 @@ from pyvale.physics.field import *
 from pyvale.physics.scalarfield import *
 from pyvale.physics.vectorfield import *
 from pyvale.physics.tensorfield import *
+from pyvale.physics.coordtransform import *
 
 from pyvale.numerical.spatialintegrator import *
 from pyvale.numerical.quadratureintegrator import *

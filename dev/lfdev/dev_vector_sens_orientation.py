@@ -36,7 +36,7 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-
+    #---------------------------------------------------------------------------
     disp_sens_norot = pyvale.PointSensorArray(sens_pos,
                                               disp_field,
                                               None,
@@ -44,8 +44,13 @@ def main() -> None:
                                               None,
                                               None)
 
+    rand_err_int = pyvale.ErrorIntegrator([pyvale.RandErrNormal(std=0.01e-3)],
+                                        disp_sens_norot.get_measurement_shape())
+    disp_sens_norot.set_rand_err_integrator(rand_err_int)
+
     meas_norot = disp_sens_norot.get_measurements()
 
+    #---------------------------------------------------------------------------
     orientations = sens_pos.shape[0] * \
         (R.from_euler("zyx", [90, 0, 0], degrees=True),)
 
@@ -56,8 +61,13 @@ def main() -> None:
                                               None,
                                               orientations)
 
+    rand_err_rot = pyvale.ErrorIntegrator([pyvale.RandErrNormal(std=0.01e-3)],
+                                        disp_sens_rot.get_measurement_shape())
+    disp_sens_rot.set_rand_err_integrator(rand_err_rot)
+
     meas_rot = disp_sens_rot.get_measurements()
 
+    #---------------------------------------------------------------------------
     pyvale.plot_time_traces(disp_sens_norot,'disp_x')
     pyvale.plot_time_traces(disp_sens_norot,'disp_y')
 

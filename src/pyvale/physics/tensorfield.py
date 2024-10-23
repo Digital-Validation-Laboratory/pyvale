@@ -13,6 +13,8 @@ import mooseherder as mh
 from pyvale.physics.field import (IField,
                                   conv_simdata_to_pyvista,
                                   sample_pyvista)
+from pyvale.physics.coordtransform import (transform_tensor_2d,
+                                           transform_tensor_3d)
 
 class TensorField(IField):
     def __init__(self,
@@ -60,9 +62,35 @@ class TensorField(IField):
                     orientations: tuple[Rotation,...] | None = None,
                     ) -> np.ndarray:
 
-        return sample_pyvista(self._norm_components+self._dev_components,
-                                self._pyvista_grid,
-                                self._time_steps,
-                                points,
-                                times)
+        field_data =  sample_pyvista(self._norm_components+self._dev_components,
+                                    self._pyvista_grid,
+                                    self._time_steps,
+                                    points,
+                                    times)
+
+        if orientations is None:
+            return field_data
+
+        # NOTE:
+        # ROTATION= object rotates with coords fixed
+        # For Z rotation: sin negative in row 1.
+        # TRANSFORMATION= coords rotate with object fixed
+        # For Z transformation: sin negative in row 2, transpose scipy mat.
+
+        #  Need to rotate each sensor using individual rotation = loop :(
+        if self._spat_dim == 2:
+            for ii,rr in enumerate(orientations):
+                rmat = rr.as_matrix().T
+                rmat = rmat[:2,:2]
+
+                field_data[ii,:,:] = transform_tensor_2d(rmat,field_data[ii,:,:])
+
+        else:
+            for ii,rr in enumerate(orientations):
+                rmat = rr.as_matrix().T
+
+                field_data[ii,:,:] = transform_tensor_3d(rmat,field_data[ii,:,:])
+
+
+        return field_data
 

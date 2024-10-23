@@ -115,7 +115,7 @@ def main() -> None:
     np_swap = np.swapaxes(np_mul_along_axis,1,2)
     print(f"{np_swap.shape=}")
     np_swap_sens = np_swap[sens_num,:,:]
-    print(f"{np.allclose(np_swap_sens,check_scipy)}")
+    print(f"{np.allclose(np_swap_sens,check_scipy)=}")
     print()
 
 
