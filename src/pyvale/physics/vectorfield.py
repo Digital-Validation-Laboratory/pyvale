@@ -32,7 +32,6 @@ class VectorField(IField):
 
     def set_sim_data(self, sim_data: mh.SimData) -> None:
         self._time_steps = sim_data.time
-        self._time_steps = sim_data.time
         self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
                                                     self._components,
                                                     self._spat_dim)

@@ -41,7 +41,7 @@ http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubatur
 - Type hint everything: e.g. 'def add_ints(a: int, b: int) -> int:'
 - Default mutable data types to None
 - Numpy is your friend - avoid for/while loops
-- No inheritance unless it is an interface (python ABC or protocol) - use composition
+- No inheritance unless it is an interface (python ABC or protocol) - use composition / dependency injection
 - Only have one layer of abstraction - don't inherit from multiple layers of interfaces and don't use mix ins.
 - Only use abstraction/interfaces when if/else or switch has at least 3 layers and/or becomes annoying
 - Use a mixture of plain functions and classes with methods where and when they make sense
