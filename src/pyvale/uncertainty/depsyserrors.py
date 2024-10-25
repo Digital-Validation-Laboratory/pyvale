@@ -64,17 +64,6 @@ class SysErrSaturation(IErrCalculator):
         return err_data
 
 
-class SysErrCalibration(IErrCalculator):
-    def __init__(self, cal_func: Callable) -> None:
-        self._cal_func = cal_func
-
-    def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
-
-        # Need a calibration function
-        err_data = ErrorData(error_array=np.array([]))
-        return err_data
-
-
 def _select_round_method(method: str) -> Callable:
     if method == 'floor':
         return np.floor

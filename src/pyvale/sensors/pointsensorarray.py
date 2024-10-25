@@ -16,6 +16,7 @@ from pyvale.numerical.spatialintegrator import ISpatialIntegrator
 
 
 class PointSensorArray:
+    
     def __init__(self,
                  positions: np.ndarray,
                  field: IField,

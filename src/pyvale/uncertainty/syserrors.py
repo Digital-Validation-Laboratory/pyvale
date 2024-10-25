@@ -154,14 +154,34 @@ class SysErrGenerator(IErrCalculator):
 
 class SysErrCalibration(IErrCalculator):
 
-    def __init__(self, assumed_calib: Callable, truth_calib: Callable) -> None:
+    def __init__(self,
+                 assumed_calib: Callable,
+                 truth_calib: Callable,
+                 cal_range: tuple[float,float],
+                 n_cal_divs: int = 10000) -> None:
+  
         self._assumed_calib = assumed_calib
         self._truth_calib = truth_calib
+        self._cal_range = cal_range
+        self._n_cal_divs = n_cal_divs
+
+        self._truth_cal_table = np.zeros((n_cal_divs,2))
+        self._truth_cal_table[:,0] = np.linspace(cal_range[0],
+                                                cal_range[1],
+                                                n_cal_divs)
+        self._truth_cal_table[:,1] = self._truth_calib(self._truth_cal_table[:,0])
 
     def calc_errs(self,
-                err_basis: np.ndarray) -> ErrorData:
+                  err_basis: np.ndarray) -> ErrorData:
 
-        sys_errs = np.zeros_like(err_basis)
+        # shape=(n_sens,n_comps,n_time_steps)
+        signal_from_field = np.interp(err_basis,
+                                    self._truth_cal_table[:,1],
+                                    self._truth_cal_table[:,0])
+        # shape=(n_sens,n_comps,n_time_steps)
+        field_from_assumed_calib = self._assumed_calib(signal_from_field)
+
+        sys_errs = field_from_assumed_calib - err_basis
 
         return ErrorData(error_array=sys_errs)
 
