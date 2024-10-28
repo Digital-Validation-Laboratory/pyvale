@@ -130,7 +130,7 @@ def plot_time_traces(sensor_array: PointSensorArray,
         sim_time = field.get_time_steps()
         sim_vals = field.sample_field(sensor_array.positions,
                                       None,
-                                      sensor_array.orientations)
+                                      sensor_array.angles)
 
         for ss in range(n_sensors):
             if ss in trace_opts.sensors_to_plot:

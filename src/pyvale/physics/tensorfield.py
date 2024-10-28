@@ -59,7 +59,7 @@ class TensorField(IField):
     def sample_field(self,
                     points: np.ndarray,
                     times: np.ndarray | None = None,
-                    orientations: tuple[Rotation,...] | None = None,
+                    angles: tuple[Rotation,...] | None = None,
                     ) -> np.ndarray:
 
         field_data =  sample_pyvista(self._norm_components+self._dev_components,
@@ -68,7 +68,7 @@ class TensorField(IField):
                                     points,
                                     times)
 
-        if orientations is None:
+        if angles is None:
             return field_data
 
         # NOTE:
@@ -79,14 +79,14 @@ class TensorField(IField):
 
         #  Need to rotate each sensor using individual rotation = loop :(
         if self._spat_dim == 2:
-            for ii,rr in enumerate(orientations):
+            for ii,rr in enumerate(angles):
                 rmat = rr.as_matrix().T
                 rmat = rmat[:2,:2]
 
                 field_data[ii,:,:] = transform_tensor_2d(rmat,field_data[ii,:,:])
 
         else:
-            for ii,rr in enumerate(orientations):
+            for ii,rr in enumerate(angles):
                 rmat = rr.as_matrix().T
 
                 field_data[ii,:,:] = transform_tensor_3d(rmat,field_data[ii,:,:])

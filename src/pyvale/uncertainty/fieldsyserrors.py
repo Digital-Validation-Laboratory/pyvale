@@ -7,6 +7,7 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 
 import numpy as np
+from scipy.spatial.transform import Rotation
 
 from pyvale.physics.field import IField
 from pyvale.numerical.spatialintegrator import ISpatialIntegrator
@@ -150,10 +151,10 @@ class SysErrTimeRand(IErrCalculator):
 class SysErrTimeDrift(IErrCalculator):
 
     def __init__(self,
-                field: IField,
-                sens_pos: np.ndarray,
-                drift: IDriftCalculator,
-                sample_times: np.ndarray | None = None) -> None:
+                 field: IField,
+                 sens_pos: np.ndarray,
+                 drift: IDriftCalculator,
+                 sample_times: np.ndarray | None = None) -> None:
 
         self._field = field
         self._sens_pos = sens_pos
@@ -181,4 +182,43 @@ class SysErrTimeDrift(IErrCalculator):
 
         err_data = ErrorData(error_array=sys_errs,
                              time_steps=self._time_perturbed)
+        return err_data
+
+
+class SysErrOrientation(IErrCalculator):
+
+    def __init__(self,
+                 field: IField,
+                 sens_pos: np.ndarray,
+                 angles: tuple[Rotation,...],
+                 rand_by_ax: tuple[IRandomGenerator | None,
+                                   IRandomGenerator | None,
+                                   IRandomGenerator | None],
+                 sample_times: np.ndarray | None = None) -> None:
+
+        self._field = field
+        self._sens_pos = sens_pos
+        self._sens_angles_original = angles
+        self._sens_angles_perturbed = angles
+        self._rand_by_ax = rand_by_ax
+        self._sample_times = sample_times
+
+    def get_perturbed_angles(self) -> tuple[Rotation,...]:
+        return self._sens_angles_perturbed
+
+    def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
+
+        self._sens_angles_perturbed = self._sens_angles_original
+
+        for ii,rng in enumerate(self._rand_by_ax):
+            if rng is not None:
+                pass
+
+        sys_errs = self._field.sample_field(self._sens_pos,
+                                            self._sample_times,
+                                            self._sens_angles_perturbed) \
+                                            - err_basis
+
+        err_data = ErrorData(error_array=sys_errs,
+                             positions=self._sens_pos_perturbed)
         return err_data

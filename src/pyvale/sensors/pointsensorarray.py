@@ -16,14 +16,14 @@ from pyvale.numerical.spatialintegrator import ISpatialIntegrator
 
 
 class PointSensorArray:
-    
+
     def __init__(self,
                  positions: np.ndarray,
                  field: IField,
                  sample_times: np.ndarray | None = None,
                  descriptor: SensorDescriptor | None = None,
                  area_avg: ISpatialIntegrator | None = None,
-                 orientations: tuple[Rotation,...] | None = None,
+                 angles: tuple[Rotation,...] | None = None,
                  ) -> None:
 
         self.positions = positions
@@ -35,7 +35,7 @@ class PointSensorArray:
         if descriptor is not None:
             self.descriptor = descriptor
 
-        self.orientations = orientations
+        self.angles = angles
 
         self._area_avg = area_avg
 
@@ -68,7 +68,7 @@ class PointSensorArray:
         if self._area_avg is None:
             return self.field.sample_field(self.positions,
                                            self._sample_times,
-                                           self.orientations)
+                                           self.angles)
 
         return self._area_avg.calc_averages(self.positions,
                                             self._sample_times)

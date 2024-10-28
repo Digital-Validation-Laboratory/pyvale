@@ -39,7 +39,7 @@ class IField(ABC):
     def sample_field(self,
                     points: np.ndarray,
                     times: np.ndarray | None = None,
-                    orientations: tuple[Rotation,...] | None = None,
+                    angles: tuple[Rotation,...] | None = None,
                     ) -> np.ndarray:
         pass
 

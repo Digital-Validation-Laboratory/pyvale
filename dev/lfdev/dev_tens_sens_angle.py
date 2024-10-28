@@ -62,7 +62,7 @@ def main() -> None:
     meas_norot = sg_array_norot.get_measurements()
 
     #---------------------------------------------------------------------------
-    orientations = sens_pos.shape[0] * \
+    angles = sens_pos.shape[0] * \
         (R.from_euler("zyx", [90, 0, 0], degrees=True),)
 
     sg_array_rot = pyvale.PointSensorArray(sens_pos,
@@ -70,7 +70,7 @@ def main() -> None:
                                                 None,
                                                 descriptor,
                                                 None,
-                                                orientations)
+                                                angles)
 
     rand_err_rot = pyvale.ErrorIntegrator([pyvale.RandErrNormPercent(std_percent=5.0)],
                                         sg_array_rot.get_measurement_shape())

@@ -23,15 +23,13 @@ def truth_calib(signal: np.ndarray) -> np.ndarray:
 
 
 def main() -> None:
-    n_divs = 1000
+    n_divs = 10000
     signal_calib_range = np.array((0,6))
     v = np.linspace(signal_calib_range[0],signal_calib_range[1],n_divs)
 
     T_t = -0.01897 + 25.41881*v - 0.42456*v**2 + 0.04365*v**3
     T_a = 24.3*v + 0.616
     T_err = T_a - T_t
-
-
 
     data_path = Path('src/data/case13_out.e')
     data_reader = mh.ExodusReader(data_path)

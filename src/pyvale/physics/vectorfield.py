@@ -51,7 +51,7 @@ class VectorField(IField):
     def sample_field(self,
                     points: np.ndarray,
                     times: np.ndarray | None = None,
-                    orientations: tuple[Rotation,...] | None = None,
+                    angles: tuple[Rotation,...] | None = None,
                     ) -> np.ndarray:
 
         field_data = sample_pyvista(self._components,
@@ -60,7 +60,7 @@ class VectorField(IField):
                                 points,
                                 times)
 
-        if orientations is None:
+        if angles is None:
             return field_data
 
         # NOTE:
@@ -70,7 +70,7 @@ class VectorField(IField):
         # For Z transformation: sin negative in row 2, transpose scipy mat.
 
         #  Need to rotate each sensor using individual rotation = loop :(
-        for ii,rr in enumerate(orientations):
+        for ii,rr in enumerate(angles):
             rmat = rr.as_matrix().T
 
             if self._spat_dim == 2:
