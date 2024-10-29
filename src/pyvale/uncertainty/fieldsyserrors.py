@@ -191,7 +191,7 @@ class SysErrOrientation(IErrCalculator):
                  field: IField,
                  sens_pos: np.ndarray,
                  angles: tuple[Rotation,...],
-                 rand_by_ax: tuple[IRandomGenerator | None,
+                 rand_by_zyx: tuple[IRandomGenerator | None,
                                    IRandomGenerator | None,
                                    IRandomGenerator | None],
                  sample_times: np.ndarray | None = None) -> None:
@@ -200,7 +200,7 @@ class SysErrOrientation(IErrCalculator):
         self._sens_pos = sens_pos
         self._sens_angles_original = angles
         self._sens_angles_perturbed = angles
-        self._rand_by_ax = rand_by_ax
+        self._rand_by_zyx = rand_by_zyx
         self._sample_times = sample_times
 
     def get_perturbed_angles(self) -> tuple[Rotation,...]:
@@ -208,11 +208,11 @@ class SysErrOrientation(IErrCalculator):
 
     def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
 
-        self._sens_angles_perturbed = self._sens_angles_original
-
-        for ii,rng in enumerate(self._rand_by_ax):
-            if rng is not None:
-                pass
+        self._sens_angles_perturbed = list([])
+        for rr,rot in enumerate(self._sens_angles_original):
+            for ii,rng in enumerate(self._rand_by_zyx):
+                if rng is not None:
+                    pass
 
         sys_errs = self._field.sample_field(self._sens_pos,
                                             self._sample_times,
@@ -220,5 +220,5 @@ class SysErrOrientation(IErrCalculator):
                                             - err_basis
 
         err_data = ErrorData(error_array=sys_errs,
-                             positions=self._sens_pos_perturbed)
+                             angles=self._sens_angles_perturbed)
         return err_data

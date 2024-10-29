@@ -10,7 +10,7 @@ Copyright (C) 2024 The Digital Validation Team
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.spatial.transform import Rotation as R
+from scipy.spatial.transform import Rotation
 import mooseherder as mh
 import pyvale
 
@@ -52,7 +52,7 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     orientations = sens_pos.shape[0] * \
-        (R.from_euler("zyx", [90, 0, 0], degrees=True),)
+        (Rotation.from_euler("zyx", [90, 0, 0], degrees=True),)
 
     disp_sens_rot = pyvale.PointSensorArray(sens_pos,
                                               disp_field,
