@@ -8,6 +8,7 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 from pathlib import Path
+import numpy as np
 import matplotlib.pyplot as plt
 import mooseherder as mh
 import pyvale
@@ -37,22 +38,29 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
+    use_sim_time = True
+    if use_sim_time:
+        sample_times = None
+    else:
+        sample_times = np.linspace(0.0,np.max(sim_data.time),50)
+
+    sens_data = pyvale.SensorData(positions=sens_pos,
+                                  sample_times=sample_times)
+
     tc_field = 'temperature'
     tc_array = pyvale.SensorArrayFactory \
-        .basic_thermocouple_array(sim_data,
-                                  sens_pos,
+        .thermocouples_basic_errs(sim_data,
+                                  sens_data,
                                   tc_field,
                                   spat_dims=2,
-                                  sample_times=None,
                                   errs_pc=1.0)
 
     sg_field = 'strain'
     sg_array = pyvale.SensorArrayFactory \
-        .basic_straingauge_array(sim_data,
-                                  sens_pos,
+        .strain_gauges_basic_errs(sim_data,
+                                  sens_data,
                                   sg_field,
                                   spat_dims=2,
-                                  sample_times=None,
                                   errs_pc=1.0)
 
     sensor_arrays = [tc_array,sg_array]
@@ -60,8 +68,8 @@ def main() -> None:
     #===========================================================================
     # Create and run the simulated experiment
     exp_sim = pyvale.ExperimentSimulator(sim_list,
-                                        sensor_arrays,
-                                        num_exp_per_sim=1000)
+                                         sensor_arrays,
+                                         num_exp_per_sim=1000)
 
     exp_data = exp_sim.run_experiments()
     exp_stats = exp_sim.calc_stats()

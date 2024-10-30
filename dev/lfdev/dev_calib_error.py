@@ -68,7 +68,7 @@ def main() -> None:
                                         n_cal_divs=10000)
     sys_err_int = pyvale.ErrorIntegrator([cal_err],
                                             tc_array.get_measurement_shape())
-    tc_array.set_indep_sys_err_integrator(sys_err_int)
+    tc_array.set_systematic_err_integrator_independent(sys_err_int)
 
     measurements = tc_array.get_measurements()
 

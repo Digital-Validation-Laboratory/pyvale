@@ -4,8 +4,16 @@
 NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
 
 - TODO: EXAMPLES
-    - Example showing sensor orientation
     - Example showing area averaging as ground truth
+
+- TODO: PointSensorArray
+    - Switch to using SensorArrayData to init the class
+
+- TODO: ErrorIntegrator
+    - Need to have option to store or not store separate errors by func to save memory
+    - Need to pass updated position/time/angle/area along as errors are accumulated?
+        - Might not be the best way to do this - might need to pass a single data class that encodes all errors
+        - SensorArrayErrorData: rand_pos_xyz, rand_ang_zyx, area_avg, rand_time?
 
 - TODO: Experiment generator/ runner
     - TODO: Allow user to extract all sources of error for each experiment, need to dig out of `ErrorIntegrator`

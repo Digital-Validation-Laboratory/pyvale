@@ -36,23 +36,24 @@ def main() -> None:
     else:
         sample_times = np.linspace(0.0,np.max(sim_data.time),50)
 
+    sens_data = pyvale.SensorData(positions=sens_pos,
+                                  sample_times=sample_times)
+
     #===========================================================================
     # Create pyvale sensor arrays for thermal and mechanical data
     tc_field = 'temperature'
     tc_array = pyvale.SensorArrayFactory \
-        .basic_thermocouple_array(sim_data,
-                                  sens_pos,
+        .thermocouples_basic_errs(sim_data,
+                                  sens_data,
                                   tc_field,
-                                  spat_dims=2,
-                                  sample_times=None)
+                                  spat_dims=2)
 
     sg_field = 'strain'
     sg_array = pyvale.SensorArrayFactory \
-        .basic_straingauge_array(sim_data,
-                                  sens_pos,
+        .strain_gauges_basic_errs(sim_data,
+                                  sens_data,
                                   sg_field,
-                                  spat_dims=2,
-                                  sample_times=None)
+                                  spat_dims=2)
 
     #===========================================================================
     # Visualise Traces

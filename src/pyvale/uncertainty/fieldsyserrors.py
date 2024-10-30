@@ -10,7 +10,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from pyvale.physics.field import IField
-from pyvale.numerical.spatialintegrator import ISpatialIntegrator
+from pyvale.numerical.spatialintegrator import ISpatialAverager
 from pyvale.uncertainty.errorcalculator import IErrCalculator, ErrorData
 from pyvale.uncertainty.driftcalculator import IDriftCalculator
 from pyvale.uncertainty.randomgenerator import IGeneratorRandom
@@ -56,7 +56,7 @@ class SysErrSpatialAverage(IErrCalculator):
 
     def __init__(self,
                  field: IField,
-                 spatial_averager: ISpatialIntegrator,
+                 spatial_averager: ISpatialAverager,
                  sample_times: np.ndarray | None = None,
                  ) -> None:
 
@@ -76,7 +76,7 @@ class SysErrSpatialAverageRandPos(IErrCalculator):
 
     def __init__(self,
                  field: IField,
-                 spatial_average: ISpatialIntegrator,
+                 spatial_average: ISpatialAverager,
                  sens_pos: np.ndarray,
                  rand_by_ax: tuple[IGeneratorRandom | None,
                                    IGeneratorRandom | None,

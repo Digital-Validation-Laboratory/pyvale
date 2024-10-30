@@ -37,7 +37,7 @@ def main() -> None:
     rand_err1 = pyvale.RandErrNormPercent(std_percent=10.0)
     rand_err_int = pyvale.ErrorIntegrator([rand_err1],
                                             tc_array.get_measurement_shape())
-    tc_array.set_rand_err_integrator(rand_err_int)
+    tc_array.set_random_err_integrator(rand_err_int)
 
 
     start_time = time.perf_counter()

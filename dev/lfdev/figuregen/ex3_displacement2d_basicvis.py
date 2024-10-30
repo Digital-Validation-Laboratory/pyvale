@@ -28,7 +28,7 @@ def main() -> None:
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
     disp_sens_array = pyvale.SensorArrayFactory \
-                            .basic_dispsens_array(sim_data,
+                            .disp_sensors_basic_errs(sim_data,
                                                 sens_pos,
                                                 "displacement",
                                                 spat_dims=2)

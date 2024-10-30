@@ -33,12 +33,14 @@ def main() -> None:
 
     sample_times = np.linspace(0.0,np.max(sim_data.time),50)
 
-    tc_array = pyvale.SensorArrayFactory \
-        .plain_thermocouple_array(sim_data,
-                                  sens_pos,
-                                  field_key,
-                                  spat_dims=2,
+    sens_data = pyvale.SensorData(positions=sens_pos,
                                   sample_times=sample_times)
+
+    tc_array = pyvale.SensorArrayFactory \
+        .thermocouples_no_errs(sim_data,
+                               sens_data,
+                               field_key,
+                               spat_dims=2)
 
     #===========================================================================
     # Examples of full error library
@@ -52,14 +54,14 @@ def main() -> None:
     pre_sys_errs.append(pyvale.SysErrUniform(low=-2.0,
                                         high=2.0))
     pre_sys_errs.append(pyvale.SysErrUniformPercent(low_percent=-2.0,
-                                                high_percent=2.0))
+                                                    high_percent=2.0))
 
     pre_sys_errs.append(pyvale.SysErrNormal(std=1.0))
     pre_sys_errs.append(pyvale.SysErrNormPercent(std_percent=2.0))
 
     sys_gen = pyvale.GeneratorTriangular(left=-1.0,
-                                          mode=0.0,
-                                          right=1.0)
+                                         mode=0.0,
+                                         right=1.0)
     pre_sys_errs.append(pyvale.SysErrGenerator(sys_gen))
 
     # Field based errors
@@ -72,7 +74,7 @@ def main() -> None:
 
     indep_sys_err_int = pyvale.ErrorIntegrator(pre_sys_errs,
                         tc_array.get_measurement_shape())
-    tc_array.set_indep_sys_err_integrator(indep_sys_err_int)
+    tc_array.set_systematic_err_integrator_independent(indep_sys_err_int)
 
     #---------------------------------------------------------------------------
     rand_errs = []
@@ -90,7 +92,7 @@ def main() -> None:
 
     rand_err_int = pyvale.ErrorIntegrator(rand_errs,
                                           tc_array.get_measurement_shape())
-    tc_array.set_rand_err_integrator(rand_err_int)
+    tc_array.set_random_err_integrator(rand_err_int)
 
     #---------------------------------------------------------------------------
     post_sys_errs = []
@@ -99,7 +101,7 @@ def main() -> None:
 
     dep_sys_err_int = pyvale.ErrorIntegrator(post_sys_errs,
                                              tc_array.get_measurement_shape())
-    tc_array.set_dep_sys_err_integrator(dep_sys_err_int)
+    tc_array.set_systematic_err_integrator_dependent(dep_sys_err_int)
 
 
     #===========================================================================

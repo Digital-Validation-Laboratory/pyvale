@@ -26,7 +26,7 @@ def main() -> None:
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
     straingauge_array = pyvale.SensorArrayFactory \
-                            .basic_straingauge_array(sim_data,
+                            .strain_gauges_basic_errs(sim_data,
                                                      sens_pos,
                                                      "strain",
                                                      spat_dims=2)

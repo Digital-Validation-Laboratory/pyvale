@@ -8,6 +8,7 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 from pathlib import Path
+import numpy as np
 import matplotlib.pyplot as plt
 import mooseherder as mh
 import pyvale
@@ -25,11 +26,20 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
+    use_sim_time = False
+    if use_sim_time:
+        sample_times = None
+    else:
+        sample_times = np.linspace(0.0,np.max(sim_data.time),50)
+
+    sens_data = pyvale.SensorData(positions=sens_pos,
+                                  sample_times=sample_times)
+
     straingauge_array = pyvale.SensorArrayFactory \
-                            .basic_straingauge_array(sim_data,
-                                                     sens_pos,
-                                                     "strain",
-                                                     spat_dims=2)
+                            .strain_gauges_basic_errs(sim_data,
+                                                      sens_data,
+                                                      "strain",
+                                                      spat_dims=2)
 
     plot_field = 'strain_yy'
     pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,plot_field)

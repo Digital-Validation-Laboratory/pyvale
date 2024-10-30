@@ -8,12 +8,12 @@ Copyright (C) 2024 The Digital Validation Team
 import numpy as np
 
 from pyvale.physics.field import IField
-from pyvale.numerical.spatialintegrator import (ISpatialIntegrator,
+from pyvale.numerical.spatialintegrator import (ISpatialAverager,
                                                 create_int_pt_array)
 
 # NOTE: code below is very similar to quadrature integrator should be able to
 # refactor into injected classes/functions
-class Rectangle2D(ISpatialIntegrator):
+class Rectangle2D(ISpatialAverager):
     def __init__(self,
                  int_pt_offsets: np.ndarray,
                  field: IField,
