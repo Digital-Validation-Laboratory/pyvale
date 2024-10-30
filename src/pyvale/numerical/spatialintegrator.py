@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 
-class SpatialIntType(enum.Enum):
+class ESpatialIntType(enum.Enum):
     RECT1PT = enum.auto()
     RECT4PT = enum.auto()
     RECT9PT = enum.auto()

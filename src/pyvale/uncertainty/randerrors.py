@@ -6,20 +6,29 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 import numpy as np
-
-from pyvale.uncertainty.errorcalculator import IErrCalculator, ErrorData
+from pyvale.uncertainty.errorcalculator import (IErrCalculator,
+                                                ErrorData,
+                                                EErrorType,
+                                                EErrorCalc)
 from pyvale.uncertainty.randomgenerator import IGeneratorRandom
 
 
 class RandErrUniform(IErrCalculator):
-
     def __init__(self,
                  low: float,
                  high: float,
+                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT,
                  seed: int | None = None) -> None:
         self._low = low
         self._high = high
         self._rng = np.random.default_rng(seed)
+        self._err_calc = err_calc
+
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.RANDOM
 
     def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
 
@@ -32,15 +41,21 @@ class RandErrUniform(IErrCalculator):
 
 
 class RandErrUnifPercent(IErrCalculator):
-
     def __init__(self,
                  low_percent: float,
                  high_percent: float,
+                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT,
                  seed: int | None = None) -> None:
         self._low = low_percent
         self._high = high_percent
         self._rng = np.random.default_rng(seed)
+        self._err_calc = err_calc
 
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.RANDOM
 
     def calc_errs(self,
                   err_basis: np.ndarray) -> ErrorData:
@@ -54,12 +69,19 @@ class RandErrUnifPercent(IErrCalculator):
 
 
 class RandErrNormal(IErrCalculator):
-
     def __init__(self,
                  std: float,
+                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT,
                  seed: int | None = None) -> None:
         self._std = std
         self._rng = np.random.default_rng(seed)
+        self._err_calc = err_calc
+
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.RANDOM
 
     def calc_errs(self,
                   err_basis: np.ndarray) -> ErrorData:
@@ -72,13 +94,19 @@ class RandErrNormal(IErrCalculator):
 
 
 class RandErrNormPercent(IErrCalculator):
-
     def __init__(self,
                  std_percent: float,
+                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT,
                  seed: int | None = None) -> None:
         self._std = std_percent/100
         self._rng = np.random.default_rng(seed)
+        self._err_calc = err_calc
 
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.RANDOM
 
     def calc_errs(self,
                   err_basis: np.ndarray) -> ErrorData:
@@ -90,11 +118,19 @@ class RandErrNormPercent(IErrCalculator):
         err_data = ErrorData(error_array=err_basis*self._std*norm_rand)
         return err_data
 
-class RandErrGenerator(IErrCalculator):
 
+class RandErrGenerator(IErrCalculator):
     def __init__(self,
-                 generator: IGeneratorRandom) -> None:
+                 generator: IGeneratorRandom,
+                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
         self._generator = generator
+        self._err_calc = err_calc
+
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.RANDOM
 
     def calc_errs(self,
                   err_basis: np.ndarray) -> ErrorData:

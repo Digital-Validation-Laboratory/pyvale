@@ -19,14 +19,13 @@ from pyvale.numerical.spatialintegrator import ISpatialAverager
 
 @dataclass
 class SensorData:
-    positions: np.ndarray
+    positions: np.ndarray | None = None
     sample_times: np.ndarray | None = None
     area_averager: ISpatialAverager | None = None
     angles: tuple[Rotation,...] | None = None
 
 
 class PointSensorArray:
-
     def __init__(self,
                  sensor_array_data: SensorData,
                  field: IField,
@@ -40,13 +39,10 @@ class PointSensorArray:
         if descriptor is not None:
             self.descriptor = descriptor
 
-
         self._truth = None
         self._measurements = None
+        self._error_integrator = None
 
-        self._syserr_integrator_independent = None
-        self._randerr_integrator = None
-        self._syserr_integrator_dependent = None
 
     #---------------------------------------------------------------------------
     # accessors
@@ -62,7 +58,7 @@ class PointSensorArray:
                 self.get_sample_times().shape[0])
 
     #---------------------------------------------------------------------------
-    # truth calculation from simulation
+    # Truth calculation from simulation
     def calc_truth_values(self) -> np.ndarray:
         if self.sensor_data.area_averager is None:
             return self.field.sample_field(self.sensor_data.positions,
@@ -80,88 +76,25 @@ class PointSensorArray:
         return self._truth
 
     #---------------------------------------------------------------------------
-    # independent systematic errors calculated based on ground truth
-    def set_systematic_err_integrator_independent(self,
-                               err_int: ErrorIntegrator) -> None:
-        self._syserr_integrator_independent = err_int
+    # Errors
+    def set_error_integrator(self, err_int: ErrorIntegrator) -> None:
+        self._error_integrator = err_int
 
+    def get_systematic_errors(self) -> np.ndarray:
+        return self._error_integrator.get_errs_systematic()
 
-    def _calc_systematic_errs_independent(self) -> np.ndarray | None:
-        if self._syserr_integrator_independent is None:
-            return None
-
-        self._syserr_integrator_independent.calc_errs_independent(
-                                                self.get_truth_values())
-        return self._syserr_integrator_independent.get_errs_tot()
-
-
-    def get_systematic_errs_independent(self) -> np.ndarray | None:
-        if self._syserr_integrator_independent is None:
-            return None
-
-        return self._syserr_integrator_independent.get_errs_tot()
+    def get_random_errors(self) -> np.ndarray:
+        return self._error_integrator.get_errs_random()
 
     #---------------------------------------------------------------------------
-    # random errors
-    def set_random_err_integrator(self,
-                                err_int: ErrorIntegrator) -> None:
-        self._randerr_integrator = err_int
-
-
-    def _calc_random_errs(self)-> np.ndarray | None:
-        if self._randerr_integrator is None:
-            return None
-
-        self._randerr_integrator.calc_errs_independent(self.get_truth_values())
-        return self._randerr_integrator.get_errs_tot()
-
-
-    def get_random_errs(self) -> np.ndarray | None:
-        if self._randerr_integrator is None:
-            return None
-
-        return self._randerr_integrator.get_errs_tot()
-
-    #---------------------------------------------------------------------------
-    # dependent systematic errors calculated based on integrated error
-    def set_systematic_err_integrator_dependent(self,
-                               err_int: ErrorIntegrator) -> None:
-        self._syserr_integrator_dependent = err_int
-
-
-    def _calc_systematic_errs_dependent(self, measurements: np.ndarray
-                                   ) -> np.ndarray | None:
-        if self._syserr_integrator_dependent is None:
-            return None
-
-        self._syserr_integrator_dependent.calc_errs_dependent(measurements)
-        return self._syserr_integrator_dependent.get_errs_tot()
-
-
-    def get_systematic_errs_dependent(self) -> np.ndarray | None:
-        if self._syserr_integrator_dependent is None:
-            return None
-
-        return self._syserr_integrator_dependent.get_errs_tot()
-
-    #---------------------------------------------------------------------------
-    # measurements
+    # Measurements
     def calc_measurements(self) -> np.ndarray:
-        measurements = self.get_truth_values()
+        if self._error_integrator is None:
+            self._measurements = self.get_truth_values()
+            return self._measurements
 
-        indep_sys_errs = self._calc_systematic_errs_independent()
-        if indep_sys_errs is not None:
-            measurements = measurements + indep_sys_errs
-
-        rand_errs = self._calc_random_errs()
-        if rand_errs is not None:
-            measurements = measurements + rand_errs
-
-        dep_sys_errs = self._calc_systematic_errs_dependent(measurements)
-        if dep_sys_errs is not None:
-            measurements = measurements + dep_sys_errs
-
-        self._measurements = measurements
+        self._measurements = self._error_integrator.calc_errors(
+                                                    self.get_truth_values())
         return self._measurements
 
 

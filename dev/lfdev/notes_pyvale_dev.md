@@ -7,13 +7,27 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
     - Example showing area averaging as ground truth
 
 - TODO: PointSensorArray
-    - Switch to using SensorArrayData to init the class
 
 - TODO: ErrorIntegrator
+    - Should this be split into independent / dependent so the user controls how the errors are calculated?
+        - ErrIntIndep, ErrIntDep,
+
+    - Need to accumulate and store the ErrorData returns
     - Need to have option to store or not store separate errors by func to save memory
     - Need to pass updated position/time/angle/area along as errors are accumulated?
         - Might not be the best way to do this - might need to pass a single data class that encodes all errors
         - SensorArrayErrorData: rand_pos_xyz, rand_ang_zyx, area_avg, rand_time?
+
+    - OPTIONS:
+        - Owned by IErrorCalculator?: Independent / Dependent
+        - Owned by ErrorIntegrator: Memory Efficient / Not (remember all individual error sources or not)
+        - Owned by IErrorCalculator?: Random / Systematic
+
+    - Need to have a long queue of all errors in user defined order
+        - Go through the error queue and accumulate everything
+            - Can then pass accumulated error or ground truth
+            - Can then pass SensorData
+        - Split errors after the fact into systematic or random
 
 - TODO: Experiment generator/ runner
     - TODO: Allow user to extract all sources of error for each experiment, need to dig out of `ErrorIntegrator`

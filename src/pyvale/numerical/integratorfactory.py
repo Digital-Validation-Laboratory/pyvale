@@ -9,7 +9,7 @@ import numpy as np
 
 from pyvale.physics.field import IField
 from pyvale.numerical.spatialintegrator import (ISpatialAverager,
-                                                SpatialIntType)
+                                                ESpatialIntType)
 from pyvale.numerical.rectangleintegrator import Rectangle2D
 from pyvale.numerical.quadratureintegrator import (Quadrature2D,
                                                    create_gauss_weights_2d_4pts,
@@ -132,34 +132,34 @@ class SpatialIntegratorFactory:
         return quadrature
 
 
-def build_spatial_integrator(integrator_type: SpatialIntType,
+def build_spatial_integrator(integrator_type: ESpatialIntType,
                             field: IField,
                             cent_pos: np.ndarray,
                             area_dims: np.ndarray,
                             sample_times: np.ndarray | None = None
                             ) -> ISpatialAverager:
 
-    if integrator_type == SpatialIntType.RECT1PT:
+    if integrator_type == ESpatialIntType.RECT1PT:
         return SpatialIntegratorFactory.rect_2d_1pt(field,
                                                       cent_pos,
                                                       area_dims,
                                                       sample_times)
-    elif integrator_type == SpatialIntType.RECT4PT:
+    elif integrator_type == ESpatialIntType.RECT4PT:
         return SpatialIntegratorFactory.rect_2d_4pt(field,
                                                       cent_pos,
                                                       area_dims,
                                                       sample_times)
-    elif integrator_type == SpatialIntType.RECT9PT:
+    elif integrator_type == ESpatialIntType.RECT9PT:
         return SpatialIntegratorFactory.rect_2d_9pt(field,
                                                       cent_pos,
                                                       area_dims,
                                                       sample_times)
-    elif integrator_type == SpatialIntType.QUAD4PT:
+    elif integrator_type == ESpatialIntType.QUAD4PT:
         return SpatialIntegratorFactory.quad_2d_4pt(field,
                                             cent_pos,
                                             area_dims,
                                             sample_times)
-    elif integrator_type == SpatialIntType.QUAD9PT:
+    elif integrator_type == ESpatialIntType.QUAD9PT:
         return SpatialIntegratorFactory.quad_2d_9pt(field,
                                             cent_pos,
                                             area_dims,

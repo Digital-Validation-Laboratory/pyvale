@@ -11,26 +11,36 @@ from scipy.spatial.transform import Rotation
 
 from pyvale.physics.field import IField
 from pyvale.numerical.spatialintegrator import ISpatialAverager
-from pyvale.uncertainty.errorcalculator import IErrCalculator, ErrorData
+from pyvale.uncertainty.errorcalculator import (IErrCalculator,
+                                                ErrorData,
+                                                EErrorType,
+                                                EErrorCalc)
 from pyvale.uncertainty.driftcalculator import IDriftCalculator
 from pyvale.uncertainty.randomgenerator import IGeneratorRandom
 
 
 class SysErrRandPosition(IErrCalculator):
-
     def __init__(self,
                  field: IField,
                  sens_pos: np.ndarray,
                  rand_by_ax: tuple[IGeneratorRandom | None,
                                    IGeneratorRandom | None,
                                    IGeneratorRandom | None],
-                 sample_times: np.ndarray | None = None) -> None:
+                 sample_times: np.ndarray | None = None,
+                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
 
         self._field = field
         self._sens_pos_original = np.copy(sens_pos)
         self._sens_pos_perturbed = np.copy(sens_pos)
         self._rand_by_ax = rand_by_ax
         self._sample_times = sample_times
+        self._err_calc = err_calc
+
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.SYSTEMATIC
 
     def get_perturbed_pos(self) -> np.ndarray:
         return self._sens_pos_perturbed
@@ -53,16 +63,22 @@ class SysErrRandPosition(IErrCalculator):
 
 
 class SysErrSpatialAverage(IErrCalculator):
-
     def __init__(self,
                  field: IField,
                  spatial_averager: ISpatialAverager,
                  sample_times: np.ndarray | None = None,
-                 ) -> None:
+                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
 
         self._field = field
         self._spatial_averager = spatial_averager
         self._sample_times = sample_times
+        self._err_calc = err_calc
+
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.SYSTEMATIC
 
     def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
 
@@ -73,7 +89,6 @@ class SysErrSpatialAverage(IErrCalculator):
 
 
 class SysErrSpatialAverageRandPos(IErrCalculator):
-
     def __init__(self,
                  field: IField,
                  spatial_average: ISpatialAverager,
@@ -81,7 +96,8 @@ class SysErrSpatialAverageRandPos(IErrCalculator):
                  rand_by_ax: tuple[IGeneratorRandom | None,
                                    IGeneratorRandom | None,
                                    IGeneratorRandom | None],
-                 sample_times: np.ndarray | None = None) -> None:
+                 sample_times: np.ndarray | None = None,
+                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
 
         self._field = field
         self._spatial_average = spatial_average
@@ -89,6 +105,13 @@ class SysErrSpatialAverageRandPos(IErrCalculator):
         self._sens_pos_perturbed = np.copy(sens_pos)
         self._rand_by_ax = rand_by_ax
         self._sample_times = sample_times
+        self._err_calc = err_calc
+
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.SYSTEMATIC
 
     def get_perturbed_pos(self) -> np.ndarray:
         return self._sens_pos_perturbed
@@ -111,16 +134,17 @@ class SysErrSpatialAverageRandPos(IErrCalculator):
 
 
 class SysErrTimeRand(IErrCalculator):
-
     def __init__(self,
                 field: IField,
                 sens_pos: np.ndarray,
                 rand_time: IGeneratorRandom,
-                sample_times: np.ndarray | None = None) -> None:
+                sample_times: np.ndarray | None = None,
+                err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
 
         self._field = field
         self._sens_pos = sens_pos
         self._rand_time = rand_time
+        self._err_calc = err_calc
 
         if sample_times is None:
             original_times = field.get_time_steps()
@@ -130,6 +154,11 @@ class SysErrTimeRand(IErrCalculator):
         self._time_original = np.copy(original_times)
         self._time_perturbed = np.copy(original_times)
 
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.SYSTEMATIC
 
     def get_perturbed_time(self) -> np.ndarray:
         return self._time_perturbed
@@ -149,16 +178,17 @@ class SysErrTimeRand(IErrCalculator):
 
 
 class SysErrTimeDrift(IErrCalculator):
-
     def __init__(self,
                  field: IField,
                  sens_pos: np.ndarray,
                  drift: IDriftCalculator,
-                 sample_times: np.ndarray | None = None) -> None:
+                 sample_times: np.ndarray | None = None,
+                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
 
         self._field = field
         self._sens_pos = sens_pos
         self._drift = drift
+        self._err_calc = err_calc
 
         if sample_times is None:
             original_times = field.get_time_steps()
@@ -168,6 +198,11 @@ class SysErrTimeDrift(IErrCalculator):
         self._time_original = np.copy(original_times)
         self._time_perturbed = np.copy(original_times)
 
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.SYSTEMATIC
 
     def get_perturbed_time(self) -> np.ndarray:
         return self._time_perturbed
@@ -186,13 +221,13 @@ class SysErrTimeDrift(IErrCalculator):
 
 
 class SysErrAngleOffset(IErrCalculator):
-
     def __init__(self,
                  field: IField,
                  sens_pos: np.ndarray,
                  angles: tuple[Rotation,...],
                  offset_ang_zyx: np.ndarray,
-                 sample_times: np.ndarray | None = None) -> None:
+                 sample_times: np.ndarray | None = None,
+                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
 
         self._field = field
         self._sens_pos = sens_pos
@@ -200,6 +235,13 @@ class SysErrAngleOffset(IErrCalculator):
         self._sens_angles_perturbed = angles
         self._offset_ang_zyx = offset_ang_zyx
         self._sample_times = sample_times
+        self._err_calc = err_calc
+
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.SYSTEMATIC
 
     def get_perturbed_angles(self) -> tuple[Rotation,...]:
         return self._sens_angles_perturbed
@@ -224,8 +266,8 @@ class SysErrAngleOffset(IErrCalculator):
                              angles=self._sens_angles_perturbed)
         return err_data
 
-class SysErrAngleRand(IErrCalculator):
 
+class SysErrAngleRand(IErrCalculator):
     def __init__(self,
                  field: IField,
                  sens_pos: np.ndarray,
@@ -233,7 +275,8 @@ class SysErrAngleRand(IErrCalculator):
                  rand_ang_zyx: tuple[IGeneratorRandom | None,
                                     IGeneratorRandom | None,
                                     IGeneratorRandom | None],
-                 sample_times: np.ndarray | None = None) -> None:
+                 sample_times: np.ndarray | None = None,
+                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
 
         self._field = field
         self._sens_pos = sens_pos
@@ -241,6 +284,13 @@ class SysErrAngleRand(IErrCalculator):
         self._sens_angles_perturbed = angles
         self._rand_ang_zyx = rand_ang_zyx
         self._sample_times = sample_times
+        self._err_calc = err_calc
+
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.SYSTEMATIC
 
     def get_perturbed_angles(self) -> tuple[Rotation,...]:
         return self._sens_angles_perturbed

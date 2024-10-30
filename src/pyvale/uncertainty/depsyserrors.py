@@ -5,18 +5,45 @@ License: MIT
 Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
+import enum
 from typing import Callable
 import numpy as np
 
-from pyvale.uncertainty.errorcalculator import IErrCalculator, ErrorData
+from pyvale.uncertainty.errorcalculator import (IErrCalculator,
+                                                ErrorData,
+                                                EErrorType,
+                                                EErrorCalc)
+
+
+class ERoundMethod(enum.Enum):
+    ROUND = enum.auto()
+    FLOOR = enum.auto()
+    CEIL = enum.auto()
+
+
+def _select_round_method(method: ERoundMethod) -> Callable:
+    if method == ERoundMethod.FLOOR:
+        return np.floor
+    if method == ERoundMethod.CEIL:
+        return np.ceil
+    return np.round
 
 
 class SysErrRoundOff(IErrCalculator):
-    def __init__(self, method: str = 'round', base: float = 1.0) -> None:
+    def __init__(self,
+                 method: ERoundMethod = ERoundMethod.ROUND,
+                 base: float = 1.0,
+                 err_calc: EErrorCalc = EErrorCalc.DEPENDENT) -> None:
 
         self._base = base
         self._method = _select_round_method(method)
+        self._err_calc = err_calc
 
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.SYSTEMATIC
 
     def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
 
@@ -27,10 +54,20 @@ class SysErrRoundOff(IErrCalculator):
 
 
 class SysErrDigitisation(IErrCalculator):
-    def __init__(self, bits_per_unit: float, method: str = 'round') -> None:
+    def __init__(self,
+                 bits_per_unit: float,
+                 method: ERoundMethod = ERoundMethod.ROUND,
+                 err_calc: EErrorCalc = EErrorCalc.DEPENDENT) -> None:
 
         self._units_per_bit = 1/float(bits_per_unit)
         self._method = _select_round_method(method)
+        self._err_calc = err_calc
+
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.SYSTEMATIC
 
     def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
 
@@ -44,7 +81,8 @@ class SysErrDigitisation(IErrCalculator):
 class SysErrSaturation(IErrCalculator):
     def __init__(self,
                  meas_min: float,
-                 meas_max: float) -> None:
+                 meas_max: float,
+                 err_calc: EErrorCalc = EErrorCalc.DEPENDENT) -> None:
 
         if meas_min > meas_max:
             raise ValueError("Minimum must be smaller than maximum for "+
@@ -52,7 +90,13 @@ class SysErrSaturation(IErrCalculator):
 
         self._min = meas_min
         self._max = meas_max
+        self._err_calc = err_calc
 
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.SYSTEMATIC
 
     def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
 
@@ -64,11 +108,5 @@ class SysErrSaturation(IErrCalculator):
         return err_data
 
 
-def _select_round_method(method: str) -> Callable:
-    if method == 'floor':
-        return np.floor
-    if method == 'ceil':
-        return np.ceil
-    return np.round
 
 
