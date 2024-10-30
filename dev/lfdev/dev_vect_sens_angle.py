@@ -44,35 +44,50 @@ def main() -> None:
                                               None,
                                               None)
 
-    rand_err_int = pyvale.ErrorIntegrator([pyvale.RandErrNormal(std=0.01e-3)],
-                                        disp_sens_norot.get_measurement_shape())
-    disp_sens_norot.set_rand_err_integrator(rand_err_int)
+    #rand_err_int = pyvale.ErrorIntegrator([pyvale.RandErrNormal(std=0.01e-3)],
+    #                                    disp_sens_norot.get_measurement_shape())
+    #disp_sens_norot.set_rand_err_integrator(rand_err_int)
 
     meas_norot = disp_sens_norot.get_measurements()
 
     #---------------------------------------------------------------------------
-    orientations = sens_pos.shape[0] * \
-        (Rotation.from_euler("zyx", [90, 0, 0], degrees=True),)
+    sens_angles = sens_pos.shape[0] * \
+        (Rotation.from_euler("zyx", [0, 0, 0], degrees=True),)
 
     disp_sens_rot = pyvale.PointSensorArray(sens_pos,
                                               disp_field,
                                               None,
                                               descriptor,
                                               None,
-                                              orientations)
+                                              sens_angles)
 
-    rand_err_rot = pyvale.ErrorIntegrator([pyvale.RandErrNormal(std=0.01e-3)],
+    offset_angles = np.array([1,0,0])
+    sys_err_rot = pyvale.SysErrAngleOffset(disp_field,
+                                     sens_pos,
+                                     sens_angles,
+                                     offset_angles,
+                                     None)
+    sys_err_int = pyvale.ErrorIntegrator([sys_err_rot],
                                         disp_sens_rot.get_measurement_shape())
-    disp_sens_rot.set_rand_err_integrator(rand_err_rot)
+    disp_sens_rot.set_indep_sys_err_integrator(sys_err_int)
 
     meas_rot = disp_sens_rot.get_measurements()
 
     #---------------------------------------------------------------------------
+    print(80*'-')
+    sens_num = 4
+    print('The last 5 time steps (measurements) of sensor {sens_num}:')
+    pyvale.print_measurements(disp_sens_rot,
+                              (sens_num-1,sens_num),
+                              (0,1),
+                              (meas_rot.shape[2]-5,meas_rot.shape[2]))
+    print(80*'-')
+
     pyvale.plot_time_traces(disp_sens_norot,'disp_x')
-    pyvale.plot_time_traces(disp_sens_norot,'disp_y')
+    #pyvale.plot_time_traces(disp_sens_norot,'disp_y')
 
     pyvale.plot_time_traces(disp_sens_rot,'disp_x')
-    pyvale.plot_time_traces(disp_sens_rot,'disp_y')
+    #pyvale.plot_time_traces(disp_sens_rot,'disp_y')
     plt.show()
 
 

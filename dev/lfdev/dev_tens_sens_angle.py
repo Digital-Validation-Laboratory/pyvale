@@ -55,30 +55,43 @@ def main() -> None:
                                                 descriptor,
                                                 None,
                                                 None)
-    rand_err_int = pyvale.ErrorIntegrator([pyvale.RandErrNormPercent(std_percent=5.0)],
-                                        sg_array_norot.get_measurement_shape())
-    sg_array_norot.set_rand_err_integrator(rand_err_int)
 
     meas_norot = sg_array_norot.get_measurements()
 
     #---------------------------------------------------------------------------
-    angles = sens_pos.shape[0] * \
-        (R.from_euler("zyx", [90, 0, 0], degrees=True),)
+    sens_angles = sens_pos.shape[0] * \
+        (R.from_euler("zyx", [0, 0, 0], degrees=True),)
 
     sg_array_rot = pyvale.PointSensorArray(sens_pos,
                                                 strain_field,
                                                 None,
                                                 descriptor,
                                                 None,
-                                                angles)
+                                                sens_angles)
 
-    rand_err_rot = pyvale.ErrorIntegrator([pyvale.RandErrNormPercent(std_percent=5.0)],
+    offset_angles = np.array([1,0,0])
+    sys_err_rot = pyvale.SysErrAngleOffset(strain_field,
+                                     sens_pos,
+                                     sens_angles,
+                                     offset_angles,
+                                     None)
+    sys_err_int = pyvale.ErrorIntegrator([sys_err_rot],
                                         sg_array_rot.get_measurement_shape())
-    sg_array_rot.set_rand_err_integrator(rand_err_rot)
+    sg_array_rot.set_indep_sys_err_integrator(sys_err_int)
+
 
     meas_rot = sg_array_rot.get_measurements()
 
     #---------------------------------------------------------------------------
+    print(80*'-')
+    sens_num = 4
+    print('The last 5 time steps (measurements) of sensor {sens_num}:')
+    pyvale.print_measurements(sg_array_rot,
+                              (sens_num-1,sens_num),
+                              (1,2),
+                              (meas_rot.shape[2]-5,meas_rot.shape[2]))
+    print(80*'-')
+
     plot_comp = 'strain_yy'
     pyvale.plot_time_traces(sg_array_norot,plot_comp)
     pyvale.plot_time_traces(sg_array_rot,plot_comp)

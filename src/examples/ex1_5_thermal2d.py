@@ -57,13 +57,13 @@ def main() -> None:
     pre_sys_errs.append(pyvale.SysErrNormal(std=1.0))
     pre_sys_errs.append(pyvale.SysErrNormPercent(std_percent=2.0))
 
-    sys_gen = pyvale.TriangularGenerator(left=-1.0,
+    sys_gen = pyvale.GeneratorTriangular(left=-1.0,
                                           mode=0.0,
                                           right=1.0)
     pre_sys_errs.append(pyvale.SysErrGenerator(sys_gen))
 
     # Field based errors
-    pos_gen = pyvale.NormalGenerator(std=1.0)
+    pos_gen = pyvale.GeneratorNormal(std=1.0)
     pre_sys_errs.append(pyvale.SysErrRandPosition(tc_array.field,
                                                   sens_pos,
                                                   (pos_gen,pos_gen,None),
@@ -83,7 +83,7 @@ def main() -> None:
     rand_errs.append(pyvale.RandErrUnifPercent(low_percent=-2.0,
                                                high_percent=2.0))
 
-    rand_gen = pyvale.TriangularGenerator(left=-5.0,
+    rand_gen = pyvale.GeneratorTriangular(left=-5.0,
                                           mode=0.0,
                                           right=5.0)
     rand_errs.append(pyvale.RandErrGenerator(rand_gen))

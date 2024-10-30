@@ -8,7 +8,7 @@ Copyright (C) 2024 The Digital Validation Team
 from typing import Callable
 import numpy as np
 from pyvale.uncertainty.errorcalculator import IErrCalculator, ErrorData
-from pyvale.uncertainty.randomgenerator import IRandomGenerator
+from pyvale.uncertainty.randomgenerator import IGeneratorRandom
 
 
 class SysErrOffset(IErrCalculator):
@@ -134,7 +134,7 @@ class SysErrNormPercent(IErrCalculator):
 class SysErrGenerator(IErrCalculator):
 
     def __init__(self,
-                 generator: IRandomGenerator) -> None:
+                 generator: IGeneratorRandom) -> None:
         self._generator = generator
 
     def calc_errs(self,
@@ -159,7 +159,7 @@ class SysErrCalibration(IErrCalculator):
                  truth_calib: Callable,
                  cal_range: tuple[float,float],
                  n_cal_divs: int = 10000) -> None:
-  
+
         self._assumed_calib = assumed_calib
         self._truth_calib = truth_calib
         self._cal_range = cal_range

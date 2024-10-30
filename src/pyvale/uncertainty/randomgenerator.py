@@ -9,13 +9,13 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 
-class IRandomGenerator(ABC):
+class IGeneratorRandom(ABC):
     @abstractmethod
     def generate(self, size: tuple[int,...]) -> np.ndarray:
         pass
 
 
-class NormalGenerator(IRandomGenerator):
+class GeneratorNormal(IGeneratorRandom):
     def __init__(self,
                  std: float = 1.0,
                  mean: float = 0.0,
@@ -30,7 +30,8 @@ class NormalGenerator(IRandomGenerator):
                                 scale = self._std,
                                 size = size)
 
-class LogNormalGenerator(IRandomGenerator):
+
+class GeneratorLogNormal(IGeneratorRandom):
     def __init__(self,
                  std: float = 1.0,
                  mean: float = 0.0,
@@ -46,7 +47,7 @@ class LogNormalGenerator(IRandomGenerator):
                                    size = size)
 
 
-class UniformGenerator(IRandomGenerator):
+class GeneratorUniform(IGeneratorRandom):
     def __init__(self,
                  low: float = -1.0,
                  high: float = 1.0,
@@ -62,7 +63,7 @@ class UniformGenerator(IRandomGenerator):
                                  size = size)
 
 
-class ExponentialGenerator(IRandomGenerator):
+class GeneratorExponential(IGeneratorRandom):
     def __init__(self,
                  scale: float = 1.0,
                  seed: int | None = None) -> None:
@@ -75,7 +76,7 @@ class ExponentialGenerator(IRandomGenerator):
                                      size = size)
 
 
-class ChiSquareGenerator(IRandomGenerator):
+class GeneratorChiSquare(IGeneratorRandom):
     def __init__(self,
                  dofs: float,
                  seed: int | None = None) -> None:
@@ -88,7 +89,7 @@ class ChiSquareGenerator(IRandomGenerator):
                                    size = size)
 
 
-class DirichletGenerator(IRandomGenerator):
+class GeneratorDirichlet(IGeneratorRandom):
     def __init__(self,
                  alpha: float,
                  seed: int | None = None) -> None:
@@ -100,7 +101,7 @@ class DirichletGenerator(IRandomGenerator):
         return self._rng.dirichlet(alpha = self._alpha, size = size)
 
 
-class FGenerator(IRandomGenerator):
+class GeneratorF(IGeneratorRandom):
     def __init__(self,
                  dofs: float,
                  seed: int | None = None) -> None:
@@ -112,7 +113,7 @@ class FGenerator(IRandomGenerator):
         return self._rng.f(dfnum = self._dofs, size = size)
 
 
-class GammaGenerator(IRandomGenerator):
+class GeneratorGamma(IGeneratorRandom):
     def __init__(self,
                  shape: float,
                  scale: float = 1.0,
@@ -126,7 +127,8 @@ class GammaGenerator(IRandomGenerator):
         return self._rng.gamma(scale = self._scale,
                                      size = size)
 
-class StudentTGenerator(IRandomGenerator):
+
+class GeneratorStudentT(IGeneratorRandom):
     def __init__(self,
                  dofs: float,
                  seed: int | None = None) -> None:
@@ -138,7 +140,8 @@ class StudentTGenerator(IRandomGenerator):
         return self._rng.standard_t(df = self._dofs,
                                    size = size)
 
-class BetaGenerator(IRandomGenerator):
+
+class GeneratorBeta(IGeneratorRandom):
     def __init__(self,
                  a: float,
                  b: float,
@@ -154,7 +157,7 @@ class BetaGenerator(IRandomGenerator):
                               size = size)
 
 
-class TriangularGenerator(IRandomGenerator):
+class GeneratorTriangular(IGeneratorRandom):
     def __init__(self,
                  left: float = -1.0,
                  mode: float = 0.0,

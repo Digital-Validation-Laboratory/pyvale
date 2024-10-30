@@ -37,6 +37,19 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
 
 - IMAGE DEF: allow upsampled image to be generated once and retained.
 
+- CAMERAS:
+    - Need CameraData class
+    - Create 'CameraBasic' class or Simple?
+    - Create 'CameraRayTracing' class
+    - Create 'CameraIRThermo'
+    - Create 'CameraDIC2D'
+    - Create 'CameraDICStereo'
+    - Allow field class to do a single field rotation into camera coords on creation and store this
+    - Allow all sensors to have
+
+- TESTING:
+    - Need to check rotations are consistent
+
 Gauss Quadrature for the Unit Disc
 http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubature-formulas-for-the-unit-disk/
 
