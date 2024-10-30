@@ -77,7 +77,7 @@ def main() -> None:
                                      None)
     sys_err_int = pyvale.ErrorIntegrator([sys_err_rot],
                                         sg_array_rot.get_measurement_shape())
-    sg_array_rot.set_indep_sys_err_integrator(sys_err_int)
+    sg_array_rot.set_systematic_err_integrator_independent(sys_err_int)
 
 
     meas_rot = sg_array_rot.get_measurements()

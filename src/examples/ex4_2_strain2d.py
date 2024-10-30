@@ -8,6 +8,7 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 from pathlib import Path
+import numpy as np
 import matplotlib.pyplot as plt
 import mooseherder as mh
 import pyvale
@@ -42,25 +43,33 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    straingauge_array = pyvale.PointSensorArray(sens_pos,
+    use_sim_time = False
+    if use_sim_time:
+        sample_times = None
+    else:
+        sample_times = np.linspace(0.0,np.max(sim_data.time),50)
+
+    sens_data = pyvale.SensorData(positions=sens_pos,
+                                  sample_times=sample_times)
+
+    straingauge_array = pyvale.PointSensorArray(sens_data,
                                                 strain_field,
-                                                None,
                                                 descriptor)
 
-    sys_errors_on = False
+    sys_errors_on = True
     rand_errors_on = True
 
     if sys_errors_on:
         indep_sys_err1 = pyvale.SysErrUniform(low=-0.1e-3,high=0.1e-3)
         sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1],
                                             straingauge_array.get_measurement_shape())
-        straingauge_array.set_indep_sys_err_integrator(sys_err_int)
+        straingauge_array.set_systematic_err_integrator_independent(sys_err_int)
 
     if rand_errors_on:
         rand_err1 = pyvale.RandErrNormal(std=0.1e-3)
         rand_err_int = pyvale.ErrorIntegrator([rand_err1],
                                                 straingauge_array.get_measurement_shape())
-        straingauge_array.set_rand_err_integrator(rand_err_int)
+        straingauge_array.set_random_err_integrator(rand_err_int)
 
 
     plot_field = 'strain_yy'

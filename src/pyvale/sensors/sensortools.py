@@ -37,9 +37,9 @@ def print_measurements(sens_array: PointSensorArray,
 
     measurement =  sens_array.get_measurements()
     truth = sens_array.get_truth_values()
-    indep_sys_errs = sens_array.get_pre_systematic_errs()
+    indep_sys_errs = sens_array.get_systematic_errs_independent()
     rand_errs = sens_array.get_random_errs()
-    dep_sys_errs = sens_array.get_dep_systematic_errs()
+    dep_sys_errs = sens_array.get_systematic_errs_dependent()
 
     print(f"\nmeasurement.shape = \n    {measurement.shape}")
     print_meas = measurement[sensors[0]:sensors[1],

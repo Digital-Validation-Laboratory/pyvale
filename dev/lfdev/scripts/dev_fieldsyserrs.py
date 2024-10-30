@@ -49,7 +49,7 @@ def main() -> None:
 
     pre_syserr_int = pyvale.ErrorIntegrator([field_sys_err2],
                                             tc_array.get_measurement_shape())
-    tc_array.set_indep_sys_err_integrator(pre_syserr_int)
+    tc_array.set_systematic_err_integrator_independent(pre_syserr_int)
 
     measurements = tc_array.calc_measurements()
 

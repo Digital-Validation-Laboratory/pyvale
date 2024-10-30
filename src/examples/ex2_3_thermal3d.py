@@ -54,38 +54,42 @@ def main() -> None:
     else:
         sample_times = np.linspace(0.0,np.max(sim_data.time),80)
 
+    sens_data = pyvale.SensorData(positions=sens_pos,
+                                  sample_times=sample_times)
 
-    tc_array = pyvale.PointSensorArray(sens_pos,
+    tc_array = pyvale.PointSensorArray(sens_data,
                                        t_field,
-                                       sample_times,
                                        descriptor)
 
-    errors_on = {'indep_sys': False,
-                 'rand': False,
+    errors_on = {'indep_sys': True,
+                 'rand': True,
                  'dep_sys': True}
 
     if errors_on['indep_sys']:
-        indep_sys_err1 = pyvale.SysErrOffset(offset=-5.0)
-        indep_sys_err2 = pyvale.SysErrUniform(low=-10.0,
-                                            high=10.0)
-        indep_sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1,indep_sys_err2],
+        sys_errs_indep = []
+        sys_errs_indep.append(pyvale.SysErrOffset(offset=-5.0))
+        sys_errs_indep.append(pyvale.SysErrUniform(low=-10.0,
+                                                   high=10.0))
+        indep_sys_err_int = pyvale.ErrorIntegrator(sys_errs_indep,
                                             tc_array.get_measurement_shape())
-        tc_array.set_indep_sys_err_integrator(indep_sys_err_int)
+        tc_array.set_systematic_err_integrator_independent(indep_sys_err_int)
 
     if errors_on['rand']:
-        rand_err1 = pyvale.RandErrNormPercent(std_percent=5.0)
-        rand_err2 = pyvale.RandErrUnifPercent(low_percent=-5.0,
-                                            high_percent=5.0)
-        rand_err_int = pyvale.ErrorIntegrator([rand_err1,rand_err2],
-                                                tc_array.get_measurement_shape())
-        tc_array.set_rand_err_integrator(rand_err_int)
+        rand_errs = []
+        rand_errs.append(pyvale.RandErrNormPercent(std_percent=5.0))
+        rand_errs.append(pyvale.RandErrUnifPercent(low_percent=-5.0,
+                                                   high_percent=5.0))
+        rand_err_int = pyvale.ErrorIntegrator(rand_errs,
+                                              tc_array.get_measurement_shape())
+        tc_array.set_random_err_integrator(rand_err_int)
 
     if errors_on['dep_sys']:
-        dep_sys_err1 = pyvale.SysErrDigitisation(bits_per_unit=1/20)
-        dep_sys_err2 = pyvale.SysErrSaturation(meas_min=0.0,meas_max=800.0)
-        dep_sys_err_int = pyvale.ErrorIntegrator([dep_sys_err1,dep_sys_err2],
+        sys_errs_dep = []
+        sys_errs_dep.append(pyvale.SysErrDigitisation(bits_per_unit=1/20))
+        sys_errs_dep.append(pyvale.SysErrSaturation(meas_min=0.0,meas_max=800.0))
+        dep_sys_err_int = pyvale.ErrorIntegrator(sys_errs_dep,
                                             tc_array.get_measurement_shape())
-        tc_array.set_dep_sys_err_integrator(dep_sys_err_int)
+        tc_array.set_systematic_err_integrator_dependent(dep_sys_err_int)
 
 
     measurements = tc_array.get_measurements()

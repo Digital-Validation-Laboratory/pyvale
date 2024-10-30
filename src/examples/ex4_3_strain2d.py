@@ -41,33 +41,41 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    sg_array_norot = pyvale.PointSensorArray(sens_pos,
-                                                strain_field,
-                                                None,
-                                                descriptor,
-                                                None,
-                                                None)
+    use_sim_time = False
+    if use_sim_time:
+        sample_times = None
+    else:
+        sample_times = np.linspace(0.0,np.max(sim_data.time),50)
+
+    sens_data_norot = pyvale.SensorData(positions=sens_pos,
+                                        sample_times=sample_times)
+
+    sg_array_norot = pyvale.PointSensorArray(sens_data_norot,
+                                             strain_field,
+                                             descriptor)
 
     meas_norot = sg_array_norot.get_measurements()
 
     sens_angles = sens_pos.shape[0] * \
-        (R.from_euler("zyx", [0, 0, 0], degrees=True),)
-    sg_array_rot = pyvale.PointSensorArray(sens_pos,
-                                                strain_field,
-                                                None,
-                                                descriptor,
-                                                None,
-                                                sens_angles)
+        (R.from_euler("zyx", [45, 0, 0], degrees=True),)
+
+    sens_data_rot = pyvale.SensorData(positions=sens_pos,
+                                      sample_times=sample_times,
+                                      angles=sens_angles)
+
+    sg_array_rot = pyvale.PointSensorArray(sens_data_rot,
+                                           strain_field,
+                                           descriptor)
 
     offset_angles = np.array([1,0,0])
     sys_err_rot = pyvale.SysErrAngleOffset(strain_field,
                                      sens_pos,
                                      sens_angles,
                                      offset_angles,
-                                     None)
+                                     sample_times)
     sys_err_int = pyvale.ErrorIntegrator([sys_err_rot],
                                         sg_array_rot.get_measurement_shape())
-    sg_array_rot.set_indep_sys_err_integrator(sys_err_int)
+    sg_array_rot.set_systematic_err_integrator_independent(sys_err_int)
 
 
     meas_rot = sg_array_rot.get_measurements()

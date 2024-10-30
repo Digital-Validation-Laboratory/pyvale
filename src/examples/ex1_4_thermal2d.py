@@ -34,16 +34,18 @@ def main() -> None:
 
     sample_times = np.linspace(0.0,np.max(sim_data.time),12)
 
-    tc_array = pyvale.SensorArrayFactory \
-        .basic_thermocouple_array(sim_data,
-                                  sens_pos,
-                                  field_key,
-                                  spat_dims=2,
+    sens_data = pyvale.SensorData(positions=sens_pos,
                                   sample_times=sample_times)
+
+    tc_array = pyvale.SensorArrayFactory \
+        .thermocouples_basic_errs(sim_data,
+                                  sens_data,
+                                  field_key,
+                                  spat_dims=2)
 
     indep_sys_err_int = pyvale.ErrorIntegrator([pyvale.SysErrOffset(offset=-10.0)],
                                         tc_array.get_measurement_shape())
-    tc_array.set_indep_sys_err_integrator(indep_sys_err_int)
+    tc_array.set_systematic_err_integrator_independent(indep_sys_err_int)
 
     measurements = tc_array.get_measurements()
 

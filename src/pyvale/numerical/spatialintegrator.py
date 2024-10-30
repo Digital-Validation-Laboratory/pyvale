@@ -28,7 +28,7 @@ def create_int_pt_array(int_pt_offsets: np.ndarray,
     return int_pt_array + offset_array
 
 
-class ISpatialIntegrator(ABC):
+class ISpatialAverager(ABC):
     @abstractmethod
     def calc_averages(self,
                       cent_pos: np.ndarray | None = None,
