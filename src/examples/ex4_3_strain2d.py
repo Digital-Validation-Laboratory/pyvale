@@ -41,13 +41,6 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    straingauge_array = pyvale.PointSensorArray(sens_pos,
-                                                strain_field,
-                                                None,
-                                                descriptor,
-                                                None,
-                                                None)
-
     sg_array_norot = pyvale.PointSensorArray(sens_pos,
                                                 strain_field,
                                                 None,
