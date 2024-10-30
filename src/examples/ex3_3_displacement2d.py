@@ -1,6 +1,6 @@
 '''
 ================================================================================
-example: displacement sensors on a 2d plate
+Example: displacement sensors on a 2d plate
 
 pyvale: the python validation engine
 License: MIT
@@ -15,7 +15,7 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
-    """pyvale example:
+    """pyvale example: rotation of vector field sensors
     """
     data_path = Path('src/data/case17_out.e')
     data_reader = mh.ExodusReader(data_path)
@@ -36,7 +36,6 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    #---------------------------------------------------------------------------
     disp_sens_norot = pyvale.PointSensorArray(sens_pos,
                                               disp_field,
                                               None,
@@ -46,7 +45,6 @@ def main() -> None:
 
     meas_norot = disp_sens_norot.get_measurements()
 
-    #---------------------------------------------------------------------------
     sens_angles = sens_pos.shape[0] * \
         (Rotation.from_euler("zyx", [0, 0, 0], degrees=True),)
 
@@ -57,7 +55,7 @@ def main() -> None:
                                             None,
                                             sens_angles)
 
-    offset_angles = np.array([1,0,0])
+    offset_angles = np.array([1,0,0]) # degrees
     sys_err_rot = pyvale.SysErrAngleOffset(disp_field,
                                            sens_pos,
                                            sens_angles,
@@ -70,7 +68,7 @@ def main() -> None:
 
     meas_rot = disp_sens_rot.get_measurements()
 
-    #---------------------------------------------------------------------------
+
     print(80*'-')
     sens_num = 4
     print('The last 5 time steps (measurements) of sensor {sens_num}:')
@@ -81,10 +79,10 @@ def main() -> None:
     print(80*'-')
 
     pyvale.plot_time_traces(disp_sens_norot,'disp_x')
-    #pyvale.plot_time_traces(disp_sens_norot,'disp_y')
+    pyvale.plot_time_traces(disp_sens_norot,'disp_y')
 
     pyvale.plot_time_traces(disp_sens_rot,'disp_x')
-    #pyvale.plot_time_traces(disp_sens_rot,'disp_y')
+    pyvale.plot_time_traces(disp_sens_rot,'disp_y')
     plt.show()
 
 

@@ -1,6 +1,6 @@
 '''
 ================================================================================
-example: strain sensors on a 2d plate
+Example: strain sensors on a 2d plate
 
 pyvale: the python validation engine
 License: MIT
@@ -15,7 +15,7 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
-    """pyvale example:
+    """pyvale example: rotation of tensor field sensors
     """
     data_path = Path('src/data/case17_out.e')
     data_reader = mh.ExodusReader(data_path)
@@ -48,7 +48,6 @@ def main() -> None:
                                                 None,
                                                 None)
 
-    #---------------------------------------------------------------------------
     sg_array_norot = pyvale.PointSensorArray(sens_pos,
                                                 strain_field,
                                                 None,
@@ -58,10 +57,8 @@ def main() -> None:
 
     meas_norot = sg_array_norot.get_measurements()
 
-    #---------------------------------------------------------------------------
     sens_angles = sens_pos.shape[0] * \
         (R.from_euler("zyx", [0, 0, 0], degrees=True),)
-
     sg_array_rot = pyvale.PointSensorArray(sens_pos,
                                                 strain_field,
                                                 None,
@@ -82,7 +79,7 @@ def main() -> None:
 
     meas_rot = sg_array_rot.get_measurements()
 
-    #---------------------------------------------------------------------------
+
     print(80*'-')
     sens_num = 4
     print('The last 5 time steps (measurements) of sensor {sens_num}:')

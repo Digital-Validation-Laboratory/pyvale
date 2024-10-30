@@ -1,6 +1,6 @@
 '''
 ================================================================================
-example: strain gauges on a 2d plate
+Example: thermo-mechanical multiphysics on a divertor armour heatsink
 
 pyvale: the python validation engine
 License: MIT
