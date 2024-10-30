@@ -40,7 +40,7 @@ def main() -> None:
 
     tc_field = 'temperature'
     tc_array = pyvale.SensorArrayFactory \
-        .basic_thermocouple_array(sim_data,
+        .thermocouples_basic_errs(sim_data,
                                   sens_pos,
                                   tc_field,
                                   spat_dims=spat_dims,
@@ -49,7 +49,7 @@ def main() -> None:
 
     sg_field = 'strain'
     sg_array = pyvale.SensorArrayFactory \
-        .basic_straingauge_array(sim_data,
+        .strain_gauges_basic_errs(sim_data,
                                   sens_pos,
                                   sg_field,
                                   spat_dims=spat_dims,

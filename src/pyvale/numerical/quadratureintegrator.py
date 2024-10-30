@@ -10,7 +10,7 @@ from typing import Callable
 import numpy as np
 
 from pyvale.physics.field import IField
-from pyvale.numerical.spatialintegrator import (ISpatialIntegrator,
+from pyvale.numerical.spatialintegrator import (ISpatialAverager,
                                                 create_int_pt_array)
 
 
@@ -26,7 +26,7 @@ def create_gauss_weights_2d_9pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
     return gauss_weights
 
 
-class Quadrature2D(ISpatialIntegrator):
+class Quadrature2D(ISpatialAverager):
     def __init__(self,
                  gauss_pt_offsets: np.ndarray,
                  gauss_weight_func: Callable,

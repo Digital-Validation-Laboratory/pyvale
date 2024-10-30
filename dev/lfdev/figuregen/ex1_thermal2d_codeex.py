@@ -57,20 +57,20 @@ indep_sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1,
                                             indep_sys_err2,
                                             indep_sys_err3],
                                     thermocouple_array.get_measurement_shape())
-thermocouple_array.set_indep_sys_err_integrator(indep_sys_err_int)
+thermocouple_array.set_systematic_err_integrator_independent(indep_sys_err_int)
 
 # Calculated based on the sensor 'truth' value
 rand_err1 = pyvale.RandErrNormPercent(std_percent=5.0)
 rand_err_int = pyvale.ErrorIntegrator([rand_err1,],
                                     thermocouple_array.get_measurement_shape())
-thermocouple_array.set_rand_err_integrator(rand_err_int)
+thermocouple_array.set_random_err_integrator(rand_err_int)
 
 # Calculated based on the accumulated error in the error chain
 dep_sys_err1 = pyvale.SysErrDigitisation(bits_per_unit=1/10)
 dep_sys_err2 = pyvale.SysErrSaturation(meas_min=0.0,meas_max=300.0)
 dep_sys_err_int = pyvale.ErrorIntegrator([dep_sys_err1,dep_sys_err2],
                                     thermocouple_array.get_measurement_shape())
-thermocouple_array.set_dep_sys_err_integrator(dep_sys_err_int)
+thermocouple_array.set_systematic_err_integrator_dependent(dep_sys_err_int)
 
 measurements = thermocouple_array.calc_measurements()
 

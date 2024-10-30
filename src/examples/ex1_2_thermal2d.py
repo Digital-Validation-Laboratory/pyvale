@@ -39,10 +39,11 @@ def main() -> None:
     y_lims = (0.0,50.0)
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
+    sens_data = pyvale.SensorData(positions=sens_pos)
 
     tc_array = pyvale.SensorArrayFactory \
-        .basic_thermocouple_array(sim_data,
-                                  sens_pos,
+        .thermocouples_basic_errs(sim_data,
+                                  sens_data,
                                   field_key,
                                   spat_dims=2)
 

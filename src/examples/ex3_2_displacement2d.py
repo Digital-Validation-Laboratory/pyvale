@@ -8,6 +8,7 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 from pathlib import Path
+import numpy as np
 import matplotlib.pyplot as plt
 import mooseherder as mh
 import pyvale
@@ -37,20 +38,28 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    disp_sens_array = pyvale.PointSensorArray(sens_pos,
+    use_sim_time = False
+    if use_sim_time:
+        sample_times = None
+    else:
+        sample_times = np.linspace(0.0,np.max(sim_data.time),50)
+
+    sens_data = pyvale.SensorData(positions=sens_pos,
+                                  sample_times=sample_times)
+
+    disp_sens_array = pyvale.PointSensorArray(sens_data,
                                               disp_field,
-                                              None,
                                               descriptor)
 
     indep_sys_err1 = pyvale.SysErrUniform(low=-0.01e-3,high=0.01e-3)
     sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1],
                                           disp_sens_array.get_measurement_shape())
-    disp_sens_array.set_indep_sys_err_integrator(sys_err_int)
+    disp_sens_array.set_systematic_err_integrator_independent(sys_err_int)
 
     rand_err1 = pyvale.RandErrNormal(std=0.01e-3)
     rand_err_int = pyvale.ErrorIntegrator([rand_err1],
                                             disp_sens_array.get_measurement_shape())
-    disp_sens_array.set_rand_err_integrator(rand_err_int)
+    disp_sens_array.set_random_err_integrator(rand_err_int)
 
     plot_field = 'disp_x'
     if plot_field == 'disp_x':

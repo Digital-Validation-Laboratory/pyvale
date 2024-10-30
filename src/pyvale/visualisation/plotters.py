@@ -106,7 +106,7 @@ def plot_time_traces(sensor_array: PointSensorArray,
     comp_ind = sensor_array.field.get_component_index(component)
     samp_time = sensor_array.get_sample_times()
     measurements = sensor_array.get_measurements()
-    n_sensors = sensor_array.positions.shape[0]
+    n_sensors = sensor_array.sensor_data.positions.shape[0]
     descriptor = sensor_array.descriptor
 
     if plot_opts is None:
@@ -128,9 +128,9 @@ def plot_time_traces(sensor_array: PointSensorArray,
     # Plot simulation and truth lines
     if trace_opts.sim_line is not None:
         sim_time = field.get_time_steps()
-        sim_vals = field.sample_field(sensor_array.positions,
+        sim_vals = field.sample_field(sensor_array.sensor_data.positions,
                                       None,
-                                      sensor_array.angles)
+                                      sensor_array.sensor_data.angles)
 
         for ss in range(n_sensors):
             if ss in trace_opts.sensors_to_plot:
@@ -207,6 +207,8 @@ def plot_exp_traces(exp_sim: ExperimentSimulator,
 
     if trace_opts.sensors_to_plot is None:
         sensors_to_plot = range(num_sens)
+    else:
+        sensors_to_plot = trace_opts.sensors_to_plot
 
     #---------------------------------------------------------------------------
     # Figure canvas setup

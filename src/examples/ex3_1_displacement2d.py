@@ -27,11 +27,13 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
+    sens_data = pyvale.SensorData(positions=sens_pos)
+
     disp_sens_array = pyvale.SensorArrayFactory \
-                            .basic_dispsens_array(sim_data,
-                                                sens_pos,
-                                                "displacement",
-                                                spat_dims=2)
+                            .disp_sensors_basic_errs(sim_data,
+                                                     sens_data,
+                                                     "displacement",
+                                                     spat_dims=2)
 
     plot_field = 'disp_x'
     pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,plot_field)

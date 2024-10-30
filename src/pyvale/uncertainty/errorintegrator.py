@@ -27,16 +27,19 @@ class ErrorIntegrator:
         self._err_calcs = err_calcs
 
 
-    def calc_errs_static(self, err_basis: np.ndarray) -> np.ndarray:
-
+    def calc_errs_independent(self, err_basis: np.ndarray) -> np.ndarray:
+        # NOTE: In this case the error basis is the ground truth and all errors
+        # are calculated independently
         for ii,ff in enumerate(self._err_calcs):
             self._errs_by_func[ii,:,:,:] = ff.calc_errs(err_basis).error_array
 
         self._errs_tot = np.sum(self._errs_by_func,axis=0)
         return self._errs_tot
 
-    def calc_errs_recursive(self, err_basis: np.ndarray) -> np.ndarray:
-
+    def calc_errs_dependent(self, err_basis: np.ndarray) -> np.ndarray:
+        # NOTE: In this case the error basis is the current value of all errors
+        # summed (integrated) previously in the chain. So, the current error is
+        # dependent on the accumulation of all previous errors.
         current_basis = np.copy(err_basis)
         for ii,ff in enumerate(self._err_calcs):
             self._errs_by_func[ii,:,:,:] = ff.calc_errs(current_basis).error_array

@@ -8,7 +8,7 @@ Copyright (C) 2024 The Digital Validation Team
 import numpy as np
 
 from pyvale.physics.field import IField
-from pyvale.numerical.spatialintegrator import (ISpatialIntegrator,
+from pyvale.numerical.spatialintegrator import (ISpatialAverager,
                                                 SpatialIntType)
 from pyvale.numerical.rectangleintegrator import Rectangle2D
 from pyvale.numerical.quadratureintegrator import (Quadrature2D,
@@ -21,7 +21,7 @@ class SpatialIntegratorFactory:
                     cent_pos: np.ndarray,
                     area_dims: np.ndarray,
                     sample_times: np.ndarray | None = None
-                    )-> ISpatialIntegrator:
+                    )-> ISpatialAverager:
 
         int_pt_offsets = np.array([[0,0,0],])
 
@@ -39,7 +39,7 @@ class SpatialIntegratorFactory:
                     cent_pos: np.ndarray,
                     area_dims: np.ndarray,
                     sample_times: np.ndarray | None = None
-                    )-> ISpatialIntegrator:
+                    )-> ISpatialAverager:
 
         int_pt_offsets = area_dims * np.array([[-0.5,-0.5,0],
                                           [-0.5,0.5,0],
@@ -60,7 +60,7 @@ class SpatialIntegratorFactory:
                     cent_pos: np.ndarray,
                     area_dims: np.ndarray,
                     sample_times: np.ndarray | None = None
-                    )-> ISpatialIntegrator:
+                    )-> ISpatialAverager:
 
         int_pt_offsets = area_dims * np.array([[-1/3,-1/3,0],
                                           [-1/3,0,0],
@@ -86,7 +86,7 @@ class SpatialIntegratorFactory:
                     cent_pos: np.ndarray,
                     area_dims: np.ndarray,
                     sample_times: np.ndarray | None = None
-                    )-> ISpatialIntegrator:
+                    )-> ISpatialAverager:
 
         gauss_pt_offsets = area_dims * 1/np.sqrt(3)* np.array([[-1,-1,0],
                                                         [-1,1,0],
@@ -109,7 +109,7 @@ class SpatialIntegratorFactory:
                     cent_pos: np.ndarray,
                     area_dims: np.ndarray,
                     sample_times: np.ndarray | None = None
-                    )-> ISpatialIntegrator:
+                    )-> ISpatialAverager:
 
         gauss_pt_offsets = area_dims * np.array([[-np.sqrt(0.6),-np.sqrt(0.6),0],
                                             [-np.sqrt(0.6),np.sqrt(0.6),0],
@@ -137,7 +137,7 @@ def build_spatial_integrator(integrator_type: SpatialIntType,
                             cent_pos: np.ndarray,
                             area_dims: np.ndarray,
                             sample_times: np.ndarray | None = None
-                            ) -> ISpatialIntegrator:
+                            ) -> ISpatialAverager:
 
     if integrator_type == SpatialIntType.RECT1PT:
         return SpatialIntegratorFactory.rect_2d_1pt(field,

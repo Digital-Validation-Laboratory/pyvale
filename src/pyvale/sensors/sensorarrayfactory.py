@@ -13,7 +13,7 @@ from pyvale.physics.scalarfield import ScalarField
 from pyvale.physics.vectorfield import VectorField
 from pyvale.physics.tensorfield import TensorField
 from pyvale.sensors.sensordescriptor import SensorDescriptorFactory
-from pyvale.sensors.pointsensorarray import PointSensorArray
+from pyvale.sensors.pointsensorarray import PointSensorArray, SensorData
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
 from pyvale.uncertainty.syserrors import SysErrUniformPercent
 from pyvale.uncertainty.randerrors import RandErrNormPercent
@@ -23,37 +23,33 @@ from pyvale.uncertainty.depsyserrors import (SysErrDigitisation,
 
 class SensorArrayFactory:
     @staticmethod
-    def plain_thermocouple_array(sim_data: mh.SimData,
-                                 positions: np.ndarray,
-                                 field_name: str = "temperature",
-                                 spat_dims: int = 3,
-                                 sample_times: np.ndarray | None = None
-                                 ) -> PointSensorArray:
+    def thermocouples_no_errs(sim_data: mh.SimData,
+                              sensor_array_data: SensorData,
+                              field_name: str = "temperature",
+                              spat_dims: int = 3,
+                              ) -> PointSensorArray:
         descriptor = SensorDescriptorFactory.temperature_descriptor()
 
         t_field = ScalarField(sim_data,field_name,spat_dims)
 
-        sens_array = PointSensorArray(positions,
+        sens_array = PointSensorArray(sensor_array_data,
                                       t_field,
-                                      sample_times,
                                       descriptor)
 
         return sens_array
 
     @staticmethod
-    def basic_thermocouple_array(sim_data: mh.SimData,
-                                 positions: np.ndarray,
+    def thermocouples_basic_errs(sim_data: mh.SimData,
+                                 sensor_array_data: SensorData,
                                  field_name: str = "temperature",
                                  spat_dims: int = 3,
-                                 sample_times: np.ndarray | None = None,
                                  errs_pc: float = 1.0
                                  ) -> PointSensorArray:
 
-        sens_array = SensorArrayFactory.plain_thermocouple_array(sim_data,
-                                                                 positions,
-                                                                 field_name,
-                                                                 spat_dims,
-                                                                 sample_times)
+        sens_array = SensorArrayFactory.thermocouples_no_errs(sim_data,
+                                                              sensor_array_data,
+                                                              field_name,
+                                                              spat_dims)
 
         sens_array = init_basic_errs(sens_array,errs_pc)
 
@@ -62,16 +58,15 @@ class SensorArrayFactory:
         dep_sys_err2 = SysErrSaturation(meas_min=0.0,meas_max=1000.0)
         dep_sys_err_int = ErrorIntegrator([dep_sys_err1,dep_sys_err2],
                                             sens_array.get_measurement_shape())
-        sens_array.set_dep_sys_err_integrator(dep_sys_err_int)
+        sens_array.set_systematic_err_integrator_dependent(dep_sys_err_int)
 
         return sens_array
 
     @staticmethod
-    def plain_dispsens_array(sim_data: mh.SimData,
-                            positions: np.ndarray,
+    def disp_sensors_no_errs(sim_data: mh.SimData,
+                            sensor_array_data: SensorData,
                             field_name: str = "displacement",
                             spat_dims: int = 3,
-                            sample_times: np.ndarray | None = None
                             ) -> PointSensorArray:
 
         descriptor = SensorDescriptorFactory.displacement_descriptor()
@@ -81,38 +76,34 @@ class SensorArrayFactory:
                                  ('disp_x','disp_y'),
                                  spat_dims)
 
-        sens_array = PointSensorArray(positions,
+        sens_array = PointSensorArray(sensor_array_data,
                                       disp_field,
-                                      sample_times,
                                       descriptor)
         return sens_array
 
 
     @staticmethod
-    def basic_dispsens_array(sim_data: mh.SimData,
-                            positions: np.ndarray,
-                            field_name: str = "displacement",
-                            spat_dims: int = 3,
-                            sample_times: np.ndarray | None = None,
-                            errs_pc: float = 1
-                            ) -> PointSensorArray:
+    def disp_sensors_basic_errs(sim_data: mh.SimData,
+                                sensor_array_data: SensorData,
+                                field_name: str = "displacement",
+                                spat_dims: int = 3,
+                                errs_pc: float = 1
+                                ) -> PointSensorArray:
 
-        sens_array = SensorArrayFactory.plain_dispsens_array(sim_data,
-                                                            positions,
+        sens_array = SensorArrayFactory.disp_sensors_no_errs(sim_data,
+                                                            sensor_array_data,
                                                             field_name,
-                                                            spat_dims,
-                                                            sample_times)
+                                                            spat_dims)
         sens_array = init_basic_errs(sens_array,errs_pc)
 
         return sens_array
 
     @staticmethod
-    def plain_straingauge_array(sim_data: mh.SimData,
-                                positions: np.ndarray,
-                                field_name: str = "strain",
-                                spat_dims: int = 3,
-                                sample_times: np.ndarray | None = None
-                                ) -> PointSensorArray:
+    def strain_gauges_no_errs(sim_data: mh.SimData,
+                              sensor_array_data: SensorData,
+                              field_name: str = "strain",
+                              spat_dims: int = 3
+                              ) -> PointSensorArray:
         descriptor = SensorDescriptorFactory.strain_descriptor()
 
         if spat_dims == 2:
@@ -128,41 +119,39 @@ class SensorArrayFactory:
                                  dev_components,
                                  spat_dims)
 
-        sens_array = PointSensorArray(positions,
+        sens_array = PointSensorArray(sensor_array_data,
                                       strain_field,
-                                      sample_times,
                                       descriptor)
 
         return sens_array
 
 
     @staticmethod
-    def basic_straingauge_array(sim_data: mh.SimData,
-                                positions: np.ndarray,
+    def strain_gauges_basic_errs(sim_data: mh.SimData,
+                                sensor_array_data: SensorData,
                                 field_name: str = "strain",
                                 spat_dims: int = 3,
-                                sample_times: np.ndarray | None = None,
                                 errs_pc: float = 1.0
                                 ) -> PointSensorArray:
 
-        sens_array = SensorArrayFactory.plain_straingauge_array(sim_data,
-                                                                positions,
-                                                                field_name,
-                                                                spat_dims,
-                                                                sample_times)
+        sens_array = SensorArrayFactory.strain_gauges_no_errs(sim_data,
+                                                              sensor_array_data,
+                                                              field_name,
+                                                              spat_dims)
         sens_array = init_basic_errs(sens_array,errs_pc)
 
         return sens_array
 
 
-def init_basic_errs(sens_array: PointSensorArray, errs_pc: float = 1.0) -> PointSensorArray:
+def init_basic_errs(sens_array: PointSensorArray,
+                    errs_pc: float = 1.0) -> PointSensorArray:
 
     indep_sys_err_int = ErrorIntegrator([SysErrUniformPercent(-errs_pc,errs_pc)],
                                     sens_array.get_measurement_shape())
-    sens_array.set_indep_sys_err_integrator(indep_sys_err_int)
+    sens_array.set_systematic_err_integrator_independent(indep_sys_err_int)
 
     rand_err_int = ErrorIntegrator([RandErrNormPercent(errs_pc)],
                                         sens_array.get_measurement_shape())
-    sens_array.set_rand_err_integrator(rand_err_int)
+    sens_array.set_random_err_integrator(rand_err_int)
 
     return sens_array
