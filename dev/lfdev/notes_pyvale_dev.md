@@ -1,72 +1,74 @@
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
+NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
 
-**General**
+- TODO: EXAMPLES
+    - Example showing sensor orientation
+    - Example showing area averaging as ground truth
+
 - TODO: Experiment generator/ runner
-    - NOTE: assume user provides `mooseherder` like array of simulations
-    - TODO: Create example connecting to `mooseherder`
+    - TODO: Allow user to extract all sources of error for each experiment, need to dig out of `ErrorIntegrator`
+    - TODO: Create example connecting to `mooseherder`, assume user provides `mooseherder` like array of simulations
+    - TODO: Increase plotting capabilities to compare over simulations as well as all sensors on experiments
+
+- TODO: visualisation tools for:
+    - TODO: presentation animations - create pyvista animation synced to matplotlib traces
+    - TODO: visualisation of perturbed time / sensor locations
+    - TODO: experiment - allow extraction of different conditions for comparison plots
+
 - TODO: Calibration errors
-- TODO: function based temporal drift
-- Field based errors:
-    - DONE: Positioning error
-    - TODO: Temporal position error allow drift of +/- X s
+    - Need to define a ground-truth calibration function
+    - Need to define an assumed calibration function
+    - Error is the difference?
+
+- TODO: Field based errors:
+    - TODO: vector/tensor rotations
     - HALF DONE: Spatial averaging error
         - Set an integration area
         - Set a weighting function
+    - TODO: combine spatial averaging with rotation errors
+        - Need to rotate (not transform!) sensor local coords befor eval
     - TODO: Temporal averaging error
         - Set an integration time
         - Set a weighting function
-    - TODO Allow Gauss Quad as Truth with other as Err
-    - TODO Allow Gauss Quad with position and temporal drift
+    - **TODO Allow Gauss Quad as Truth with other as Err**
+    - TODO: Allow Gauss Quad with position and temporal drift
+
 - IMAGE DEF: allow upsampled image to be generated once and retained.
 
+- CAMERAS:
+    - Need CameraData class
+    - Create 'CameraBasic' class or Simple?
+    - Create 'CameraRayTracing' class
+    - Create 'CameraIRThermo'
+    - Create 'CameraDIC2D'
+    - Create 'CameraDICStereo'
+    - Allow field class to do a single field rotation into camera coords on creation and store this
+    - Allow all sensors to have
+
+- TESTING:
+    - Need to check rotations are consistent
 
 Gauss Quadrature for the Unit Disc
 http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubature-formulas-for-the-unit-disk/
 
-**Examples**
-- Positioning error, spatial integration error
-- Spatial integration truth
-- Change examples to use simcases:
-    - Thermal 2D, Transient = case13 - plate / moose only
-    - Thermal 3D, Transient = case15 - monoblock+gmsh - use 16 with mech data as well
-    - Mechanical 2D, Transient = case17 - plate with hole 2D+gmsh
-    - Mechanical 3D = **TODO**
-    - Thermomechanical 3D = case16 - monoblock+gmsh
-
-**Systematic error handling**
-- Add spatial and temporal averaging errors:
-    - Based on the `Field` object
-- Add positioning errors to the sensors
-    - Based on the `Field` object
-- Add calibration error
-
-**Future: Experiment Simulation & Workflow**
-- Future: Allow user to specify sideset to locate sensors
-- Need an simulated experiment generator with mooseherder
-    - Build monoblock models of increasing fidelity (thermal -> thermo-mech, single value mat props -> temp dependence)
-    - Monte Carlo or Latin Hypercube sampling
-    - Experiments that just perturb one parameter
-        - Material Properties
-        - Load and BCs
-        - Geometry
-    - Look at sensitivity maps? - how does this work with a geometric perturbation
-    - Start with the purely thermal case with thermocouples
-
-
 ## Python coding pinciples:
-- Use git, vscode and pylint (PEP8)
-- Use descriptive variable names, no single letter variables
+- Use git and the Ruff linter
+- Use descriptive variable names, no single letter variables (double letters for iterators in numpy style are ok)
 - Avoid comments unless needed to explain something weird (like 1 vs 0 indexing) – the code and variable names should speak for themselves
-- Work in your own 'feature' branch, pull to 'dev' - don't push to main!
+- Work in your own 'feature' branch, pull to 'dev' - don't push to main (at least it should be protected)!
 - Type hint everything: e.g. 'def add_ints(a: int, b: int) -> int:'
 - Default mutable data types to None
-- Numpy is your friend - no for/while loops!
-- No inheritance unless it is an interface / ABC - use composition
-- Use a mixture of functions and classes with methods where they make sense
+- Numpy is your friend - avoid for/while loops
+- No inheritance unless it is an interface (python ABC or protocol) - use composition / dependency injection
+- Only have one layer of abstraction - don't inherit from multiple layers of interfaces and don't use mix ins.
+- Only use abstraction/interfaces when if/else or switch has at least 3 layers and/or becomes annoying
+- Use a mixture of plain functions and classes with methods where and when they make sense
+- Avoid decorators unless absolutely necessary
 - Write good docstrings when the code is ready for sharing – use auto docstring to help.
-- Use code reviews to help each other but be nice!
+- Write some good quickstart examples so people can easily use your code
+- Use code reviews to help each other and be nice / constructive as we are not all software engineers!
 
 ## `pyvale` architecture
 - Module: `ExperimentWorkflow`
@@ -106,10 +108,7 @@ http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubatur
     - Based on Adel's thermocouple optimiser
     - Optimiser wraps `pymoo`
 
-
-
 ## Sensors
-
 A sensor should have:
 - A spatial measurement geometry: point, line, area, volume
 - A measurement position, centroid of the measurement geometry

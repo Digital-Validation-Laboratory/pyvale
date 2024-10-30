@@ -2,19 +2,32 @@ from scipy.spatial.transform import Rotation as R
 import numpy as np
 
 def main() -> None:
-    v0 = np.array((1,0,0))
-    v1 = np.array((1,1,1))
+    v0 = np.array(((1.0,0.0,0.0),
+                   (0.0,1.0,0.0),
+                   (1.0,0.0,0.0),
+                   (0.0,1.0,0.0),
+                   (0.0,0.0,1.0)))
+    v0 = v0.T
 
-    print(v0)
-    print(v1)
+    r0 = R.from_euler("zyx", [30, 0, 0], degrees=True)
+    m0 = r0.as_matrix()
 
-    r0 = R.identity()
-    r1 = R.from_euler("ZYX", [90, 0, 0], degrees=True)  # intrinsic
-    r2 = R.from_euler("zyx", [90, 0, 0], degrees=True)  # extrinsic
-
-    v0_r = r2.apply(v0)
+    v0_r = r0.apply(v0.T)
     print(v0)
     print(v0_r)
+
+    # NOTE:
+    # Rotation = object rotates coords fixed, sin neg row 1
+    # Transformation = coords rotate object fixed, win neg row 2, transpose scipy
+    print()
+    print(m0.T)
+    print()
+
+    print(f"{m0.shape} x {v0.shape}")
+
+    print(np.matmul(m0,v0).shape)
+    print(np.matmul(m0,v0))
+    print()
 
 
 if __name__ == '__main__':

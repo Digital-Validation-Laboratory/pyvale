@@ -2,19 +2,17 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Computer Aided Validation Team
+Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 from abc import ABC, abstractmethod
 import numpy as np
+from scipy.spatial.transform import Rotation
 import pyvista as pv
 from pyvista import CellType
 
 import mooseherder as mh
 
-
-class FieldError(Exception):
-    pass
 
 class IField(ABC):
     @abstractmethod
@@ -39,8 +37,9 @@ class IField(ABC):
 
     @abstractmethod
     def sample_field(self,
-                    sample_points: np.ndarray,
-                    sample_times: np.ndarray | None = None
+                    points: np.ndarray,
+                    times: np.ndarray | None = None,
+                    angles: tuple[Rotation,...] | None = None,
                     ) -> np.ndarray:
         pass
 
@@ -52,9 +51,6 @@ def conv_simdata_to_pyvista(sim_data: mh.SimData,
 
     flat_connect = np.array([],dtype=np.int64)
     cell_types = np.array([],dtype=np.int64)
-
-    if sim_data.connect is None:
-        raise FieldError("SimData does not have a connectivity table, unable to convert to pyvista")
 
     for cc in sim_data.connect:
         # NOTE: need the -1 here to make element numbers 0 indexed!
@@ -105,16 +101,15 @@ def get_cell_type(nodes_per_elem: int, spat_dim: int) -> int:
 def sample_pyvista(components: tuple,
                 pyvista_grid: pv.UnstructuredGrid,
                 time_steps: np.ndarray,
-                sample_points: np.ndarray,
-                sample_times: np.ndarray | None = None
+                points: np.ndarray,
+                times: np.ndarray | None = None
                 ) -> np.ndarray:
 
-    pv_points = pv.PolyData(sample_points)
+    # Use pyvista and shape functions for spatial interpolation at sim times
+    pv_points = pv.PolyData(points)
     sample_data = pv_points.sample(pyvista_grid)
 
-    if sample_data is None:
-        raise(FieldError("Sampling simulation data at sensors locations with pyvista failed."))
-
+    # Push into the measurement array, shape=(n_sensors,n_comps,n_time_steps)
     n_comps = len(components)
     (n_sensors,n_time_steps) = np.array(sample_data[components[0]]).shape
     sample_at_sim_time = np.empty((n_sensors,n_comps,n_time_steps))
@@ -122,12 +117,15 @@ def sample_pyvista(components: tuple,
     for ii,cc in enumerate(components):
         sample_at_sim_time[:,ii,:] = np.array(sample_data[cc])
 
-    if sample_times is None:
+
+    # If sensor times are sim times then we return
+    if times is None:
         return sample_at_sim_time
 
-    sample_time_interp = lambda x: np.interp(sample_times,time_steps,x) # type: ignore
+    # Use linear interpolation to extract sensor times
+    sample_time_interp = lambda x: np.interp(times,time_steps,x) # type: ignore
 
-    n_time_steps = sample_times.shape[0]
+    n_time_steps = times.shape[0]
     sample_at_spec_time = np.empty((n_sensors,n_comps,n_time_steps))
 
     for ii,cc in enumerate(components):

@@ -1,23 +1,20 @@
 '''
 ================================================================================
-Analytic test case data - linear
+Example: thermo-mechanical multiphysics on a divertor armour heatsink
 
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Computer Aided Validation Team
+Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
-from dataclasses import dataclass
 from pathlib import Path
-import numpy as np
 import matplotlib.pyplot as plt
-import pyvale
 import mooseherder as mh
-
+import pyvale
 
 def main() -> None:
     #===========================================================================
-    # LOAD SIMULATION(S)
+    # Load Simulations as mooseherder.SimData objects
     base_path = Path("src/data")
     data_paths = [base_path / 'case18_1_out.e',
                   base_path / 'case18_2_out.e',
@@ -31,10 +28,8 @@ def main() -> None:
         sim_list.append(sim_data)
 
     #===========================================================================
-    # CREATE SENSOR ARRAYS
+    # Create pyvale sensor arrays for thermal and mechanical data
     sim_data = sim_list[0]
-    print(sim_data.node_vars["temperature"])
-    print(sim_data.coords)
 
     n_sens = (4,1,1)
     x_lims = (0.0,100.0)
@@ -62,29 +57,38 @@ def main() -> None:
 
     sensor_arrays = [tc_array,sg_array]
 
-    measurements = tc_array.get_measurements()
-    print(f'\nMeasurements for last sensor:\n{measurements[-1,0,:]}\n')
-
     #===========================================================================
-    # CREATE & RUN THE SIMULATED EXPERIMENT
+    # Create and run the simulated experiment
     exp_sim = pyvale.ExperimentSimulator(sim_list,
-                                  sensor_arrays,
-                                  num_exp_per_sim=1000)
+                                        sensor_arrays,
+                                        num_exp_per_sim=1000)
 
     exp_data = exp_sim.run_experiments()
     exp_stats = exp_sim.calc_stats()
 
-
     #===========================================================================
-    # ANALYSE EXPERIMENTAL DATA
-    # Fix Sim, Fix Sensor, Stats over Exp
-
     print(80*"=")
+    print("exp_data and exp_stats are lists where the index is the sensor array")
+    print("position in the list as field components are not consistent dims.\n")
+
+    print(80*"-")
+    print("Thermal sensor array @ exp_data[0]")
+    print(80*"-")
+    print("shape=(n_sims,n_exps,n_sensors,n_field_comps,n_time_steps)")
     print(f"{exp_data[0].shape=}")
+    print()
+    print("Stats are calculated over all experiments (axis=1)")
+    print("shape=(n_sims,n_sensors,n_field_comps,n_time_steps)")
     print(f"{exp_stats[0].max.shape=}")
+    print()
+    print(80*"-")
+    print("Mechanical sensor array @ exp_data[1]")
+    print(80*"-")
+    print("shape=(n_sims,n_exps,n_sensors,n_field_comps,n_time_steps)")
     print(f"{exp_data[1].shape=}")
+    print()
+    print("shape=(n_sims,n_sensors,n_field_comps,n_time_steps)")
     print(f"{exp_stats[1].max.shape=}")
-    print(exp_stats[0].max[0,-1,0,:])
     print(80*"=")
 
     #===========================================================================
@@ -93,6 +97,11 @@ def main() -> None:
                                       component="temperature",
                                       sens_array_num=0,
                                       sim_num=0)
+
+    (fig,ax) = pyvale.plot_exp_traces(exp_sim,
+                                    component="strain_yy",
+                                    sens_array_num=1,
+                                    sim_num=2)
     plt.show()
 
 

@@ -2,7 +2,7 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Computer Aided Validation Team
+Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 from typing import Callable
@@ -32,15 +32,15 @@ class Quadrature2D(ISpatialIntegrator):
                  gauss_weight_func: Callable,
                  field: IField,
                  cent_pos: np.ndarray,
-                 dims: np.ndarray,
+                 area_dims: np.ndarray,
                  sample_times: np.ndarray | None = None) -> None:
 
         self._field = field
         self._cent_pos = cent_pos
-        self._dims = dims
+        self._area_dims = area_dims
         self._sample_times = sample_times
 
-        self._area = self._dims[0]*self._dims[1]
+        self._area = self._area_dims[0]*self._area_dims[1]
 
         self._n_gauss_pts = gauss_pt_offsets.shape[0]
         self._gauss_pt_offsets = gauss_pt_offsets
@@ -94,56 +94,4 @@ class Quadrature2D(ISpatialIntegrator):
 
     def get_averages(self) -> np.ndarray:
         return (1/self._area)*self._integrals
-
-
-class QuadratureFactory:
-
-    @staticmethod
-    def quad_2d_4points(field: IField,
-                        cent_pos: np.ndarray,
-                        dims: np.ndarray,
-                        sample_times: np.ndarray | None = None) -> Quadrature2D:
-
-        gauss_pt_offsets = dims * 1/np.sqrt(3)* np.array([[-1,-1,0],
-                                                        [-1,1,0],
-                                                        [1,-1,0],
-                                                        [1,1,0]])
-
-        gauss_weight_func = create_gauss_weights_2d_4pts
-
-        quadrature = Quadrature2D(gauss_pt_offsets,
-                            gauss_weight_func,
-                            field,
-                            cent_pos,
-                            dims,
-                            sample_times)
-        return quadrature
-
-    @staticmethod
-    def quad_2d_9points(field: IField,
-                        cent_pos: np.ndarray,
-                        dims: np.ndarray,
-                        sample_times: np.ndarray | None = None) -> Quadrature2D:
-
-
-        gauss_pt_offsets = dims * np.array([[-np.sqrt(0.6),-np.sqrt(0.6),0],
-                                            [-np.sqrt(0.6),np.sqrt(0.6),0],
-                                            [np.sqrt(0.6),-np.sqrt(0.6),0],
-                                            [np.sqrt(0.6),np.sqrt(0.6),0],
-                                            [-np.sqrt(0.6),0,0],
-                                            [0,-np.sqrt(0.6),0],
-                                            [0,np.sqrt(0.6),0],
-                                            [np.sqrt(0.6),0,0],
-                                            [0,0,0]])
-
-        gauss_weight_func = create_gauss_weights_2d_9pts
-
-        quadrature = Quadrature2D(gauss_pt_offsets,
-                            gauss_weight_func,
-                            field,
-                            cent_pos,
-                            dims,
-                            sample_times)
-        return quadrature
-
 

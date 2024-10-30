@@ -2,7 +2,7 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Computer Aided Validation Team
+Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 
@@ -14,9 +14,12 @@ from pyvale.physics.field import *
 from pyvale.physics.scalarfield import *
 from pyvale.physics.vectorfield import *
 from pyvale.physics.tensorfield import *
+from pyvale.physics.coordtransform import *
 
 from pyvale.numerical.spatialintegrator import *
 from pyvale.numerical.quadratureintegrator import *
+from pyvale.numerical.rectangleintegrator import *
+from pyvale.numerical.integratorfactory import *
 
 from pyvale.sensors.sensordescriptor import *
 from pyvale.sensors.sensortools import *
@@ -28,6 +31,8 @@ from pyvale.uncertainty.randerrors import *
 from pyvale.uncertainty.syserrors import *
 from pyvale.uncertainty.depsyserrors import *
 from pyvale.uncertainty.fieldsyserrors import *
+from pyvale.uncertainty.driftcalculator import *
+from pyvale.uncertainty.randomgenerator import *
 
 from pyvale.visualisation.plotopts import *
 from pyvale.visualisation.plotters import *

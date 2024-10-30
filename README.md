@@ -36,9 +36,11 @@ pip install -e .
 The examples folder includes a sequence of examples using `pyvale`.
 
 ## Contributors
-The Computer Aided Validation Team at UKAEA:
+The Digital Validation Team at UKAEA:
 - Lloyd Fletcher, UK Atomic Energy Authority
 - Adel Tayeb, UK Atomic Energy Authority
-- Michael Atkinson, UK Atomic Energy Authority
 - Alex Marsh, UK Atomic Energy Authority
+- Rory Spencer, UK Atomic Energy Authority
+- Michael Atkinson, UK Atomic Energy Authority
+
 

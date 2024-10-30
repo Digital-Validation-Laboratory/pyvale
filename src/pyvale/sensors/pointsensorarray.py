@@ -2,23 +2,28 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Computer Aided Validation Team
+Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 import numpy as np
+from scipy.spatial.transform import Rotation
 import pyvista as pv
 
 from pyvale.physics.field import IField
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
 from pyvale.sensors.sensordescriptor import SensorDescriptor
+from pyvale.numerical.spatialintegrator import ISpatialIntegrator
 
 
-class PointSensorArray():
+class PointSensorArray:
+
     def __init__(self,
                  positions: np.ndarray,
                  field: IField,
                  sample_times: np.ndarray | None = None,
-                 descriptor: SensorDescriptor | None = None
+                 descriptor: SensorDescriptor | None = None,
+                 area_avg: ISpatialIntegrator | None = None,
+                 angles: tuple[Rotation,...] | None = None,
                  ) -> None:
 
         self.positions = positions
@@ -30,12 +35,16 @@ class PointSensorArray():
         if descriptor is not None:
             self.descriptor = descriptor
 
+        self.angles = angles
+
+        self._area_avg = area_avg
+
         self._truth = None
         self._measurements = None
 
-        self._pre_syserr_integ = None
-        self._randerr_integ = None
-        self._post_syserr_integ = None
+        self._pre_syserr_integrator = None
+        self._randerr_integrator = None
+        self._post_syserr_integrator = None
 
     #---------------------------------------------------------------------------
     # accessors
@@ -56,8 +65,13 @@ class PointSensorArray():
     #---------------------------------------------------------------------------
     # truth calculation from simulation
     def calc_truth_values(self) -> np.ndarray:
-        return self.field.sample_field(self.positions,
-                                        self._sample_times)
+        if self._area_avg is None:
+            return self.field.sample_field(self.positions,
+                                           self._sample_times,
+                                           self.angles)
+
+        return self._area_avg.calc_averages(self.positions,
+                                            self._sample_times)
 
     def get_truth_values(self) -> np.ndarray:
         if self._truth is None:
@@ -69,65 +83,65 @@ class PointSensorArray():
     # pre / independent / truth-based  systematic errors
     def set_indep_sys_err_integrator(self,
                                err_int: ErrorIntegrator) -> None:
-        self._pre_syserr_integ = err_int
+        self._pre_syserr_integrator = err_int
 
 
     def _calc_pre_systematic_errs(self) -> np.ndarray | None:
-        if self._pre_syserr_integ is None:
+        if self._pre_syserr_integrator is None:
             return None
 
-        self._pre_syserr_integ.calc_errs_static(self.get_truth_values())
-        return self._pre_syserr_integ.get_errs_tot()
+        self._pre_syserr_integrator.calc_errs_static(self.get_truth_values())
+        return self._pre_syserr_integrator.get_errs_tot()
 
 
     def get_pre_systematic_errs(self) -> np.ndarray | None:
-        if self._pre_syserr_integ is None:
+        if self._pre_syserr_integrator is None:
             return None
 
-        return self._pre_syserr_integ.get_errs_tot()
+        return self._pre_syserr_integrator.get_errs_tot()
 
     #---------------------------------------------------------------------------
     # random errors
     def set_rand_err_integrator(self,
                                 err_int: ErrorIntegrator) -> None:
-        self._randerr_integ = err_int
+        self._randerr_integrator = err_int
 
 
     def _calc_random_errs(self)-> np.ndarray | None:
-        if self._randerr_integ is None:
+        if self._randerr_integrator is None:
             return None
 
-        self._randerr_integ.calc_errs_static(self.get_truth_values())
-        return self._randerr_integ.get_errs_tot()
+        self._randerr_integrator.calc_errs_static(self.get_truth_values())
+        return self._randerr_integrator.get_errs_tot()
 
 
     def get_random_errs(self) -> np.ndarray | None:
-        if self._randerr_integ is None:
+        if self._randerr_integrator is None:
             return None
 
-        return self._randerr_integ.get_errs_tot()
+        return self._randerr_integrator.get_errs_tot()
 
     #---------------------------------------------------------------------------
     # post / coupled / measurement based systematic errors
     def set_dep_sys_err_integrator(self,
                                err_int: ErrorIntegrator) -> None:
-        self._post_syserr_integ = err_int
+        self._post_syserr_integrator = err_int
 
 
     def _calc_dep_systematic_errs(self, measurements: np.ndarray
                                    ) -> np.ndarray | None:
-        if self._post_syserr_integ is None:
+        if self._post_syserr_integrator is None:
             return None
 
-        self._post_syserr_integ.calc_errs_recursive(measurements)
-        return self._post_syserr_integ.get_errs_tot()
+        self._post_syserr_integrator.calc_errs_recursive(measurements)
+        return self._post_syserr_integrator.get_errs_tot()
 
 
     def get_dep_systematic_errs(self) -> np.ndarray | None:
-        if self._post_syserr_integ is None:
+        if self._post_syserr_integrator is None:
             return None
 
-        return self._post_syserr_integ.get_errs_tot()
+        return self._post_syserr_integrator.get_errs_tot()
 
     #---------------------------------------------------------------------------
     # measurements

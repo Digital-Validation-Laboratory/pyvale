@@ -2,16 +2,15 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Computer Aided Validation Team
+Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 import numpy as np
 import pyvista as pv
-
+from scipy.spatial.transform import Rotation
 import mooseherder as mh
 
 from pyvale.physics.field import (IField,
-                                  FieldError,
                                   conv_simdata_to_pyvista,
                                   sample_pyvista)
 
@@ -33,7 +32,6 @@ class VectorField(IField):
 
     def set_sim_data(self, sim_data: mh.SimData) -> None:
         self._time_steps = sim_data.time
-        self._time_steps = sim_data.time
         self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
                                                     self._components,
                                                     self._spat_dim)
@@ -51,13 +49,34 @@ class VectorField(IField):
         return self._components.index(comp)
 
     def sample_field(self,
-                sample_points: np.ndarray,
-                sample_times: np.ndarray | None = None
-                ) -> np.ndarray:
+                    points: np.ndarray,
+                    times: np.ndarray | None = None,
+                    angles: tuple[Rotation,...] | None = None,
+                    ) -> np.ndarray:
 
-        return sample_pyvista(self._components,
+        field_data = sample_pyvista(self._components,
                                 self._pyvista_grid,
                                 self._time_steps,
-                                sample_points,
-                                sample_times)
+                                points,
+                                times)
+
+        if angles is None:
+            return field_data
+
+        # NOTE:
+        # ROTATION= object rotates with coords fixed
+        # For Z rotation: sin negative in row 1.
+        # TRANSFORMATION= coords rotate with object fixed
+        # For Z transformation: sin negative in row 2, transpose scipy mat.
+
+        #  Need to rotate each sensor using individual rotation = loop :(
+        for ii,rr in enumerate(angles):
+            rmat = rr.as_matrix().T
+
+            if self._spat_dim == 2:
+                rmat = rmat[:2,:2]
+
+            field_data[ii,:,:] = np.matmul(rmat,field_data[ii,:,:])
+
+        return field_data
 

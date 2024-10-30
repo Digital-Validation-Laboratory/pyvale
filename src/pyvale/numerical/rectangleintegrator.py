@@ -2,7 +2,7 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Computer Aided Validation Team
+Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 import numpy as np
@@ -76,63 +76,3 @@ class Rectangle2D(ISpatialIntegrator):
         return (1/self._area_tot)*self._integrals
 
 
-class RectangleIntegratorFactory:
-
-    @staticmethod
-    def rect_2d_1pt(field: IField,
-                    cent_pos: np.ndarray,
-                    dims: np.ndarray,
-                    sample_times: np.ndarray | None = None) -> Rectangle2D:
-
-        int_pt_offsets = np.array([[0,0,0],])
-
-        rect_int = Rectangle2D(int_pt_offsets,
-                               field,
-                               cent_pos,
-                               dims,
-                               sample_times)
-
-        return rect_int
-
-    @staticmethod
-    def rect_2d_4pt(field: IField,
-                    cent_pos: np.ndarray,
-                    dims: np.ndarray,
-                    sample_times: np.ndarray | None = None) -> Rectangle2D:
-
-        int_pt_offsets = dims * np.array([[-0.5,-0.5,0],
-                                          [-0.5,0.5,0],
-                                          [0.5,-0.5,0],
-                                          [0.5,0.5,0],])
-
-        rect_int = Rectangle2D(int_pt_offsets,
-                               field,
-                               cent_pos,
-                               dims,
-                               sample_times)
-
-        return rect_int
-
-    @staticmethod
-    def rect_2d_9pt(field: IField,
-                    cent_pos: np.ndarray,
-                    dims: np.ndarray,
-                    sample_times: np.ndarray | None = None) -> Rectangle2D:
-
-        int_pt_offsets = dims * np.array([[-1/3,-1/3,0],
-                                          [-1/3,0,0],
-                                          [-1/3,1/3,0],
-                                          [0,-1/3,0],
-                                          [0,0,0],
-                                          [0,1/3,0],
-                                          [1/3,-1/3,0],
-                                          [1/3,0,0],
-                                          [1/3,1/3,0]])
-
-        rect_int = Rectangle2D(int_pt_offsets,
-                               field,
-                               cent_pos,
-                               dims,
-                               sample_times)
-
-        return rect_int

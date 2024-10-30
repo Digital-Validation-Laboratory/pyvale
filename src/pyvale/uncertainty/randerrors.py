@@ -2,12 +2,13 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Computer Aided Validation Team
+Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 import numpy as np
 
-from pyvale.uncertainty.errorcalculator import IErrCalculator
+from pyvale.uncertainty.errorcalculator import IErrCalculator, ErrorData
+from pyvale.uncertainty.randomgenerator import IGeneratorRandom
 
 
 class RandErrUniform(IErrCalculator):
@@ -20,12 +21,14 @@ class RandErrUniform(IErrCalculator):
         self._high = high
         self._rng = np.random.default_rng(seed)
 
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
+    def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
+
         rand_errs = self._rng.uniform(low=self._low,
                                     high=self._high,
                                     size=err_basis.shape)
-        return rand_errs
+
+        err_data = ErrorData(error_array=rand_errs)
+        return err_data
 
 
 class RandErrUnifPercent(IErrCalculator):
@@ -40,14 +43,14 @@ class RandErrUnifPercent(IErrCalculator):
 
 
     def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
+                  err_basis: np.ndarray) -> ErrorData:
 
         norm_rand = self._rng.uniform(low=self._low/100,
                                     high=self._high/100,
                                     size=err_basis.shape)
 
-        rand_errs = err_basis*norm_rand
-        return rand_errs
+        err_data = ErrorData(error_array=err_basis*norm_rand)
+        return err_data
 
 
 class RandErrNormal(IErrCalculator):
@@ -59,11 +62,13 @@ class RandErrNormal(IErrCalculator):
         self._rng = np.random.default_rng(seed)
 
     def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
+                  err_basis: np.ndarray) -> ErrorData:
         rand_errs = self._rng.normal(loc=0.0,
                                     scale=self._std,
                                     size=err_basis.shape)
-        return rand_errs
+
+        err_data = ErrorData(error_array=rand_errs)
+        return err_data
 
 
 class RandErrNormPercent(IErrCalculator):
@@ -76,11 +81,25 @@ class RandErrNormPercent(IErrCalculator):
 
 
     def calc_errs(self,
-                  err_basis: np.ndarray) -> np.ndarray:
+                  err_basis: np.ndarray) -> ErrorData:
 
         norm_rand = self._rng.normal(loc=0.0,
                                     scale=1.0,
                                     size=err_basis.shape)
 
-        rand_errs = err_basis*self._std*norm_rand
-        return rand_errs
+        err_data = ErrorData(error_array=err_basis*self._std*norm_rand)
+        return err_data
+
+class RandErrGenerator(IErrCalculator):
+
+    def __init__(self,
+                 generator: IGeneratorRandom) -> None:
+        self._generator = generator
+
+    def calc_errs(self,
+                  err_basis: np.ndarray) -> ErrorData:
+
+        rand_errs = self._generator.generate(size=err_basis.shape)
+
+        err_data = ErrorData(error_array=rand_errs)
+        return err_data

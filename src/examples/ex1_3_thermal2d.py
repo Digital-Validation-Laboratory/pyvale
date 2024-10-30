@@ -1,10 +1,10 @@
 '''
 ================================================================================
-example: thermocouples on a 2d plate
+Example: thermocouples on a 2d plate
 
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Computer Aided Validation Team
+Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 from pathlib import Path
@@ -84,9 +84,9 @@ def main() -> None:
         indep_sys_err1 = pyvale.SysErrOffset(offset=-5.0)
         indep_sys_err2 = pyvale.SysErrUniform(low=-10.0,
                                             high=10.0)
-        indep_sys_err3 = pyvale.SysErrPointPosition(t_field,
+        indep_sys_err3 = pyvale.SysErrRandPosition(t_field,
                                             sens_pos,
-                                            (0.05,0.05,None),
+                                            (1.0,1.0,None),
                                             sample_times)
         indep_sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1,
                                                     indep_sys_err2,
