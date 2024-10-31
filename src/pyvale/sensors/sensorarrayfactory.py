@@ -51,15 +51,14 @@ class SensorArrayFactory:
                                                               field_name,
                                                               spat_dims)
 
-        sens_array = init_basic_errs(sens_array,errs_pc)
+        err_int = basic_err_integrator(sens_array.get_measurement_shape(),
+                                       errs_pc)
 
         # Normal thermcouple amp = 5mV / K
-        dep_sys_err1 = SysErrDigitisation(bits_per_unit=2**16/1000)
-        dep_sys_err2 = SysErrSaturation(meas_min=0.0,meas_max=1000.0)
-        dep_sys_err_int = ErrorIntegrator([dep_sys_err1,dep_sys_err2],
-                                            sens_array.get_measurement_shape())
-        sens_array.set_systematic_err_integrator_dependent(dep_sys_err_int)
+        err_int.err_chain.append(SysErrDigitisation(bits_per_unit=2**16/1000))
+        err_int.err_chain.append(SysErrSaturation(meas_min=0.0,meas_max=1000.0))
 
+        sens_array.set_error_integrator(err_int)
         return sens_array
 
     @staticmethod
@@ -94,7 +93,9 @@ class SensorArrayFactory:
                                                             sensor_array_data,
                                                             field_name,
                                                             spat_dims)
-        sens_array = init_basic_errs(sens_array,errs_pc)
+        err_int = basic_err_integrator(sens_array.get_measurement_shape(),
+                                       errs_pc)
+        sens_array.set_error_integrator(err_int)
 
         return sens_array
 
@@ -104,7 +105,7 @@ class SensorArrayFactory:
                               field_name: str = "strain",
                               spat_dims: int = 3
                               ) -> PointSensorArray:
-        descriptor = SensorDescriptorFactory.strain_descriptor()
+        descriptor = SensorDescriptorFactory.strain_descriptor(spat_dims)
 
         if spat_dims == 2:
             norm_components = ('strain_xx','strain_yy')
@@ -138,20 +139,18 @@ class SensorArrayFactory:
                                                               sensor_array_data,
                                                               field_name,
                                                               spat_dims)
-        sens_array = init_basic_errs(sens_array,errs_pc)
+
+        err_int = basic_err_integrator(sens_array.get_measurement_shape(),
+                                       errs_pc)
+        sens_array.set_error_integrator(err_int)
 
         return sens_array
 
 
-def init_basic_errs(sens_array: PointSensorArray,
-                    errs_pc: float = 1.0) -> PointSensorArray:
-
-    indep_sys_err_int = ErrorIntegrator([SysErrUniformPercent(-errs_pc,errs_pc)],
-                                    sens_array.get_measurement_shape())
-    sens_array.set_systematic_err_integrator_independent(indep_sys_err_int)
-
-    rand_err_int = ErrorIntegrator([RandErrNormPercent(errs_pc)],
-                                        sens_array.get_measurement_shape())
-    sens_array.set_random_err_integrator(rand_err_int)
-
-    return sens_array
+def basic_err_integrator(meas_shape: np.ndarray,
+                        errs_pc: float = 1.0) -> ErrorIntegrator:
+    err_chain = []
+    err_chain.append(SysErrUniformPercent(-errs_pc,errs_pc))
+    err_chain.append(RandErrNormPercent(errs_pc))
+    err_int = ErrorIntegrator(err_chain,meas_shape)
+    return err_int

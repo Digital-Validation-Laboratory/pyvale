@@ -51,15 +51,13 @@ def main() -> None:
                                               disp_field,
                                               descriptor)
 
-    indep_sys_err1 = pyvale.SysErrUniform(low=-0.01e-3,high=0.01e-3)
-    sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1],
-                                          disp_sens_array.get_measurement_shape())
-    disp_sens_array.set_systematic_err_integrator_independent(sys_err_int)
+    error_chain = []
+    error_chain.append(pyvale.SysErrUniform(low=-0.01e-3,high=0.01e-3))
+    error_chain.append(pyvale.RandErrNormal(std=0.01e-3))
+    error_int = pyvale.ErrorIntegrator(error_chain,
+                                       disp_sens_array.get_measurement_shape())
+    disp_sens_array.set_error_integrator(error_int)
 
-    rand_err1 = pyvale.RandErrNormal(std=0.01e-3)
-    rand_err_int = pyvale.ErrorIntegrator([rand_err1],
-                                            disp_sens_array.get_measurement_shape())
-    disp_sens_array.set_random_err_integrator(rand_err_int)
 
     plot_field = 'disp_x'
     if plot_field == 'disp_x':

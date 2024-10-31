@@ -27,6 +27,10 @@ def create_gauss_weights_2d_9pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
 
 
 class Quadrature2D(ISpatialAverager):
+    __slots__ = ("_field","_cent_pos","_area_dims","_sample_times","_area",
+                 "_n_gauss_pts","_gauss_pt_offsets","_gauss_weight_func",
+                 "_gauss_pts","_integrals")
+
     def __init__(self,
                  gauss_pt_offsets: np.ndarray,
                  gauss_weight_func: Callable,

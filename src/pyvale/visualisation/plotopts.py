@@ -9,7 +9,7 @@ from dataclasses import dataclass
 import numpy as np
 import matplotlib as plt
 
-@dataclass
+@dataclass(slots=True)
 class GeneralPlotOpts:
     """ Helper class to set properties in matplotlib for scaling to use in a
     journal article or report.
@@ -46,7 +46,7 @@ class GeneralPlotOpts:
     n_colors = len(plt.rcParams['axes.prop_cycle'].by_key()['color'])
 
 
-@dataclass
+@dataclass(slots=True)
 class SensorTraceOpts:
     legend: bool = True
 
@@ -63,7 +63,7 @@ class SensorTraceOpts:
     time_min_max: tuple[float,float] | None = None
 
 
-@dataclass
+@dataclass(slots=True)
 class ExpTraceOpts:
     legend: bool = True
 

@@ -20,6 +20,9 @@ from pyvale.uncertainty.randomgenerator import IGeneratorRandom
 
 
 class SysErrRandPosition(IErrCalculator):
+    __slots__ = ("_field","_samples_times","_err_calc","_sens_pos_original",
+                 "_sens_pos_perturbed","_rand_by_ax")
+
     def __init__(self,
                  field: IField,
                  sens_pos: np.ndarray,
@@ -63,6 +66,8 @@ class SysErrRandPosition(IErrCalculator):
 
 
 class SysErrSpatialAverage(IErrCalculator):
+    __slots__ = ("_field","_samples_times","_err_calc","_spatial_averager")
+
     def __init__(self,
                  field: IField,
                  spatial_averager: ISpatialAverager,
@@ -89,6 +94,9 @@ class SysErrSpatialAverage(IErrCalculator):
 
 
 class SysErrSpatialAverageRandPos(IErrCalculator):
+    __slots__ = ("_field","_samples_times","_err_calc","_sens_pos_original",
+                 "_sens_pos_perturbed","_rand_by_ax","_spatial_average")
+
     def __init__(self,
                  field: IField,
                  spatial_average: ISpatialAverager,
@@ -134,6 +142,9 @@ class SysErrSpatialAverageRandPos(IErrCalculator):
 
 
 class SysErrTimeRand(IErrCalculator):
+    __slots__ = ("_field","_samples_times","_err_calc","_rand_time",
+                 "_time_original","_time_perturbed")
+
     def __init__(self,
                 field: IField,
                 sens_pos: np.ndarray,
@@ -178,6 +189,9 @@ class SysErrTimeRand(IErrCalculator):
 
 
 class SysErrTimeDrift(IErrCalculator):
+    __slots__ = ("_field","_samples_times","_err_calc","_drift","_sens_pos",
+                 "_time_original","_time_perturbed")
+
     def __init__(self,
                  field: IField,
                  sens_pos: np.ndarray,
@@ -221,6 +235,10 @@ class SysErrTimeDrift(IErrCalculator):
 
 
 class SysErrAngleOffset(IErrCalculator):
+    __slots__ = ("_field","_samples_times","_err_calc","_sens_pos",
+                 "_sens_angles_original","_sens_angles_perturbed",
+                 "_offset_ang_zyx")
+
     def __init__(self,
                  field: IField,
                  sens_pos: np.ndarray,
@@ -268,6 +286,10 @@ class SysErrAngleOffset(IErrCalculator):
 
 
 class SysErrAngleRand(IErrCalculator):
+    __slots__ = ("_field","_samples_times","_err_calc","_sens_pos",
+                 "_sens_angles_original","_sens_angles_perturbed",
+                 "_rand_ang_zyx")
+
     def __init__(self,
                  field: IField,
                  sens_pos: np.ndarray,

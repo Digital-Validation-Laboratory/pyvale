@@ -16,6 +16,8 @@ class IGeneratorRandom(ABC):
 
 
 class GeneratorNormal(IGeneratorRandom):
+    __slots__ = ("_std","_mean","_rng")
+
     def __init__(self,
                  std: float = 1.0,
                  mean: float = 0.0,
@@ -32,6 +34,8 @@ class GeneratorNormal(IGeneratorRandom):
 
 
 class GeneratorLogNormal(IGeneratorRandom):
+    __slots__ = ("_std","_mean","_rng")
+
     def __init__(self,
                  std: float = 1.0,
                  mean: float = 0.0,
@@ -48,6 +52,8 @@ class GeneratorLogNormal(IGeneratorRandom):
 
 
 class GeneratorUniform(IGeneratorRandom):
+    __slots__ = ("_low","_high","_rng")
+
     def __init__(self,
                  low: float = -1.0,
                  high: float = 1.0,
@@ -64,6 +70,8 @@ class GeneratorUniform(IGeneratorRandom):
 
 
 class GeneratorExponential(IGeneratorRandom):
+    __slots__ = ("_scale","_rng")
+
     def __init__(self,
                  scale: float = 1.0,
                  seed: int | None = None) -> None:
@@ -77,6 +85,8 @@ class GeneratorExponential(IGeneratorRandom):
 
 
 class GeneratorChiSquare(IGeneratorRandom):
+    __slots__ = ("_dofs","_rng")
+
     def __init__(self,
                  dofs: float,
                  seed: int | None = None) -> None:
@@ -90,6 +100,8 @@ class GeneratorChiSquare(IGeneratorRandom):
 
 
 class GeneratorDirichlet(IGeneratorRandom):
+    __slots__ = ("_alpha","_rng")
+
     def __init__(self,
                  alpha: float,
                  seed: int | None = None) -> None:
@@ -102,6 +114,8 @@ class GeneratorDirichlet(IGeneratorRandom):
 
 
 class GeneratorF(IGeneratorRandom):
+    __slots__ = ("_dofs","_rng")
+
     def __init__(self,
                  dofs: float,
                  seed: int | None = None) -> None:
@@ -114,6 +128,8 @@ class GeneratorF(IGeneratorRandom):
 
 
 class GeneratorGamma(IGeneratorRandom):
+    __slots__ = ("_shape","_scale","_rng")
+
     def __init__(self,
                  shape: float,
                  scale: float = 1.0,
@@ -129,6 +145,8 @@ class GeneratorGamma(IGeneratorRandom):
 
 
 class GeneratorStudentT(IGeneratorRandom):
+    __slots__ = ("_dofs","_rng")
+
     def __init__(self,
                  dofs: float,
                  seed: int | None = None) -> None:
@@ -142,6 +160,8 @@ class GeneratorStudentT(IGeneratorRandom):
 
 
 class GeneratorBeta(IGeneratorRandom):
+    __slots__ = ("_a","_b","_rng")
+
     def __init__(self,
                  a: float,
                  b: float,
@@ -158,6 +178,8 @@ class GeneratorBeta(IGeneratorRandom):
 
 
 class GeneratorTriangular(IGeneratorRandom):
+    __slots__ = ("_left","_mode","_right","_rng")
+
     def __init__(self,
                  left: float = -1.0,
                  mode: float = 0.0,

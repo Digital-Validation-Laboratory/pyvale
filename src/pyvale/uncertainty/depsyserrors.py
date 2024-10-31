@@ -30,6 +30,8 @@ def _select_round_method(method: ERoundMethod) -> Callable:
 
 
 class SysErrRoundOff(IErrCalculator):
+    __slots__ = ("_base","_method","_err_calc")
+
     def __init__(self,
                  method: ERoundMethod = ERoundMethod.ROUND,
                  base: float = 1.0,
@@ -54,6 +56,8 @@ class SysErrRoundOff(IErrCalculator):
 
 
 class SysErrDigitisation(IErrCalculator):
+    __slots__ = ("_units_per_bit","_method","_err_calc")
+
     def __init__(self,
                  bits_per_unit: float,
                  method: ERoundMethod = ERoundMethod.ROUND,
@@ -79,6 +83,8 @@ class SysErrDigitisation(IErrCalculator):
 
 
 class SysErrSaturation(IErrCalculator):
+    __slots__ = ("_min","_max","_err_calc")
+
     def __init__(self,
                  meas_min: float,
                  meas_max: float,

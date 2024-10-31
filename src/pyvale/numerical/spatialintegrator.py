@@ -7,7 +7,6 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 import enum
 from abc import ABC, abstractmethod
-
 import numpy as np
 
 

@@ -15,26 +15,29 @@ from pyvale.physics.field import (IField,
                                   sample_pyvista)
 
 class VectorField(IField):
+    __slots__ = ("_field_key","_components","_spat_dims","_time_steps",
+                 "_pyvista_grid")
+
     def __init__(self,
                  sim_data: mh.SimData,
                  field_key: str,
                  components: tuple[str,...],
-                 spat_dim: int) -> None:
+                 spat_dims: int) -> None:
 
         self._field_key = field_key
         self._components = components
-        self._spat_dim = spat_dim
+        self._spat_dims = spat_dims
 
         self._time_steps = sim_data.time
         self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
                                                     components,
-                                                    spat_dim)
+                                                    spat_dims)
 
     def set_sim_data(self, sim_data: mh.SimData) -> None:
         self._time_steps = sim_data.time
         self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
                                                     self._components,
-                                                    self._spat_dim)
+                                                    self._spat_dims)
 
     def get_time_steps(self) -> np.ndarray:
         return self._time_steps
@@ -73,7 +76,7 @@ class VectorField(IField):
         for ii,rr in enumerate(angles):
             rmat = rr.as_matrix().T
 
-            if self._spat_dim == 2:
+            if self._spat_dims == 2:
                 rmat = rmat[:2,:2]
 
             field_data[ii,:,:] = np.matmul(rmat,field_data[ii,:,:])

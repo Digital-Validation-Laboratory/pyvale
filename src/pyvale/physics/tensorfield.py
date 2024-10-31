@@ -17,6 +17,9 @@ from pyvale.physics.coordtransform import (transform_tensor_2d,
                                            transform_tensor_3d)
 
 class TensorField(IField):
+    __slots__ = ("_field_key","_spat_dims","_time_steps","_pyvista_grid",
+                 "_norm_components","_dev_components")
+
     def __init__(self,
                  sim_data: mh.SimData,
                  field_key: str,

@@ -15,6 +15,7 @@ from pyvale.uncertainty.randomgenerator import IGeneratorRandom
 
 
 class SysErrOffset(IErrCalculator):
+    __slots__ = ("_offset","_err_calc")
 
     def __init__(self,
                  offset: float,
@@ -35,6 +36,7 @@ class SysErrOffset(IErrCalculator):
 
 
 class SysErrOffsetPercent(IErrCalculator):
+    __slots__ = ("_offset_percent","_err_calc")
 
     def __init__(self,
                  offset_percent: float,
@@ -55,6 +57,7 @@ class SysErrOffsetPercent(IErrCalculator):
 
 
 class SysErrUniform(IErrCalculator):
+    __slots__ = ("_low","_high","_rng","_err_calc")
 
     def __init__(self,
                  low: float,
@@ -88,6 +91,8 @@ class SysErrUniform(IErrCalculator):
 
 
 class SysErrUniformPercent(IErrCalculator):
+    __slots__ = ("_low","_high","_rng","_err_calc")
+
     def __init__(self,
                  low_percent: float,
                  high_percent: float,
@@ -120,6 +125,8 @@ class SysErrUniformPercent(IErrCalculator):
 
 
 class SysErrNormal(IErrCalculator):
+    __slots__ = ("_std","_rng","_err_calc")
+
     def __init__(self,
                  std: float,
                  err_calc: EErrorCalc = EErrorCalc.INDEPENDENT,
@@ -150,6 +157,8 @@ class SysErrNormal(IErrCalculator):
 
 
 class SysErrNormPercent(IErrCalculator):
+    __slots__ = ("_std","_rng","_err_calc")
+
     def __init__(self,
                  std_percent: float,
                  err_calc: EErrorCalc = EErrorCalc.INDEPENDENT,
@@ -180,6 +189,8 @@ class SysErrNormPercent(IErrCalculator):
 
 
 class SysErrGenerator(IErrCalculator):
+    __slots__ = ("_generator","_err_calc")
+
     def __init__(self,
                  generator: IGeneratorRandom,
                  err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
@@ -208,6 +219,9 @@ class SysErrGenerator(IErrCalculator):
 
 
 class SysErrCalibration(IErrCalculator):
+    __slots__ = ("_assumed_cali","_truth_calib","_cal_range","_n_cal_divs",
+                 "_err_calc","_truth_calc_table")
+
     def __init__(self,
                  assumed_calib: Callable,
                  truth_calib: Callable,

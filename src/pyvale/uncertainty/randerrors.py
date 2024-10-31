@@ -14,6 +14,8 @@ from pyvale.uncertainty.randomgenerator import IGeneratorRandom
 
 
 class RandErrUniform(IErrCalculator):
+    __slots__ = ("_low","_high","_rng","_err_calc")
+
     def __init__(self,
                  low: float,
                  high: float,
@@ -41,6 +43,8 @@ class RandErrUniform(IErrCalculator):
 
 
 class RandErrUnifPercent(IErrCalculator):
+    __slots__ = ("_low","_high","_rng","_err_calc")
+
     def __init__(self,
                  low_percent: float,
                  high_percent: float,
@@ -69,6 +73,8 @@ class RandErrUnifPercent(IErrCalculator):
 
 
 class RandErrNormal(IErrCalculator):
+    __slots__ = ("_std","_rng","_err_calc")
+
     def __init__(self,
                  std: float,
                  err_calc: EErrorCalc = EErrorCalc.INDEPENDENT,
@@ -94,6 +100,8 @@ class RandErrNormal(IErrCalculator):
 
 
 class RandErrNormPercent(IErrCalculator):
+    __slots__ = ("_std","_rng","_err_calc")
+
     def __init__(self,
                  std_percent: float,
                  err_calc: EErrorCalc = EErrorCalc.INDEPENDENT,
@@ -120,6 +128,8 @@ class RandErrNormPercent(IErrCalculator):
 
 
 class RandErrGenerator(IErrCalculator):
+    __slots__ = ("_generator","_err_calc")
+
     def __init__(self,
                  generator: IGeneratorRandom,
                  err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:

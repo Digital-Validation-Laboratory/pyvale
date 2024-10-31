@@ -65,32 +65,25 @@ def main() -> None:
                  'rand': True,
                  'dep_sys': True}
 
+    error_chain = []
     if errors_on['indep_sys']:
-        sys_errs_indep = []
-        sys_errs_indep.append(pyvale.SysErrOffset(offset=-5.0))
-        sys_errs_indep.append(pyvale.SysErrUniform(low=-10.0,
+        error_chain.append(pyvale.SysErrOffset(offset=-5.0))
+        error_chain.append(pyvale.SysErrUniform(low=-10.0,
                                                    high=10.0))
-        indep_sys_err_int = pyvale.ErrorIntegrator(sys_errs_indep,
-                                            tc_array.get_measurement_shape())
-        tc_array.set_systematic_err_integrator_independent(indep_sys_err_int)
 
     if errors_on['rand']:
-        rand_errs = []
-        rand_errs.append(pyvale.RandErrNormPercent(std_percent=5.0))
-        rand_errs.append(pyvale.RandErrUnifPercent(low_percent=-5.0,
+        error_chain.append(pyvale.RandErrNormPercent(std_percent=5.0))
+        error_chain.append(pyvale.RandErrUnifPercent(low_percent=-5.0,
                                                    high_percent=5.0))
-        rand_err_int = pyvale.ErrorIntegrator(rand_errs,
-                                              tc_array.get_measurement_shape())
-        tc_array.set_random_err_integrator(rand_err_int)
 
     if errors_on['dep_sys']:
-        sys_errs_dep = []
-        sys_errs_dep.append(pyvale.SysErrDigitisation(bits_per_unit=1/20))
-        sys_errs_dep.append(pyvale.SysErrSaturation(meas_min=0.0,meas_max=800.0))
-        dep_sys_err_int = pyvale.ErrorIntegrator(sys_errs_dep,
-                                            tc_array.get_measurement_shape())
-        tc_array.set_systematic_err_integrator_dependent(dep_sys_err_int)
+        error_chain.append(pyvale.SysErrDigitisation(bits_per_unit=1/20))
+        error_chain.append(pyvale.SysErrSaturation(meas_min=0.0,meas_max=800.0))
 
+    if len(error_chain) > 0:
+        error_integrator = pyvale.ErrorIntegrator(error_chain,
+                                                  tc_array.get_measurement_shape())
+        tc_array.set_error_integrator(error_integrator)
 
     measurements = tc_array.get_measurements()
     print(f'\nMeasurements for sensor at top of block:\n{measurements[-1,0,:]}\n')

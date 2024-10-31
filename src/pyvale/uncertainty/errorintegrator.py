@@ -5,28 +5,35 @@ License: MIT
 Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
+from dataclasses import dataclass
 import numpy as np
 from pyvale.uncertainty.errorcalculator import (IErrCalculator,
                                                 EErrorType,
                                                 EErrorCalc)
 #from pyvale.sensors.pointsensorarray import SensorData
 
+@dataclass(slots=True)
+class ErrorIntegrationOpts:
+    force_dependence: bool = False
+    store_errs_by_func: bool = False
+
 
 class ErrorIntegrator:
+    __slots__ = ("err_chain","meas_shape","store_errs_by_func","_errs_by_func",
+                 "_errs_systematic","_errs_random","_errs_total")
+
     def __init__(self,
-                 err_calcs: list[IErrCalculator],
+                 err_chain: list[IErrCalculator],
                  meas_shape: tuple[int,int,int],
                  store_errs_by_func: bool = True) -> None:
 
-        self._err_calcs = err_calcs
-        self._meas_shape = meas_shape
-        self.store_errors_by_func = store_errs_by_func
+        self.err_chain = err_chain
+        self.meas_shape = meas_shape
+        self.store_errs_by_func = store_errs_by_func
 
         if store_errs_by_func:
-            self._errs_by_func = np.zeros((len(err_calcs),
-                                            meas_shape[0],
-                                            meas_shape[1],
-                                            meas_shape[2]))
+            self._errs_by_func = np.zeros((len(self.err_chain),)+ \
+                                               self.meas_shape)
         else:
             self._errs_by_func = None
 
@@ -36,50 +43,53 @@ class ErrorIntegrator:
 
 
     def set_err_calcs(self, err_calcs: list[IErrCalculator]) -> None:
-        self._err_calcs = err_calcs
+        self.err_chain = err_calcs
 
 
-    def calc_errors(self, truth: np.ndarray) -> np.ndarray:
-        if self.store_errors_by_func:
+    def calc_errors_from_chain(self, truth: np.ndarray) -> np.ndarray:
+        if self.store_errs_by_func:
             return self._calc_errors_store_by_func(truth)
 
         return self._calc_errors_mem_eff(truth)
 
 
-    def _calc_errors_store_by_func(self,truth: np.ndarray) -> np.ndarray:
-        accumulated_error = np.copy(truth)
+    def _calc_errors_store_by_func(self, truth: np.ndarray) -> np.ndarray:
+        accumulated_error = np.zeros_like(truth)
+        self._errs_by_func = np.zeros((len(self.err_chain),) + \
+                                           self.meas_shape)
 
-        for ii,ff in enumerate(self._err_calcs):
+        for ii,ee in enumerate(self.err_chain):
 
-            if ff.get_error_calc() == EErrorCalc.DEPENDENT:
-                self._errs_by_func[ii,:,:,:] = ff.calc_errs(accumulated_error).error_array
+            if ee.get_error_calc() == EErrorCalc.DEPENDENT:
+                self._errs_by_func[ii,:,:,:] = ee.calc_errs(truth+accumulated_error).error_array
             else:
-                self._errs_by_func[ii,:,:,:] = ff.calc_errs(truth).error_array
+                self._errs_by_func[ii,:,:,:] = ee.calc_errs(truth).error_array
 
-            if ff.get_error_type() == EErrorType.SYSTEMATIC:
+            if ee.get_error_type() == EErrorType.SYSTEMATIC:
                 self._errs_systematic = self._errs_systematic + \
                                         self._errs_by_func[ii,:,:,:]
             else:
                 self._errs_random = self._errs_random + \
                                     self._errs_by_func[ii,:,:,:]
 
-            accumulated_error = accumulated_error+ self._errs_by_func[ii,:,:,:]
+            accumulated_error = accumulated_error + self._errs_by_func[ii,:,:,:]
 
-        self._errs_total = np.sum(self._errs_by_func,axis=0)
+        self._errs_total = accumulated_error
         return self._errs_total
 
-    def _calc_errors_mem_eff(self,truth: np.ndarray) -> np.ndarray:
-        accumulated_error = np.copy(truth)
 
-        for ii,ff in enumerate(self._err_calcs):
-            current_errs = np.zeros(self._meas_shape)
+    def _calc_errors_mem_eff(self, truth: np.ndarray) -> np.ndarray:
+        accumulated_error = np.zeros_like(truth)
 
-            if ff.get_error_calc() == EErrorCalc.DEPENDENT:
-                current_errs = ff.calc_errs(accumulated_error).error_array
+        for ee in self.err_chain:
+            current_errs = np.zeros(self.meas_shape)
+
+            if ee.get_error_calc() == EErrorCalc.DEPENDENT:
+                current_errs = ee.calc_errs(truth+accumulated_error).error_array
             else:
-                current_errs = ff.calc_errs(truth).error_array
+                current_errs = ee.calc_errs(truth).error_array
 
-            if ff.get_error_type() == EErrorType.SYSTEMATIC:
+            if ee.get_error_type() == EErrorType.SYSTEMATIC:
                 self._errs_systematic = self._errs_systematic + \
                                         current_errs
             else:

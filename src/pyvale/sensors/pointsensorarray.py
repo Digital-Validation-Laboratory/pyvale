@@ -17,7 +17,7 @@ from pyvale.sensors.sensordescriptor import SensorDescriptor
 from pyvale.numerical.spatialintegrator import ISpatialAverager
 
 
-@dataclass
+@dataclass(slots=True)
 class SensorData:
     positions: np.ndarray | None = None
     sample_times: np.ndarray | None = None
@@ -26,6 +26,9 @@ class SensorData:
 
 
 class PointSensorArray:
+    __slots__ = ("sensor_data","field","descriptor","_truth","_measurements",
+                 "_error_integrator")
+
     def __init__(self,
                  sensor_array_data: SensorData,
                  field: IField,
@@ -42,7 +45,6 @@ class PointSensorArray:
         self._truth = None
         self._measurements = None
         self._error_integrator = None
-
 
     #---------------------------------------------------------------------------
     # accessors
@@ -69,7 +71,7 @@ class PointSensorArray:
                         self.sensor_data.positions,
                         self.sensor_data.sample_times)
 
-    def get_truth_values(self) -> np.ndarray:
+    def get_truth(self) -> np.ndarray:
         if self._truth is None:
             self._truth = self.calc_truth_values()
 
@@ -86,17 +88,19 @@ class PointSensorArray:
     def get_random_errors(self) -> np.ndarray:
         return self._error_integrator.get_errs_random()
 
+    def get_total_errors(self) -> np.ndarray:
+        return self._error_integrator.get_errs_total()
+
     #---------------------------------------------------------------------------
     # Measurements
     def calc_measurements(self) -> np.ndarray:
         if self._error_integrator is None:
-            self._measurements = self.get_truth_values()
-            return self._measurements
+            self._measurements = self.get_truth()
+        else:
+            self._measurements = self.get_truth() + \
+                self._error_integrator.calc_errors_from_chain(self.get_truth())
 
-        self._measurements = self._error_integrator.calc_errors(
-                                                    self.get_truth_values())
         return self._measurements
-
 
     def get_measurements(self) -> np.ndarray:
         if self._measurements is None:
@@ -105,8 +109,7 @@ class PointSensorArray:
         return self._measurements
 
     #---------------------------------------------------------------------------
-    # visualisation tools
+    # Visualisation tools
+    # TODO: this should probably be moved from here
     def get_visualiser(self) -> pv.PolyData:
-        pv_data = pv.PolyData(self.sensor_data.positions)
-        return pv_data
-
+        return pv.PolyData(self.sensor_data.positions)

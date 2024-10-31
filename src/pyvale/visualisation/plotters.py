@@ -39,6 +39,7 @@ def plot_sim_mesh(sim_data: mh.SimData) -> Any:
     pv_plot.add_axes_at_origin(labels_off=True)
     return pv_plot
 
+
 def plot_sim_data(sim_data: mh.SimData,
                   component: str,
                   time_step: int = -1) -> Any:
@@ -142,7 +143,7 @@ def plot_time_traces(sensor_array: PointSensorArray,
                         color=plot_opts.colors[ss % plot_opts.n_colors])
 
     if trace_opts.truth_line is not None:
-        truth = sensor_array.get_truth_values()
+        truth = sensor_array.get_truth()
         for ss in range(n_sensors):
             if ss in trace_opts.sensors_to_plot:
                 ax.plot(samp_time,
@@ -289,7 +290,7 @@ def plot_exp_traces(exp_sim: ExperimentSimulator,
                     ms=plot_opts.ms)
 
     if trace_opts.truth_line is not None:
-        truth = exp_sim.sensor_arrays[sens_array_num].get_truth_values()
+        truth = exp_sim.sensor_arrays[sens_array_num].get_truth()
         for ss in sensors_to_plot:
             ax.plot(samp_time,
                     truth[ss,comp_ind,:],

@@ -14,6 +14,10 @@ from pyvale.numerical.spatialintegrator import (ISpatialAverager,
 # NOTE: code below is very similar to quadrature integrator should be able to
 # refactor into injected classes/functions
 class Rectangle2D(ISpatialAverager):
+    __slots__ = ("_field","_cent_pos","_dims","_sample_times","_area_tot",
+                "_area_int","_n_int_pts","_int_pt_offsets","_int_pts",
+                "_integrals")
+
     def __init__(self,
                  int_pt_offsets: np.ndarray,
                  field: IField,

@@ -9,7 +9,7 @@ Copyright (C) 2024 The Digital Validation Team
 from dataclasses import dataclass
 import numpy as np
 
-@dataclass
+@dataclass(slots=True)
 class SensorDescriptor:
     name: str = 'Measured Value'
     units: str = r'-'
