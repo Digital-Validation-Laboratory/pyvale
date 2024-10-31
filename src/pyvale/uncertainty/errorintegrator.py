@@ -8,9 +8,10 @@ Copyright (C) 2024 The Digital Validation Team
 from dataclasses import dataclass
 import numpy as np
 from pyvale.uncertainty.errorcalculator import (IErrCalculator,
+                                                ErrorData,
                                                 EErrorType,
                                                 EErrorCalc)
-#from pyvale.sensors.pointsensorarray import SensorData
+from pyvale.sensors.pointsensorarray import SensorData
 
 @dataclass(slots=True)
 class ErrorIntegrationOpts:
@@ -42,8 +43,8 @@ class ErrorIntegrator:
         self._errs_total = np.zeros(meas_shape)
 
 
-    def set_err_calcs(self, err_calcs: list[IErrCalculator]) -> None:
-        self.err_chain = err_calcs
+    def set_error_chain(self, err_chain: list[IErrCalculator]) -> None:
+        self.err_chain = err_chain
 
 
     def calc_errors_from_chain(self, truth: np.ndarray) -> np.ndarray:
@@ -60,19 +61,21 @@ class ErrorIntegrator:
 
         for ii,ee in enumerate(self.err_chain):
 
+            error_data = ErrorData()
             if ee.get_error_calc() == EErrorCalc.DEPENDENT:
-                self._errs_by_func[ii,:,:,:] = ee.calc_errs(truth+accumulated_error).error_array
+                error_data = ee.calc_errs(truth+accumulated_error)
             else:
-                self._errs_by_func[ii,:,:,:] = ee.calc_errs(truth).error_array
+                error_data = ee.calc_errs(truth)
 
             if ee.get_error_type() == EErrorType.SYSTEMATIC:
                 self._errs_systematic = self._errs_systematic + \
-                                        self._errs_by_func[ii,:,:,:]
+                                        error_data.error_array
             else:
                 self._errs_random = self._errs_random + \
-                                    self._errs_by_func[ii,:,:,:]
+                                    error_data.error_array
 
-            accumulated_error = accumulated_error + self._errs_by_func[ii,:,:,:]
+            accumulated_error = accumulated_error + error_data.error_array
+            self._errs_by_func[ii,:,:,:] = error_data.error_array
 
         self._errs_total = accumulated_error
         return self._errs_total
@@ -82,21 +85,21 @@ class ErrorIntegrator:
         accumulated_error = np.zeros_like(truth)
 
         for ee in self.err_chain:
-            current_errs = np.zeros(self.meas_shape)
 
+            error_data = ErrorData()
             if ee.get_error_calc() == EErrorCalc.DEPENDENT:
-                current_errs = ee.calc_errs(truth+accumulated_error).error_array
+                error_data = ee.calc_errs(truth+accumulated_error)
             else:
-                current_errs = ee.calc_errs(truth).error_array
+                error_data = ee.calc_errs(truth)
 
             if ee.get_error_type() == EErrorType.SYSTEMATIC:
                 self._errs_systematic = self._errs_systematic + \
-                                        current_errs
+                                        error_data.error_array
             else:
                 self._errs_random = self._errs_random + \
-                                    current_errs
+                                    error_data.error_array
 
-            accumulated_error = accumulated_error+current_errs
+            accumulated_error = accumulated_error + error_data.error_array
 
         self._errs_total = accumulated_error
         return self._errs_total
@@ -113,6 +116,21 @@ class ErrorIntegrator:
 
     def get_errs_total(self) -> np.ndarray:
         return self._errs_total
+
+
+
+def update_sensor_data_with_error(error_data: ErrorData,
+                                  sensor_data: SensorData) -> SensorData:
+    if error_data.positions is not None:
+        sensor_data.positions = error_data.positions
+
+    if error_data.time_steps is not None:
+        sensor_data.sample_times = error_data.time_steps
+
+    if error_data.angles is not None:
+        sensor_data.angles = error_data.angles
+
+    return sensor_data
 
 
 

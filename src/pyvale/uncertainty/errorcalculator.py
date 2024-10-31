@@ -12,7 +12,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 
-@dataclass
+@dataclass(slots=True)
 class ErrorData:
     error_array: np.ndarray | None = None
     positions: np.ndarray | None = None

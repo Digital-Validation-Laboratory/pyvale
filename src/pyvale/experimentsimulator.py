@@ -25,7 +25,9 @@ class ExperimentStats:
 
 
 class ExperimentSimulator:
-    
+    __slots__ = ("sim_list","sensor_arrays","num_exp_per_sim","_exp_data",
+                 "_exp_stats")
+
     def __init__(self,
                  sim_list: list[mh.SimData],
                  sensor_arrays: list[PointSensorArray],

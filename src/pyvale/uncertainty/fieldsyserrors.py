@@ -5,11 +5,12 @@ License: MIT
 Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
-
+from dataclasses import dataclass
 import numpy as np
 from scipy.spatial.transform import Rotation
 
 from pyvale.physics.field import IField
+from pyvale.sensors.pointsensorarray import SensorData
 from pyvale.numerical.spatialintegrator import ISpatialAverager
 from pyvale.uncertainty.errorcalculator import (IErrCalculator,
                                                 ErrorData,
@@ -332,6 +333,57 @@ class SysErrAngleRand(IErrCalculator):
             self._sens_angles_perturbed[ii] = rand_rot*rot_orig
 
         self._sens_angles_perturbed = tuple(self._sens_angles_perturbed)
+        sys_errs = self._field.sample_field(self._sens_pos,
+                                            self._sample_times,
+                                            self._sens_angles_perturbed) \
+                                            - err_basis
+
+        err_data = ErrorData(error_array=sys_errs,
+                             angles=self._sens_angles_perturbed)
+        return err_data
+
+
+@dataclass(slots=True)
+class FieldErrorData:
+    pos_offset_xyz: float | None = None
+    ang_offset_zyx: float | None = None
+    time_offset: float | None = None
+    rand_pos_xyz: tuple[IGeneratorRandom | None,
+                        IGeneratorRandom | None,
+                        IGeneratorRandom | None] = (None,None,None)
+    rand_ang_zyx: tuple[IGeneratorRandom | None,
+                        IGeneratorRandom | None,
+                        IGeneratorRandom | None] = (None,None,None)
+    rand_time: IGeneratorRandom | None = None
+
+
+class SysErrSensorData(IErrCalculator):
+    __slots__ = ("_field","_sensor_data_original","_sensor_data_perturbed",
+                 "_field_err_data","_err_calc")
+
+    def __init__(self,
+                field: IField,
+                sensor_data: SensorData,
+                field_err_data: FieldErrorData,
+                err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
+
+        self._field = field
+        self._sensor_data_original = sensor_data
+        self._sensor_data_perturbed = sensor_data
+        self._field_err_data = field_err_data
+        self._err_calc = err_calc
+
+    def get_error_calc(self) -> EErrorCalc:
+        return self._err_calc
+
+    def get_error_type(self) -> EErrorType:
+        return EErrorType.SYSTEMATIC
+
+    def get_perturbed_sensor_data(self) -> SensorData:
+        return self._sensor_data_perturbed
+
+    def calc_errs(self, err_basis: np.ndarray) -> ErrorData:
+
         sys_errs = self._field.sample_field(self._sens_pos,
                                             self._sample_times,
                                             self._sens_angles_perturbed) \
