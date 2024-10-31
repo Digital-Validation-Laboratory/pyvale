@@ -5,14 +5,13 @@ License: MIT
 Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
-from typing import Callable
 from dataclasses import dataclass
 import numpy as np
 from pyvale.sensors.pointsensorarray import PointSensorArray
 import mooseherder as mh
 
 
-@dataclass
+@dataclass(slots=True)
 class ExperimentStats:
     mean: np.ndarray | None = None
     std: np.ndarray | None = None
@@ -26,6 +25,7 @@ class ExperimentStats:
 
 
 class ExperimentSimulator:
+    
     def __init__(self,
                  sim_list: list[mh.SimData],
                  sensor_arrays: list[PointSensorArray],
