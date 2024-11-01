@@ -1,18 +1,19 @@
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
-NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
+
 
 - TODO PRIORITY:
     - Fix ErrorIntegrator to use options dataclass
     - Visualisation tools for perturbed field errors:
         - Perturbed pos, time, angle
+- BUGS!
+NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
+    - Spatial integrators don't rotate integration point locations!
 
 - TODO: EXAMPLES
     - Example showing area averaging as ground truth
-
-- BUGS!
-    - Spatial integrators don't rotate integration point locations!
+    - Example showing field error chain with other errors and extraction of perturbed sensor data
 
 - TODO: ErrorIntegrator
     - Need to pass updated position/time/angle/area along as errors are accumulated?
@@ -37,7 +38,6 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
     - Error is the difference?
 
 - TODO: Field based errors:
-    - TODO: vector/tensor rotations
     - HALF DONE: Spatial averaging error
         - Set an integration area
         - Set a weighting function
@@ -46,8 +46,6 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
     - TODO: Temporal averaging error
         - Set an integration time
         - Set a weighting function
-    - **TODO Allow Gauss Quad as Truth with other as Err**
-    - TODO: Allow Gauss Quad with position and temporal drift
 
 - IMAGE DEF: allow upsampled image to be generated once and retained.
 
