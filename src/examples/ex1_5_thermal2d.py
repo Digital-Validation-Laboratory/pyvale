@@ -33,12 +33,12 @@ def main() -> None:
 
     sample_times = np.linspace(0.0,np.max(sim_data.time),50)
 
-    sens_data = pyvale.SensorData(positions=sens_pos,
+    sensor_data = pyvale.SensorData(positions=sens_pos,
                                   sample_times=sample_times)
 
     tc_array = pyvale.SensorArrayFactory \
         .thermocouples_no_errs(sim_data,
-                               sens_data,
+                               sensor_data,
                                field_key,
                                spat_dims=2)
 
@@ -67,9 +67,8 @@ def main() -> None:
     # Field based errors
     pos_gen = pyvale.GeneratorNormal(std=1.0)
     err_chain.append(pyvale.SysErrRandPosition(tc_array.field,
-                                                  sens_pos,
-                                                  (pos_gen,pos_gen,None),
-                                                  sample_times))
+                                                sensor_data,
+                                                (pos_gen,pos_gen,None)))
 
     #---------------------------------------------------------------------------
     err_chain.append(pyvale.RandErrNormal(std = 2.0))

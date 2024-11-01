@@ -69,10 +69,8 @@ def main() -> None:
 
     offset_angles = np.array([1,0,0])
     err_rot = pyvale.SysErrAngleOffset(strain_field,
-                                     sens_pos,
-                                     sens_angles,
-                                     offset_angles,
-                                     sample_times)
+                                     sens_data_rot,
+                                     offset_angles)
     err_int = pyvale.ErrorIntegrator([err_rot],
                                         sg_array_rot.get_measurement_shape())
     sg_array_rot.set_error_integrator(err_int)

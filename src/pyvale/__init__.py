@@ -25,6 +25,7 @@ from pyvale.sensors.sensordescriptor import *
 from pyvale.sensors.sensortools import *
 from pyvale.sensors.sensorarrayfactory import *
 from pyvale.sensors.pointsensorarray import *
+from pyvale.sensors.sensordata import *
 
 from pyvale.uncertainty.errorintegrator import *
 from pyvale.uncertainty.randerrors import *

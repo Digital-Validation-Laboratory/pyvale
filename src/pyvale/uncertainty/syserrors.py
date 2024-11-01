@@ -8,10 +8,10 @@ Copyright (C) 2024 The Digital Validation Team
 from typing import Callable
 import numpy as np
 from pyvale.uncertainty.errorcalculator import (IErrCalculator,
-                                                ErrorData,
-                                                EErrorType,
-                                                EErrorCalc)
+                                                EErrType,
+                                                EErrDependence)
 from pyvale.uncertainty.randomgenerator import IGeneratorRandom
+from pyvale.sensors.sensordata import SensorData
 
 
 class SysErrOffset(IErrCalculator):
@@ -19,20 +19,20 @@ class SysErrOffset(IErrCalculator):
 
     def __init__(self,
                  offset: float,
-                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
+                 err_calc: EErrDependence = EErrDependence.INDEPENDENT) -> None:
         self._offset = offset
         self._err_calc = err_calc
 
-    def get_error_calc(self) -> EErrorCalc:
+    def get_error_dep(self) -> EErrDependence:
         return self._err_calc
 
-    def get_error_type(self) -> EErrorType:
-        return EErrorType.SYSTEMATIC
+    def get_error_type(self) -> EErrType:
+        return EErrType.SYSTEMATIC
 
-    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
+    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
+                                                       SensorData | None]:
 
-        return ErrorData(error_array=
-                             self._offset*np.ones(shape=err_basis.shape))
+        return (self._offset*np.ones(shape=err_basis.shape),None)
 
 
 class SysErrOffsetPercent(IErrCalculator):
@@ -40,20 +40,23 @@ class SysErrOffsetPercent(IErrCalculator):
 
     def __init__(self,
                  offset_percent: float,
-                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
+                 err_calc: EErrDependence = EErrDependence.INDEPENDENT) -> None:
         self._offset_percent = offset_percent
         self._err_calc = err_calc
 
-    def get_error_calc(self) -> EErrorCalc:
+    def get_error_dep(self) -> EErrDependence:
         return self._err_calc
 
-    def get_error_type(self) -> EErrorType:
-        return EErrorType.SYSTEMATIC
+    def get_error_type(self) -> EErrType:
+        return EErrType.SYSTEMATIC
 
-    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
+    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
+                                                       SensorData | None]:
 
-        return ErrorData(error_array=self._offset_percent/100*err_basis*
-                             np.ones(shape=err_basis.shape))
+        return (self._offset_percent/100 *
+                err_basis *
+                np.ones(shape=err_basis.shape),
+                None)
 
 
 class SysErrUniform(IErrCalculator):
@@ -62,20 +65,21 @@ class SysErrUniform(IErrCalculator):
     def __init__(self,
                  low: float,
                  high: float,
-                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT,
+                 err_calc: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
         self._low = low
         self._high = high
         self._rng = np.random.default_rng(seed)
         self._err_calc = err_calc
 
-    def get_error_calc(self) -> EErrorCalc:
+    def get_error_dep(self) -> EErrDependence:
         return self._err_calc
 
-    def get_error_type(self) -> EErrorType:
-        return EErrorType.SYSTEMATIC
+    def get_error_type(self) -> EErrType:
+        return EErrType.SYSTEMATIC
 
-    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
+    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
+                                                       SensorData | None]:
 
         err_shape = np.array(err_basis.shape)
         err_shape[-1] = 1
@@ -87,7 +91,7 @@ class SysErrUniform(IErrCalculator):
         tile_shape[0:-1] = 1
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
-        return ErrorData(error_array=sys_errs)
+        return (sys_errs,None)
 
 
 class SysErrUniformPercent(IErrCalculator):
@@ -96,20 +100,21 @@ class SysErrUniformPercent(IErrCalculator):
     def __init__(self,
                  low_percent: float,
                  high_percent: float,
-                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT,
+                 err_calc: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
         self._low = low_percent/100
         self._high = high_percent/100
         self._rng = np.random.default_rng(seed)
         self._err_calc = err_calc
 
-    def get_error_calc(self) -> EErrorCalc:
+    def get_error_dep(self) -> EErrDependence:
         return self._err_calc
 
-    def get_error_type(self) -> EErrorType:
-        return EErrorType.SYSTEMATIC
+    def get_error_type(self) -> EErrType:
+        return EErrType.SYSTEMATIC
 
-    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
+    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
+                                                       SensorData | None]:
 
         err_shape = np.array(err_basis.shape)
         err_shape[-1] = 1
@@ -121,7 +126,7 @@ class SysErrUniformPercent(IErrCalculator):
         tile_shape[0:-1] = 1
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
-        return ErrorData(error_array=err_basis*sys_errs)
+        return (err_basis*sys_errs,None)
 
 
 class SysErrNormal(IErrCalculator):
@@ -129,19 +134,20 @@ class SysErrNormal(IErrCalculator):
 
     def __init__(self,
                  std: float,
-                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT,
+                 err_calc: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
         self._std = std
         self._rng = np.random.default_rng(seed)
         self._err_calc = err_calc
 
-    def get_error_calc(self) -> EErrorCalc:
+    def get_error_dep(self) -> EErrDependence:
         return self._err_calc
 
-    def get_error_type(self) -> EErrorType:
-        return EErrorType.SYSTEMATIC
+    def get_error_type(self) -> EErrType:
+        return EErrType.SYSTEMATIC
 
-    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
+    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
+                                                       SensorData | None]:
 
         err_shape = np.array(err_basis.shape)
         err_shape[-1] = 1
@@ -153,7 +159,7 @@ class SysErrNormal(IErrCalculator):
         tile_shape[0:-1] = 1
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
-        return ErrorData(error_array=sys_errs)
+        return (sys_errs,None)
 
 
 class SysErrNormPercent(IErrCalculator):
@@ -161,19 +167,20 @@ class SysErrNormPercent(IErrCalculator):
 
     def __init__(self,
                  std_percent: float,
-                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT,
+                 err_calc: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
         self._std = std_percent/100
         self._rng = np.random.default_rng(seed)
         self._err_calc = err_calc
 
-    def get_error_calc(self) -> EErrorCalc:
+    def get_error_dep(self) -> EErrDependence:
         return self._err_calc
 
-    def get_error_type(self) -> EErrorType:
-        return EErrorType.SYSTEMATIC
+    def get_error_type(self) -> EErrType:
+        return EErrType.SYSTEMATIC
 
-    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
+    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
+                                                       SensorData | None]:
 
         err_shape = np.array(err_basis.shape)
         err_shape[-1] = 1
@@ -185,7 +192,7 @@ class SysErrNormPercent(IErrCalculator):
         tile_shape[0:-1] = 1
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
-        return ErrorData(error_array=err_basis*sys_errs)
+        return (err_basis*sys_errs,None)
 
 
 class SysErrGenerator(IErrCalculator):
@@ -193,18 +200,18 @@ class SysErrGenerator(IErrCalculator):
 
     def __init__(self,
                  generator: IGeneratorRandom,
-                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
+                 err_calc: EErrDependence = EErrDependence.INDEPENDENT) -> None:
         self._generator = generator
         self._err_calc = err_calc
 
-    def get_error_calc(self) -> EErrorCalc:
+    def get_error_dep(self) -> EErrDependence:
         return self._err_calc
 
-    def get_error_type(self) -> EErrorType:
-        return EErrorType.SYSTEMATIC
+    def get_error_type(self) -> EErrType:
+        return EErrType.SYSTEMATIC
 
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> ErrorData:
+    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
+                                                       SensorData | None]:
 
         err_shape = np.array(err_basis.shape)
         err_shape[-1] = 1
@@ -215,7 +222,7 @@ class SysErrGenerator(IErrCalculator):
         tile_shape[0:-1] = 1
         sys_errs = np.tile(sys_errs,tuple(tile_shape))
 
-        return ErrorData(error_array=sys_errs)
+        return (sys_errs,None)
 
 
 class SysErrCalibration(IErrCalculator):
@@ -227,7 +234,7 @@ class SysErrCalibration(IErrCalculator):
                  truth_calib: Callable,
                  cal_range: tuple[float,float],
                  n_cal_divs: int = 10000,
-                 err_calc: EErrorCalc = EErrorCalc.INDEPENDENT) -> None:
+                 err_calc: EErrDependence = EErrDependence.INDEPENDENT) -> None:
 
         self._assumed_calib = assumed_calib
         self._truth_calib = truth_calib
@@ -241,14 +248,14 @@ class SysErrCalibration(IErrCalculator):
                                                 n_cal_divs)
         self._truth_cal_table[:,1] = self._truth_calib(self._truth_cal_table[:,0])
 
-    def get_error_calc(self) -> EErrorCalc:
+    def get_error_dep(self) -> EErrDependence:
         return self._err_calc
 
-    def get_error_type(self) -> EErrorType:
-        return EErrorType.SYSTEMATIC
+    def get_error_type(self) -> EErrType:
+        return EErrType.SYSTEMATIC
 
-    def calc_errs(self,
-                  err_basis: np.ndarray) -> ErrorData:
+    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
+                                                       SensorData | None]:
 
         # shape=(n_sens,n_comps,n_time_steps)
         signal_from_field = np.interp(err_basis,
@@ -259,7 +266,7 @@ class SysErrCalibration(IErrCalculator):
 
         sys_errs = field_from_assumed_calib - err_basis
 
-        return ErrorData(error_array=sys_errs)
+        return (sys_errs,None)
 
 
 

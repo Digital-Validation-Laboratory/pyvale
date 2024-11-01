@@ -8,7 +8,8 @@ Copyright (C) 2024 The Digital Validation Team
 import numpy as np
 
 from pyvale.physics.field import IField
-from pyvale.numerical.spatialintegrator import (ISpatialAverager,
+from pyvale.sensors.sensordata import SensorData
+from pyvale.numerical.spatialintegrator import (ISpatialIntegrator,
                                                 ESpatialIntType)
 from pyvale.numerical.rectangleintegrator import Rectangle2D
 from pyvale.numerical.quadratureintegrator import (Quadrature2D,
@@ -18,149 +19,139 @@ from pyvale.numerical.quadratureintegrator import (Quadrature2D,
 class SpatialIntegratorFactory:
     @staticmethod
     def rect_2d_1pt(field: IField,
-                    cent_pos: np.ndarray,
-                    area_dims: np.ndarray,
-                    sample_times: np.ndarray | None = None
-                    )-> ISpatialAverager:
+                    sensor_data: SensorData,
+                    )-> ISpatialIntegrator:
 
         int_pt_offsets = np.array([[0,0,0],])
 
         rect_int = Rectangle2D(int_pt_offsets,
                                field,
-                               cent_pos,
-                               area_dims,
-                               sample_times)
+                               sensor_data.positions,
+                               sensor_data.spatial_dims,
+                               sensor_data.sample_times)
 
         return rect_int
 
 
     @staticmethod
     def rect_2d_4pt(field: IField,
-                    cent_pos: np.ndarray,
-                    area_dims: np.ndarray,
-                    sample_times: np.ndarray | None = None
-                    )-> ISpatialAverager:
+                    sensor_data: SensorData,
+                    )-> ISpatialIntegrator:
 
-        int_pt_offsets = area_dims * np.array([[-0.5,-0.5,0],
-                                          [-0.5,0.5,0],
-                                          [0.5,-0.5,0],
-                                          [0.5,0.5,0],])
+        int_pt_offsets = sensor_data.spatial_dims * np.array([[-0.5,-0.5,0],
+                                                              [-0.5,0.5,0],
+                                                              [0.5,-0.5,0],
+                                                              [0.5,0.5,0],])
 
         rect_int = Rectangle2D(int_pt_offsets,
                                field,
-                               cent_pos,
-                               area_dims,
-                               sample_times)
+                               sensor_data.positions,
+                               sensor_data.spatial_dims,
+                               sensor_data.sample_times)
 
         return rect_int
 
 
     @staticmethod
     def rect_2d_9pt(field: IField,
-                    cent_pos: np.ndarray,
-                    area_dims: np.ndarray,
-                    sample_times: np.ndarray | None = None
-                    )-> ISpatialAverager:
+                    sensor_data: SensorData,
+                    )-> ISpatialIntegrator:
 
-        int_pt_offsets = area_dims * np.array([[-1/3,-1/3,0],
-                                          [-1/3,0,0],
-                                          [-1/3,1/3,0],
-                                          [0,-1/3,0],
-                                          [0,0,0],
-                                          [0,1/3,0],
-                                          [1/3,-1/3,0],
-                                          [1/3,0,0],
-                                          [1/3,1/3,0]])
+        int_pt_offsets = sensor_data.spatial_dims * np.array([[-1/3,-1/3,0],
+                                                              [-1/3,0,0],
+                                                              [-1/3,1/3,0],
+                                                              [0,-1/3,0],
+                                                              [0,0,0],
+                                                              [0,1/3,0],
+                                                              [1/3,-1/3,0],
+                                                              [1/3,0,0],
+                                                              [1/3,1/3,0]])
 
         rect_int = Rectangle2D(int_pt_offsets,
                                field,
-                               cent_pos,
-                               area_dims,
-                               sample_times)
+                               sensor_data.positions,
+                               sensor_data.spatial_dims,
+                               sensor_data.sample_times)
 
         return rect_int
 
 
     @staticmethod
     def quad_2d_4pt(field: IField,
-                    cent_pos: np.ndarray,
-                    area_dims: np.ndarray,
-                    sample_times: np.ndarray | None = None
-                    )-> ISpatialAverager:
+                    sensor_data: SensorData,
+                    )-> ISpatialIntegrator:
 
-        gauss_pt_offsets = area_dims * 1/np.sqrt(3)* np.array([[-1,-1,0],
-                                                        [-1,1,0],
-                                                        [1,-1,0],
-                                                        [1,1,0]])
+        gauss_pt_offsets = sensor_data.spatial_dims * 1/np.sqrt(3) * \
+                                                np.array([[-1,-1,0],
+                                                          [-1,1,0],
+                                                          [1,-1,0],
+                                                          [1,1,0]])
 
         gauss_weight_func = create_gauss_weights_2d_4pts
 
         quadrature = Quadrature2D(gauss_pt_offsets,
                             gauss_weight_func,
                             field,
-                            cent_pos,
-                            area_dims,
-                            sample_times)
+                            sensor_data.positions,
+                            sensor_data.spatial_dims,
+                            sensor_data.sample_times)
         return quadrature
 
 
     @staticmethod
     def quad_2d_9pt(field: IField,
-                    cent_pos: np.ndarray,
-                    area_dims: np.ndarray,
-                    sample_times: np.ndarray | None = None
-                    )-> ISpatialAverager:
+                    sensor_data: SensorData,
+                    )-> ISpatialIntegrator:
 
-        gauss_pt_offsets = area_dims * np.array([[-np.sqrt(0.6),-np.sqrt(0.6),0],
-                                            [-np.sqrt(0.6),np.sqrt(0.6),0],
-                                            [np.sqrt(0.6),-np.sqrt(0.6),0],
-                                            [np.sqrt(0.6),np.sqrt(0.6),0],
-                                            [-np.sqrt(0.6),0,0],
-                                            [0,-np.sqrt(0.6),0],
-                                            [0,np.sqrt(0.6),0],
-                                            [np.sqrt(0.6),0,0],
-                                            [0,0,0]])
+        gauss_pt_offsets = sensor_data.spatial_dims * \
+                                np.array([[-np.sqrt(0.6),-np.sqrt(0.6),0],
+                                          [-np.sqrt(0.6),np.sqrt(0.6),0],
+                                          [np.sqrt(0.6),-np.sqrt(0.6),0],
+                                          [np.sqrt(0.6),np.sqrt(0.6),0],
+                                          [-np.sqrt(0.6),0,0],
+                                          [0,-np.sqrt(0.6),0],
+                                          [0,np.sqrt(0.6),0],
+                                          [np.sqrt(0.6),0,0],
+                                          [0,0,0]])
 
         gauss_weight_func = create_gauss_weights_2d_9pts
 
         quadrature = Quadrature2D(gauss_pt_offsets,
                             gauss_weight_func,
                             field,
-                            cent_pos,
-                            area_dims,
-                            sample_times)
+                            sensor_data.positions,
+                            sensor_data.spatial_dims,
+                            sensor_data.sample_times)
         return quadrature
 
 
-def build_spatial_integrator(integrator_type: ESpatialIntType,
-                            field: IField,
-                            cent_pos: np.ndarray,
-                            area_dims: np.ndarray,
-                            sample_times: np.ndarray | None = None
-                            ) -> ISpatialAverager:
+def build_spatial_averager(field: IField, sensor_data: SensorData,
+                          ) -> ISpatialIntegrator | None:
+    if sensor_data.spatial_averager is None or sensor_data.spatial_dims is None:
+        return None
 
-    if integrator_type == ESpatialIntType.RECT1PT:
+    if sensor_data.spatial_averager == ESpatialIntType.RECT1PT:
         return SpatialIntegratorFactory.rect_2d_1pt(field,
-                                                      cent_pos,
-                                                      area_dims,
-                                                      sample_times)
-    elif integrator_type == ESpatialIntType.RECT4PT:
+                                                    sensor_data.positions,
+                                                    sensor_data.spatial_dims,
+                                                    sensor_data.sample_times)
+    elif sensor_data.spatial_averager == ESpatialIntType.RECT4PT:
         return SpatialIntegratorFactory.rect_2d_4pt(field,
-                                                      cent_pos,
-                                                      area_dims,
-                                                      sample_times)
-    elif integrator_type == ESpatialIntType.RECT9PT:
+                                                    sensor_data.positions,
+                                                    sensor_data.spatial_dims,
+                                                    sensor_data.sample_times)
+    elif sensor_data.spatial_averager == ESpatialIntType.RECT9PT:
         return SpatialIntegratorFactory.rect_2d_9pt(field,
-                                                      cent_pos,
-                                                      area_dims,
-                                                      sample_times)
-    elif integrator_type == ESpatialIntType.QUAD4PT:
+                                                    sensor_data.positions,
+                                                    sensor_data.spatial_dims,
+                                                    sensor_data.sample_times)
+    elif sensor_data.spatial_averager == ESpatialIntType.QUAD4PT:
         return SpatialIntegratorFactory.quad_2d_4pt(field,
-                                            cent_pos,
-                                            area_dims,
-                                            sample_times)
-    elif integrator_type == ESpatialIntType.QUAD9PT:
+                                                    sensor_data.positions,
+                                                    sensor_data.spatial_dims,
+                                                    sensor_data.sample_times)
+    elif sensor_data.spatial_averager == ESpatialIntType.QUAD9PT:
         return SpatialIntegratorFactory.quad_2d_9pt(field,
-                                            cent_pos,
-                                            area_dims,
-                                            sample_times)
+                                                    sensor_data.positions,
+                                                    sensor_data.spatial_dims,
+                                                    sensor_data.sample_times)

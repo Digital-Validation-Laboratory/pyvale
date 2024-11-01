@@ -40,7 +40,7 @@ def main() -> None:
     field_key = 'temperature'
     t_field = pyvale.ScalarField(sim_data,
                                  field_key=field_key,
-                                 spat_dim=3)
+                                 spat_dims=3)
 
     n_sens = (1,4,1)
     x_lims = (12.5,12.5)

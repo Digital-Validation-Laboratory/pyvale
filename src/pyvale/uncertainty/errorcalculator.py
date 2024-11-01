@@ -6,40 +6,32 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 import enum
-from dataclasses import dataclass
 from abc import ABC, abstractmethod
 import numpy as np
-from scipy.spatial.transform import Rotation
+from pyvale.sensors.sensordata import SensorData
 
 
-@dataclass(slots=True)
-class ErrorData:
-    error_array: np.ndarray | None = None
-    positions: np.ndarray | None = None
-    angles: tuple[Rotation,...] | None = None
-    time_steps: np.ndarray | None = None
-
-
-class EErrorType(enum.Enum):
+class EErrType(enum.Enum):
     SYSTEMATIC = enum.auto()
     RANDOM = enum.auto()
 
-class EErrorCalc(enum.Enum):
+class EErrDependence(enum.Enum):
     INDEPENDENT = enum.auto()
     DEPENDENT = enum.auto()
 
 
 class IErrCalculator(ABC):
     @abstractmethod
-    def get_error_type(self) -> EErrorType:
+    def get_error_type(self) -> EErrType:
         pass
 
     @abstractmethod
-    def get_error_calc(self) -> EErrorCalc:
+    def get_error_dep(self) -> EErrDependence:
         pass
 
     @abstractmethod
-    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
+    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
+                                                       SensorData | None]:
         pass
 
 

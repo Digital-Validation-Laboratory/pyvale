@@ -123,7 +123,8 @@ def sample_pyvista(components: tuple,
         return sample_at_sim_time
 
     # Use linear interpolation to extract sensor times
-    sample_time_interp = lambda x: np.interp(times,time_steps,x) # type: ignore
+    def sample_time_interp(x):
+        return np.interp(times, time_steps, x) # type: ignore
 
     n_time_steps = times.shape[0]
     sample_at_spec_time = np.empty((n_sensors,n_comps,n_time_steps))
@@ -133,3 +134,4 @@ def sample_pyvista(components: tuple,
                                                     sample_at_sim_time[:,ii,:])
 
     return sample_at_spec_time
+

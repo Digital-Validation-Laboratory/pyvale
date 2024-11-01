@@ -1,19 +1,25 @@
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
-Update experiment simulator to use __slots__
-
 NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
+
+- TODO PRIORITY:
+    - Fix ErrorIntegrator to use options dataclass
+    - Visualisation tools for perturbed field errors:
+        - Perturbed pos, time, angle
 
 - TODO: EXAMPLES
     - Example showing area averaging as ground truth
 
-- TODO: PointSensorArray
+- BUGS!
+    - Spatial integrators don't rotate integration point locations!
 
 - TODO: ErrorIntegrator
     - Need to pass updated position/time/angle/area along as errors are accumulated?
         - Might not be the best way to do this - might need to pass a single data class that encodes all errors
         - SensorArrayErrorData: rand_pos_xyz, rand_ang_zyx, area_avg, rand_time?
+    - Add error integration options
+    - Simplify the memory efficient and non-memory efficient options
 
 - TODO: Experiment generator/ runner
     - TODO: Allow user to extract all sources of error for each experiment, need to dig out of `ErrorIntegrator`

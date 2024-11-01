@@ -8,6 +8,7 @@ Copyright (C) 2024 The Digital Validation Team
 import enum
 from abc import ABC, abstractmethod
 import numpy as np
+from scipy.spatial.transform import Rotation
 
 
 class ESpatialIntType(enum.Enum):
@@ -27,11 +28,12 @@ def create_int_pt_array(int_pt_offsets: np.ndarray,
     return int_pt_array + offset_array
 
 
-class ISpatialAverager(ABC):
+class ISpatialIntegrator(ABC):
     @abstractmethod
     def calc_averages(self,
                       cent_pos: np.ndarray | None = None,
-                      sample_times: np.ndarray | None = None) -> np.ndarray:
+                      sample_times: np.ndarray | None = None,
+                      angles: tuple[Rotation,...] | None = None) -> np.ndarray:
         pass
 
     @abstractmethod

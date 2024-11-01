@@ -8,11 +8,10 @@ Copyright (C) 2024 The Digital Validation Team
 import enum
 from typing import Callable
 import numpy as np
-
+from pyvale.sensors.sensordata import SensorData
 from pyvale.uncertainty.errorcalculator import (IErrCalculator,
-                                                ErrorData,
-                                                EErrorType,
-                                                EErrorCalc)
+                                                EErrType,
+                                                EErrDependence)
 
 
 class ERoundMethod(enum.Enum):
@@ -35,24 +34,24 @@ class SysErrRoundOff(IErrCalculator):
     def __init__(self,
                  method: ERoundMethod = ERoundMethod.ROUND,
                  base: float = 1.0,
-                 err_calc: EErrorCalc = EErrorCalc.DEPENDENT) -> None:
+                 err_calc: EErrDependence = EErrDependence.DEPENDENT) -> None:
 
         self._base = base
         self._method = _select_round_method(method)
         self._err_calc = err_calc
 
-    def get_error_calc(self) -> EErrorCalc:
+    def get_error_dep(self) -> EErrDependence:
         return self._err_calc
 
-    def get_error_type(self) -> EErrorType:
-        return EErrorType.SYSTEMATIC
+    def get_error_type(self) -> EErrType:
+        return EErrType.SYSTEMATIC
 
-    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
+    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
+                                                       SensorData | None]:
 
         rounded_measurements = self._base*self._method(err_basis/self._base)
 
-        err_data = ErrorData(error_array=(rounded_measurements - err_basis))
-        return err_data
+        return (rounded_measurements - err_basis,None)
 
 
 class SysErrDigitisation(IErrCalculator):
@@ -61,25 +60,25 @@ class SysErrDigitisation(IErrCalculator):
     def __init__(self,
                  bits_per_unit: float,
                  method: ERoundMethod = ERoundMethod.ROUND,
-                 err_calc: EErrorCalc = EErrorCalc.DEPENDENT) -> None:
+                 err_calc: EErrDependence = EErrDependence.DEPENDENT) -> None:
 
         self._units_per_bit = 1/float(bits_per_unit)
         self._method = _select_round_method(method)
         self._err_calc = err_calc
 
-    def get_error_calc(self) -> EErrorCalc:
+    def get_error_dep(self) -> EErrDependence:
         return self._err_calc
 
-    def get_error_type(self) -> EErrorType:
-        return EErrorType.SYSTEMATIC
+    def get_error_type(self) -> EErrType:
+        return EErrType.SYSTEMATIC
 
-    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
+    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
+                                                       SensorData | None]:
 
         rounded_measurements = self._units_per_bit*self._method(
             err_basis/self._units_per_bit)
 
-        err_data = ErrorData(error_array=(rounded_measurements - err_basis))
-        return err_data
+        return (rounded_measurements - err_basis, None)
 
 
 class SysErrSaturation(IErrCalculator):
@@ -88,7 +87,7 @@ class SysErrSaturation(IErrCalculator):
     def __init__(self,
                  meas_min: float,
                  meas_max: float,
-                 err_calc: EErrorCalc = EErrorCalc.DEPENDENT) -> None:
+                 err_calc: EErrDependence = EErrDependence.DEPENDENT) -> None:
 
         if meas_min > meas_max:
             raise ValueError("Minimum must be smaller than maximum for "+
@@ -98,20 +97,20 @@ class SysErrSaturation(IErrCalculator):
         self._max = meas_max
         self._err_calc = err_calc
 
-    def get_error_calc(self) -> EErrorCalc:
+    def get_error_dep(self) -> EErrDependence:
         return self._err_calc
 
-    def get_error_type(self) -> EErrorType:
-        return EErrorType.SYSTEMATIC
+    def get_error_type(self) -> EErrType:
+        return EErrType.SYSTEMATIC
 
-    def calc_errs(self,err_basis: np.ndarray) -> ErrorData:
+    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
+                                                       SensorData | None]:
 
         saturated = np.copy(err_basis)
         saturated[saturated > self._max] = self._max
         saturated[saturated < self._min] = self._min
 
-        err_data = ErrorData(error_array=(saturated - err_basis))
-        return err_data
+        return (saturated - err_basis,None)
 
 
 

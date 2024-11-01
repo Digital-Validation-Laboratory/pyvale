@@ -6,14 +6,14 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 import numpy as np
-
+from scipy.spatial.transform import Rotation
 from pyvale.physics.field import IField
-from pyvale.numerical.spatialintegrator import (ISpatialAverager,
+from pyvale.numerical.spatialintegrator import (ISpatialIntegrator,
                                                 create_int_pt_array)
 
 # NOTE: code below is very similar to quadrature integrator should be able to
 # refactor into injected classes/functions
-class Rectangle2D(ISpatialAverager):
+class Rectangle2D(ISpatialIntegrator):
     __slots__ = ("_field","_cent_pos","_dims","_sample_times","_area_tot",
                 "_area_int","_n_int_pts","_int_pt_offsets","_int_pts",
                 "_integrals")
@@ -44,7 +44,9 @@ class Rectangle2D(ISpatialAverager):
 
     def calc_integrals(self,
                     cent_pos: np.ndarray | None = None,
-                    sample_times: np.ndarray | None = None) -> np.ndarray:
+                    sample_times: np.ndarray | None = None,
+                    angles: tuple[Rotation,...] | None = None,
+                    ) -> np.ndarray:
 
         if cent_pos is not None:
             # shape=(n_sens*n_gauss_pts,n_dims)
@@ -53,7 +55,8 @@ class Rectangle2D(ISpatialAverager):
 
         # shape=(n_gauss_pts*n_sens,n_comps,n_timesteps)
         int_vals = self._field.sample_field(self._int_pts,
-                                              sample_times)
+                                            sample_times,
+                                            angles)
 
         meas_shape = (self._cent_pos.shape[0],
                 int_vals.shape[1],

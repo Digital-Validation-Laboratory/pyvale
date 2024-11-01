@@ -64,10 +64,9 @@ def main() -> None:
 
     offset_angles = np.array([1,0,0]) # degrees
     sys_err_rot = pyvale.SysErrAngleOffset(disp_field,
-                                           sens_pos,
-                                           sens_angles,
-                                           offset_angles,
-                                           sample_times)
+                                           sens_data_rot,
+                                           offset_angles)
+
 
     sys_err_int = pyvale.ErrorIntegrator([sys_err_rot],
                                         disp_sens_rot.get_measurement_shape())

@@ -6,11 +6,10 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 from typing import Callable
-
 import numpy as np
-
+from scipy.spatial.transform import Rotation
 from pyvale.physics.field import IField
-from pyvale.numerical.spatialintegrator import (ISpatialAverager,
+from pyvale.numerical.spatialintegrator import (ISpatialIntegrator,
                                                 create_int_pt_array)
 
 
@@ -26,10 +25,10 @@ def create_gauss_weights_2d_9pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
     return gauss_weights
 
 
-class Quadrature2D(ISpatialAverager):
+class Quadrature2D(ISpatialIntegrator):
     __slots__ = ("_field","_cent_pos","_area_dims","_sample_times","_area",
                  "_n_gauss_pts","_gauss_pt_offsets","_gauss_weight_func",
-                 "_gauss_pts","_integrals")
+                 "_gauss_pts","_averages")
 
     def __init__(self,
                  gauss_pt_offsets: np.ndarray,
@@ -52,13 +51,22 @@ class Quadrature2D(ISpatialAverager):
 
         self._gauss_pts = create_int_pt_array(self._gauss_pt_offsets,
                                               cent_pos)
-
-        self._integrals = self.calc_integrals(None, sample_times)
-
+        self._averages = None
 
     def calc_integrals(self,
                        cent_pos: np.ndarray | None = None,
-                       sample_times: np.ndarray | None = None) -> np.ndarray:
+                       sample_times: np.ndarray | None = None,
+                       angles: tuple[Rotation,...] | None = None) -> np.ndarray:
+        self._averages = self.calc_averages(cent_pos,sample_times,angles)
+        return self._area*self.get_averages()
+
+    def get_integrals(self) -> np.ndarray:
+        return self._area*self.get_averages()
+
+    def calc_averages(self,
+                      cent_pos: np.ndarray | None = None,
+                      sample_times: np.ndarray | None = None,
+                      angles: tuple[Rotation,...] | None = None) -> np.ndarray:
 
         if cent_pos is not None:
             # shape=(n_sens*n_gauss_pts,n_dims)
@@ -67,7 +75,8 @@ class Quadrature2D(ISpatialAverager):
 
         # shape=(n_gauss_pts*n_sens,n_comps,n_timesteps)
         gauss_vals = self._field.sample_field(self._gauss_pts,
-                                              sample_times)
+                                              sample_times,
+                                              angles)
 
         meas_shape = (self._cent_pos.shape[0],
                         gauss_vals.shape[1],
@@ -80,22 +89,19 @@ class Quadrature2D(ISpatialAverager):
         # shape=(n_gauss_pts,n_sens,n_comps,n_timesteps)
         gauss_weights = self._gauss_weight_func(meas_shape)
 
-        # shape=(n_sensors,n_comps,n_timsteps)
         # NOTE: coeff comes from changing gauss interval from [-1,1] to [a,b] -
         # so (a-b)/2 * (a-b)/2 = sensor_area / 4, then need to divide by the
-        # integration area to convert to an average.
-        self._integrals = self._area/4 * np.sum(gauss_weights*gauss_vals,axis=0)
+        # integration area to convert to an average:
+        # integrals = self._area/4 * np.sum(gauss_weights*gauss_vals,axis=0)
+        # self._averages = (1/self._area)*integrals
 
-        return self._integrals
-
-    def get_integrals(self) -> np.ndarray:
-        return self._integrals
-
-    def calc_averages(self,
-                      cent_pos: np.ndarray | None = None,
-                      sample_times: np.ndarray | None = None) -> np.ndarray:
-        return (1/self._area)*self.calc_integrals(cent_pos,sample_times)
+        # shape=(n_sensors,n_comps,n_timsteps)=meas_shape
+        self._averages = 1/4 * np.sum(gauss_weights*gauss_vals,axis=0)
+        return self._averages
 
     def get_averages(self) -> np.ndarray:
-        return (1/self._area)*self._integrals
+        if self._averages is None:
+            self._averages = self.calc_averages()
+
+        return self._averages
 

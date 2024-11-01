@@ -5,37 +5,25 @@ License: MIT
 Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
-from dataclasses import dataclass
-
 import numpy as np
-from scipy.spatial.transform import Rotation
 import pyvista as pv
-
 from pyvale.physics.field import IField
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
 from pyvale.sensors.sensordescriptor import SensorDescriptor
-from pyvale.numerical.spatialintegrator import ISpatialAverager
-
-
-@dataclass(slots=True)
-class SensorData:
-    positions: np.ndarray | None = None
-    sample_times: np.ndarray | None = None
-    area_averager: ISpatialAverager | None = None
-    angles: tuple[Rotation,...] | None = None
+from pyvale.sensors.sensordata import SensorData
+from pyvale.physics.fieldsampler import sample_field_with_sensor_data
 
 
 class PointSensorArray:
-    __slots__ = ("sensor_data","field","descriptor","_truth","_measurements",
+    __slots__ = ("field","descriptor","sensor_data","_truth","_measurements",
                  "_error_integrator")
 
     def __init__(self,
-                 sensor_array_data: SensorData,
+                 sensor_data: SensorData,
                  field: IField,
                  descriptor: SensorDescriptor | None = None,
                  ) -> None:
-
-        self.sensor_data = sensor_array_data
+        self.sensor_data = sensor_data
         self.field = field
 
         self.descriptor = SensorDescriptor()
@@ -62,14 +50,9 @@ class PointSensorArray:
     #---------------------------------------------------------------------------
     # Truth calculation from simulation
     def calc_truth_values(self) -> np.ndarray:
-        if self.sensor_data.area_averager is None:
-            return self.field.sample_field(self.sensor_data.positions,
-                                           self.sensor_data.sample_times,
-                                           self.sensor_data.angles)
-
-        return self.sensor_data.area_averager.calc_averages(
-                        self.sensor_data.positions,
-                        self.sensor_data.sample_times)
+        self._truth = sample_field_with_sensor_data(self.field,
+                                                    self.sensor_data)
+        return self._truth
 
     def get_truth(self) -> np.ndarray:
         if self._truth is None:
