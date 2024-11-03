@@ -19,23 +19,28 @@ class ErrorIntegrationOpts:
 
 
 class ErrorIntegrator:
-    __slots__ = ("err_chain","meas_shape","store_errs_by_func","_errs_by_chain",
+    __slots__ = ("_err_chain","_meas_shape","_errs_by_chain",
                  "_errs_systematic","_errs_random","_errs_total",
-                 "_sens_data_by_chain")
+                 "_sens_data_by_chain","_err_int_opts")
 
     def __init__(self,
                  err_chain: list[IErrCalculator],
                  meas_shape: tuple[int,int,int],
-                 store_errs_by_func: bool = True) -> None:
+                 err_int_opts: ErrorIntegrationOpts | None = None) -> None:
 
-        self.err_chain = err_chain
-        self.meas_shape = meas_shape
-        self.store_errs_by_func = store_errs_by_func
+        if err_int_opts is None:
+            self._err_int_opts = ErrorIntegrationOpts()
+        else:
+            self._err_int_opts = err_int_opts
+
+        self.set_error_chain(err_chain)
+        self._meas_shape = meas_shape
 
         self._sens_data_by_chain = []
-        if store_errs_by_func:
-            self._errs_by_chain = np.zeros((len(self.err_chain),)+ \
-                                               self.meas_shape)
+
+        if self._err_int_opts.store_errs_by_func:
+            self._errs_by_chain = np.zeros((len(self._err_chain),)+ \
+                                               self._meas_shape)
         else:
             self._errs_by_chain = None
 
@@ -45,11 +50,15 @@ class ErrorIntegrator:
 
 
     def set_error_chain(self, err_chain: list[IErrCalculator]) -> None:
-        self.err_chain = err_chain
+        self._err_chain = err_chain
+
+        if self._err_int_opts.force_dependence:
+            for ee in self._err_chain:
+                ee.set_error_dep(EErrDependence.DEPENDENT)
 
 
     def calc_errors_from_chain(self, truth: np.ndarray) -> np.ndarray:
-        if self.store_errs_by_func:
+        if self._err_int_opts.store_errs_by_func:
             return self._calc_errors_store_by_func(truth)
 
         return self._calc_errors_mem_eff(truth)
@@ -57,10 +66,10 @@ class ErrorIntegrator:
 
     def _calc_errors_store_by_func(self, truth: np.ndarray) -> np.ndarray:
         accumulated_error = np.zeros_like(truth)
-        self._errs_by_chain = np.zeros((len(self.err_chain),) + \
-                                           self.meas_shape)
+        self._errs_by_chain = np.zeros((len(self._err_chain),) + \
+                                           self._meas_shape)
 
-        for ii,ee in enumerate(self.err_chain):
+        for ii,ee in enumerate(self._err_chain):
 
             if ee.get_error_dep() == EErrDependence.DEPENDENT:
                 (error_array,sens_data) = ee.calc_errs(truth+accumulated_error)
@@ -84,7 +93,7 @@ class ErrorIntegrator:
     def _calc_errors_mem_eff(self, truth: np.ndarray) -> np.ndarray:
         accumulated_error = np.zeros_like(truth)
 
-        for ee in self.err_chain:
+        for ee in self._err_chain:
 
             if ee.get_error_dep() == EErrDependence.DEPENDENT:
                 (error_array,sens_data) = ee.calc_errs(truth+accumulated_error)

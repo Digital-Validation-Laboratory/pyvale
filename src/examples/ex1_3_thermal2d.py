@@ -87,7 +87,7 @@ def main() -> None:
         error_chain.append(pyvale.SysErrUniform(low=-5.0,
                                             high=5.0))
         gen_norm = pyvale.GeneratorNormal(std=1.0)
-        error_chain.append(pyvale.SysErrRandPosition(t_field,
+        error_chain.append(pyvale.SysErrPositionRand(t_field,
                                             sens_pos,
                                             (gen_norm,gen_norm,None),
                                             sample_times))

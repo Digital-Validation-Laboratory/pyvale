@@ -30,6 +30,10 @@ class IErrCalculator(ABC):
         pass
 
     @abstractmethod
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        pass
+
+    @abstractmethod
     def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
                                                        SensorData | None]:
         pass

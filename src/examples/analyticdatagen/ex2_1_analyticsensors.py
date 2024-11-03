@@ -48,7 +48,7 @@ def main() -> None:
         indep_sys_err1 = pyvale.SysErrOffset(offset=-5.0)
         indep_sys_err2 = pyvale.SysErrUniform(low=-10.0,
                                             high=10.0)
-        indep_sys_err3 = pyvale.SysErrRandPosition(t_field,
+        indep_sys_err3 = pyvale.SysErrPositionRand(t_field,
                                             sens_pos,
                                             (0.05,0.05,None),
                                             sample_times)

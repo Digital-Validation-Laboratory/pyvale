@@ -66,7 +66,7 @@ def main() -> None:
 
     # Field based errors
     pos_gen = pyvale.GeneratorNormal(std=1.0)
-    err_chain.append(pyvale.SysErrRandPosition(tc_array.field,
+    err_chain.append(pyvale.SysErrPositionRand(tc_array.field,
                                                 sensor_data,
                                                 (pos_gen,pos_gen,None)))
 

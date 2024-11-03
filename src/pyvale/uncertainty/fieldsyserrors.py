@@ -21,7 +21,7 @@ from pyvale.uncertainty.driftcalculator import IDriftCalculator
 from pyvale.uncertainty.randomgenerator import IGeneratorRandom
 
 
-class SysErrRandPosition(IErrCalculator):
+class SysErrPositionRand(IErrCalculator):
     __slots__ = ("_field","_sensor_data_nominal","_sensor_data_perturbed",
                  "_err_dep","_rand_err_xyz")
 
@@ -35,13 +35,16 @@ class SysErrRandPosition(IErrCalculator):
                  ) -> None:
 
         self._field = field
-        self._sensor_data_nominal = sensor_data_nominal
+        self._sensor_data_nominal = copy.deepcopy(sensor_data_nominal)
         self._sensor_data_perturbed = copy.deepcopy(sensor_data_nominal)
         self._rand_err_xyz = rand_pos_xyz
         self._err_dep = err_dep
 
     def get_error_dep(self) -> EErrDependence:
         return self._err_dep
+
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        self._err_dep = dependence
 
     def get_error_type(self) -> EErrType:
         return EErrType.SYSTEMATIC
@@ -88,6 +91,9 @@ class SysErrSpatialAverage(IErrCalculator):
     def get_error_dep(self) -> EErrDependence:
         return self._err_dep
 
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        self._err_dep = dependence
+
     def get_error_type(self) -> EErrType:
         return EErrType.SYSTEMATIC
 
@@ -104,7 +110,7 @@ class SysErrSpatialAverage(IErrCalculator):
         return (sys_errs,self._sensor_data_perturbed)
 
 
-class SysErrSpatialAverageRandPos(IErrCalculator):
+class SysErrSpatialAveragePosRand(IErrCalculator):
     __slots__ = ("_field","_sensor_data_nominal","_sensor_data_perturbed",
                 "_err_dep","_rand_pos_xyz")
 
@@ -128,6 +134,9 @@ class SysErrSpatialAverageRandPos(IErrCalculator):
 
     def get_error_dep(self) -> EErrDependence:
         return self._err_dep
+
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        self._err_dep = dependence
 
     def get_error_type(self) -> EErrType:
         return EErrType.SYSTEMATIC
@@ -171,6 +180,9 @@ class SysErrTimeRand(IErrCalculator):
     def get_error_dep(self) -> EErrDependence:
         return self._err_dep
 
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        self._err_dep = dependence
+
     def get_error_type(self) -> EErrType:
         return EErrType.SYSTEMATIC
 
@@ -213,6 +225,9 @@ class SysErrTimeDrift(IErrCalculator):
     def get_error_dep(self) -> EErrDependence:
         return self._err_dep
 
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        self._err_dep = dependence
+
     def get_error_type(self) -> EErrType:
         return EErrType.SYSTEMATIC
 
@@ -254,6 +269,9 @@ class SysErrAngleOffset(IErrCalculator):
     def get_error_dep(self) -> EErrDependence:
         return self._err_dep
 
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        self._err_dep = dependence
+
     def get_error_type(self) -> EErrType:
         return EErrType.SYSTEMATIC
 
@@ -293,12 +311,22 @@ class SysErrAngleRand(IErrCalculator):
 
         self._field = field
         self._sensor_data_nominal = sensor_data_nominal
+
+
         self._sensor_data_perturbed = copy.deepcopy(sensor_data_nominal)
+        if self._sensor_data_perturbed.angles is None:
+            self._sensor_data_perturbed.angles = [
+                Rotation.from_euler("zyx",[0,0,0], degrees=True)
+                for _ in range(sensor_data_nominal.positions.shape[0])]
+
         self._rand_ang_zyx = rand_ang_zyx
         self._err_dep = err_dep
 
     def get_error_dep(self) -> EErrDependence:
         return self._err_dep
+
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        self._err_dep = dependence
 
     def get_error_type(self) -> EErrType:
         return EErrType.SYSTEMATIC
@@ -374,6 +402,9 @@ class SysErrField(IErrCalculator):
 
     def get_error_dep(self) -> EErrDependence:
         return self._err_dep
+
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        self._err_dep = dependence
 
     def get_error_type(self) -> EErrType:
         return EErrType.SYSTEMATIC

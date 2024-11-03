@@ -31,7 +31,7 @@ def main() -> None:
 
     tc_array = pyvale.PointSensorArray(sens_pos,t_field)
 
-    field_sys_err1 = pyvale.SysErrRandPosition(t_field,
+    field_sys_err1 = pyvale.SysErrPositionRand(t_field,
                                            sens_pos,
                                            (0.1,0.1,None))
 
@@ -42,7 +42,7 @@ def main() -> None:
     field_sys_err2 = pyvale.SysErrSpatialAverage(t_field,
                                                  spatial_int)
 
-    field_sys_err3 = pyvale.SysErrSpatialAverageRandPos(t_field,
+    field_sys_err3 = pyvale.SysErrSpatialAveragePosRand(t_field,
                                                  spatial_int,
                                                  sens_pos,
                                                  (0.1,0.1,None))

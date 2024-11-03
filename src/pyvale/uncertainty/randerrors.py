@@ -14,20 +14,23 @@ from pyvale.uncertainty.randomgenerator import IGeneratorRandom
 
 
 class RandErrUniform(IErrCalculator):
-    __slots__ = ("_low","_high","_rng","_err_calc")
+    __slots__ = ("_low","_high","_rng","_err_dep")
 
     def __init__(self,
                  low: float,
                  high: float,
-                 err_calc: EErrDependence = EErrDependence.INDEPENDENT,
+                 err_dep: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
         self._low = low
         self._high = high
         self._rng = np.random.default_rng(seed)
-        self._err_calc = err_calc
+        self._err_dep = err_dep
 
     def get_error_dep(self) -> EErrDependence:
-        return self._err_calc
+        return self._err_dep
+
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        self._err_dep = dependence
 
     def get_error_type(self) -> EErrType:
         return EErrType.RANDOM
@@ -43,20 +46,23 @@ class RandErrUniform(IErrCalculator):
 
 
 class RandErrUnifPercent(IErrCalculator):
-    __slots__ = ("_low","_high","_rng","_err_calc")
+    __slots__ = ("_low","_high","_rng","_err_dep")
 
     def __init__(self,
                  low_percent: float,
                  high_percent: float,
-                 err_calc: EErrDependence = EErrDependence.INDEPENDENT,
+                 err_dep: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
         self._low = low_percent
         self._high = high_percent
         self._rng = np.random.default_rng(seed)
-        self._err_calc = err_calc
+        self._err_dep = err_dep
 
     def get_error_dep(self) -> EErrDependence:
-        return self._err_calc
+        return self._err_dep
+
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        self._err_dep = dependence
 
     def get_error_type(self) -> EErrType:
         return EErrType.RANDOM
@@ -72,18 +78,21 @@ class RandErrUnifPercent(IErrCalculator):
 
 
 class RandErrNormal(IErrCalculator):
-    __slots__ = ("_std","_rng","_err_calc")
+    __slots__ = ("_std","_rng","_err_dep")
 
     def __init__(self,
                  std: float,
-                 err_calc: EErrDependence = EErrDependence.INDEPENDENT,
+                 err_dep: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
         self._std = std
         self._rng = np.random.default_rng(seed)
-        self._err_calc = err_calc
+        self._err_dep = err_dep
 
     def get_error_dep(self) -> EErrDependence:
-        return self._err_calc
+        return self._err_dep
+
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        self._err_dep = dependence
 
     def get_error_type(self) -> EErrType:
         return EErrType.RANDOM
@@ -98,18 +107,21 @@ class RandErrNormal(IErrCalculator):
 
 
 class RandErrNormPercent(IErrCalculator):
-    __slots__ = ("_std","_rng","_err_calc")
+    __slots__ = ("_std","_rng","_err_dep")
 
     def __init__(self,
                  std_percent: float,
-                 err_calc: EErrDependence = EErrDependence.INDEPENDENT,
+                 err_dep: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
         self._std = std_percent/100
         self._rng = np.random.default_rng(seed)
-        self._err_calc = err_calc
+        self._err_dep = err_dep
 
     def get_error_dep(self) -> EErrDependence:
-        return self._err_calc
+        return self._err_dep
+
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        self._err_dep = dependence
 
     def get_error_type(self) -> EErrType:
         return EErrType.RANDOM
@@ -125,17 +137,20 @@ class RandErrNormPercent(IErrCalculator):
 
 
 class RandErrGenerator(IErrCalculator):
-    __slots__ = ("_generator","_err_calc")
+    __slots__ = ("_generator","_err_dep")
 
     def __init__(self,
                  generator: IGeneratorRandom,
-                 err_calc: EErrDependence = EErrDependence.INDEPENDENT) -> None:
+                 err_dep: EErrDependence = EErrDependence.INDEPENDENT) -> None:
         self._generator = generator
-        self._err_calc = err_calc
+        self._err_dep = err_dep
 
     def get_error_dep(self) -> EErrDependence:
-        return self._err_calc
+        return self._err_dep
 
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        self._err_dep = dependence
+        
     def get_error_type(self) -> EErrType:
         return EErrType.RANDOM
 

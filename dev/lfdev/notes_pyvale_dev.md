@@ -1,12 +1,12 @@
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
-
+FIX FIELD ERRORS TO COPY AND INIT THE NOMINAL SENSOR DATA!
 
 - TODO PRIORITY:
-    - Fix ErrorIntegrator to use options dataclass
     - Visualisation tools for perturbed field errors:
         - Perturbed pos, time, angle
+
 - BUGS!
 NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
     - Spatial integrators don't rotate integration point locations!
@@ -16,9 +16,6 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
     - Example showing field error chain with other errors and extraction of perturbed sensor data
 
 - TODO: ErrorIntegrator
-    - Need to pass updated position/time/angle/area along as errors are accumulated?
-        - Might not be the best way to do this - might need to pass a single data class that encodes all errors
-        - SensorArrayErrorData: rand_pos_xyz, rand_ang_zyx, area_avg, rand_time?
     - Add error integration options
     - Simplify the memory efficient and non-memory efficient options
 
