@@ -15,6 +15,7 @@ class EErrType(enum.Enum):
     SYSTEMATIC = enum.auto()
     RANDOM = enum.auto()
 
+
 class EErrDependence(enum.Enum):
     INDEPENDENT = enum.auto()
     DEPENDENT = enum.auto()
@@ -34,8 +35,10 @@ class IErrCalculator(ABC):
         pass
 
     @abstractmethod
-    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
-                                                       SensorData | None]:
+    def calc_errs(self,
+                  err_basis: np.ndarray,
+                  sens_data: SensorData,
+                  ) -> tuple[np.ndarray, SensorData]:
         pass
 
 

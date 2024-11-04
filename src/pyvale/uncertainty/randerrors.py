@@ -10,7 +10,7 @@ from pyvale.sensors.sensordata import SensorData
 from pyvale.uncertainty.errorcalculator import (IErrCalculator,
                                                 EErrType,
                                                 EErrDependence)
-from pyvale.uncertainty.randomgenerator import IGeneratorRandom
+from pyvale.uncertainty.generatorsrandom import IGeneratorRandom
 
 
 class RandErrUniform(IErrCalculator):
@@ -35,14 +35,16 @@ class RandErrUniform(IErrCalculator):
     def get_error_type(self) -> EErrType:
         return EErrType.RANDOM
 
-    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
-                                                       SensorData | None]:
+    def calc_errs(self,
+                  err_basis: np.ndarray,
+                  sens_data: SensorData,
+                  ) -> tuple[np.ndarray, SensorData]:
 
         rand_errs = self._rng.uniform(low=self._low,
                                     high=self._high,
                                     size=err_basis.shape)
 
-        return (rand_errs,None)
+        return (rand_errs,sens_data)
 
 
 class RandErrUnifPercent(IErrCalculator):
@@ -67,14 +69,16 @@ class RandErrUnifPercent(IErrCalculator):
     def get_error_type(self) -> EErrType:
         return EErrType.RANDOM
 
-    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
-                                                       SensorData | None]:
+    def calc_errs(self,
+                  err_basis: np.ndarray,
+                  sens_data: SensorData,
+                  ) -> tuple[np.ndarray, SensorData]:
 
         norm_rand = self._rng.uniform(low=self._low/100,
                                     high=self._high/100,
                                     size=err_basis.shape)
 
-        return (err_basis*norm_rand,None)
+        return (err_basis*norm_rand,sens_data)
 
 
 class RandErrNormal(IErrCalculator):
@@ -97,13 +101,15 @@ class RandErrNormal(IErrCalculator):
     def get_error_type(self) -> EErrType:
         return EErrType.RANDOM
 
-    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
-                                                       SensorData | None]:
+    def calc_errs(self,
+                  err_basis: np.ndarray,
+                  sens_data: SensorData,
+                  ) -> tuple[np.ndarray, SensorData]:
         rand_errs = self._rng.normal(loc=0.0,
                                     scale=self._std,
                                     size=err_basis.shape)
 
-        return (rand_errs,None)
+        return (rand_errs,sens_data)
 
 
 class RandErrNormPercent(IErrCalculator):
@@ -126,14 +132,16 @@ class RandErrNormPercent(IErrCalculator):
     def get_error_type(self) -> EErrType:
         return EErrType.RANDOM
 
-    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
-                                                       SensorData | None]:
+    def calc_errs(self,
+                  err_basis: np.ndarray,
+                  sens_data: SensorData,
+                  ) -> tuple[np.ndarray, SensorData]:
 
         norm_rand = self._rng.normal(loc=0.0,
                                     scale=1.0,
                                     size=err_basis.shape)
 
-        return (err_basis*self._std*norm_rand,None)
+        return (err_basis*self._std*norm_rand,sens_data)
 
 
 class RandErrGenerator(IErrCalculator):
@@ -150,13 +158,15 @@ class RandErrGenerator(IErrCalculator):
 
     def set_error_dep(self, dependence: EErrDependence) -> None:
         self._err_dep = dependence
-        
+
     def get_error_type(self) -> EErrType:
         return EErrType.RANDOM
 
-    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
-                                                       SensorData | None]:
+    def calc_errs(self,
+                  err_basis: np.ndarray,
+                  sens_data: SensorData,
+                  ) -> tuple[np.ndarray, SensorData]:
 
         rand_errs = self._generator.generate(size=err_basis.shape)
 
-        return (rand_errs,None)
+        return (rand_errs,sens_data)

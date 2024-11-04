@@ -29,11 +29,11 @@ from pyvale.sensors.sensordata import *
 
 from pyvale.uncertainty.errorintegrator import *
 from pyvale.uncertainty.randerrors import *
-from pyvale.uncertainty.syserrors import *
-from pyvale.uncertainty.depsyserrors import *
-from pyvale.uncertainty.fieldsyserrors import *
+from pyvale.uncertainty.syserrorsIndep import *
+from pyvale.uncertainty.syserrorsdep import *
+from pyvale.uncertainty.syserrorsfield import *
 from pyvale.uncertainty.driftcalculator import *
-from pyvale.uncertainty.randomgenerator import *
+from pyvale.uncertainty.generatorsrandom import *
 
 from pyvale.visualisation.plotopts import *
 from pyvale.visualisation.plotters import *

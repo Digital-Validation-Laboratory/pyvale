@@ -1,11 +1,11 @@
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
-FIX FIELD ERRORS TO COPY AND INIT THE NOMINAL SENSOR DATA!
 
 - TODO PRIORITY:
     - Visualisation tools for perturbed field errors:
         - Perturbed pos, time, angle
+    - De-duplicate code in fieldsyserrs
 
 - BUGS!
 NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
@@ -25,6 +25,7 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
     - TODO: Increase plotting capabilities to compare over simulations as well as all sensors on experiments
 
 - TODO: visualisation tools for:
+    - TODO: remove methods from sensor descriptor data class
     - TODO: presentation animations - create pyvista animation synced to matplotlib traces
     - TODO: visualisation of perturbed time / sensor locations
     - TODO: experiment - allow extraction of different conditions for comparison plots

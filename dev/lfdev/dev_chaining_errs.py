@@ -66,9 +66,9 @@ def main() -> None:
         pos_offset_xyz = pos_offset_xyz,
         ang_offset_zyx = ang_offset_zyx,
         time_offset = 1.0,
-        rand_pos_xyz = (pos_gen,pos_gen,None),
-        rand_ang_zyx = (angle_gen,None,None),
-        rand_time = time_gen
+        pos_rand_xyz = (pos_gen,pos_gen,None),
+        ang_rand_zyx = (angle_gen,None,None),
+        time_rand = time_gen
     )
     sys_err_field = pyvale.SysErrField(disp_field,
                                        sensor_data,

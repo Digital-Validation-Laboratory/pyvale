@@ -51,30 +51,47 @@ def main() -> None:
                                               disp_field,
                                               descriptor)
 
-    rand_pos = pyvale.GeneratorNormal(std=5.0)
-    rand_ang = pyvale.GeneratorNormal(std=1.0)
-    rand_time = pyvale.GeneratorNormal(std=2.0)
+    pos_offset = -1.0*np.ones_like(sensor_positions)
+    pos_offset[:,2] = 0 # in 2d we only have offset in x and y so zero z
+    pos_error_data = pyvale.FieldErrorData(pos_offset_xyz=pos_offset)
+    angle_offset = np.zeros_like(sensor_positions)
+    angle_offset[:,0] = 5.0 # only rotate about z in 2D
+    time_offset = 1.0*np.ones_like(disp_sens_array.get_sample_times())
+    time_error_data = pyvale.FieldErrorData(time_offset=time_offset)
 
     field_errs = []
-    field_errs.append(pyvale.SysErrPositionRand(disp_field,
-                                                sensor_data,
-                                                (rand_pos,rand_pos,None)))
-    field_errs.append(pyvale.SysErrAngleRand(disp_field,
-                                             sensor_data,
-                                             (rand_ang,None,None)))
-    field_errs.append(pyvale.SysErrTimeRand(disp_field,
-                                            sensor_data,
-                                            rand_time))
 
-    err_int_opts = pyvale.ErrorIntegrationOpts(force_dependence=True)
+    field_errs.append(pyvale.SysErrField(disp_field,
+                                        time_error_data))
+    field_errs.append(pyvale.SysErrField(disp_field,
+                                        time_error_data))
+
+    err_int_opts = pyvale.ErrorIntegrationOpts(force_dependence=True,
+                                               store_errs_by_func=True)
     error_int = pyvale.ErrorIntegrator(field_errs,
+                                       sensor_data,
                                        disp_sens_array.get_measurement_shape(),
                                        err_int_opts)
     disp_sens_array.set_error_integrator(error_int)
 
     measurements = disp_sens_array.calc_measurements()
 
+    print(sensor_data.sample_times)
+    print()
+
     sens_data_by_chain = error_int.get_sens_data_by_chain()
+    if sens_data_by_chain is not None:
+        for ii,ss in enumerate(sens_data_by_chain):
+            if ss is not None:
+                print(f"SensorData @ [{ii}]")
+                print(ss.sample_times)
+
+    sens_data_accumulated = error_int.get_sens_data_accumulated()
+    print()
+    print(sens_data_accumulated.sample_times)
+    print()
+
+    return
 
     print(80*'-')
     sens_num = 4

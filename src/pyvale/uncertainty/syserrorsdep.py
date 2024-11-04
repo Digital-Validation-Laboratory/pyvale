@@ -49,12 +49,14 @@ class SysErrRoundOff(IErrCalculator):
     def get_error_type(self) -> EErrType:
         return EErrType.SYSTEMATIC
 
-    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
-                                                       SensorData | None]:
+    def calc_errs(self,
+                  err_basis: np.ndarray,
+                  sens_data: SensorData,
+                  ) -> tuple[np.ndarray, SensorData]:
 
         rounded_measurements = self._base*self._method(err_basis/self._base)
 
-        return (rounded_measurements - err_basis,None)
+        return (rounded_measurements - err_basis,sens_data)
 
 
 class SysErrDigitisation(IErrCalculator):
@@ -78,13 +80,15 @@ class SysErrDigitisation(IErrCalculator):
     def get_error_type(self) -> EErrType:
         return EErrType.SYSTEMATIC
 
-    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
-                                                       SensorData | None]:
+    def calc_errs(self,
+                  err_basis: np.ndarray,
+                  sens_data: SensorData,
+                  ) -> tuple[np.ndarray, SensorData]:
 
         rounded_measurements = self._units_per_bit*self._method(
             err_basis/self._units_per_bit)
 
-        return (rounded_measurements - err_basis, None)
+        return (rounded_measurements - err_basis,sens_data)
 
 
 class SysErrSaturation(IErrCalculator):
@@ -112,14 +116,16 @@ class SysErrSaturation(IErrCalculator):
     def get_error_type(self) -> EErrType:
         return EErrType.SYSTEMATIC
 
-    def calc_errs(self,err_basis: np.ndarray) -> tuple[np.ndarray,
-                                                       SensorData | None]:
+    def calc_errs(self,
+                  err_basis: np.ndarray,
+                  sens_data: SensorData,
+                  ) -> tuple[np.ndarray, SensorData]:
 
         saturated = np.copy(err_basis)
         saturated[saturated > self._max] = self._max
         saturated[saturated < self._min] = self._min
 
-        return (saturated - err_basis,None)
+        return (saturated - err_basis,sens_data)
 
 
 

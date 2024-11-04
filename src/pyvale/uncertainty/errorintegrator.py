@@ -5,6 +5,7 @@ License: MIT
 Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
+import copy
 from dataclasses import dataclass
 import numpy as np
 from pyvale.uncertainty.errorcalculator import (IErrCalculator,
@@ -21,10 +22,12 @@ class ErrorIntegrationOpts:
 class ErrorIntegrator:
     __slots__ = ("_err_chain","_meas_shape","_errs_by_chain",
                  "_errs_systematic","_errs_random","_errs_total",
-                 "_sens_data_by_chain","_err_int_opts")
+                 "_sens_data_by_chain","_err_int_opts","_sens_data_accumulated",
+                 "_sens_data_initial")
 
     def __init__(self,
                  err_chain: list[IErrCalculator],
+                 sensor_data_initial: SensorData,
                  meas_shape: tuple[int,int,int],
                  err_int_opts: ErrorIntegrationOpts | None = None) -> None:
 
@@ -36,12 +39,15 @@ class ErrorIntegrator:
         self.set_error_chain(err_chain)
         self._meas_shape = meas_shape
 
-        self._sens_data_by_chain = []
+        self._sens_data_initial = copy.deepcopy(sensor_data_initial)
+        self._sens_data_accumulated = copy.deepcopy(sensor_data_initial)
 
         if self._err_int_opts.store_errs_by_func:
+            self._sens_data_by_chain = []
             self._errs_by_chain = np.zeros((len(self._err_chain),)+ \
                                                self._meas_shape)
         else:
+            self._sens_data_by_chain = None
             self._errs_by_chain = None
 
         self._errs_systematic = np.zeros(meas_shape)
@@ -72,9 +78,13 @@ class ErrorIntegrator:
         for ii,ee in enumerate(self._err_chain):
 
             if ee.get_error_dep() == EErrDependence.DEPENDENT:
-                (error_array,sens_data) = ee.calc_errs(truth+accumulated_error)
+                (error_array,sens_data) = ee.calc_errs(truth+accumulated_error,
+                                                       self._sens_data_accumulated)
             else:
-                (error_array,sens_data) = ee.calc_errs(truth)
+                (error_array,sens_data) = ee.calc_errs(truth,
+                                                       self._sens_data_initial)
+
+            self._sens_data_accumulated = sens_data
 
             self._sens_data_by_chain.append(sens_data)
 
@@ -96,11 +106,13 @@ class ErrorIntegrator:
         for ee in self._err_chain:
 
             if ee.get_error_dep() == EErrDependence.DEPENDENT:
-                (error_array,sens_data) = ee.calc_errs(truth+accumulated_error)
+                (error_array,sens_data) = ee.calc_errs(truth+accumulated_error,
+                                                       self._sens_data_accumulated)
             else:
-                (error_array,sens_data) = ee.calc_errs(truth)
+                (error_array,sens_data) = ee.calc_errs(truth,
+                                                       self._sens_data_initial)
 
-            self._sens_data_by_chain.append(sens_data)
+            self._sens_data_accumulated = sens_data
 
             if ee.get_error_type() == EErrType.SYSTEMATIC:
                 self._errs_systematic = self._errs_systematic + error_array
@@ -116,8 +128,11 @@ class ErrorIntegrator:
     def get_errs_by_chain(self) -> np.ndarray | None:
         return self._errs_by_chain
 
-    def get_sens_data_by_chain(self) -> list[SensorData]:
+    def get_sens_data_by_chain(self) -> list[SensorData] | None:
         return self._sens_data_by_chain
+
+    def get_sens_data_accumulated(self) -> SensorData:
+        return self._sens_data_accumulated
 
     def get_errs_systematic(self) -> np.ndarray:
         return self._errs_systematic
@@ -127,14 +142,5 @@ class ErrorIntegrator:
 
     def get_errs_total(self) -> np.ndarray:
         return self._errs_total
-
-
-
-
-
-
-
-
-
 
 

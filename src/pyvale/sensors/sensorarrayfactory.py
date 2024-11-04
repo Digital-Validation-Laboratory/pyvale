@@ -15,9 +15,9 @@ from pyvale.physics.tensorfield import TensorField
 from pyvale.sensors.sensordescriptor import SensorDescriptorFactory
 from pyvale.sensors.pointsensorarray import PointSensorArray, SensorData
 from pyvale.uncertainty.errorintegrator import ErrorIntegrator
-from pyvale.uncertainty.syserrors import SysErrUniformPercent
+from pyvale.uncertainty.syserrorsIndep import SysErrUniformPercent
 from pyvale.uncertainty.randerrors import RandErrNormPercent
-from pyvale.uncertainty.depsyserrors import (SysErrDigitisation,
+from pyvale.uncertainty.syserrorsdep import (SysErrDigitisation,
                                               SysErrSaturation)
 
 
