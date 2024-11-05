@@ -7,11 +7,11 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 from typing import Callable
 import numpy as np
-from scipy.spatial.transform import Rotation
 from pyvale.physics.field import IField
 from pyvale.numerical.spatialintegrator import (ISpatialIntegrator,
                                                 create_int_pt_array)
 
+from pyvale.sensors.sensordata import SensorData
 
 def create_gauss_weights_2d_4pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
     return np.ones((4,)+meas_shape)
@@ -26,59 +26,50 @@ def create_gauss_weights_2d_9pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
 
 
 class Quadrature2D(ISpatialIntegrator):
-    __slots__ = ("_field","_cent_pos","_area_dims","_sample_times","_area",
-                 "_n_gauss_pts","_gauss_pt_offsets","_gauss_weight_func",
-                 "_gauss_pts","_averages")
+    __slots__ = ("_field","_area","_n_gauss_pts","_gauss_pt_offsets"
+                 ,"_gauss_weight_func","_gauss_pts","_averages","_sens_data")
 
     def __init__(self,
-                 gauss_pt_offsets: np.ndarray,
-                 gauss_weight_func: Callable,
                  field: IField,
-                 cent_pos: np.ndarray,
-                 area_dims: np.ndarray,
-                 sample_times: np.ndarray | None = None) -> None:
+                 sens_data: SensorData,
+                 gauss_pt_offsets: np.ndarray,
+                 gauss_weight_func: Callable) -> None:
 
         self._field = field
-        self._cent_pos = cent_pos
-        self._area_dims = area_dims
-        self._sample_times = sample_times
-
-        self._area = self._area_dims[0]*self._area_dims[1]
+        self._sens_data = sens_data
+        self._area = self._sens_data.spatial_dims[0] * \
+            self._sens_data.spatial_dims[1]
 
         self._n_gauss_pts = gauss_pt_offsets.shape[0]
         self._gauss_pt_offsets = gauss_pt_offsets
         self._gauss_weight_func = gauss_weight_func
 
-        self._gauss_pts = create_int_pt_array(self._gauss_pt_offsets,
-                                              cent_pos)
+        self._gauss_pts = create_int_pt_array(self._sens_data,
+                                              self._gauss_pt_offsets)
         self._averages = None
 
-    def calc_integrals(self,
-                       cent_pos: np.ndarray | None = None,
-                       sample_times: np.ndarray | None = None,
-                       angles: tuple[Rotation,...] | None = None) -> np.ndarray:
-        self._averages = self.calc_averages(cent_pos,sample_times,angles)
+    def calc_integrals(self, sens_data: SensorData | None = None) -> np.ndarray:
+        self._averages = self.calc_averages(sens_data)
         return self._area*self.get_averages()
 
     def get_integrals(self) -> np.ndarray:
         return self._area*self.get_averages()
 
-    def calc_averages(self,
-                      cent_pos: np.ndarray | None = None,
-                      sample_times: np.ndarray | None = None,
-                      angles: tuple[Rotation,...] | None = None) -> np.ndarray:
+    def calc_averages(self, sens_data: SensorData | None = None) -> np.ndarray:
 
-        if cent_pos is not None:
-            # shape=(n_sens*n_gauss_pts,n_dims)
-            self._gauss_pts = create_int_pt_array(self._gauss_pt_offsets,
-                                                  cent_pos)
+        if sens_data is not None:
+            self._sens_data = sens_data
+
+        # shape=(n_sens*n_gauss_pts,n_dims)
+        self._gauss_pts = create_int_pt_array(self._sens_data,
+                                              self._gauss_pt_offsets)
 
         # shape=(n_gauss_pts*n_sens,n_comps,n_timesteps)
         gauss_vals = self._field.sample_field(self._gauss_pts,
-                                              sample_times,
-                                              angles)
+                                              self._sens_data.sample_times,
+                                              self._sens_data.angles)
 
-        meas_shape = (self._cent_pos.shape[0],
+        meas_shape = (self._sens_data.positions.shape[0],
                         gauss_vals.shape[1],
                         gauss_vals.shape[2])
 

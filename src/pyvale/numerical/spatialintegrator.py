@@ -5,25 +5,23 @@ License: MIT
 Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
-import enum
 from abc import ABC, abstractmethod
 import numpy as np
-from scipy.spatial.transform import Rotation
+from pyvale.sensors.sensordata import SensorData
 
 
-class ESpatialIntType(enum.Enum):
-    RECT1PT = enum.auto()
-    RECT4PT = enum.auto()
-    RECT9PT = enum.auto()
-    QUAD4PT = enum.auto()
-    QUAD9PT = enum.auto()
-
-
-def create_int_pt_array(int_pt_offsets: np.ndarray,
-                        cent_pos: np.ndarray,
+def create_int_pt_array(sens_data: SensorData,
+                        int_pt_offsets: np.ndarray,
                         ) -> np.ndarray:
-    offset_array = np.tile(int_pt_offsets,(cent_pos.shape[0],1))
-    int_pt_array = np.repeat(cent_pos,int_pt_offsets.shape[0],axis=0)
+
+    # shape=(n_sens*n_int_pts,n_dims)
+    offset_array = np.tile(int_pt_offsets,(sens_data.positions.shape[0],1))
+
+    if sens_data.angles is not None:
+        for rr in sens_data.angles:
+            offset_array[,:] = np.matmul(rr.as_matrix(),int_pt_offsets.T).T
+
+    int_pt_array = np.repeat(sens_data.positions,int_pt_offsets.shape[0],axis=0)
     # shape=(n_sens*n_int_pts,n_dims)
     return int_pt_array + offset_array
 
@@ -31,9 +29,7 @@ def create_int_pt_array(int_pt_offsets: np.ndarray,
 class ISpatialIntegrator(ABC):
     @abstractmethod
     def calc_averages(self,
-                      cent_pos: np.ndarray | None = None,
-                      sample_times: np.ndarray | None = None,
-                      angles: tuple[Rotation,...] | None = None) -> np.ndarray:
+                      sens_data: SensorData) -> np.ndarray:
         pass
 
     @abstractmethod

@@ -20,12 +20,7 @@ def main() -> None:
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
-    descriptor = pyvale.SensorDescriptor()
-    descriptor.name = 'Displacement'
-    descriptor.symbol = r'u'
-    descriptor.units = r'm'
-    descriptor.tag = 'DS'
-    descriptor.components = ('x','y','z')
+    descriptor = pyvale.SensorDescriptorFactory.displacement_descriptor()
 
     spat_dims = 2
     field_key = 'disp'
@@ -51,34 +46,18 @@ def main() -> None:
                                               disp_field,
                                               descriptor)
 
-    pos_offset = -1.0*np.ones_like(sensor_positions)
-    pos_offset[:,2] = 0 # in 2d we only have offset in x and y so zero z
-    pos_error_data = pyvale.FieldErrorData(pos_offset_xyz=pos_offset)
+
 
     angle_offset = np.zeros_like(sensor_positions)
-    angle_offset[:,0] = 1.0 # only rotate about z in 2D
-    angle_error_data = pyvale.FieldErrorData(ang_offset_zyx=angle_offset)
+    angle_offset[:,0] = 90.0 # only rotate about z in 2D
 
-    time_offset = 1.0*np.ones_like(disp_sens_array.get_sample_times())
-    time_error_data = pyvale.FieldErrorData(time_offset=time_offset)
-
-
+    field_error_data = pyvale.FieldErrorData(ang_offset_zyx=angle_offset,
+                                             spatial_averager=pyvale.ESpatialIntType.QUAD4PT,
+                                             spatial_dims=np.array([2.0,2.0,0.0]))
 
     field_errs = []
     field_errs.append(pyvale.SysErrField(disp_field,
-                                        time_error_data))
-    field_errs.append(pyvale.SysErrField(disp_field,
-                                        time_error_data))
-
-    field_errs.append(pyvale.SysErrField(disp_field,
-                                        pos_error_data))
-    field_errs.append(pyvale.SysErrField(disp_field,
-                                        pos_error_data))
-
-    field_errs.append(pyvale.SysErrField(disp_field,
-                                        angle_error_data))
-    field_errs.append(pyvale.SysErrField(disp_field,
-                                        angle_error_data))
+                                        field_error_data))
 
     err_int_opts = pyvale.ErrorIntegrationOpts(force_dependence=True,
                                                store_errs_by_func=True)
@@ -90,38 +69,6 @@ def main() -> None:
 
     measurements = disp_sens_array.calc_measurements()
 
-    sens_data_by_chain = error_int.get_sens_data_by_chain()
-    if sens_data_by_chain is not None:
-        for ii,ss in enumerate(sens_data_by_chain):
-            print(80*"-")
-            if ss is not None:
-                print(f"SensorData @ [{ii}]")
-                print("TIME")
-                print(ss.sample_times)
-                print()
-                print("POSITIONS")
-                print(ss.positions)
-                print()
-                print("ANGLES")
-                for aa in ss.angles:
-                    print(aa.as_euler('zyx',degrees=True))
-                print()
-            print(80*"-")
-
-    print()
-    print(80*"=")
-    sens_data_accumulated = error_int.get_sens_data_accumulated()
-    print("TIME")
-    print(sens_data_accumulated.sample_times)
-    print()
-    print("POSITIONS")
-    print(sens_data_accumulated.positions)
-    print()
-    print("ANGLES")
-    for aa in sens_data_accumulated.angles:
-        print(aa.as_euler('zyx',degrees=True))
-    print()
-    print(80*"=")
 
     return
 

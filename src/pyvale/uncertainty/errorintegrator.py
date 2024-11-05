@@ -13,6 +13,7 @@ from pyvale.uncertainty.errorcalculator import (IErrCalculator,
                                                 EErrDependence)
 from pyvale.sensors.sensordata import SensorData
 
+
 @dataclass(slots=True)
 class ErrorIntegrationOpts:
     force_dependence: bool = False
@@ -80,11 +81,10 @@ class ErrorIntegrator:
             if ee.get_error_dep() == EErrDependence.DEPENDENT:
                 (error_array,sens_data) = ee.calc_errs(truth+accumulated_error,
                                                        self._sens_data_accumulated)
+                self._sens_data_accumulated = sens_data
             else:
                 (error_array,sens_data) = ee.calc_errs(truth,
                                                        self._sens_data_initial)
-
-            self._sens_data_accumulated = sens_data
 
             self._sens_data_by_chain.append(sens_data)
 
@@ -108,6 +108,7 @@ class ErrorIntegrator:
             if ee.get_error_dep() == EErrDependence.DEPENDENT:
                 (error_array,sens_data) = ee.calc_errs(truth+accumulated_error,
                                                        self._sens_data_accumulated)
+                self._sens_data_accumulated = sens_data
             else:
                 (error_array,sens_data) = ee.calc_errs(truth,
                                                        self._sens_data_initial)

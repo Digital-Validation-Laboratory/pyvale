@@ -5,13 +5,10 @@ License: MIT
 Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
-import copy
 from dataclasses import dataclass
 import numpy as np
 from scipy.spatial.transform import Rotation
-from pyvale.numerical.spatialintegrator import ESpatialIntType
-from pyvale.physics.field import IField
-
+from pyvale.numerical.spatialinttype import ESpatialIntType
 
 @dataclass(slots=True)
 class SensorData:

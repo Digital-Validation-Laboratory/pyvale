@@ -13,7 +13,7 @@ from scipy.spatial.transform import Rotation
 from pyvale.physics.field import IField
 from pyvale.physics.fieldsampler import sample_field_with_sensor_data
 from pyvale.sensors.sensordata import SensorData
-from pyvale.numerical.spatialintegrator import ESpatialIntType
+from pyvale.numerical.spatialinttype import ESpatialIntType
 from pyvale.uncertainty.errorcalculator import (IErrCalculator,
                                                 EErrType,
                                                 EErrDependence)
@@ -55,7 +55,6 @@ class SysErrField(IErrCalculator):
         self._err_dep = err_dep
         self._sensor_data_perturbed = SensorData()
 
-
     def get_error_dep(self) -> EErrDependence:
         return self._err_dep
 
@@ -72,7 +71,12 @@ class SysErrField(IErrCalculator):
                   err_basis: np.ndarray,
                   sens_data: SensorData,
                   ) -> tuple[np.ndarray, SensorData]:
+        
         self._sensor_data_perturbed = copy.deepcopy(sens_data)
+        self._sensor_data_perturbed.spatial_averager = \
+            self._field_err_data.spatial_averager
+        self._sensor_data_perturbed.spatial_dims = \
+            self._field_err_data.spatial_dims
 
         self._sensor_data_perturbed.positions = perturb_sensor_positions(
             self._sensor_data_perturbed.positions,
@@ -142,9 +146,6 @@ def perturb_sample_times(sim_time: np.ndarray,
         else:
             return None
 
-    if time_offset is None and time_rand is None and time_drift is None:
-        return None
-
     time_perturbed = np.copy(time_nominal)
 
     if time_offset is not None:
@@ -172,9 +173,6 @@ def perturb_sensor_angles(n_sensors: int,
                 (Rotation.from_euler("zyx",[0,0,0], degrees=True),)
         else:
             return None
-
-    if angle_offsets_zyx is None and rand_ang_zyx is None:
-        return None
 
     angles_perturbed = [Rotation.from_euler("zyx",[0,0,0], degrees=True)] * \
         len(angles_nominal)

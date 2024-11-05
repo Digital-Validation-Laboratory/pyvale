@@ -9,8 +9,8 @@ import numpy as np
 
 from pyvale.physics.field import IField
 from pyvale.sensors.sensordata import SensorData
-from pyvale.numerical.spatialintegrator import (ISpatialIntegrator,
-                                                ESpatialIntType)
+from pyvale.numerical.spatialintegrator import ISpatialIntegrator
+from pyvale.numerical.spatialinttype import ESpatialIntType
 from pyvale.numerical.rectangleintegrator import Rectangle2D
 from pyvale.numerical.quadratureintegrator import (Quadrature2D,
                                                    create_gauss_weights_2d_4pts,
@@ -89,13 +89,10 @@ class SpatialIntegratorFactory:
 
         gauss_weight_func = create_gauss_weights_2d_4pts
 
-        quadrature = Quadrature2D(gauss_pt_offsets,
-                            gauss_weight_func,
-                            field,
-                            sensor_data.positions,
-                            sensor_data.spatial_dims,
-                            sensor_data.sample_times)
-        return quadrature
+        return Quadrature2D(field,
+                            sensor_data,
+                            gauss_pt_offsets,
+                            gauss_weight_func)
 
 
     @staticmethod
@@ -116,14 +113,11 @@ class SpatialIntegratorFactory:
 
         gauss_weight_func = create_gauss_weights_2d_9pts
 
-        quadrature = Quadrature2D(gauss_pt_offsets,
-                            gauss_weight_func,
-                            field,
-                            sensor_data.positions,
-                            sensor_data.spatial_dims,
-                            sensor_data.sample_times)
-        return quadrature
-
+        return Quadrature2D(field,
+                            sensor_data,
+                            gauss_pt_offsets,
+                            gauss_weight_func)
+    
 
 def build_spatial_averager(field: IField, sensor_data: SensorData,
                           ) -> ISpatialIntegrator | None:
@@ -132,26 +126,16 @@ def build_spatial_averager(field: IField, sensor_data: SensorData,
 
     if sensor_data.spatial_averager == ESpatialIntType.RECT1PT:
         return SpatialIntegratorFactory.rect_2d_1pt(field,
-                                                    sensor_data.positions,
-                                                    sensor_data.spatial_dims,
-                                                    sensor_data.sample_times)
+                                                    sensor_data)
     elif sensor_data.spatial_averager == ESpatialIntType.RECT4PT:
         return SpatialIntegratorFactory.rect_2d_4pt(field,
-                                                    sensor_data.positions,
-                                                    sensor_data.spatial_dims,
-                                                    sensor_data.sample_times)
+                                                    sensor_data)
     elif sensor_data.spatial_averager == ESpatialIntType.RECT9PT:
         return SpatialIntegratorFactory.rect_2d_9pt(field,
-                                                    sensor_data.positions,
-                                                    sensor_data.spatial_dims,
-                                                    sensor_data.sample_times)
+                                                    sensor_data)
     elif sensor_data.spatial_averager == ESpatialIntType.QUAD4PT:
         return SpatialIntegratorFactory.quad_2d_4pt(field,
-                                                    sensor_data.positions,
-                                                    sensor_data.spatial_dims,
-                                                    sensor_data.sample_times)
+                                                    sensor_data)
     elif sensor_data.spatial_averager == ESpatialIntType.QUAD9PT:
         return SpatialIntegratorFactory.quad_2d_9pt(field,
-                                                    sensor_data.positions,
-                                                    sensor_data.spatial_dims,
-                                                    sensor_data.sample_times)
+                                                    sensor_data)

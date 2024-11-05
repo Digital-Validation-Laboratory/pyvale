@@ -5,7 +5,6 @@
 - TODO PRIORITY:
     - Visualisation tools for perturbed field errors:
         - Perturbed pos, time, angle
-    - De-duplicate code in fieldsyserrs
 
 - BUGS!
 NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
@@ -29,11 +28,6 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
     - TODO: presentation animations - create pyvista animation synced to matplotlib traces
     - TODO: visualisation of perturbed time / sensor locations
     - TODO: experiment - allow extraction of different conditions for comparison plots
-
-- TODO: Calibration errors
-    - Need to define a ground-truth calibration function
-    - Need to define an assumed calibration function
-    - Error is the difference?
 
 - TODO: Field based errors:
     - HALF DONE: Spatial averaging error
