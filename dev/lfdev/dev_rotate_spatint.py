@@ -25,7 +25,7 @@ def main() -> None:
     spat_dims = 2
     field_key = 'disp'
     components = ('disp_x','disp_y')
-    disp_field = pyvale.VectorField(sim_data,field_key,components,spat_dims)
+    disp_field = pyvale.FieldVector(sim_data,field_key,components,spat_dims)
 
     n_sens = (2,3,1)
     x_lims = (0.0,100.0)
@@ -42,35 +42,32 @@ def main() -> None:
     sensor_data = pyvale.SensorData(positions=sensor_positions,
                                     sample_times=sample_times)
 
-    disp_sens_array = pyvale.PointSensorArray(sensor_data,
+    disp_sens_array = pyvale.SensorArrayPoint(sensor_data,
                                               disp_field,
                                               descriptor)
 
 
 
     angle_offset = np.zeros_like(sensor_positions)
-    angle_offset[:,0] = 90.0 # only rotate about z in 2D
+    angle_offset[:,0] = 45.0 # only rotate about z in 2D
 
-    field_error_data = pyvale.FieldErrorData(ang_offset_zyx=angle_offset,
-                                             spatial_averager=pyvale.ESpatialIntType.QUAD4PT,
+    field_error_data = pyvale.ErrFieldData(ang_offset_zyx=angle_offset,
+                                             spatial_averager=pyvale.EIntSpatialType.RECT4PT,
                                              spatial_dims=np.array([2.0,2.0,0.0]))
 
     field_errs = []
-    field_errs.append(pyvale.SysErrField(disp_field,
+    field_errs.append(pyvale.ErrSysField(disp_field,
                                         field_error_data))
 
-    err_int_opts = pyvale.ErrorIntegrationOpts(force_dependence=True,
+    err_int_opts = pyvale.ErrIntOpts(force_dependence=True,
                                                store_errs_by_func=True)
-    error_int = pyvale.ErrorIntegrator(field_errs,
+    error_int = pyvale.ErrIntegrator(field_errs,
                                        sensor_data,
                                        disp_sens_array.get_measurement_shape(),
                                        err_int_opts)
     disp_sens_array.set_error_integrator(error_int)
 
     measurements = disp_sens_array.calc_measurements()
-
-
-    return
 
     print(80*'-')
     sens_num = 4
@@ -80,12 +77,6 @@ def main() -> None:
                               (0,1),
                               (measurements.shape[2]-5,measurements.shape[2]))
     print(80*'-')
-
-    sens_data_by_chain = error_int.get_sens_data_by_chain()
-    for ii,ss in enumerate(sens_data_by_chain):
-        if ss is not None:
-            print(f"SensorData @ [{ii}]")
-            print(ss)
 
     plot_field = 'disp_x'
     if plot_field == 'disp_x':

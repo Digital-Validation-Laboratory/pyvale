@@ -8,19 +8,19 @@ Copyright (C) 2024 The Digital Validation Team
 import copy
 from dataclasses import dataclass
 import numpy as np
-from pyvale.uncertainty.errorcalculator import (IErrCalculator,
+from pyvale.errorcalculator import (IErrCalculator,
                                                 EErrType,
                                                 EErrDependence)
-from pyvale.sensors.sensordata import SensorData
+from pyvale.sensordata import SensorData
 
 
 @dataclass(slots=True)
-class ErrorIntegrationOpts:
+class ErrIntOpts:
     force_dependence: bool = False
     store_errs_by_func: bool = False
 
 
-class ErrorIntegrator:
+class ErrIntegrator:
     __slots__ = ("_err_chain","_meas_shape","_errs_by_chain",
                  "_errs_systematic","_errs_random","_errs_total",
                  "_sens_data_by_chain","_err_int_opts","_sens_data_accumulated",
@@ -30,10 +30,10 @@ class ErrorIntegrator:
                  err_chain: list[IErrCalculator],
                  sensor_data_initial: SensorData,
                  meas_shape: tuple[int,int,int],
-                 err_int_opts: ErrorIntegrationOpts | None = None) -> None:
+                 err_int_opts: ErrIntOpts | None = None) -> None:
 
         if err_int_opts is None:
-            self._err_int_opts = ErrorIntegrationOpts()
+            self._err_int_opts = ErrIntOpts()
         else:
             self._err_int_opts = err_int_opts
 

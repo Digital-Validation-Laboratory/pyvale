@@ -16,11 +16,11 @@ import pyvista as pv
 
 import mooseherder as mh
 
-from pyvale.physics.field import conv_simdata_to_pyvista
-from pyvale.sensors.pointsensorarray import PointSensorArray
-from pyvale.visualisation.plotopts import (GeneralPlotOpts,
-                                           SensorTraceOpts,
-                                           ExpTraceOpts)
+from pyvale.field import conv_simdata_to_pyvista
+from pyvale.sensorarraypoint import SensorArrayPoint
+from pyvale.visualplotopts import (PlotOptsGeneral,
+                                    TraceOptsSensor,
+                                    TraceOptsExperiment)
 from pyvale.experimentsimulator import ExperimentSimulator
 
 
@@ -60,7 +60,7 @@ def plot_sim_data(sim_data: mh.SimData,
     return pv_plot
 
 
-def plot_sensors_on_sim(sensor_array: PointSensorArray,
+def plot_sensors_on_sim(sensor_array: SensorArrayPoint,
                         component: str,
                         time_step: int = -1,
                         ) -> Any:
@@ -97,10 +97,10 @@ def plot_sensors_on_sim(sensor_array: PointSensorArray,
     return pv_plot
 
 
-def plot_time_traces(sensor_array: PointSensorArray,
+def plot_time_traces(sensor_array: SensorArrayPoint,
                      component: str,
-                     trace_opts: SensorTraceOpts | None = None,
-                     plot_opts: GeneralPlotOpts | None = None
+                     trace_opts: TraceOptsSensor | None = None,
+                     plot_opts: PlotOptsGeneral | None = None
                      ) -> tuple[Any,Any]:
 
     field = sensor_array.field
@@ -111,10 +111,10 @@ def plot_time_traces(sensor_array: PointSensorArray,
     descriptor = sensor_array.descriptor
 
     if plot_opts is None:
-        plot_opts = GeneralPlotOpts()
+        plot_opts = PlotOptsGeneral()
 
     if trace_opts is None:
-        trace_opts = SensorTraceOpts()
+        trace_opts = TraceOptsSensor()
 
     if trace_opts.sensors_to_plot is None:
         trace_opts.sensors_to_plot = np.arange(0,n_sensors)
@@ -189,14 +189,14 @@ def plot_exp_traces(exp_sim: ExperimentSimulator,
                     component: str,
                     sens_array_num: int,
                     sim_num: int,
-                    trace_opts: ExpTraceOpts | None = None,
-                    plot_opts: GeneralPlotOpts | None = None) -> tuple[Any,Any]:
+                    trace_opts: TraceOptsExperiment | None = None,
+                    plot_opts: PlotOptsGeneral | None = None) -> tuple[Any,Any]:
 
     if trace_opts is None:
-        trace_opts = ExpTraceOpts()
+        trace_opts = TraceOptsExperiment()
 
     if plot_opts is None:
-        plot_opts = GeneralPlotOpts()
+        plot_opts = PlotOptsGeneral()
 
     descriptor = exp_sim.sensor_arrays[sens_array_num].descriptor
     comp_ind = exp_sim.sensor_arrays[sens_array_num].field.get_component_index(component)

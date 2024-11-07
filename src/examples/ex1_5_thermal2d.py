@@ -48,47 +48,42 @@ def main() -> None:
     #---------------------------------------------------------------------------
     # Standard independent systematic errors
     err_chain = []
-    err_chain.append(pyvale.SysErrOffset(offset=-1.0))
-    err_chain.append(pyvale.SysErrOffsetPercent(offset_percent=-1.0))
+    err_chain.append(pyvale.ErrSysOffset(offset=-1.0))
+    err_chain.append(pyvale.ErrSysOffsetPercent(offset_percent=-1.0))
 
-    err_chain.append(pyvale.SysErrUniform(low=-2.0,
+    err_chain.append(pyvale.ErrSysUniform(low=-2.0,
                                         high=2.0))
-    err_chain.append(pyvale.SysErrUniformPercent(low_percent=-2.0,
+    err_chain.append(pyvale.ErrSysUniformPercent(low_percent=-2.0,
                                                     high_percent=2.0))
 
-    err_chain.append(pyvale.SysErrNormal(std=1.0))
-    err_chain.append(pyvale.SysErrNormPercent(std_percent=2.0))
+    err_chain.append(pyvale.ErrSysNormal(std=1.0))
+    err_chain.append(pyvale.ErrSysNormPercent(std_percent=2.0))
 
     sys_gen = pyvale.GeneratorTriangular(left=-1.0,
                                          mode=0.0,
                                          right=1.0)
-    err_chain.append(pyvale.SysErrGenerator(sys_gen))
-
-    # Field based errors
-    pos_gen = pyvale.GeneratorNormal(std=1.0)
-    err_chain.append(pyvale.SysErrPositionRand(tc_array.field,
-                                                sensor_data,
-                                                (pos_gen,pos_gen,None)))
+    err_chain.append(pyvale.ErrSysGenerator(sys_gen))
 
     #---------------------------------------------------------------------------
-    err_chain.append(pyvale.RandErrNormal(std = 2.0))
-    err_chain.append(pyvale.RandErrNormPercent(std_percent=2.0))
+    err_chain.append(pyvale.ErrRandNormal(std = 2.0))
+    err_chain.append(pyvale.ErrRandNormPercent(std_percent=2.0))
 
-    err_chain.append(pyvale.RandErrUniform(low=-2.0,high=2.0))
-    err_chain.append(pyvale.RandErrUnifPercent(low_percent=-2.0,
+    err_chain.append(pyvale.ErrRandUniform(low=-2.0,high=2.0))
+    err_chain.append(pyvale.ErrRandUnifPercent(low_percent=-2.0,
                                                high_percent=2.0))
 
     rand_gen = pyvale.GeneratorTriangular(left=-5.0,
                                           mode=0.0,
                                           right=5.0)
-    err_chain.append(pyvale.RandErrGenerator(rand_gen))
+    err_chain.append(pyvale.ErrRandGenerator(rand_gen))
 
     #---------------------------------------------------------------------------
-    err_chain.append(pyvale.SysErrDigitisation(bits_per_unit=2**8/100))
-    err_chain.append(pyvale.SysErrSaturation(meas_min=0.0,meas_max=300.0))
+    err_chain.append(pyvale.ErrSysDigitisation(bits_per_unit=2**8/100))
+    err_chain.append(pyvale.ErrSysSaturation(meas_min=0.0,meas_max=300.0))
 
-    err_int = pyvale.ErrorIntegrator(err_chain,
-                                             tc_array.get_measurement_shape())
+    err_int = pyvale.ErrIntegrator(err_chain,
+                                     sensor_data,
+                                     tc_array.get_measurement_shape())
     tc_array.set_error_integrator(err_int)
 
 

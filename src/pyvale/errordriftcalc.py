@@ -15,7 +15,7 @@ class IDriftCalculator(ABC):
         pass
 
 
-class ConstantDrift(IDriftCalculator):
+class DriftConstant(IDriftCalculator):
     def __init__(self, offset: float) -> None:
         self._offset = offset
 
@@ -23,7 +23,7 @@ class ConstantDrift(IDriftCalculator):
         return self._offset*np.ones_like(time_steps)
 
 
-class LinearDrift(IDriftCalculator):
+class DriftLinear(IDriftCalculator):
     def __init__(self, slope: float, offset: float = 0.0) -> None:
         self._slope = slope
         self._offset = offset

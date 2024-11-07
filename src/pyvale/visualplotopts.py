@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib as plt
 
 @dataclass(slots=True)
-class GeneralPlotOpts:
+class PlotOptsGeneral:
     """ Helper class to set properties in matplotlib for scaling to use in a
     journal article or report.
     """
@@ -47,7 +47,7 @@ class GeneralPlotOpts:
 
 
 @dataclass(slots=True)
-class SensorTraceOpts:
+class TraceOptsSensor:
     legend: bool = True
 
     x_label: str = r"x [$m$]"
@@ -64,7 +64,7 @@ class SensorTraceOpts:
 
 
 @dataclass(slots=True)
-class ExpTraceOpts:
+class TraceOptsExperiment:
     legend: bool = True
 
     x_label: str = r"x [$m$]"

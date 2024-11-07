@@ -10,34 +10,31 @@ import pyvista as pv
 from scipy.spatial.transform import Rotation
 import mooseherder as mh
 
-from pyvale.physics.field import (IField,
+from pyvale.field import (IField,
                                   conv_simdata_to_pyvista,
                                   sample_pyvista)
 
-class VectorField(IField):
-    __slots__ = ("_field_key","_components","_spat_dims","_time_steps",
-                 "_pyvista_grid")
+class FieldScalar(IField):
+    __slots__ = ("_field_key","_spat_dims","_time_steps","_pyvista_gris")
 
     def __init__(self,
                  sim_data: mh.SimData,
                  field_key: str,
-                 components: tuple[str,...],
                  spat_dims: int) -> None:
 
         self._field_key = field_key
-        self._components = components
         self._spat_dims = spat_dims
 
         self._time_steps = sim_data.time
         self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
-                                                    components,
+                                                    (field_key,),
                                                     spat_dims)
 
     def set_sim_data(self, sim_data: mh.SimData) -> None:
         self._time_steps = sim_data.time
         self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
-                                                    self._components,
-                                                    self._spat_dims)
+                                            (self._field_key,),
+                                            self._spat_dims)
 
     def get_time_steps(self) -> np.ndarray:
         return self._time_steps
@@ -46,10 +43,10 @@ class VectorField(IField):
         return self._pyvista_grid
 
     def get_all_components(self) -> tuple[str, ...]:
-        return self._components
+        return (self._field_key,)
 
-    def get_component_index(self,comp: str) -> int:
-        return self._components.index(comp)
+    def get_component_index(self, comp: str) -> int:
+        return 0 # scalar fields only have one component!
 
     def sample_field(self,
                     points: np.ndarray,
@@ -57,29 +54,9 @@ class VectorField(IField):
                     angles: tuple[Rotation,...] | None = None,
                     ) -> np.ndarray:
 
-        field_data = sample_pyvista(self._components,
+        return sample_pyvista((self._field_key,),
                                 self._pyvista_grid,
                                 self._time_steps,
                                 points,
                                 times)
-
-        if angles is None:
-            return field_data
-
-        # NOTE:
-        # ROTATION= object rotates with coords fixed
-        # For Z rotation: sin negative in row 1.
-        # TRANSFORMATION= coords rotate with object fixed
-        # For Z transformation: sin negative in row 2, transpose scipy mat.
-
-        #  Need to rotate each sensor using individual rotation = loop :(
-        for ii,rr in enumerate(angles):
-            rmat = rr.as_matrix().T
-
-            if self._spat_dims == 2:
-                rmat = rmat[:2,:2]
-
-            field_data[ii,:,:] = np.matmul(rmat,field_data[ii,:,:])
-
-        return field_data
 

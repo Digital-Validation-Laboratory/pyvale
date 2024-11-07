@@ -5,41 +5,43 @@ License: MIT
 Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
-
-from pyvale.pyvale import *
+# NOTE: this simplifies and decouples how the user calls pyvale from the
+# underlying project structure: the user should always be able to use pyvale.
+# and access everything in one layer without multiple import dots
 
 from pyvale.imagesim import *
 
-from pyvale.physics.field import *
-from pyvale.physics.scalarfield import *
-from pyvale.physics.vectorfield import *
-from pyvale.physics.tensorfield import *
-from pyvale.physics.coordtransform import *
+from pyvale.field import *
+from pyvale.fieldscalar import *
+from pyvale.fieldvector import *
+from pyvale.fieldtensor import *
+from pyvale.fieldtransform import *
 
-from pyvale.numerical.spatialintegrator import *
-from pyvale.numerical.quadratureintegrator import *
-from pyvale.numerical.rectangleintegrator import *
-from pyvale.numerical.integratorfactory import *
+from pyvale.integratorspatial import *
+from pyvale.integratorquadrature import *
+from pyvale.integratorrectangle import *
+from pyvale.integratorfactory import *
 
-from pyvale.sensors.sensordescriptor import *
-from pyvale.sensors.sensortools import *
-from pyvale.sensors.sensorarrayfactory import *
-from pyvale.sensors.pointsensorarray import *
-from pyvale.sensors.sensordata import *
+from pyvale.sensordescriptor import *
+from pyvale.sensortools import *
+from pyvale.sensorarrayfactory import *
+from pyvale.sensorarraypoint import *
+from pyvale.sensordata import *
 
-from pyvale.uncertainty.errorintegrator import *
-from pyvale.uncertainty.randerrors import *
-from pyvale.uncertainty.syserrorsIndep import *
-from pyvale.uncertainty.syserrorsdep import *
-from pyvale.uncertainty.syserrorsfield import *
-from pyvale.uncertainty.driftcalculator import *
-from pyvale.uncertainty.generatorsrandom import *
+from pyvale.errorintegrator import *
+from pyvale.errorrand import *
+from pyvale.errorsysindep import *
+from pyvale.errorsysdep import *
+from pyvale.errorsysfield import *
+from pyvale.errordriftcalc import *
 
-from pyvale.visualisation.plotopts import *
-from pyvale.visualisation.plotters import *
+from pyvale.generatorsrandom import *
 
-from pyvale.analyticdata.meshgen import *
-from pyvale.analyticdata.simdatagenerator import *
-from pyvale.analyticdata.simdatafactory import *
+from pyvale.visualplotopts import *
+from pyvale.visualplotters import *
+
+from pyvale.analyticmeshgen import *
+from pyvale.analyticsimdatagenerator import *
+from pyvale.analyticsimdatafactory import *
 
 from pyvale.experimentsimulator import *

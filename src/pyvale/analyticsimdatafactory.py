@@ -9,8 +9,8 @@ import numpy as np
 import sympy
 import mooseherder as mh
 
-from pyvale.analyticdata.simdatagenerator import (AnalyticCaseData2D,
-                                                  AnalyticSimDataGenerator)
+from pyvale.analyticsimdatagenerator import (AnalyticCaseData2D,
+                                            AnalyticSimDataGenerator)
 
 def standard_case_2d() -> AnalyticCaseData2D:
     case_data = AnalyticCaseData2D()

@@ -30,7 +30,7 @@ def main() -> None:
     spat_dims = 2
     field_key = 'disp'
     components = ('disp_x','disp_y')
-    disp_field = pyvale.VectorField(sim_data,field_key,components,spat_dims)
+    disp_field = pyvale.FieldVector(sim_data,field_key,components,spat_dims)
 
     n_sens = (2,3,1)
     x_lims = (0.0,100.0)
@@ -47,7 +47,7 @@ def main() -> None:
     sensor_data = pyvale.SensorData(positions=sensor_positions,
                                   sample_times=sample_times)
 
-    disp_sens_array = pyvale.PointSensorArray(sensor_data,
+    disp_sens_array = pyvale.SensorArrayPoint(sensor_data,
                                               disp_field,
                                               descriptor)
 
@@ -62,7 +62,7 @@ def main() -> None:
     ang_offset_zyx[:,0] = 1.5 # only rotate about z in 2D
 
 
-    field_err_data = pyvale.FieldErrorData(
+    field_err_data = pyvale.ErrFieldData(
         pos_offset_xyz = pos_offset_xyz,
         ang_offset_zyx = ang_offset_zyx,
         time_offset = 1.0,
@@ -70,11 +70,11 @@ def main() -> None:
         ang_rand_zyx = (angle_gen,None,None),
         time_rand = time_gen
     )
-    sys_err_field = pyvale.SysErrField(disp_field,
+    sys_err_field = pyvale.ErrSysField(disp_field,
                                        sensor_data,
                                        field_err_data)
 
-    error_int = pyvale.ErrorIntegrator([sys_err_field],
+    error_int = pyvale.ErrIntegrator([sys_err_field],
                                        disp_sens_array.get_measurement_shape())
     disp_sens_array.set_error_integrator(error_int)
 

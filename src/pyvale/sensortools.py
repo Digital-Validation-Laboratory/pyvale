@@ -7,7 +7,7 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 import numpy as np
 
-from pyvale.sensors.pointsensorarray import PointSensorArray
+from pyvale.sensorarraypoint import SensorArrayPoint
 
 
 def create_sensor_pos_array(n_sens: tuple[int,int,int],
@@ -30,7 +30,7 @@ def create_sensor_pos_array(n_sens: tuple[int,int,int],
     return sens_pos
 
 
-def print_measurements(sens_array: PointSensorArray,
+def print_measurements(sens_array: SensorArrayPoint,
                        sensors: tuple[int,int],
                        components: tuple[int,int],
                        time_steps: tuple[int,int])  -> None:

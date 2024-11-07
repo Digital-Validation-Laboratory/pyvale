@@ -7,14 +7,14 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 from typing import Callable
 import numpy as np
-from pyvale.uncertainty.errorcalculator import (IErrCalculator,
-                                                EErrType,
-                                                EErrDependence)
-from pyvale.uncertainty.generatorsrandom import IGeneratorRandom
-from pyvale.sensors.sensordata import SensorData
+from pyvale.errorcalculator import (IErrCalculator,
+                                    EErrType,
+                                    EErrDependence)
+from pyvale.generatorsrandom import IGeneratorRandom
+from pyvale.sensordata import SensorData
 
 
-class SysErrOffset(IErrCalculator):
+class ErrSysOffset(IErrCalculator):
     __slots__ = ("_offset","_err_dep")
 
     def __init__(self,
@@ -40,7 +40,7 @@ class SysErrOffset(IErrCalculator):
         return (self._offset*np.ones(shape=err_basis.shape),sens_data)
 
 
-class SysErrOffsetPercent(IErrCalculator):
+class ErrSysOffsetPercent(IErrCalculator):
     __slots__ = ("_offset_percent","_err_dep")
 
     def __init__(self,
@@ -69,7 +69,7 @@ class SysErrOffsetPercent(IErrCalculator):
                 None)
 
 
-class SysErrUniform(IErrCalculator):
+class ErrSysUniform(IErrCalculator):
     __slots__ = ("_low","_high","_rng","_err_dep")
 
     def __init__(self,
@@ -109,7 +109,7 @@ class SysErrUniform(IErrCalculator):
         return (sys_errs,sens_data)
 
 
-class SysErrUniformPercent(IErrCalculator):
+class ErrSysUniformPercent(IErrCalculator):
     __slots__ = ("_low","_high","_rng","_err_dep")
 
     def __init__(self,
@@ -149,7 +149,7 @@ class SysErrUniformPercent(IErrCalculator):
         return (err_basis*sys_errs,sens_data)
 
 
-class SysErrNormal(IErrCalculator):
+class ErrSysNormal(IErrCalculator):
     __slots__ = ("_std","_rng","_err_dep")
 
     def __init__(self,
@@ -187,7 +187,7 @@ class SysErrNormal(IErrCalculator):
         return (sys_errs,sens_data)
 
 
-class SysErrNormPercent(IErrCalculator):
+class ErrSysNormPercent(IErrCalculator):
     __slots__ = ("_std","_rng","_err_dep")
 
     def __init__(self,
@@ -225,7 +225,7 @@ class SysErrNormPercent(IErrCalculator):
         return (err_basis*sys_errs,sens_data)
 
 
-class SysErrGenerator(IErrCalculator):
+class ErrSysGenerator(IErrCalculator):
     __slots__ = ("_generator","_err_dep")
 
     def __init__(self,
@@ -260,7 +260,7 @@ class SysErrGenerator(IErrCalculator):
         return (sys_errs,sens_data)
 
 
-class SysErrCalibration(IErrCalculator):
+class ErrSysCalibration(IErrCalculator):
     __slots__ = ("_assumed_cali","_truth_calib","_cal_range","_n_cal_divs",
                  "_err_dep","_truth_calc_table")
 

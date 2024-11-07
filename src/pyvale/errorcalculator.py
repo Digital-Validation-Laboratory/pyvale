@@ -8,7 +8,7 @@ Copyright (C) 2024 The Digital Validation Team
 import enum
 from abc import ABC, abstractmethod
 import numpy as np
-from pyvale.sensors.sensordata import SensorData
+from pyvale.sensordata import SensorData
 
 
 class EErrType(enum.Enum):

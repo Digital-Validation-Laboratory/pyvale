@@ -10,19 +10,19 @@ from dataclasses import dataclass
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from pyvale.physics.field import IField
-from pyvale.physics.fieldsampler import sample_field_with_sensor_data
-from pyvale.sensors.sensordata import SensorData
-from pyvale.numerical.spatialinttype import ESpatialIntType
-from pyvale.uncertainty.errorcalculator import (IErrCalculator,
-                                                EErrType,
-                                                EErrDependence)
-from pyvale.uncertainty.driftcalculator import IDriftCalculator
-from pyvale.uncertainty.generatorsrandom import IGeneratorRandom
+from pyvale.field import IField
+from pyvale.fieldsampler import sample_field_with_sensor_data
+from pyvale.sensordata import SensorData
+from pyvale.integratortype import EIntSpatialType
+from pyvale.errorcalculator import (IErrCalculator,
+                                    EErrType,
+                                    EErrDependence)
+from pyvale.errordriftcalc import IDriftCalculator
+from pyvale.generatorsrandom import IGeneratorRandom
 
 
 @dataclass(slots=True)
-class FieldErrorData:
+class ErrFieldData:
     pos_offset_xyz: np.ndarray | None = None #shape=(n_sens,3 as {x,y,z})
     ang_offset_zyx: np.ndarray | None = None #shape=(n_sens,3 as {z,y,x})
     time_offset: np.ndarray | None = None #shape=(n_time_steps,)
@@ -38,16 +38,16 @@ class FieldErrorData:
     #TODO: implement drift for other dimensions, pos/angle
     time_drift: IDriftCalculator | None = None
 
-    spatial_averager: ESpatialIntType | None = None
+    spatial_averager: EIntSpatialType | None = None
     spatial_dims: np.ndarray | None = None
 
 
-class SysErrField(IErrCalculator):
+class ErrSysField(IErrCalculator):
     __slots__ = ("_field","_sensor_data_perturbed","_field_err_data","_err_dep")
 
     def __init__(self,
                 field: IField,
-                field_err_data: FieldErrorData,
+                field_err_data: ErrFieldData,
                 err_dep: EErrDependence = EErrDependence.INDEPENDENT) -> None:
 
         self._field = field
@@ -71,7 +71,7 @@ class SysErrField(IErrCalculator):
                   err_basis: np.ndarray,
                   sens_data: SensorData,
                   ) -> tuple[np.ndarray, SensorData]:
-        
+
         self._sensor_data_perturbed = copy.deepcopy(sens_data)
         self._sensor_data_perturbed.spatial_averager = \
             self._field_err_data.spatial_averager

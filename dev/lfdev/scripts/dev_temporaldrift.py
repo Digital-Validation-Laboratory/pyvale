@@ -22,7 +22,7 @@ def main() -> None:
     descriptor = pyvale.SensorDescriptorFactory.temperature_descriptor()
 
     field_key = 'temperature'
-    t_field = pyvale.ScalarField(sim_data,
+    t_field = pyvale.FieldScalar(sim_data,
                                  field_key=field_key,
                                  spat_dim=2)
 
@@ -39,30 +39,30 @@ def main() -> None:
         sample_times = np.linspace(0.0,np.max(sim_data.time),50)
 
 
-    tc_array = pyvale.PointSensorArray(sens_pos,
+    tc_array = pyvale.SensorArrayPoint(sens_pos,
                                        t_field,
                                        sample_times,
                                        descriptor)
 
 
-    drift_1 = pyvale.ConstantDrift(offset=0.0)
-    indep_sys_err1 = pyvale.SysErrTimeDrift(t_field,
+    drift_1 = pyvale.DriftConstant(offset=0.0)
+    indep_sys_err1 = pyvale.ErrSysTimeDrift(t_field,
                                             sens_pos,
                                             drift_1,
                                             sample_times)
 
-    drift_2 = pyvale.LinearDrift(slope=0.0)
-    indep_sys_err2 = pyvale.SysErrTimeDrift(t_field,
+    drift_2 = pyvale.DriftLinear(slope=0.0)
+    indep_sys_err2 = pyvale.ErrSysTimeDrift(t_field,
                                             sens_pos,
                                             drift_2,
                                             sample_times)
 
-    indep_sys_err3 = pyvale.SysErrTimeRand(t_field,
+    indep_sys_err3 = pyvale.ErrSysTimeRand(t_field,
                                             sens_pos,
                                             time_std=5.0,
                                             sample_times=sample_times)
 
-    indep_sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1,
+    indep_sys_err_int = pyvale.ErrIntegrator([indep_sys_err1,
                                                 indep_sys_err2,
                                                 indep_sys_err3],
                                         tc_array.get_measurement_shape())

@@ -72,7 +72,7 @@ def main() -> None:
     save_traces = True
     save_path = Path('dev/lfdev/figuregen')
 
-    trace_opts = pyvale.ExpTraceOpts()
+    trace_opts = pyvale.TraceOptsExperiment()
 
     (fig,ax) = pyvale.plot_exp_traces(exp_sim,
                                       component="temperature",

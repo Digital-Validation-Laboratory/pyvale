@@ -7,7 +7,7 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 import enum
 
-class ESpatialIntType(enum.Enum):
+class EIntSpatialType(enum.Enum):
     RECT1PT = enum.auto()
     RECT4PT = enum.auto()
     RECT9PT = enum.auto()

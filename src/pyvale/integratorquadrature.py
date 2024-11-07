@@ -7,11 +7,11 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 from typing import Callable
 import numpy as np
-from pyvale.physics.field import IField
-from pyvale.numerical.spatialintegrator import (ISpatialIntegrator,
-                                                create_int_pt_array)
+from pyvale.field import IField
+from pyvale.integratorspatial import (IIntegratorSpatial,
+                                     create_int_pt_array)
+from pyvale.sensordata import SensorData
 
-from pyvale.sensors.sensordata import SensorData
 
 def create_gauss_weights_2d_4pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
     return np.ones((4,)+meas_shape)
@@ -25,7 +25,7 @@ def create_gauss_weights_2d_9pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
     return gauss_weights
 
 
-class Quadrature2D(ISpatialIntegrator):
+class Quadrature2D(IIntegratorSpatial):
     __slots__ = ("_field","_area","_n_gauss_pts","_gauss_pt_offsets"
                  ,"_gauss_weight_func","_gauss_pts","_averages","_sens_data")
 
@@ -70,8 +70,8 @@ class Quadrature2D(ISpatialIntegrator):
                                               self._sens_data.angles)
 
         meas_shape = (self._sens_data.positions.shape[0],
-                        gauss_vals.shape[1],
-                        gauss_vals.shape[2])
+                      gauss_vals.shape[1],
+                      gauss_vals.shape[2])
 
         # shape=(n_gauss_pts,n_sens,n_comps,n_timesteps)
         gauss_vals = gauss_vals.reshape((self._n_gauss_pts,)+meas_shape,

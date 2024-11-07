@@ -8,14 +8,12 @@
 
 - BUGS!
 NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
-    - Spatial integrators don't rotate integration point locations!
 
 - TODO: EXAMPLES
     - Example showing area averaging as ground truth
     - Example showing field error chain with other errors and extraction of perturbed sensor data
 
 - TODO: ErrorIntegrator
-    - Add error integration options
     - Simplify the memory efficient and non-memory efficient options
 
 - TODO: Experiment generator/ runner
@@ -33,8 +31,6 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
     - HALF DONE: Spatial averaging error
         - Set an integration area
         - Set a weighting function
-    - TODO: combine spatial averaging with rotation errors
-        - Need to rotate (not transform!) sensor local coords befor eval
     - TODO: Temporal averaging error
         - Set an integration time
         - Set a weighting function
@@ -82,7 +78,7 @@ http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubatur
     - Separates espitemic and aleatory errors? - might not be needed
 - Module: `RandErrGenerator`= Enhanced uncertainty function generation for random errors focusing on point sensors including:
     - Specification of noise as a function/percentage of sensor measurement value
-- Module: `SysErrGenerator` = Enhanced uncertainty function generation for systematic errors focusing on point sensors including:
+- Module: `ErrSysGenerator` = Enhanced uncertainty function generation for systematic errors focusing on point sensors including:
     - Calibration errors
     - Digitisation errors
     - Positioning errors

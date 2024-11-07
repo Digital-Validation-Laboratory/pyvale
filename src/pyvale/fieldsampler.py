@@ -6,9 +6,9 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 import numpy as np
-from pyvale.physics.field import IField
-from pyvale.sensors.sensordata import SensorData
-from pyvale.numerical.integratorfactory import build_spatial_averager
+from pyvale.field import IField
+from pyvale.sensordata import SensorData
+from pyvale.integratorfactory import build_spatial_averager
 
 def sample_field_with_sensor_data(field: IField, sensor_data: SensorData
                                   ) -> np.ndarray:

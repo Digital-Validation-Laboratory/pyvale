@@ -6,14 +6,14 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 import numpy as np
-from pyvale.sensors.sensordata import SensorData
-from pyvale.uncertainty.errorcalculator import (IErrCalculator,
-                                                EErrType,
-                                                EErrDependence)
-from pyvale.uncertainty.generatorsrandom import IGeneratorRandom
+from pyvale.sensordata import SensorData
+from pyvale.errorcalculator import (IErrCalculator,
+                                    EErrType,
+                                    EErrDependence)
+from pyvale.generatorsrandom import IGeneratorRandom
 
 
-class RandErrUniform(IErrCalculator):
+class ErrRandUniform(IErrCalculator):
     __slots__ = ("_low","_high","_rng","_err_dep")
 
     def __init__(self,
@@ -47,7 +47,7 @@ class RandErrUniform(IErrCalculator):
         return (rand_errs,sens_data)
 
 
-class RandErrUnifPercent(IErrCalculator):
+class ErrRandUnifPercent(IErrCalculator):
     __slots__ = ("_low","_high","_rng","_err_dep")
 
     def __init__(self,
@@ -81,7 +81,7 @@ class RandErrUnifPercent(IErrCalculator):
         return (err_basis*norm_rand,sens_data)
 
 
-class RandErrNormal(IErrCalculator):
+class ErrRandNormal(IErrCalculator):
     __slots__ = ("_std","_rng","_err_dep")
 
     def __init__(self,
@@ -112,7 +112,7 @@ class RandErrNormal(IErrCalculator):
         return (rand_errs,sens_data)
 
 
-class RandErrNormPercent(IErrCalculator):
+class ErrRandNormPercent(IErrCalculator):
     __slots__ = ("_std","_rng","_err_dep")
 
     def __init__(self,
@@ -144,7 +144,7 @@ class RandErrNormPercent(IErrCalculator):
         return (err_basis*self._std*norm_rand,sens_data)
 
 
-class RandErrGenerator(IErrCalculator):
+class ErrRandGenerator(IErrCalculator):
     __slots__ = ("_generator","_err_dep")
 
     def __init__(self,

@@ -7,14 +7,14 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 import numpy as np
 import pyvista as pv
-from pyvale.physics.field import IField
-from pyvale.uncertainty.errorintegrator import ErrorIntegrator
-from pyvale.sensors.sensordescriptor import SensorDescriptor
-from pyvale.sensors.sensordata import SensorData
-from pyvale.physics.fieldsampler import sample_field_with_sensor_data
+from pyvale.field import IField
+from pyvale.errorintegrator import ErrIntegrator
+from pyvale.sensordescriptor import SensorDescriptor
+from pyvale.sensordata import SensorData
+from pyvale.fieldsampler import sample_field_with_sensor_data
 
 
-class PointSensorArray:
+class SensorArrayPoint:
     __slots__ = ("field","descriptor","sensor_data","_truth","_measurements",
                  "_error_integrator")
 
@@ -62,7 +62,7 @@ class PointSensorArray:
 
     #---------------------------------------------------------------------------
     # Errors
-    def set_error_integrator(self, err_int: ErrorIntegrator) -> None:
+    def set_error_integrator(self, err_int: ErrIntegrator) -> None:
         self._error_integrator = err_int
 
     def get_systematic_errors(self) -> np.ndarray:

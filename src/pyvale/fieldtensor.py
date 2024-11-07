@@ -10,13 +10,13 @@ import pyvista as pv
 from scipy.spatial.transform import Rotation
 import mooseherder as mh
 
-from pyvale.physics.field import (IField,
+from pyvale.field import (IField,
                                   conv_simdata_to_pyvista,
                                   sample_pyvista)
-from pyvale.physics.coordtransform import (transform_tensor_2d,
+from pyvale.fieldtransform import (transform_tensor_2d,
                                            transform_tensor_3d)
 
-class TensorField(IField):
+class FieldTensor(IField):
     __slots__ = ("_field_key","_spat_dims","_time_steps","_pyvista_grid",
                  "_norm_components","_dev_components")
 

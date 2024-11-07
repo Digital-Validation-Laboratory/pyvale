@@ -24,7 +24,7 @@ def main() -> None:
 
     spat_dims = 2       # Specify that we only have 2 spatial dimensions
     field_name = 'temperature'    # Same as in the moose input and SimData node_var key
-    t_field = pyvale.ScalarField(sim_data,field_name,spat_dims)
+    t_field = pyvale.FieldScalar(sim_data,field_name,spat_dims)
 
     n_sens = (3,1,1)    # Number of sensor (x,y,z)
     x_lims = (0.0,2.0)  # Limits for each coord in sim length units
@@ -32,10 +32,10 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    tc_array = pyvale.PointSensorArray(sens_pos,t_field)
+    tc_array = pyvale.SensorArrayPoint(sens_pos,t_field)
 
-    rand_err1 = pyvale.RandErrNormPercent(std_percent=10.0)
-    rand_err_int = pyvale.ErrorIntegrator([rand_err1],
+    rand_err1 = pyvale.ErrRandNormPercent(std_percent=10.0)
+    rand_err_int = pyvale.ErrIntegrator([rand_err1],
                                             tc_array.get_measurement_shape())
     tc_array.set_random_err_integrator(rand_err_int)
 

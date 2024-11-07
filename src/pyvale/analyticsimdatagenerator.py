@@ -12,7 +12,7 @@ import sympy
 
 import mooseherder as mh
 
-from pyvale.analyticdata.meshgen import rectangle_mesh_2d, fill_dims
+from pyvale.analyticmeshgen import rectangle_mesh_2d, fill_dims
 
 @dataclass
 class AnalyticCaseData2D:

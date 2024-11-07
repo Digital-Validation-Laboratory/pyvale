@@ -9,7 +9,7 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 import matplotlib.pyplot as plt
 import pyvale
-import pyvale.visualisation.plotters
+import pyvale.visualisation.visualplotters
 
 def main() -> None:
 

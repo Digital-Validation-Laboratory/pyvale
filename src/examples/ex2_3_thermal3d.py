@@ -38,7 +38,7 @@ def main() -> None:
 
 
     field_key = 'temperature'
-    t_field = pyvale.ScalarField(sim_data,
+    t_field = pyvale.FieldScalar(sim_data,
                                  field_key=field_key,
                                  spat_dims=3)
 
@@ -57,7 +57,7 @@ def main() -> None:
     sens_data = pyvale.SensorData(positions=sens_pos,
                                   sample_times=sample_times)
 
-    tc_array = pyvale.PointSensorArray(sens_data,
+    tc_array = pyvale.SensorArrayPoint(sens_data,
                                        t_field,
                                        descriptor)
 
@@ -67,22 +67,25 @@ def main() -> None:
 
     error_chain = []
     if errors_on['indep_sys']:
-        error_chain.append(pyvale.SysErrOffset(offset=-5.0))
-        error_chain.append(pyvale.SysErrUniform(low=-10.0,
+        error_chain.append(pyvale.ErrSysOffset(offset=-5.0))
+        error_chain.append(pyvale.ErrSysUniform(low=-10.0,
                                                    high=10.0))
 
     if errors_on['rand']:
-        error_chain.append(pyvale.RandErrNormPercent(std_percent=5.0))
-        error_chain.append(pyvale.RandErrUnifPercent(low_percent=-5.0,
+        error_chain.append(pyvale.ErrRandNormPercent(std_percent=5.0))
+        error_chain.append(pyvale.ErrRandUnifPercent(low_percent=-5.0,
                                                    high_percent=5.0))
 
     if errors_on['dep_sys']:
-        error_chain.append(pyvale.SysErrDigitisation(bits_per_unit=1/20))
-        error_chain.append(pyvale.SysErrSaturation(meas_min=0.0,meas_max=800.0))
+        error_chain.append(pyvale.ErrSysDigitisation(bits_per_unit=1/20))
+        error_chain.append(pyvale.ErrSysSaturation(meas_min=0.0,meas_max=800.0))
 
     if len(error_chain) > 0:
-        error_integrator = pyvale.ErrorIntegrator(error_chain,
-                                                  tc_array.get_measurement_shape())
+        error_integrator = pyvale.ErrIntegrator(
+            error_chain,
+            sens_data,
+            tc_array.get_measurement_shape(),
+        )
         tc_array.set_error_integrator(error_integrator)
 
     measurements = tc_array.get_measurements()

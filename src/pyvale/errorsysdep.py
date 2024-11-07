@@ -8,10 +8,10 @@ Copyright (C) 2024 The Digital Validation Team
 import enum
 from typing import Callable
 import numpy as np
-from pyvale.sensors.sensordata import SensorData
-from pyvale.uncertainty.errorcalculator import (IErrCalculator,
-                                                EErrType,
-                                                EErrDependence)
+from pyvale.sensordata import SensorData
+from pyvale.errorcalculator import (IErrCalculator,
+                                    EErrType,
+                                    EErrDependence)
 
 
 class ERoundMethod(enum.Enum):
@@ -28,7 +28,7 @@ def _select_round_method(method: ERoundMethod) -> Callable:
     return np.round
 
 
-class SysErrRoundOff(IErrCalculator):
+class ErrSysRoundOff(IErrCalculator):
     __slots__ = ("_base","_method","_err_dep")
 
     def __init__(self,
@@ -59,7 +59,7 @@ class SysErrRoundOff(IErrCalculator):
         return (rounded_measurements - err_basis,sens_data)
 
 
-class SysErrDigitisation(IErrCalculator):
+class ErrSysDigitisation(IErrCalculator):
     __slots__ = ("_units_per_bit","_method","_err_dep")
 
     def __init__(self,
@@ -91,7 +91,7 @@ class SysErrDigitisation(IErrCalculator):
         return (rounded_measurements - err_basis,sens_data)
 
 
-class SysErrSaturation(IErrCalculator):
+class ErrSysSaturation(IErrCalculator):
     __slots__ = ("_min","_max","_err_dep")
 
     def __init__(self,

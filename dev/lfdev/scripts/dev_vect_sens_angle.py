@@ -28,7 +28,7 @@ def main() -> None:
     spat_dims = 2
     field_key = 'disp'
     components = ('disp_x','disp_y')
-    disp_field = pyvale.VectorField(sim_data,field_key,components,spat_dims)
+    disp_field = pyvale.FieldVector(sim_data,field_key,components,spat_dims)
 
     n_sens = (2,2,1)
     x_lims = (0.0,100.0)
@@ -37,7 +37,7 @@ def main() -> None:
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
     #---------------------------------------------------------------------------
-    disp_sens_norot = pyvale.PointSensorArray(sens_pos,
+    disp_sens_norot = pyvale.SensorArrayPoint(sens_pos,
                                               disp_field,
                                               None,
                                               descriptor,
@@ -50,7 +50,7 @@ def main() -> None:
     sens_angles = sens_pos.shape[0] * \
         (Rotation.from_euler("zyx", [0, 0, 0], degrees=True),)
 
-    disp_sens_rot = pyvale.PointSensorArray(sens_pos,
+    disp_sens_rot = pyvale.SensorArrayPoint(sens_pos,
                                             disp_field,
                                             None,
                                             descriptor,
@@ -58,13 +58,13 @@ def main() -> None:
                                             sens_angles)
 
     offset_angles = np.array([1,0,0])
-    sys_err_rot = pyvale.SysErrAngleOffset(disp_field,
+    sys_err_rot = pyvale.ErrSysAngleOffset(disp_field,
                                            sens_pos,
                                            sens_angles,
                                            offset_angles,
                                            None)
 
-    sys_err_int = pyvale.ErrorIntegrator([sys_err_rot],
+    sys_err_int = pyvale.ErrIntegrator([sys_err_rot],
                                         disp_sens_rot.get_measurement_shape())
     disp_sens_rot.set_systematic_err_integrator_independent(sys_err_int)
 
