@@ -1,19 +1,20 @@
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
+
+- TODO PRIORITY:
+    - Visualisation tools for perturbed field errors:
+        - Perturbed pos, time, angle
+
+- BUGS!
 NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
 
 - TODO: EXAMPLES
     - Example showing area averaging as ground truth
-
-- TODO: PointSensorArray
-    - Switch to using SensorArrayData to init the class
+    - Example showing field error chain with other errors and extraction of perturbed sensor data
 
 - TODO: ErrorIntegrator
-    - Need to have option to store or not store separate errors by func to save memory
-    - Need to pass updated position/time/angle/area along as errors are accumulated?
-        - Might not be the best way to do this - might need to pass a single data class that encodes all errors
-        - SensorArrayErrorData: rand_pos_xyz, rand_ang_zyx, area_avg, rand_time?
+    - Simplify the memory efficient and non-memory efficient options
 
 - TODO: Experiment generator/ runner
     - TODO: Allow user to extract all sources of error for each experiment, need to dig out of `ErrorIntegrator`
@@ -21,27 +22,18 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
     - TODO: Increase plotting capabilities to compare over simulations as well as all sensors on experiments
 
 - TODO: visualisation tools for:
+    - TODO: remove methods from sensor descriptor data class
     - TODO: presentation animations - create pyvista animation synced to matplotlib traces
     - TODO: visualisation of perturbed time / sensor locations
     - TODO: experiment - allow extraction of different conditions for comparison plots
 
-- TODO: Calibration errors
-    - Need to define a ground-truth calibration function
-    - Need to define an assumed calibration function
-    - Error is the difference?
-
 - TODO: Field based errors:
-    - TODO: vector/tensor rotations
     - HALF DONE: Spatial averaging error
         - Set an integration area
         - Set a weighting function
-    - TODO: combine spatial averaging with rotation errors
-        - Need to rotate (not transform!) sensor local coords befor eval
     - TODO: Temporal averaging error
         - Set an integration time
         - Set a weighting function
-    - **TODO Allow Gauss Quad as Truth with other as Err**
-    - TODO: Allow Gauss Quad with position and temporal drift
 
 - IMAGE DEF: allow upsampled image to be generated once and retained.
 
@@ -86,7 +78,7 @@ http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubatur
     - Separates espitemic and aleatory errors? - might not be needed
 - Module: `RandErrGenerator`= Enhanced uncertainty function generation for random errors focusing on point sensors including:
     - Specification of noise as a function/percentage of sensor measurement value
-- Module: `SysErrGenerator` = Enhanced uncertainty function generation for systematic errors focusing on point sensors including:
+- Module: `ErrSysGenerator` = Enhanced uncertainty function generation for systematic errors focusing on point sensors including:
     - Calibration errors
     - Digitisation errors
     - Positioning errors

@@ -20,12 +20,7 @@ def main() -> None:
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
-    descriptor = pyvale.SensorDescriptor()
-    descriptor.name = 'Disp.'
-    descriptor.symbol = r'u'
-    descriptor.units = r'm'
-    descriptor.tag = 'DS'
-    descriptor.components = ('x','y','z')
+    descriptor = pyvale.SensorDescriptorFactory.displacement_descriptor()
 
     spat_dims = 2
     field_key = 'disp'
@@ -36,29 +31,52 @@ def main() -> None:
     x_lims = (0.0,100.0)
     y_lims = (0.0,150.0)
     z_lims = (0.0,0.0)
-    sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
+    sensor_positions = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    use_sim_time = False
+    use_sim_time = True
     if use_sim_time:
         sample_times = None
     else:
         sample_times = np.linspace(0.0,np.max(sim_data.time),50)
 
-    sens_data = pyvale.SensorData(positions=sens_pos,
-                                  sample_times=sample_times)
+    sensor_data = pyvale.SensorData(positions=sensor_positions,
+                                    sample_times=sample_times)
 
-    disp_sens_array = pyvale.SensorArrayPoint(sens_data,
+    disp_sens_array = pyvale.SensorArrayPoint(sensor_data,
                                               disp_field,
                                               descriptor)
 
-    error_chain = []
-    error_chain.append(pyvale.ErrSysUniform(low=-0.01e-3,high=0.01e-3))
-    error_chain.append(pyvale.ErrRandNormal(std=0.01e-3))
-    error_int = pyvale.ErrIntegrator(error_chain,
-                                       sens_data,
-                                       disp_sens_array.get_measurement_shape())
+
+
+    angle_offset = np.zeros_like(sensor_positions)
+    angle_offset[:,0] = 45.0 # only rotate about z in 2D
+
+    field_error_data = pyvale.ErrFieldData(ang_offset_zyx=angle_offset,
+                                             spatial_averager=pyvale.EIntSpatialType.RECT4PT,
+                                             spatial_dims=np.array([2.0,2.0,0.0]))
+
+    field_errs = []
+    field_errs.append(pyvale.ErrSysField(disp_field,
+                                        field_error_data))
+
+    err_int_opts = pyvale.ErrIntOpts(force_dependence=True,
+                                               store_errs_by_func=True)
+    error_int = pyvale.ErrIntegrator(field_errs,
+                                       sensor_data,
+                                       disp_sens_array.get_measurement_shape(),
+                                       err_int_opts)
     disp_sens_array.set_error_integrator(error_int)
 
+    measurements = disp_sens_array.calc_measurements()
+
+    print(80*'-')
+    sens_num = 4
+    print('The last 5 time steps (measurements) of sensor {sens_num}:')
+    pyvale.print_measurements(disp_sens_array,
+                              (sens_num-1,sens_num),
+                              (0,1),
+                              (measurements.shape[2]-5,measurements.shape[2]))
+    print(80*'-')
 
     plot_field = 'disp_x'
     if plot_field == 'disp_x':

@@ -40,7 +40,7 @@ def main() -> None:
     descriptor = pyvale.SensorDescriptorFactory.temperature_descriptor()
 
     field_key = 'temperature'
-    t_field = pyvale.ScalarField(sim_data,
+    t_field = pyvale.FieldScalar(sim_data,
                                  field_key=field_key,
                                  spat_dim=2)
 
@@ -57,16 +57,16 @@ def main() -> None:
         sample_times = np.linspace(0.0,np.max(sim_data.time),50)
 
 
-    tc_array = pyvale.PointSensorArray(sens_pos,
+    tc_array = pyvale.SensorArrayPoint(sens_pos,
                                        t_field,
                                        sample_times,
                                        descriptor)
 
-    cal_err = pyvale.SysErrCalibration(assumed_calib,
+    cal_err = pyvale.ErrSysCalibration(assumed_calib,
                                         truth_calib,
                                         signal_calib_range,
                                         n_cal_divs=10000)
-    sys_err_int = pyvale.ErrorIntegrator([cal_err],
+    sys_err_int = pyvale.ErrIntegrator([cal_err],
                                             tc_array.get_measurement_shape())
     tc_array.set_systematic_err_integrator_independent(sys_err_int)
 

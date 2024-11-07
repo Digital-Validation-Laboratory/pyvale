@@ -43,9 +43,10 @@ def main() -> None:
                                   field_key,
                                   spat_dims=2)
 
-    indep_sys_err_int = pyvale.ErrorIntegrator([pyvale.SysErrOffset(offset=-10.0)],
-                                        tc_array.get_measurement_shape())
-    tc_array.set_systematic_err_integrator_independent(indep_sys_err_int)
+    err_int = pyvale.ErrIntegrator([pyvale.ErrSysOffset(offset=-5.0)],
+                                     sens_data,
+                                     tc_array.get_measurement_shape())
+    tc_array.set_error_integrator(err_int)
 
     measurements = tc_array.get_measurements()
 
@@ -57,10 +58,7 @@ def main() -> None:
                               (measurements.shape[2]-5,measurements.shape[2]))
     print(80*'-')
 
-
-
-
-    trace_props = pyvale.SensorTraceOpts()
+    trace_props = pyvale.TraceOptsSensor()
 
     trace_props.truth_line = None
     trace_props.sim_line = None

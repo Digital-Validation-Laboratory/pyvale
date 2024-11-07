@@ -21,7 +21,7 @@ def main() -> None:
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
     descriptor = pyvale.SensorDescriptor()
-    descriptor.name = 'Disp.'
+    descriptor.name = 'Displacement'
     descriptor.symbol = r'u'
     descriptor.units = r'm'
     descriptor.tag = 'DS'
@@ -36,29 +36,64 @@ def main() -> None:
     x_lims = (0.0,100.0)
     y_lims = (0.0,150.0)
     z_lims = (0.0,0.0)
-    sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
+    sensor_positions = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    use_sim_time = False
+    use_sim_time = True
     if use_sim_time:
         sample_times = None
     else:
         sample_times = np.linspace(0.0,np.max(sim_data.time),50)
 
-    sens_data = pyvale.SensorData(positions=sens_pos,
+    sensor_data = pyvale.SensorData(positions=sensor_positions,
                                   sample_times=sample_times)
 
-    disp_sens_array = pyvale.SensorArrayPoint(sens_data,
+    disp_sens_array = pyvale.SensorArrayPoint(sensor_data,
                                               disp_field,
                                               descriptor)
 
-    error_chain = []
-    error_chain.append(pyvale.ErrSysUniform(low=-0.01e-3,high=0.01e-3))
-    error_chain.append(pyvale.ErrRandNormal(std=0.01e-3))
-    error_int = pyvale.ErrIntegrator(error_chain,
-                                       sens_data,
+    pos_gen = pyvale.GeneratorNormal(std = 1.0)
+    angle_gen = pyvale.GeneratorNormal(std = 1.0)
+    time_gen = pyvale.GeneratorNormal(std = 0.1)
+
+    pos_offset_xyz = 1.5*np.ones_like(sensor_positions)
+    pos_offset_xyz[:,2] = 0 # don't perturb z in 2D
+
+    ang_offset_zyx = np.zeros_like(sensor_positions)
+    ang_offset_zyx[:,0] = 1.5 # only rotate about z in 2D
+
+
+    field_err_data = pyvale.ErrFieldData(
+        pos_offset_xyz = pos_offset_xyz,
+        ang_offset_zyx = ang_offset_zyx,
+        time_offset = 1.0,
+        pos_rand_xyz = (pos_gen,pos_gen,None),
+        ang_rand_zyx = (angle_gen,None,None),
+        time_rand = time_gen
+    )
+    sys_err_field = pyvale.ErrSysField(disp_field,
+                                       sensor_data,
+                                       field_err_data)
+
+    error_int = pyvale.ErrIntegrator([sys_err_field],
                                        disp_sens_array.get_measurement_shape())
     disp_sens_array.set_error_integrator(error_int)
 
+    measurements = disp_sens_array.calc_measurements()
+
+    print(80*'-')
+    sens_num = 4
+    print('The last 5 time steps (measurements) of sensor {sens_num}:')
+    pyvale.print_measurements(disp_sens_array,
+                              (sens_num-1,sens_num),
+                              (0,1),
+                              (measurements.shape[2]-5,measurements.shape[2]))
+    print(80*'-')
+
+    sens_data_by_chain = error_int.get_sens_data_by_chain()
+    for ii,ss in enumerate(sens_data_by_chain):
+        if ss is not None:
+            print(f"SensorData @ [{ii}]")
+            print(ss)
 
     plot_field = 'disp_x'
     if plot_field == 'disp_x':

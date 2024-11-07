@@ -28,7 +28,7 @@ def main() -> None:
     spat_dims = 2
     field_key = 'disp'
     components = ('disp_x','disp_y')
-    disp_field = pyvale.VectorField(sim_data,field_key,components,spat_dims)
+    disp_field = pyvale.FieldVector(sim_data,field_key,components,spat_dims)
 
     n_sens = (2,2,1)
     x_lims = (0.0,100.0)
@@ -39,7 +39,7 @@ def main() -> None:
     orientations = sens_pos.shape[0] * \
         (R.from_euler("zyx", [45, 0, 0], degrees=True),)
 
-    disp_sens_array = pyvale.PointSensorArray(sens_pos,
+    disp_sens_array = pyvale.SensorArrayPoint(sens_pos,
                                               disp_field,
                                               None,
                                               descriptor,
