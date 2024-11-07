@@ -21,7 +21,7 @@ def main() -> None:
 
     spat_dims = 2
     field_name = 'temperature'
-    t_field = pyvale.ScalarField(sim_data,field_name,spat_dims)
+    t_field = pyvale.FieldScalar(sim_data,field_name,spat_dims)
 
     n_sens = (3,1,1)
     x_lims = (0.0,2.0)
@@ -29,9 +29,9 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    tc_array = pyvale.PointSensorArray(sens_pos,t_field)
+    tc_array = pyvale.SensorArrayPoint(sens_pos,t_field)
 
-    field_sys_err1 = pyvale.SysErrRandPosition(t_field,
+    field_sys_err1 = pyvale.ErrSysPositionRand(t_field,
                                            sens_pos,
                                            (0.1,0.1,None))
 
@@ -39,15 +39,15 @@ def main() -> None:
                                                         sens_pos,
                                                         np.array((0.1,0.1,0.0)))
 
-    field_sys_err2 = pyvale.SysErrSpatialAverage(t_field,
+    field_sys_err2 = pyvale.ErrSysSpatialAverage(t_field,
                                                  spatial_int)
 
-    field_sys_err3 = pyvale.SysErrSpatialAverageRandPos(t_field,
+    field_sys_err3 = pyvale.ErrSysSpatialAveragePosRand(t_field,
                                                  spatial_int,
                                                  sens_pos,
                                                  (0.1,0.1,None))
 
-    pre_syserr_int = pyvale.ErrorIntegrator([field_sys_err2],
+    pre_syserr_int = pyvale.ErrIntegrator([field_sys_err2],
                                             tc_array.get_measurement_shape())
     tc_array.set_systematic_err_integrator_independent(pre_syserr_int)
 

@@ -31,7 +31,7 @@ def main() -> None:
     field_key = 'strain'
     norm_components = ('strain_xx','strain_yy')
     dev_components = ('strain_xy',)
-    strain_field = pyvale.TensorField(sim_data,
+    strain_field = pyvale.FieldTensor(sim_data,
                                     field_key,
                                     norm_components,
                                     dev_components,
@@ -52,25 +52,17 @@ def main() -> None:
     sens_data = pyvale.SensorData(positions=sens_pos,
                                   sample_times=sample_times)
 
-    straingauge_array = pyvale.PointSensorArray(sens_data,
+    straingauge_array = pyvale.SensorArrayPoint(sens_data,
                                                 strain_field,
                                                 descriptor)
 
-    sys_errors_on = True
-    rand_errors_on = True
-
-    if sys_errors_on:
-        indep_sys_err1 = pyvale.SysErrUniform(low=-0.1e-3,high=0.1e-3)
-        sys_err_int = pyvale.ErrorIntegrator([indep_sys_err1],
-                                            straingauge_array.get_measurement_shape())
-        straingauge_array.set_systematic_err_integrator_independent(sys_err_int)
-
-    if rand_errors_on:
-        rand_err1 = pyvale.RandErrNormal(std=0.1e-3)
-        rand_err_int = pyvale.ErrorIntegrator([rand_err1],
-                                                straingauge_array.get_measurement_shape())
-        straingauge_array.set_random_err_integrator(rand_err_int)
-
+    error_chain = []
+    error_chain.append(pyvale.ErrSysUniform(low=-0.1e-3,high=0.1e-3))
+    error_chain.append(pyvale.ErrRandNormal(std=0.1e-3))
+    error_int = pyvale.ErrIntegrator(error_chain,
+                                       sens_data,
+                                       straingauge_array.get_measurement_shape())
+    straingauge_array.set_error_integrator(error_int)
 
     plot_field = 'strain_yy'
     pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,plot_field)

@@ -23,7 +23,7 @@ def main() -> None:
 
     descriptor = pyvale.SensorDescriptorFactory.temperature_descriptor()
     field_key = 'temperature'
-    t_field = pyvale.ScalarField(sim_data,
+    t_field = pyvale.FieldScalar(sim_data,
                                  field_key=field_key,
                                  spat_dim=2)
 
@@ -41,26 +41,26 @@ def main() -> None:
 
 
     sens_size = 10.0
-    spat_int_truth = pyvale.SpatialIntegratorFactory.quad_2d_4pt(t_field,
+    spat_int_truth = pyvale.IntegratorSpatialFactory.quad_2d_4pt(t_field,
                                                            sens_pos,
                                                            np.array((sens_size,sens_size,0.0)))
 
-    tc_array = pyvale.PointSensorArray(sens_pos,
+    tc_array = pyvale.SensorArrayPoint(sens_pos,
                                        t_field,
                                        sample_times,
                                        descriptor,
                                        area_avg=spat_int_truth)
 
-    spat_int_err = pyvale.SpatialIntegratorFactory.rect_2d_1pt(t_field,
+    spat_int_err = pyvale.IntegratorSpatialFactory.rect_2d_1pt(t_field,
                                                            sens_pos,
                                                            np.array((sens_size,sens_size,0.0)))
 
     sys_errs = []
-    sys_errs.append(pyvale.SysErrSpatialAverage(t_field,
+    sys_errs.append(pyvale.ErrSysSpatialAverage(t_field,
                                                 spat_int_err,
                                                 sample_times))
 
-    indep_sys_err_int = pyvale.ErrorIntegrator(sys_errs,
+    indep_sys_err_int = pyvale.ErrIntegrator(sys_errs,
                                         tc_array.get_measurement_shape())
 
     tc_array.set_systematic_err_integrator_independent(indep_sys_err_int)
