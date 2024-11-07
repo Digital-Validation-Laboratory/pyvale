@@ -102,7 +102,7 @@ pyvale.print_measurements(thermocouple_array,
 (fig,_) = pyvale.plot_time_traces(thermocouple_array,FIELD_KEY)
 plt.show()
 
-pv_plot = pyvale.plot_sensors_on_sim(thermocouple_array,FIELD_KEY)
+pv_plot = pyvale.plot_point_sensors_on_sim(thermocouple_array,FIELD_KEY)
 pv_plot.camera_position = [(-0.295, 1.235, 3.369),
                             (1.0274, 0.314, 0.0211),
                             (0.081, 0.969, -0.234)]

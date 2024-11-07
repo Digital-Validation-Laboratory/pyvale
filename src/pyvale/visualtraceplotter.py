@@ -9,92 +9,11 @@ from typing import Any
 
 import numpy as np
 import matplotlib.pyplot as plt
-import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
-# See: https://github.com/pyvista/pyvista/discussions/2928
-#NOTE: causes output to console to be suppressed unfortunately
-import pyvista as pv
-
-import mooseherder as mh
-
-from pyvale.field import conv_simdata_to_pyvista
 from pyvale.sensorarraypoint import SensorArrayPoint
 from pyvale.visualplotopts import (PlotOptsGeneral,
                                     TraceOptsSensor,
                                     TraceOptsExperiment)
 from pyvale.experimentsimulator import ExperimentSimulator
-
-
-def plot_sim_mesh(sim_data: mh.SimData) -> Any:
-    pv_simdata = conv_simdata_to_pyvista(sim_data,
-                                         None,
-                                         sim_data.num_spat_dims)
-
-    pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
-
-    pv_plot.add_mesh(pv_simdata,
-                     label='sim-data',
-                     show_edges=True,
-                     show_scalar_bar=False)
-
-    pv_plot.add_axes_at_origin(labels_off=True)
-    return pv_plot
-
-
-def plot_sim_data(sim_data: mh.SimData,
-                  component: str,
-                  time_step: int = -1) -> Any:
-    pv_simdata = conv_simdata_to_pyvista(sim_data,
-                                        (component,),
-                                         sim_data.num_spat_dims)
-
-    pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
-
-    pv_plot.add_mesh(pv_simdata,
-                     scalars=pv_simdata[component][:,time_step],
-                     label='sim-data',
-                     show_edges=True,
-                     show_scalar_bar=False)
-
-    pv_plot.add_scalar_bar(component)
-    pv_plot.add_axes_at_origin(labels_off=True)
-    return pv_plot
-
-
-def plot_sensors_on_sim(sensor_array: SensorArrayPoint,
-                        component: str,
-                        time_step: int = -1,
-                        ) -> Any:
-
-    pv_simdata = sensor_array.field.get_visualiser()
-    pv_sensdata = sensor_array.get_visualiser()
-    comp_ind = sensor_array.field.get_component_index(component)
-
-    descriptor = sensor_array.descriptor
-    pv_sensdata['labels'] = descriptor.create_sensor_tags(
-        sensor_array.get_measurement_shape()[0])
-
-    pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
-
-    pv_plot.add_point_labels(pv_sensdata, "labels",
-                            font_size=40,
-                            shape_color='grey',
-                            point_color='red',
-                            render_points_as_spheres=True,
-                            point_size=20,
-                            always_visible=True
-                            )
-
-    pv_plot.add_mesh(pv_simdata,
-                     scalars=pv_simdata[component][:,time_step],
-                     label='sim-data',
-                     show_edges=True,
-                     show_scalar_bar=False)
-
-    pv_plot.add_scalar_bar(descriptor.create_label(comp_ind),
-                           vertical=True)
-    pv_plot.add_axes_at_origin(labels_off=True)
-
-    return pv_plot
 
 
 def plot_time_traces(sensor_array: SensorArrayPoint,
@@ -181,10 +100,6 @@ def plot_time_traces(sensor_array: SensorArrayPoint,
 
     plt.grid(True)
     plt.draw()
-
-    return (fig,ax)
-
-
 def plot_exp_traces(exp_sim: ExperimentSimulator,
                     component: str,
                     sens_array_num: int,

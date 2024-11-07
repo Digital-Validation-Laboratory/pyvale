@@ -65,7 +65,7 @@ def main() -> None:
     straingauge_array.set_error_integrator(error_int)
 
     plot_field = 'strain_yy'
-    pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,plot_field)
+    pv_plot = pyvale.plot_point_sensors_on_sim(straingauge_array,plot_field)
     pv_plot.show()
 
     pyvale.plot_time_traces(straingauge_array,'strain_xx')

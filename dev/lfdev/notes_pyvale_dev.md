@@ -26,6 +26,8 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
     - TODO: presentation animations - create pyvista animation synced to matplotlib traces
     - TODO: visualisation of perturbed time / sensor locations
     - TODO: experiment - allow extraction of different conditions for comparison plots
+    - TODO: visualise all components of vector / tensor field
+        - See this example for subplots: https://docs.pyvista.org/examples/02-plot/cmap#sphx-glr-examples-02-plot-cmap-py
 
 - TODO: Field based errors:
     - HALF DONE: Spatial averaging error

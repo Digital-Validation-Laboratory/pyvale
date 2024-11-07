@@ -32,7 +32,7 @@ def main() -> None:
                                                      spat_dims=2)
 
     plot_field = 'strain_yy'
-    pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,plot_field)
+    pv_plot = pyvale.plot_point_sensors_on_sim(straingauge_array,plot_field)
     pv_plot.camera_position = [(214.08261967353556, 46.15582361499647, 308.687529820126),
                             (49.5, 74.5, 0.0),
                             (-0.04768267074047773, -0.996673492281819, -0.06609321216144791)]

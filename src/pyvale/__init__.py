@@ -6,7 +6,7 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 # NOTE: this simplifies and decouples how the user calls pyvale from the
-# underlying project structure: the user should always be able to use pyvale.
+# underlying project structure: the user should always be able to use 'pyvale.'
 # and access everything in one layer without multiple import dots
 
 from pyvale.imagesim import *
@@ -38,7 +38,9 @@ from pyvale.errordriftcalc import *
 from pyvale.generatorsrandom import *
 
 from pyvale.visualplotopts import *
-from pyvale.visualplotters import *
+from pyvale.visualsimdataplotter import *
+from pyvale.visualexpplotter import *
+from pyvale.visualtraceplotter import *
 
 from pyvale.analyticmeshgen import *
 from pyvale.analyticsimdatagenerator import *

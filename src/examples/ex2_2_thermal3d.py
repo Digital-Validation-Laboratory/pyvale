@@ -42,7 +42,7 @@ def main() -> None:
     measurements = tc_array.get_measurements()
     print(f'\nMeasurements for sensor at top of block:\n{measurements[-1,0,:]}\n')
 
-    pv_plot = pyvale.plot_sensors_on_sim(tc_array,field_name)
+    pv_plot = pyvale.plot_point_sensors_on_sim(tc_array,field_name)
     pv_plot.camera_position = [(59.354, 43.428, 69.946),
                                 (-2.858, 13.189, 4.523),
                                 (-0.215, 0.948, -0.233)]

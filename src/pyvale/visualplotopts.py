@@ -84,4 +84,10 @@ class TraceOptsExperiment:
     plot_all_exp_points = False
     fill_between: str | None = "3std"
 
+@dataclass(slots=True)
+class VisOptsSensorOnSim:
+    show_perturbed_pos: bool = True
+    sens_colour_nom: str = "red"
+    sens_colour_pert: str = ""
+
 

@@ -84,7 +84,7 @@ def main() -> None:
     (fig,_) = pyvale.plot_time_traces(tc_array,field_key)
     plt.show()
 
-    pv_plot = pyvale.plot_sensors_on_sim(tc_array,field_key)
+    pv_plot = pyvale.plot_point_sensors_on_sim(tc_array,field_key)
     pv_plot.show()
 
 if __name__ == '__main__':
