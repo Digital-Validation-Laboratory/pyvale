@@ -86,15 +86,6 @@ def main() -> None:
 
     measurements = disp_sensors.calc_measurements()
 
-    print(80*"-")
-    print(error_integrator)
-    print(disp_sensors.error_integrator)
-    print(disp_sensors.get_sensor_data_perturbed())
-    print(80*"-")
-    print()
-
-
-
     #---------------------------------------------------------------------------
     print(80*'-')
     sens_num = 4
@@ -108,10 +99,10 @@ def main() -> None:
     plot_field = 'disp_x'
     if plot_field == 'disp_x':
         pv_plot = pyvale.plot_point_sensors_on_sim(disp_sensors,'disp_x')
-        pv_plot.show()
+        pv_plot.show(cpos="xy")
     elif plot_field == 'disp_y':
         pv_plot = pyvale.plot_point_sensors_on_sim(disp_sensors,'disp_y')
-        pv_plot.show()
+        pv_plot.show(cpos="xy")
 
     # pyvale.plot_time_traces(disp_sensors,plot_field)
     # pyvale.plot_time_traces(disp_sensors,plot_field)

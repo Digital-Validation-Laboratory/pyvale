@@ -5,9 +5,8 @@ License: MIT
 Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
-import numpy as np
 from typing import Any
-import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
+#import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
 # See: https://github.com/pyvista/pyvista/discussions/2928
 #NOTE: causes output to console to be suppressed unfortunately
 import pyvista as pv
@@ -59,10 +58,13 @@ def plot_sim_data(sim_data: mh.SimData,
 def plot_point_sensors_on_sim(sensor_array: SensorArrayPoint,
                               component: str,
                               time_step: int = -1,
-                              vis_opts: VisOptsSensorOnSim | None = None) -> Any:
+                              vis_opts: VisOptsSensorOnSim | None = None
+                              ) -> pv.Plotter:
 
     if vis_opts is None:
         vis_opts = VisOptsSensorOnSim()
+
+    pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
 
     vis_sim = sensor_array.field.get_visualiser()
     descriptor = sensor_array.descriptor
@@ -80,8 +82,6 @@ def plot_point_sensors_on_sim(sensor_array: SensorArrayPoint,
 
     vis_sens_nominal["labels"] = descriptor.create_sensor_tags(
         sensor_array.get_measurement_shape()[0])
-
-    pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
 
     # Add points to show sensor locations
     pv_plot.add_point_labels(vis_sens_nominal,"labels",
@@ -108,7 +108,8 @@ def plot_point_sensors_on_sim(sensor_array: SensorArrayPoint,
                      show_edges=True,
                      show_scalar_bar=True,
                      scalar_bar_args={"title":descriptor.create_label(comp_ind),
-                                      "vertical":True},)
+                                      "vertical":True},
+                     lighting=False)
 
     pv_plot.add_axes_at_origin(labels_off=True)
 

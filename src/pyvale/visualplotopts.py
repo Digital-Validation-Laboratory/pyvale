@@ -86,8 +86,14 @@ class TraceOptsExperiment:
 
 @dataclass(slots=True)
 class VisOptsSensorOnSim:
+    # pyvista ops
+    off_screen: bool = False
+
+    # pyvale ops
     show_perturbed_pos: bool = True
     sens_colour_nom: str = "red"
     sens_colour_pert: str = ""
+
+
 
 
