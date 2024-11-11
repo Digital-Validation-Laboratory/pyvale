@@ -100,6 +100,10 @@ def plot_time_traces(sensor_array: SensorArrayPoint,
 
     plt.grid(True)
     plt.draw()
+
+    return (fig,ax)
+
+
 def plot_exp_traces(exp_sim: ExperimentSimulator,
                     component: str,
                     sens_array_num: int,

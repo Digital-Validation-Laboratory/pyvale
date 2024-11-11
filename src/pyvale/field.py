@@ -20,6 +20,10 @@ class IField(ABC):
         pass
 
     @abstractmethod
+    def get_sim_data(self) -> mh.SimData:
+        pass
+
+    @abstractmethod
     def get_time_steps(self) -> np.ndarray:
         pass
 
@@ -47,7 +51,8 @@ class IField(ABC):
 #-------------------------------------------------------------------------------
 def conv_simdata_to_pyvista(sim_data: mh.SimData,
                             components: tuple[str,...] | None,
-                            spat_dim: int) -> pv.UnstructuredGrid:
+                            spat_dim: int
+                            ) -> tuple[pv.UnstructuredGrid,pv.UnstructuredGrid]:
 
     flat_connect = np.array([],dtype=np.int64)
     cell_types = np.array([],dtype=np.int64)
@@ -68,12 +73,13 @@ def conv_simdata_to_pyvista(sim_data: mh.SimData,
     cells = flat_connect
     points = sim_data.coords
     pv_grid = pv.UnstructuredGrid(cells, cell_types, points)
+    pv_grid_vis = pv.UnstructuredGrid(cells, cell_types, points)
 
     if components is not None and sim_data.node_vars is not None:
         for cc in components:
             pv_grid[cc] = sim_data.node_vars[cc]
 
-    return pv_grid
+    return (pv_grid,pv_grid_vis)
 
 
 def get_cell_type(nodes_per_elem: int, spat_dim: int) -> int:

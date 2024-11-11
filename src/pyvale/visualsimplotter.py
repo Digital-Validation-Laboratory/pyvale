@@ -67,7 +67,14 @@ def plot_point_sensors_on_sim(sensor_array: SensorArrayPoint,
     pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
 
     vis_sim = sensor_array.field.get_visualiser()
+    sim_data = sensor_array.field.get_sim_data()
+    print(80*"=")
+    print(sim_data.node_vars[component][:,time_step].shape)
+    print(80*"=")
+    vis_sim[component] = sim_data.node_vars[component][:,time_step]
+
     descriptor = sensor_array.descriptor
+
     vis_sens_nominal = pv.PolyData(sensor_array.sensor_data.positions)
     sens_data_perturbed = sensor_array.get_sensor_data_perturbed()
 
@@ -103,7 +110,7 @@ def plot_point_sensors_on_sim(sensor_array: SensorArrayPoint,
 
     # Plot the simulation mesh
     pv_plot.add_mesh(vis_sim,
-                     scalars=vis_sim[component][:,time_step],
+                     scalars=component,
                      label="sim-data",
                      show_edges=True,
                      show_scalar_bar=True,
