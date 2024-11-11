@@ -116,7 +116,7 @@ pv_sens = tc_array.get_visualiser()
 pv_sim = t_field.get_visualiser()
 pv_plot = pyvale.plot_sensors_on_sim(pv_sim,pv_sens,field_name)
 pv_plot.add_scalar_bar('Temperature, T [degC]')
-pv_plot.show()
+pv_plot.show(cpos="xy")
 ```
 
 |![fig_2dplate_pyvista](images/plate_thermal_2d_sim_view.svg)|

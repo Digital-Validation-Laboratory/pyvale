@@ -151,7 +151,7 @@ def main() -> None:
     pv_plot = pyvale.visualisation.visualplotters.plot_sim_data(sim_data,
                                                           field_key,
                                                           time_step=-1)
-    #pv_plot.show()
+    #pv_plot.show(cpos="xy")
 
     # Integration
     x = sym.Symbol('x')

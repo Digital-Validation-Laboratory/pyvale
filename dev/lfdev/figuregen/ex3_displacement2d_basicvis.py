@@ -44,7 +44,7 @@ def main() -> None:
     pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
     pv_plot.screenshot(save_render.with_suffix('.png'))
 
-    pv_plot.show()
+    pv_plot.show(cpos="xy")
     print(pv_plot.camera_position)
 
     (fig,_) = pyvale.plot_time_traces(disp_sens_array,'disp_x')

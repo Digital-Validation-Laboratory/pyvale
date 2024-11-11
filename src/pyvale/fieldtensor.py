@@ -38,7 +38,7 @@ class FieldTensor(IField):
         self._sim_data = sim_data
         (self._pyvista_grid,self._pyvista_vis) = conv_simdata_to_pyvista(
             self._sim_data,
-            (self._field_key,),
+            self._norm_components+self._dev_components,
             self._spat_dims
         )
 
@@ -46,7 +46,7 @@ class FieldTensor(IField):
         self._sim_data = sim_data
         (self._pyvista_grid,self._pyvista_vis) = conv_simdata_to_pyvista(
             sim_data,
-            (self._field_key,),
+            self._norm_components+self._dev_components,
             self._spat_dims
         )
 

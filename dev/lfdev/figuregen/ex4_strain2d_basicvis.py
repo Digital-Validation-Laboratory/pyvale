@@ -41,7 +41,7 @@ def main() -> None:
     pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
     pv_plot.screenshot(save_render.with_suffix('.png'))
 
-    #pv_plot.show()
+    #pv_plot.show(cpos="xy")
 
     (fig,_) = pyvale.plot_time_traces(straingauge_array,'strain_xx')
     save_traces = Path('dev/lfdev/figuregen/strain2d_traces_exx.png')

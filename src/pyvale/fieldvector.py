@@ -31,7 +31,7 @@ class FieldVector(IField):
         self._sim_data = sim_data
         (self._pyvista_grid,self._pyvista_vis) = conv_simdata_to_pyvista(
             self._sim_data,
-            (self._field_key,),
+            self._components,
             self._spat_dims
         )
 
@@ -39,7 +39,7 @@ class FieldVector(IField):
         self._sim_data = sim_data
         (self._pyvista_grid,self._pyvista_vis) = conv_simdata_to_pyvista(
             sim_data,
-            (self._field_key,),
+            self._components,
             self._spat_dims
         )
 

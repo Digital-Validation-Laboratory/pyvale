@@ -83,7 +83,7 @@ def main() -> None:
     pv_plot.camera_position = [(-7.547, 59.753, 134.52),
                                    (41.916, 25.303, 9.297),
                                    (0.0810, 0.969, -0.234)]
-    pv_plot.show()
+    pv_plot.show(cpos="xy")
 
 
 if __name__ == '__main__':

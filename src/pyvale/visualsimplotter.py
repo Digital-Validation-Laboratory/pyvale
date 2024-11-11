@@ -15,7 +15,7 @@ import mooseherder as mh
 
 from pyvale.field import conv_simdata_to_pyvista
 from pyvale.sensorarraypoint import SensorArrayPoint
-from pyvale.visualplotopts import VisOptsSensorOnSim
+from pyvale.visualplotopts import VisOptsSimAndSensors
 
 
 def plot_sim_mesh(sim_data: mh.SimData) -> Any:
@@ -58,11 +58,11 @@ def plot_sim_data(sim_data: mh.SimData,
 def plot_point_sensors_on_sim(sensor_array: SensorArrayPoint,
                               component: str,
                               time_step: int = -1,
-                              vis_opts: VisOptsSensorOnSim | None = None
+                              vis_opts: VisOptsSimAndSensors | None = None
                               ) -> pv.Plotter:
 
     if vis_opts is None:
-        vis_opts = VisOptsSensorOnSim()
+        vis_opts = VisOptsSimAndSensors()
 
     pv_plot = pv.Plotter(window_size=[1280, 800]) # type: ignore
 

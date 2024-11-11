@@ -89,10 +89,10 @@ def main() -> None:
     plot_field = 'disp_x'
     if plot_field == 'disp_x':
         pv_plot = pyvale.plot_point_sensors_on_sim(disp_sens_rot,'disp_x')
-        pv_plot.show()
+        pv_plot.show(cpos="xy")
     elif plot_field == 'disp_y':
         pv_plot = pyvale.plot_point_sensors_on_sim(disp_sens_rot,'disp_y')
-        pv_plot.show()
+        pv_plot.show(cpos="xy")
 
     pyvale.plot_time_traces(disp_sens_norot,plot_field)
     pyvale.plot_time_traces(disp_sens_rot,plot_field)

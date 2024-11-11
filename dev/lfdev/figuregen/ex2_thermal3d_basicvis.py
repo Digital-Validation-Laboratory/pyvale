@@ -49,7 +49,7 @@ def main() -> None:
         pv_plot.camera_position = [(52.198, 26.042, 60.099),
                                     (0.0, 4.0, 5.5),
                                     (-0.190, 0.960, -0.206)]
-        pv_plot.show()
+        pv_plot.show(cpos="xy")
 
         print(80*"=")
         print('Camera positions = ')

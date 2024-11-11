@@ -8,6 +8,7 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 from pathlib import Path
+import numpy as np
 import mooseherder as mh
 import pyvale
 
@@ -37,17 +38,26 @@ def main() -> None:
                                   field_name,
                                   spat_dims=3)
 
-
     measurements = tc_array.get_measurements()
     print(f'\nMeasurements for sensor at top of block:\n{measurements[-1,0,:]}\n')
 
-    pyvale.animate_sim_with_sensors(tc_array,field_name)
+    vis_opts = pyvale.VisOptsSimAndSensors()
+    vis_opts.camera_position = np.array([(59.354, 43.428, 69.946),
+                                         (-2.858, 13.189, 4.523),
+                                         (-0.215, 0.948, -0.233)])
+
+    pv_plot = pyvale.animate_sim_with_sensors(tc_array,
+                                              field_name,
+                                              time_steps=None,
+                                              vis_opts=vis_opts)
+    print(f"{measurements.shape=}")
+    print(pv_plot.camera_position)
 
     # pv_plot = pyvale.plot_point_sensors_on_sim(tc_array,field_name)
     # pv_plot.camera_position = [(59.354, 43.428, 69.946),
     #                             (-2.858, 13.189, 4.523),
     #                             (-0.215, 0.948, -0.233)]
-    # pv_plot.show()
+    # pv_plot.show(cpos="xy")
 
 if __name__ == '__main__':
     main()

@@ -85,7 +85,7 @@ def main() -> None:
     plt.show()
 
     pv_plot = pyvale.plot_point_sensors_on_sim(tc_array,field_key)
-    pv_plot.show()
+    pv_plot.show(cpos="xy")
 
 if __name__ == '__main__':
     main()
