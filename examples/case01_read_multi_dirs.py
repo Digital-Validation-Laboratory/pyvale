@@ -13,9 +13,13 @@ from pathlib import Path
 from sklearn import metrics
 from scipy import integrate, stats
 import matplotlib.pyplot as plt
-import os
+from mpl_toolkits.mplot3d import Axes3D
+from pyDOE import *
+import os, math
 import numpy as np
 import pandas as pd
+
+np.random.seed(1000)
 
 USER_DIR = Path.home() / 'git/herding-moose/'
 PLOT_RES = 1#
@@ -24,9 +28,11 @@ PLOT_RES = 1#
 class Dataset:
 
     def __init__(self,name,output_dir,skip=None):
-    
+        
+        print("Reading dataset...",end=" ")
         self.name = name
         self.sens_pos,self.data = self.read_files(output_dir,skip=skip)
+        print("Done.")
         
         return None
         
@@ -90,11 +96,11 @@ def main():
     
     # Pick datasets to compare
     
-    data1 = datasets["sys_err"].data
-    data1_label=datasets["sys_err"].name
+    data1 = datasets["sim_err"].data
+    data1_label=datasets["sim_err"].name
     
-    data2 = datasets["sim_err"].data
-    data2_label = datasets["sim_err"].name
+    data2 = datasets["rand_err"].data
+    data2_label = datasets["rand_err"].name
     
     # Plot two datasets against each other
     
@@ -116,7 +122,8 @@ def main():
     # Test validation metrics
     
     #avm(sim_data[:,-1],noise_data[:,-1])
-    mavm(data1[:,-1],data2[:,-1])
+    #mavm(data1[:,-1],data2[:,-1])
+    reliability_metric(data1[:,-1],data2[:,-1],10)
     #avu(sim_data[:,-1],noise_data[:,-1])
     
     # Create matrix
@@ -127,7 +134,7 @@ def main():
         print("d+")
         comp_table = {"Datasets":[ds_name for ds_name in datasets.keys()]}
         
-        for ds1_name in datasets.keys():
+        for ds1_name in ("no_err","sim_err"):#datasets.keys():
             comp_list = []
             for ds2_name in datasets.keys():
                 ds1 = datasets[ds1_name]
@@ -141,7 +148,7 @@ def main():
         print("d-")
         comp_table = {"Datasets":[ds_name for ds_name in datasets.keys()]}
         
-        for ds1_name in datasets.keys():
+        for ds1_name in ("no_err","sim_err"):#datasets.keys():
             comp_list = []
             for ds2_name in datasets.keys():
                 ds1 = datasets[ds1_name]
@@ -466,9 +473,97 @@ def avu(model_data,exp_data):
 
     return output_dict
     
-def baycal(model_data,exp_data):
     
-    # See Whiting et al; Kennedy & O'Hagan.
+def reliability_metric(model_data,exp_data,eta):
+    """
+    Returns probability of difference between observed data and model prediction being < a given tolerance limit eta (E)
+    r = P(-E < d < E), d = Y_D - Y_m
+    Two factors: eta helps to estimate the probability, but the adequacy requirement is c, where we accept the model prediction only when P(-E<D<E)>=c
+    Model prediction is a single number, data are replicated experimental measurements taken for the same input.
+    """
+    # phi = probability density function
+    
+    # find empirical cdf
+    model_cdf = stats.ecdf(model_data).cdf
+    exp_cdf = stats.ecdf(exp_data).cdf
+    
+    Sn_ = exp_cdf.quantiles
+    Sn_Y = exp_cdf.probabilities
+    F_ = model_cdf.quantiles
+    F_Y = model_cdf.probabilities
+    
+    # rel-based metric (Ling & Mahadevan)
+    mean_model = np.nanmean(model_data)
+    mean_exp = np.nanmean(exp_data)
+    
+    eta_plus = np.sqrt(len(exp_data))*(eta-(mean_exp-mean_model))/np.nanstd(exp_data)
+    eta_minus = np.sqrt(len(exp_data))*(-1*eta - (mean_exp-mean_model))/np.nanstd(exp_data)
+    r = exp_cdf.evaluate(mean_exp+eta_plus) - exp_cdf.evaluate(mean_exp+eta_minus)
+    print("eta_plus",eta_plus)
+    print("eta_minus",eta_minus)
+    print("r",r)
+    
+    if PLOT_RES:
+        fig,axs = plt.subplots(1)
+        model_cdf.plot(axs)
+        exp_cdf.plot(axs)
+        plt.vlines([mean_exp+eta_plus,mean_exp+eta_minus],
+                    np.nanmin(F_Y),np.nanmax(F_Y),color="k")
+        plt.xlabel(r"Temperature [$\degree$C]")
+        plt.ylabel("Probability")
+        plt.show()
+
+    # diff method
+    diff_matrix = np.zeros(len(model_data)*len(exp_data))
+    
+    for N in range(len(exp_data)):
+        diff_matrix[N*len(model_data):(N+1)*len(model_data)] = model_data-exp_data[N]
+   
+    diff_cdf = stats.ecdf(diff_matrix).cdf
+    fig,axs=plt.subplots(1)
+    diff_cdf.plot(axs)
+    plt.vlines([eta,-eta],0,1,color="k")
+    plt.xlabel("Expectation difference")
+    plt.ylabel("Probability")
+    plt.show()
+    
+    r = diff_cdf.evaluate(eta) - diff_cdf.evaluate(-eta)
+    print("r",r)
+
+
+    return None
+    
+def baycal(model_data,exp_data):
+    # from: https://ndcbe.github.io/cbe67701-uncertainty-quantification/11.03-Contributed-Example.html
+    
+    # covariance function
+    def cov(x,y,beta,l,alpha):
+        exponent = np.sum(beta*np.abs(x-y)**alpha)
+        return 1/l*math.exp(-exponent)
+    
+    #likelihood function
+    def likelihood(z,x,beta,lam,alpha, beta_t, lam_t, alpha_t, meas_cov, N,M):
+        Sig_z = np.zeros((N+M,N+M))
+        #fill in matrix with sim covariance
+        for i in range(N+M):
+            for j in range(i+1):
+                tmp = cov(x[i,:],x[j,:],beta,lam,alpha)
+                if (i < N):
+                    tmp += cov(x[i,0], x[j,0], beta_t, lam_t, alpha_t)
+                Sig_z[i,j] = tmp
+                Sig_z[j,i] = tmp
+        #add in measurement error cov
+        Sig_z[0:N,0:N] += meas_cov
+        #print(Sig_z)
+        likelihood = stats.multivariate_normal.logpdf(z,mean=0*z, cov=Sig_z,allow_singular=True)
+        return likelihood
+    
+    M = len(model_data)
+    N = len(exp_data)
+    x = np.zeros((N+M,2))
+    
+    x[0:N,0] = model_data
+    x[N:(N+M),:]  = exp_data
     
     return None
 

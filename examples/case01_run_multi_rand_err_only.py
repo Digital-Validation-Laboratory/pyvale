@@ -26,7 +26,7 @@ import pandas as pd
 #======================================
 # Change this to run a different case
 CASE_STR = 'case01_2d_thermal_steady'
-OUT_STR = 'case01_rand_err_only'
+OUT_STR = 'case01_ff_rand_err_only'
 #======================================
 
 CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')
@@ -57,6 +57,9 @@ def main() -> None:
 
     # set up uncertainty on model parameters
     
+    #error_sources = ["material parameters","random sensor","position sensor","systematic sensor"]
+    
+    error_sources = ["random sensor"]
     
     # edit moose file
     moose_input = Path('examples/' + CASE_STR + '/' + CASE_STR + '.i')
@@ -86,7 +89,13 @@ def main() -> None:
     # Create variables to sweep
     
     numRandPars = 1000
-    stdDevPerc = 0.0#0.1
+    
+    if "material parameters" in error_sources:
+        print("Including material parameter uncertainty...",end=" ")
+        stdDevPerc = 0.1
+        print("Done.")
+    else:
+        stdDevPerc = 0.0
     
     cuDensity = np.random.normal(loc=8829.0, scale=stdDevPerc*8829.0, size=numRandPars)
     cuThermCond = np.random.normal(loc=384.0, scale=stdDevPerc*384.0, size=numRandPars)
@@ -127,7 +136,7 @@ def main() -> None:
     
     if read_results:
         
-        # Get noisy results    
+        # Get results    
         for nn in range(len(moose_vars)):
             # Use mooseherder to read the exodus and get a SimData object
             data_path = OUTPUT_DIR / f'sim-workdir-1/sim-1-{nn+1}_out.e' #Path('data/examplesims/plate_2d_thermal_out.e')
@@ -141,7 +150,7 @@ def main() -> None:
             t_field = pyvale.Field(sim_data,field_name,spat_dims)
 
             # This creates a grid of 3x2 sensors in the xy plane
-            n_sens = (3,2,1)    # Number of sensor (x,y,z)
+            n_sens = (90,60,1)#(3,2,1)    # Number of sensor (x,y,z)
             x_lims = (0.0,100.0e-03)#(0.0,2.0)  # Limits for each coord in sim length units
             y_lims = (0.0,50.0e-03)#(0.0,1.0)
             z_lims = (0.0,0.0)#(0.0,0.0)
@@ -150,8 +159,11 @@ def main() -> None:
             sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
     
             # Set up uncertainty on sensor position:
-            #pos_noise = np.random.normal(loc=0.0, scale=0.5e-03, size=sens_pos.shape) # Gaussian dist +/- 5% * sim dimensions (ylims)
-            #sens_pos[:,:2] = sens_pos[:,:2]+pos_noise[:,:2]
+            if "position sensor" in error_sources:
+                #print("Including sensor position uncertainty...",end=" ")
+                pos_noise = np.random.normal(loc=0.0, scale=0.5e-03, size=sens_pos.shape) # Gaussian dist +/- 5% * sim dimensions (ylims)
+                sens_pos[:,:2] = sens_pos[:,:2]+pos_noise[:,:2]
+                #print("Done.")
 
             # Now we create a thermocouple array with with the sensor positions and the
             # temperature field from the simulation
@@ -162,12 +174,18 @@ def main() -> None:
             # once and remains constant throughout the simulation time creating an
         #     offset. The max temp in the simulation is ~200degC so this range [lo,hi]
             # should be visible on the time traces.
-            #tc_array.set_uniform_systematic_err_func(low=-10.0,high=10.0)
+            if "systematic sensor" in error_sources:
+                #print("Including systematic bias on sensor...",end=" ")
+                tc_array.set_uniform_systematic_err_func(low=-10.0,high=10.0)
+                #print("Done.")
             
             # The default for the random error is a normal distribution here we specify
             # a standard deviation which should be visible on the time traces. Note that
             # the random error is sampled repeatedly for each time step.
-            tc_array.set_normal_random_err_func(std_dev=10.0)
+            if "random sensor" in error_sources:
+                #print("Including random sensor uncertainty...",end=" ")
+                tc_array.set_normal_random_err_func(std_dev=10.0)
+               # print("Done.")
 
             measurements = tc_array.get_measurements()
 
