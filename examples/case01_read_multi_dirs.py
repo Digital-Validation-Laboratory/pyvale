@@ -496,22 +496,22 @@ def reliability_metric(model_data,exp_data,eta):
     mean_model = np.nanmean(model_data)
     mean_exp = np.nanmean(exp_data)
     
-    eta_plus = np.sqrt(len(exp_data))*(eta-(mean_exp-mean_model))/np.nanstd(exp_data)
-    eta_minus = np.sqrt(len(exp_data))*(-1*eta - (mean_exp-mean_model))/np.nanstd(exp_data)
-    r = exp_cdf.evaluate(mean_exp+eta_plus) - exp_cdf.evaluate(mean_exp+eta_minus)
-    print("eta_plus",eta_plus)
-    print("eta_minus",eta_minus)
-    print("r",r)
+    #eta_plus = np.sqrt(len(exp_data))*(eta-(mean_exp-mean_model))/np.nanstd(exp_data)
+    #eta_minus = np.sqrt(len(exp_data))*(-1*eta - (mean_exp-mean_model))/np.nanstd(exp_data)
+    #r = exp_cdf.evaluate(mean_exp+eta_plus) - exp_cdf.evaluate(mean_exp+eta_minus)
+    #print("eta_plus",eta_plus)
+    #print("eta_minus",eta_minus)
+    #print("r",r)
     
-    if PLOT_RES:
-        fig,axs = plt.subplots(1)
-        model_cdf.plot(axs)
-        exp_cdf.plot(axs)
-        plt.vlines([mean_exp+eta_plus,mean_exp+eta_minus],
-                    np.nanmin(F_Y),np.nanmax(F_Y),color="k")
-        plt.xlabel(r"Temperature [$\degree$C]")
-        plt.ylabel("Probability")
-        plt.show()
+    #if PLOT_RES:
+    #    fig,axs = plt.subplots(1)
+    #    model_cdf.plot(axs)
+    #    exp_cdf.plot(axs)
+    #    plt.vlines([mean_exp+eta_plus,mean_exp+eta_minus],
+    #                np.nanmin(F_Y),np.nanmax(F_Y),color="k")
+    #    plt.xlabel(r"Temperature [$\degree$C]")
+    #    plt.ylabel("Probability")
+    #    plt.show()
 
     # diff method
     diff_matrix = np.zeros(len(model_data)*len(exp_data))
@@ -520,18 +520,20 @@ def reliability_metric(model_data,exp_data,eta):
         diff_matrix[N*len(model_data):(N+1)*len(model_data)] = model_data-exp_data[N]
    
     diff_cdf = stats.ecdf(diff_matrix).cdf
-    fig,axs=plt.subplots(1)
-    diff_cdf.plot(axs)
-    plt.vlines([eta,-eta],0,1,color="k")
-    plt.xlabel("Expectation difference")
-    plt.ylabel("Probability")
-    plt.show()
+    
+    if PLOT_RES:
+        fig,axs=plt.subplots(1)
+        diff_cdf.plot(axs)
+        plt.vlines([eta,-eta],0,1,color="k")
+        plt.xlabel("Expectation difference")
+        plt.ylabel("Probability")
+        plt.show()
     
     r = diff_cdf.evaluate(eta) - diff_cdf.evaluate(-eta)
-    print("r",r)
+    print("r =",r)
 
 
-    return None
+    return r
     
 def baycal(model_data,exp_data):
     # from: https://ndcbe.github.io/cbe67701-uncertainty-quantification/11.03-Contributed-Example.html
