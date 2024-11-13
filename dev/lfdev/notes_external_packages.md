@@ -95,7 +95,7 @@ pv_plot.add_mesh(pv_simdata,
                     label='sim data',
                     show_edges=True)
 pv_plot.camera_position = 'xy'
-pv_plot.show()
+pv_plot.show(cpos="xy")
 ```
 
 ## Misc pyvista plotting commands
@@ -110,7 +110,7 @@ pv_plot.add_axes_at_origin(labels_off=False)
 pv_plot.set_scale(xscale = 100, yscale = 100, zscale = 100)
 pv_plot.camera_position = 'xy'
 pv_plot.camera.zoom(5)
-pv_plot.show()
+pv_plot.show(cpos="xy")
 ```
 
 ## Labels on pyvista plots
@@ -130,7 +130,7 @@ plotter.show()
 
 https://docs.pyvista.org/version/stable/examples/02-plot/scalar-bars#sphx-glr-examples-02-plot-scalar-bars-py
 
-https://docs.pyvista.org/api/plotting/_autosummary/pyvista.plotter.add_scalar_bar 
+https://docs.pyvista.org/api/plotting/_autosummary/pyvista.plotter.add_scalar_bar
 
 ```python
 pv_plot.add_scalar_bar('Temperature, T [degC]')

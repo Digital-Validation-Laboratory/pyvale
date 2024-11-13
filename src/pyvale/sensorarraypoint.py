@@ -6,7 +6,6 @@ Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
 import numpy as np
-import pyvista as pv
 from pyvale.field import IField
 from pyvale.errorintegrator import ErrIntegrator
 from pyvale.sensordescriptor import SensorDescriptor
@@ -16,7 +15,7 @@ from pyvale.fieldsampler import sample_field_with_sensor_data
 
 class SensorArrayPoint:
     __slots__ = ("field","descriptor","sensor_data","_truth","_measurements",
-                 "_error_integrator")
+                 "error_integrator")
 
     def __init__(self,
                  sensor_data: SensorData,
@@ -25,6 +24,7 @@ class SensorArrayPoint:
                  ) -> None:
         self.sensor_data = sensor_data
         self.field = field
+        self.error_integrator = None
 
         self.descriptor = SensorDescriptor()
         if descriptor is not None:
@@ -32,7 +32,7 @@ class SensorArrayPoint:
 
         self._truth = None
         self._measurements = None
-        self._error_integrator = None
+
 
     #---------------------------------------------------------------------------
     # accessors
@@ -63,25 +63,40 @@ class SensorArrayPoint:
     #---------------------------------------------------------------------------
     # Errors
     def set_error_integrator(self, err_int: ErrIntegrator) -> None:
-        self._error_integrator = err_int
+        self.error_integrator = err_int
 
-    def get_systematic_errors(self) -> np.ndarray:
-        return self._error_integrator.get_errs_systematic()
+    def get_sensor_data_perturbed(self) -> SensorData | None:
+        if self.error_integrator is None:
+            return None
 
-    def get_random_errors(self) -> np.ndarray:
-        return self._error_integrator.get_errs_random()
+        return self.error_integrator.get_sens_data_accumulated()
 
-    def get_total_errors(self) -> np.ndarray:
-        return self._error_integrator.get_errs_total()
+    def get_errors_systematic(self) -> np.ndarray | None:
+        if self.error_integrator is None:
+            return None
+
+        return self.error_integrator.get_errs_systematic()
+
+    def get_errors_random(self) -> np.ndarray | None:
+        if self.error_integrator is None:
+            return None
+
+        return self.error_integrator.get_errs_random()
+
+    def get_errors_total(self) -> np.ndarray | None:
+        if self.error_integrator is None:
+            return None
+
+        return self.error_integrator.get_errs_total()
 
     #---------------------------------------------------------------------------
     # Measurements
     def calc_measurements(self) -> np.ndarray:
-        if self._error_integrator is None:
+        if self.error_integrator is None:
             self._measurements = self.get_truth()
         else:
             self._measurements = self.get_truth() + \
-                self._error_integrator.calc_errors_from_chain(self.get_truth())
+                self.error_integrator.calc_errors_from_chain(self.get_truth())
 
         return self._measurements
 
@@ -90,9 +105,3 @@ class SensorArrayPoint:
             self._measurements = self.calc_measurements()
 
         return self._measurements
-
-    #---------------------------------------------------------------------------
-    # Visualisation tools
-    # TODO: this should probably be moved from here
-    def get_visualiser(self) -> pv.PolyData:
-        return pv.PolyData(self.sensor_data.positions)

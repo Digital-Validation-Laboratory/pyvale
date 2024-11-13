@@ -38,7 +38,7 @@ def main() -> None:
     measurements = tc_array.get_measurements()
     print(f'\nMeasurements for sensor at top of block:\n{measurements[-1,0,:]}\n')
 
-    pv_plot = pyvale.plot_sensors_on_sim(tc_array,field_name)
+    pv_plot = pyvale.plot_point_sensors_on_sim(tc_array,field_name)
 
     # Set this to 'interactive' to get an interactive 3D plot of the simulation
     # and labelled sensor locations, set to 'save_fig' to create a vector
@@ -49,7 +49,7 @@ def main() -> None:
         pv_plot.camera_position = [(52.198, 26.042, 60.099),
                                     (0.0, 4.0, 5.5),
                                     (-0.190, 0.960, -0.206)]
-        pv_plot.show()
+        pv_plot.show(cpos="xy")
 
         print(80*"=")
         print('Camera positions = ')

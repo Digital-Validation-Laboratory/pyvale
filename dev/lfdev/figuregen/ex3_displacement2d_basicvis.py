@@ -34,7 +34,7 @@ def main() -> None:
                                                 spat_dims=2)
 
     plot_field = 'disp_y'
-    pv_plot = pyvale.plot_sensors_on_sim(disp_sens_array,plot_field)
+    pv_plot = pyvale.plot_point_sensors_on_sim(disp_sens_array,plot_field)
 
     pv_plot.camera_position = [(214.08261967353556, 46.15582361499647, 308.687529820126),
                                 (49.5, 74.5, 0.0),
@@ -44,7 +44,7 @@ def main() -> None:
     pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
     pv_plot.screenshot(save_render.with_suffix('.png'))
 
-    pv_plot.show()
+    pv_plot.show(cpos="xy")
     print(pv_plot.camera_position)
 
     (fig,_) = pyvale.plot_time_traces(disp_sens_array,'disp_x')

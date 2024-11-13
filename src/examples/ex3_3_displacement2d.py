@@ -86,11 +86,16 @@ def main() -> None:
                               (meas_rot.shape[2]-5,meas_rot.shape[2]))
     print(80*'-')
 
-    pyvale.plot_time_traces(disp_sens_norot,'disp_x')
-    pyvale.plot_time_traces(disp_sens_norot,'disp_y')
+    plot_field = 'disp_x'
+    if plot_field == 'disp_x':
+        pv_plot = pyvale.plot_point_sensors_on_sim(disp_sens_rot,'disp_x')
+        pv_plot.show(cpos="xy")
+    elif plot_field == 'disp_y':
+        pv_plot = pyvale.plot_point_sensors_on_sim(disp_sens_rot,'disp_y')
+        pv_plot.show(cpos="xy")
 
-    pyvale.plot_time_traces(disp_sens_rot,'disp_x')
-    pyvale.plot_time_traces(disp_sens_rot,'disp_y')
+    pyvale.plot_time_traces(disp_sens_norot,plot_field)
+    pyvale.plot_time_traces(disp_sens_rot,plot_field)
     plt.show()
 
 

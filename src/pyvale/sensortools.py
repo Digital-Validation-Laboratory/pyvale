@@ -37,8 +37,9 @@ def print_measurements(sens_array: SensorArrayPoint,
 
     measurement =  sens_array.get_measurements()
     truth = sens_array.get_truth()
-    rand_errs = sens_array.get_random_errors()
-    sys_errs = sens_array.get_systematic_errors()
+    rand_errs = sens_array.get_errors_random()
+    sys_errs = sens_array.get_errors_systematic()
+    tot_errs = sens_array.get_errors_total()
 
     print(f"\nmeasurement.shape = \n    {measurement.shape}")
     print_meas = measurement[sensors[0]:sensors[1],
@@ -51,17 +52,23 @@ def print_measurements(sens_array: SensorArrayPoint,
                         time_steps[0]:time_steps[1]]
     print(f"truth = \n    {print_truth}")
 
-
-    print_randerrs = rand_errs[sensors[0]:sensors[1],
-                                components[0]:components[1],
-                                time_steps[0]:time_steps[1]]
-    print(f"rand_errs = \n    {print_randerrs}")
-
-
-    print_syserrs = sys_errs[sensors[0]:sensors[1],
+    if rand_errs is not None:
+        print_randerrs = rand_errs[sensors[0]:sensors[1],
                                     components[0]:components[1],
                                     time_steps[0]:time_steps[1]]
-    print(f"sys_errs = \n    {print_syserrs}")
+        print(f"random errors = \n    {print_randerrs}")
+
+    if sys_errs is not None:
+        print_syserrs = sys_errs[sensors[0]:sensors[1],
+                                        components[0]:components[1],
+                                        time_steps[0]:time_steps[1]]
+        print(f"systematic errors = \n    {print_syserrs}")
+
+    if tot_errs is not None:
+        print_toterrs = tot_errs[sensors[0]:sensors[1],
+                                        components[0]:components[1],
+                                        time_steps[0]:time_steps[1]]
+        print(f"total errors = \n    {print_syserrs}")
 
     print()
 

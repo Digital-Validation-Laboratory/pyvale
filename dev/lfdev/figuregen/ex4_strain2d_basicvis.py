@@ -32,7 +32,7 @@ def main() -> None:
                                                      spat_dims=2)
 
     plot_field = 'strain_yy'
-    pv_plot = pyvale.plot_sensors_on_sim(straingauge_array,plot_field)
+    pv_plot = pyvale.plot_point_sensors_on_sim(straingauge_array,plot_field)
     pv_plot.camera_position = [(214.08261967353556, 46.15582361499647, 308.687529820126),
                             (49.5, 74.5, 0.0),
                             (-0.04768267074047773, -0.996673492281819, -0.06609321216144791)]
@@ -41,7 +41,7 @@ def main() -> None:
     pv_plot.save_graphic(save_render) # only for .svg .eps .ps .pdf .tex
     pv_plot.screenshot(save_render.with_suffix('.png'))
 
-    #pv_plot.show()
+    #pv_plot.show(cpos="xy")
 
     (fig,_) = pyvale.plot_time_traces(straingauge_array,'strain_xx')
     save_traces = Path('dev/lfdev/figuregen/strain2d_traces_exx.png')

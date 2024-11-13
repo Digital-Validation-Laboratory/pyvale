@@ -79,11 +79,11 @@ def main() -> None:
 
     plt.show()
 
-    pv_plot = pyvale.plot_sensors_on_sim(tc_array,field_key)
+    pv_plot = pyvale.plot_point_sensors_on_sim(tc_array,field_key)
     pv_plot.camera_position = [(-7.547, 59.753, 134.52),
                                    (41.916, 25.303, 9.297),
                                    (0.0810, 0.969, -0.234)]
-    pv_plot.show()
+    pv_plot.show(cpos="xy")
 
 
 if __name__ == '__main__':
