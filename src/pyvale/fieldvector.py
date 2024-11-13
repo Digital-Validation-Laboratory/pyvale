@@ -15,8 +15,8 @@ from pyvale.field import (IField,
                                   sample_pyvista)
 
 class FieldVector(IField):
-    __slots__ = ("_field_key","_components","_spat_dims","_time_steps",
-                 "_pyvista_grid")
+    __slots__ = ("_field_key","_components","_spat_dims","_sim_data",
+                 "_pyvista_grid","_pyvista_vis")
 
     def __init__(self,
                  sim_data: mh.SimData,
@@ -28,22 +28,29 @@ class FieldVector(IField):
         self._components = components
         self._spat_dims = spat_dims
 
-        self._time_steps = sim_data.time
-        self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
-                                                    components,
-                                                    spat_dims)
+        self._sim_data = sim_data
+        (self._pyvista_grid,self._pyvista_vis) = conv_simdata_to_pyvista(
+            self._sim_data,
+            self._components,
+            self._spat_dims
+        )
 
     def set_sim_data(self, sim_data: mh.SimData) -> None:
-        self._time_steps = sim_data.time
-        self._pyvista_grid = conv_simdata_to_pyvista(sim_data,
-                                                    self._components,
-                                                    self._spat_dims)
+        self._sim_data = sim_data
+        (self._pyvista_grid,self._pyvista_vis) = conv_simdata_to_pyvista(
+            sim_data,
+            self._components,
+            self._spat_dims
+        )
+
+    def get_sim_data(self) -> mh.SimData:
+        return self._sim_data
 
     def get_time_steps(self) -> np.ndarray:
-        return self._time_steps
+        return self._sim_data.time
 
     def get_visualiser(self) -> pv.UnstructuredGrid:
-        return self._pyvista_grid
+        return self._pyvista_vis
 
     def get_all_components(self) -> tuple[str, ...]:
         return self._components
@@ -59,7 +66,7 @@ class FieldVector(IField):
 
         field_data = sample_pyvista(self._components,
                                 self._pyvista_grid,
-                                self._time_steps,
+                                self._sim_data.time,
                                 points,
                                 times)
 

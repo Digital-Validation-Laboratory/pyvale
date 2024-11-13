@@ -12,8 +12,9 @@ import numpy as np
 @dataclass(slots=True)
 class SensorDescriptor:
     name: str = 'Measured Value'
-    units: str = r'-'
-    symbol: str = r'm'
+    units: str = r"-"
+    time_units: str = r"s"
+    symbol: str = r"m"
     tag: str = 'S'
     components: tuple[str,...] | None = None
 
@@ -30,25 +31,25 @@ class SensorDescriptor:
             label = label + symbol
 
         if self.units != "":
-            label = label + rf"[${self.units}$]"
+            label = label + "\n" + rf"[${self.units}$]" + "\n\n"
 
         return label
 
-    def create_label_notex(self, comp_ind: int | None = None) -> str:
-        label = ""
-        if self.name != "":
-            label = label + rf"{self.name} "
+    # def create_label_notex(self, comp_ind: int | None = None) -> str:
+    #     label = ""
+    #     if self.name != "":
+    #         label = label + rf"{self.name} "
 
-        symbol = rf"{self.symbol} "
-        if comp_ind is not None and self.components is not None:
-            symbol = rf"{self.symbol}_{self.components[comp_ind]} "
-        if symbol != "":
-            label = label + symbol
+    #     symbol = rf"{self.symbol} "
+    #     if comp_ind is not None and self.components is not None:
+    #         symbol = rf"{self.symbol}_{self.components[comp_ind]} "
+    #     if symbol != "":
+    #         label = label + symbol
 
-        if self.units != "":
-            label = label + rf"[{self.units}]"
+    #     if self.units != "":
+    #         label = label + "\n" + rf"[{self.units}]" + "\n\n"
 
-        return label
+    #     return label
 
     def create_sensor_tags(self,n_sensors: int) -> list[str]:
         z_width = int(np.log10(n_sensors))+1

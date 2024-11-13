@@ -26,6 +26,8 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
     - TODO: presentation animations - create pyvista animation synced to matplotlib traces
     - TODO: visualisation of perturbed time / sensor locations
     - TODO: experiment - allow extraction of different conditions for comparison plots
+    - TODO: visualise all components of vector / tensor field
+        - See this example for subplots: https://docs.pyvista.org/examples/02-plot/cmap#sphx-glr-examples-02-plot-cmap-py
 
 - TODO: Field based errors:
     - HALF DONE: Spatial averaging error
@@ -158,3 +160,26 @@ t = 0.5*(x + 1)*(b - a) + a
 and then scale the quadrature formula by (b - a)/2:
 
 gauss = sum(w * f(t)) * 0.5*(b - a)
+
+## Pyvista Cameras
+Tested on monoblock sim:
+cpos = xy
+[(0.0, 16.0, 90.80825912395183),
+    (0.0, 16.0, 5.5),
+    (0.0, 1.0, 0.0)]
+
+then, azimuth = 45
+[(60.32204851776551, 16.0, 65.8220485177655),
+(0.0, 16.0, 5.5),
+(0.0, 1.0, 0.0)]
+
+then, zoom = 0.5
+[(60.32204851776551, 16.0, 65.8220485177655),
+(0.0, 16.0, 5.5),
+(0.0, 1.0, 0.0)]
+
+Start with xy then azimuth 90
+[(85.30825912395183, 16.0, 5.5000000000000195),
+(0.0, 16.0, 5.5),
+(0.0, 1.0, 0.0)]
+

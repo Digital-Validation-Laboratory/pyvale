@@ -5,6 +5,7 @@ License: MIT
 Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
+import enum
 from dataclasses import dataclass
 import numpy as np
 import matplotlib as plt
@@ -80,8 +81,51 @@ class TraceOptsExperiment:
     sensors_to_plot: np.ndarray | None = None
     time_min_max: tuple[float,float] | None = None
 
-    centre = "mean"
-    plot_all_exp_points = False
+    centre: str = "mean"
+    plot_all_exp_points: bool = False
     fill_between: str | None = "3std"
+
+
+@dataclass(slots=True)
+class VisOptsSimAndSensors:
+    #pyvista ops
+    window_size_px: tuple[int,int] = (1280,800)
+    camera_position: np.ndarray | str = "xy"
+    show_edges: bool = True
+
+    background_colour: str = "black" # "white"
+
+    time_label_font_size: float = 12
+    time_label_position: str = "upper_left"
+    time_label_show: bool = True
+
+    colour_bar_font_size: float = 18
+    colour_bar_show: bool = True
+    colour_bar_lims: tuple[float,float] | None = None
+
+    # pyvale ops
+    show_perturbed_pos: bool = True
+    sens_colour_nom: str = "red"
+    sens_colour_pert: str = "blue"
+
+
+@dataclass(slots=True)
+class VisOptsAnimation:
+    frames_per_second: float = 10.0
+
+class EAnimationType(enum.Enum):
+    MP4 = enum.auto()
+    GIF = enum.auto()
+
+@dataclass(slots=True)
+class VisOptsSaveAnimation:
+    # pyvista ops
+    off_screen: bool = False
+    save_mode: EAnimationType = EAnimationType.MP4
+
+
+
+
+
 
 
