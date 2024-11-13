@@ -3,8 +3,9 @@
 *.mp4
 *.gif
 
-# vscode
+# vscode / venv
 .vscode/
+.pyvale-env/
 
 # My temp code for checks
 check/
