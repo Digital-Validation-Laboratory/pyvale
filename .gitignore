@@ -180,3 +180,20 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# Validation metric tests
+*.csv
+./examples/2d_thermal/
+./examples/2d_thermal_steady_case03/
+./examples/case01_2d_thermal_steady/
+./examples/case01_ff_no_err/
+./examples/case01_ff_rand_err/
+./examples/case01_ff_sim_err/
+./examples/case01_no_err/
+./examples/case01_out/
+./examples/case01_pos_err/
+./examples/case01_rand_err/
+./examples/case01_sim_err/
+./examples/case01_sys_err/
+./examples/images/
+./examples/sim-workdir-1/
