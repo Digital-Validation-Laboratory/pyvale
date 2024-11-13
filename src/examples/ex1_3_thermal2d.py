@@ -40,7 +40,6 @@ def main() -> None:
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
-
     use_auto_descriptor = 'blank'
     if use_auto_descriptor == 'factory':
         descriptor = pyvale.SensorDescriptorFactory.temperature_descriptor()
