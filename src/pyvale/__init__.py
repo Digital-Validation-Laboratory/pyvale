@@ -37,12 +37,12 @@ from pyvale.errordriftcalc import *
 
 from pyvale.generatorsrandom import *
 
-from pyvale.visualplotopts import *
+from pyvale.visualopts import *
+from pyvale.visualtools import *
 from pyvale.visualsimplotter import *
 from pyvale.visualsimanimator import *
 from pyvale.visualexpplotter import *
 from pyvale.visualtraceplotter import *
-
 
 from pyvale.analyticmeshgen import *
 from pyvale.analyticsimdatagenerator import *

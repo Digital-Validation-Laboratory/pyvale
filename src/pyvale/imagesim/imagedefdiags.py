@@ -8,7 +8,7 @@ Copyright (C) 2024 The Digital Validation Team
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pyvale.visualplotopts import PlotProps
+from pyvale.visualopts import PlotProps
 
 plot_opts = PlotProps()
 I_CMAP = 'gray'

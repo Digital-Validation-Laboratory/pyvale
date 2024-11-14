@@ -26,7 +26,7 @@ def main() -> None:
     )
 
     # Open a gif
-    #plotter.open_gif("wave.gif")
+    plotter.open_gif("wave.gif")
 
     # Update Z and write a frame for each updated position
     nframe = 30
@@ -40,7 +40,7 @@ def main() -> None:
         grid["Height"] = z.ravel()
         # Write a frame. This triggers a render.
         plotter.render()
-        #plotter.write_frame()
+        plotter.write_frame()
 
     # Closes and finalizes movie
     plotter.close()
