@@ -33,11 +33,11 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sensor_positions = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    use_sim_time = True
+    use_sim_time = False
     if use_sim_time:
         sample_times = None
     else:
-        sample_times = np.linspace(0.0,np.max(sim_data.time),50)
+        sample_times = np.linspace(0.0,np.max(sim_data.time),10)
 
     sensor_data = pyvale.SensorData(positions=sensor_positions,
                                     sample_times=sample_times)
@@ -54,7 +54,7 @@ def main() -> None:
     angle_offset[:,0] = 1.0 # only rotate about z in 2D
     angle_error_data = pyvale.ErrFieldData(ang_offset_zyx=angle_offset)
 
-    time_offset = 2.0*np.ones_like(disp_sens_array.get_sample_times())
+    time_offset = 1.0*np.ones_like(disp_sens_array.get_sample_times())
     time_error_data = pyvale.ErrFieldData(time_offset=time_offset)
 
     field_errs = []
@@ -116,15 +116,14 @@ def main() -> None:
     print()
     print(80*"=")
 
-    print(80*'-')
-    sens_num = 4
-    print('The last 5 time steps (measurements) of sensor {sens_num}:')
-    pyvale.print_measurements(disp_sens_array,
-                              (sens_num-1,sens_num),
-                              (0,1),
-                              (measurements.shape[2]-5,measurements.shape[2]))
-    print(80*'-')
-
+    # print(80*'-')
+    # sens_num = 4
+    # print('The last 5 time steps (measurements) of sensor {sens_num}:')
+    # pyvale.print_measurements(disp_sens_array,
+    #                           (sens_num-1,sens_num),
+    #                           (0,1),
+    #                           (measurements.shape[2]-5,measurements.shape[2]))
+    # print(80*'-')
 
     # plot_field = 'disp_x'
     # if plot_field == 'disp_x':
@@ -134,7 +133,6 @@ def main() -> None:
     #     pv_plot = pyvale.plot_point_sensors_on_sim(disp_sens_array,'disp_y')
     #     pv_plot.show()
 
-    return
     pyvale.plot_time_traces(disp_sens_array,'disp_x')
     pyvale.plot_time_traces(disp_sens_array,'disp_y')
     plt.show()

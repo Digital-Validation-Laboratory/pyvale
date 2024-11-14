@@ -8,7 +8,7 @@ Copyright (C) 2024 The Digital Validation Team
 import warnings
 import numpy as np
 
-class CameraData:
+class CameraImageDef:
 
     def __init__(self,
                  num_px: np.ndarray | None = None,

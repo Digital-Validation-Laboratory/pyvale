@@ -88,5 +88,8 @@ class FieldVector(IField):
 
             field_data[ii,:,:] = np.matmul(rmat,field_data[ii,:,:])
 
+        # TODO: need a mode where all the sensor rotations are the same for
+        # cameras
+
         return field_data
 

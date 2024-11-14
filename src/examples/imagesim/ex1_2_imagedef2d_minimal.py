@@ -15,7 +15,7 @@ import numpy as np
 import mooseherder as mh
 
 from pyvale.imagesim.imagedefopts import ImageDefOpts
-from pyvale.imagesim.cameradata import CameraData
+from pyvale.imagesim.cameradataimagedef import CameraImageDef
 import pyvale.imagesim.imagedef as sid
 
 
@@ -80,7 +80,7 @@ def main() -> None:
     pprint(vars(id_opts))
     print('-'*80+'\n')
 
-    camera = CameraData()
+    camera = CameraImageDef()
     camera.num_px = id_opts.crop_px
     camera.bits = 8
     if id_opts.calc_res_from_fe:

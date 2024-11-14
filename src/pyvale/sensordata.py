@@ -9,12 +9,27 @@ from dataclasses import dataclass
 import numpy as np
 from scipy.spatial.transform import Rotation
 from pyvale.integratortype import EIntSpatialType
+from pyvale.cameradata import CameraData
 
 @dataclass(slots=True)
 class SensorData:
+    #shape=(n_sensors,3) where second dim=[x,y,z]
     positions: np.ndarray | None = None
+    #shape=(n_time_steps,)
     sample_times: np.ndarray | None = None
+    #shape=(n_sensors,)
     angles: tuple[Rotation,...] | None = None
     spatial_averager: EIntSpatialType | None = None
+    #shape=(3,) where  dim=[x,y,z]
     spatial_dims: np.ndarray | None = None
+
+
+def build_sensor_data_from_camera(cam_data: CameraData) -> SensorData:
+
+    # Create the pixel grid and use this as sensor positions
+
+    sens_data = SensorData()
+
+    return sens_data
+
 

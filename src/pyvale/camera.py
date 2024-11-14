@@ -10,20 +10,19 @@ from pyvale.field import IField
 from pyvale.sensor import ISensor
 from pyvale.errorintegrator import ErrIntegrator
 from pyvale.sensordescriptor import SensorDescriptor
-from pyvale.sensordata import SensorData
-from pyvale.fieldsampler import sample_field_with_sensor_data
+from pyvale.cameradata import CameraData
+from pyvale.fieldsampler import sample_field_with_camera_data
 
 
-class SensorArrayPoint(ISensor):
-    __slots__ = ("field","descriptor","sensor_data","_truth","_measurements",
-                 "error_integrator")
+class CameraBasic2D(ISensor):
+    __slots__ = ("_cam_data",)
 
     def __init__(self,
-                 sensor_data: SensorData,
+                 cam_data: CameraData,
                  field: IField,
                  descriptor: SensorDescriptor | None = None,
                  ) -> None:
-        self.sensor_data = sensor_data
+        self.cam_data = cam_data
         self.field = field
         self.error_integrator = None
 
@@ -34,30 +33,11 @@ class SensorArrayPoint(ISensor):
         self._truth = None
         self._measurements = None
 
-
-    #---------------------------------------------------------------------------
-    # accessors
-    def get_sample_times(self) -> np.ndarray:
-        if self.sensor_data.sample_times is None:
-            #shape=(n_time_steps,)
-            return self.field.get_time_steps()
-
-        #shape=(n_time_steps,)
-        return self.sensor_data.sample_times
-
-    def get_measurement_shape(self) -> tuple[int,int,int]:
-        return (self.sensor_data.positions.shape[0],
-                len(self.field.get_all_components()),
-                self.get_sample_times().shape[0])
-
-    def get_field(self) -> IField:
-        return self.field
-
     #---------------------------------------------------------------------------
     # Truth calculation from simulation
     def calc_truth_values(self) -> np.ndarray:
-        self._truth = sample_field_with_sensor_data(self.field,
-                                                    self.sensor_data)
+        self._truth = sample_field_with_camera_data(self.field,
+                                                    self.cam_data)
         #shape=(n_sensors,n_field_comps,n_time_steps)
         return self._truth
 
@@ -71,12 +51,6 @@ class SensorArrayPoint(ISensor):
     # Errors
     def set_error_integrator(self, err_int: ErrIntegrator) -> None:
         self.error_integrator = err_int
-
-    def get_sensor_data_perturbed(self) -> SensorData | None:
-        if self.error_integrator is None:
-            return None
-
-        return self.error_integrator.get_sens_data_accumulated()
 
     def get_errors_systematic(self) -> np.ndarray | None:
         if self.error_integrator is None:
@@ -117,3 +91,4 @@ class SensorArrayPoint(ISensor):
 
         #shape=(n_sensors,n_field_comps,n_time_steps)
         return self._measurements
+

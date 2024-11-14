@@ -7,7 +7,7 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 from dataclasses import dataclass
 import numpy as np
-from pyvale.sensorarraypoint import SensorArrayPoint
+from pyvale.sensor import ISensor
 import mooseherder as mh
 
 
@@ -30,7 +30,7 @@ class ExperimentSimulator:
 
     def __init__(self,
                  sim_list: list[mh.SimData],
-                 sensor_arrays: list[SensorArrayPoint],
+                 sensor_arrays: list[ISensor],
                  num_exp_per_sim: int
                  ) -> None:
 
@@ -56,7 +56,7 @@ class ExperimentSimulator:
                                 aa.get_measurement_shape())
 
             for jj,ss in enumerate(self.sim_list):
-                aa.field.set_sim_data(ss)
+                aa.get_field().set_sim_data(ss)
 
                 for ee in range(self.num_exp_per_sim):
                     meas_array[jj,ee,:,:,:] = aa.calc_measurements()
@@ -84,10 +84,6 @@ class ExperimentSimulator:
 
         return self._exp_stats
 
-    '''
-    def apply_over_experiment(func: Callable[[np.ndarray],np.ndarray]
-                              ) -> list[np.ndarray]:
-    '''
 
 
 

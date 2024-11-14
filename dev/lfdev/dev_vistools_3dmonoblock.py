@@ -60,7 +60,8 @@ def main() -> None:
                                               field_name,
                                               time_step=-1,
                                               vis_opts=vis_opts,
-                                              image_save_opts=image_save_opts)
+                                              image_save_opts=None)
+    pv_plot.show()
 
     # pv_anim = pyvale.animate_sim_with_sensors(tc_array,
     #                                           field_name,

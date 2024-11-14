@@ -20,7 +20,7 @@ import matplotlib.image as mplim
 from PIL import Image
 
 from pyvale.imagesim.imagedefopts import ImageDefOpts
-from pyvale.imagesim.cameradata import CameraData
+from pyvale.imagesim.cameradataimagedef import CameraImageDef
 from pyvale.imagesim.alphashape import alphashape
 
 (XI,YI) = (0,1)
@@ -52,7 +52,7 @@ def save_image(save_file: Path,
     im.save(save_file)
 
 
-def get_pixel_vec_in_m(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
+def get_pixel_vec_in_m(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
 
     mppx = camera.m_per_px
     px_vec_xm = np.arange(mppx/2,camera.fov[XI],mppx)
@@ -61,13 +61,13 @@ def get_pixel_vec_in_m(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
     return (px_vec_xm,px_vec_ym)
 
 
-def get_pixel_grid_in_m(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
+def get_pixel_grid_in_m(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
     (px_vec_xm,px_vec_ym) = get_pixel_vec_in_m(camera)
     (px_grid_xm,px_grid_ym) = np.meshgrid(px_vec_xm,px_vec_ym)
     return (px_grid_xm,px_grid_ym)
 
 
-def get_pixel_vec_in_px(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
+def get_pixel_vec_in_px(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
 
     px_vec_x = np.arange(0,camera.num_px[XI],1)
     px_vec_y = np.arange(0,camera.num_px[YI],1)
@@ -75,14 +75,14 @@ def get_pixel_vec_in_px(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
     return (px_vec_x,px_vec_y)
 
 
-def get_pixel_grid_in_px(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
+def get_pixel_grid_in_px(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
 
     (px_vec_x,px_vec_y) = get_pixel_vec_in_px(camera)
     (px_grid_x,px_grid_y) = np.meshgrid(px_vec_x,px_vec_y)
     return (px_grid_x,px_grid_y)
 
 
-def get_subpixel_vec(camera: CameraData, subsample: int = 3
+def get_subpixel_vec(camera: CameraImageDef, subsample: int = 3
                      ) -> tuple[np.ndarray,np.ndarray]:
 
     mppx = camera.m_per_px
@@ -92,7 +92,7 @@ def get_subpixel_vec(camera: CameraData, subsample: int = 3
     return (subpx_vec_xm,subpx_vec_ym)
 
 
-def get_subpixel_grid(camera: CameraData, subsample: int = 3
+def get_subpixel_grid(camera: CameraImageDef, subsample: int = 3
                      ) -> tuple[np.ndarray,np.ndarray]:
 
     (subpx_vec_xm,subpx_vec_ym) = get_subpixel_vec(camera,subsample)
@@ -100,7 +100,7 @@ def get_subpixel_grid(camera: CameraData, subsample: int = 3
     return (subpx_grid_xm,subpx_grid_ym)
 
 
-def get_roi_node_vec(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
+def get_roi_node_vec(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
 
     node_vec_x = np.arange(0+camera.roi_loc[XI],
                            camera.roi_len[XI]+camera.roi_loc[XI]+camera.m_per_px/2,
@@ -112,14 +112,14 @@ def get_roi_node_vec(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
     return (node_vec_x,node_vec_y)
 
 
-def get_roi_node_grid(camera: CameraData) -> tuple[np.ndarray,np.ndarray]:
+def get_roi_node_grid(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
 
     (node_vec_x,node_vec_y) = get_roi_node_vec(camera)
     (node_grid_x,node_grid_y) = np.meshgrid(node_vec_x,node_vec_y)
     return (node_grid_x,node_grid_y)
 
 
-def calc_roi_from_nodes(camera: CameraData, nodes: np.ndarray
+def calc_roi_from_nodes(camera: CameraImageDef, nodes: np.ndarray
                         ) -> tuple[np.ndarray,np.ndarray]:
 
 
@@ -134,7 +134,7 @@ def calc_roi_from_nodes(camera: CameraData, nodes: np.ndarray
     return (roi_len,coord_offset)
 
 
-def calc_res_from_nodes(camera: CameraData, nodes: np.ndarray, border_px: int
+def calc_res_from_nodes(camera: CameraImageDef, nodes: np.ndarray, border_px: int
                         ) -> float:
 
     roi_len_x_m = np.max(nodes[:,XI]) - np.min(nodes[:,XI])
@@ -175,7 +175,7 @@ def get_image_num_str(im_num: int, width: int , cam_num: int = -1) -> str:
     return num_str
 
 
-def rectangle_crop_image(camera: CameraData,
+def rectangle_crop_image(camera: CameraImageDef,
                          image: np.ndarray,
                          corner: tuple[int,int] = (0,0),
                          ) -> np.ndarray:
@@ -195,7 +195,7 @@ def rectangle_crop_image(camera: CameraData,
     return image
 
 
-def get_im_mask_from_sim(camera: CameraData,
+def get_im_mask_from_sim(camera: CameraImageDef,
                             image: np.ndarray,
                             nodes: np.ndarray
                             ) -> tuple[np.ndarray,np.ndarray]:
@@ -240,7 +240,7 @@ def get_im_mask_from_sim(camera: CameraData,
     return (masked_im,im_mask)
 
 
-def upsample_image(camera: CameraData,
+def upsample_image(camera: CameraImageDef,
                    id_opts: ImageDefOpts,
                    input_im: np.ndarray):
     # Get grid of pixel centroid locations
@@ -287,7 +287,7 @@ def preprocess(input_im: np.ndarray,
                 coords: np.ndarray,
                 disp_x: np.ndarray,
                 disp_y: np.ndarray,
-                camera: CameraData,
+                camera: CameraImageDef,
                 id_opts: ImageDefOpts,
                 print_on: bool = False
                 ) -> tuple[np.ndarray,
@@ -353,7 +353,7 @@ def preprocess(input_im: np.ndarray,
 
 
 def deform_one_image(upsampled_image: np.ndarray,
-                 camera: CameraData,
+                 camera: CameraImageDef,
                  id_opts: ImageDefOpts,
                  coords: np.ndarray,
                  disp: np.ndarray,
@@ -513,7 +513,7 @@ def deform_one_image(upsampled_image: np.ndarray,
 
 
 def deform_images(input_im: np.ndarray,
-                 camera: CameraData,
+                 camera: CameraImageDef,
                  id_opts: ImageDefOpts,
                  coords: np.ndarray,
                  disp_x: np.ndarray,

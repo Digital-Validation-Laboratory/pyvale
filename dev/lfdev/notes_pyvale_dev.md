@@ -4,7 +4,7 @@
 
 - TODO PRIORITY:
     - Visualisation tools for perturbed field errors:
-        - Perturbed pos, time, angle
+        - Angle
 
 - BUGS!
 NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
@@ -23,16 +23,12 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
 
 - TODO: visualisation tools for:
     - TODO: remove methods from sensor descriptor data class
-    - TODO: presentation animations - create pyvista animation synced to matplotlib traces
-    - TODO: visualisation of perturbed time / sensor locations
+    - TODO: presentation animations - animate traces
     - TODO: experiment - allow extraction of different conditions for comparison plots
     - TODO: visualise all components of vector / tensor field
         - See this example for subplots: https://docs.pyvista.org/examples/02-plot/cmap#sphx-glr-examples-02-plot-cmap-py
 
 - TODO: Field based errors:
-    - HALF DONE: Spatial averaging error
-        - Set an integration area
-        - Set a weighting function
     - TODO: Temporal averaging error
         - Set an integration time
         - Set a weighting function
