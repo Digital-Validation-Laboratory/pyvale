@@ -8,9 +8,9 @@ Copyright (C) 2024 The Digital Validation Team
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pyvale.visualopts import PlotProps
+from pyvale.visualopts import PlotOptsGeneral
 
-plot_opts = PlotProps()
+plot_opts = PlotOptsGeneral()
 I_CMAP = 'gray'
 V_CMAP = 'plasma'
 

@@ -28,6 +28,10 @@ from pyvale.sensorarrayfactory import *
 from pyvale.sensorarraypoint import *
 from pyvale.sensordata import *
 
+from pyvale.camera import *
+from pyvale.cameradata import *
+from pyvale.cameratools import *
+
 from pyvale.errorintegrator import *
 from pyvale.errorrand import *
 from pyvale.errorsysindep import *
@@ -43,6 +47,7 @@ from pyvale.visualsimplotter import *
 from pyvale.visualsimanimator import *
 from pyvale.visualexpplotter import *
 from pyvale.visualtraceplotter import *
+from pyvale.visualimages import *
 
 from pyvale.analyticmeshgen import *
 from pyvale.analyticsimdatagenerator import *

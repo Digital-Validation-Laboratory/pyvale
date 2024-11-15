@@ -9,7 +9,6 @@ from dataclasses import dataclass
 import numpy as np
 from scipy.spatial.transform import Rotation
 from pyvale.integratortype import EIntSpatialType
-from pyvale.cameradata import CameraData
 
 @dataclass(slots=True)
 class SensorData:
@@ -24,12 +23,6 @@ class SensorData:
     spatial_dims: np.ndarray | None = None
 
 
-def build_sensor_data_from_camera(cam_data: CameraData) -> SensorData:
 
-    # Create the pixel grid and use this as sensor positions
-
-    sens_data = SensorData()
-
-    return sens_data
 
 

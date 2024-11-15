@@ -28,15 +28,15 @@ class PlotOptsGeneral:
     single_fig_size: tuple[float,float] = (a4_print_width*single_fig_scale,
                         a4_print_width*single_fig_scale/aspect_ratio)
 
-    resolution: int = 200
+    resolution: int = 300
 
     font_name: str = 'Liberation Sans'
     font_def_weight: str = 'normal'
-    font_def_size: float = 10
-    font_tick_size: float = 9
-    font_head_size: float = 10
-    font_ax_size: float = 10
-    font_leg_size: float = 9
+    font_def_size: float = 10.0*2
+    font_tick_size: float = 9.0*2
+    font_head_size: float = 10.0*2
+    font_ax_size: float = 10.0*2
+    font_leg_size: float = 9.0*2
 
     ms: float = 3.2
     lw: float = 0.8
