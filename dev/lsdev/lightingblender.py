@@ -20,29 +20,29 @@ class LightData():
 class BlenderLight():
     def __init__(self):
         self.light_data = LightData
-        self.light_ob = None
-        self.light = None
+        self._light_ob = None
+        self._light = None
 
-    def create_light(self):
-        self.light = bpy.data.lights.new(name='spot', type='SPOT')
-        self.light_ob = bpy.data.objects.new(name='Spot', object_data=light)
-        bpy.context.collection.objects.link(self.light_ob)
+    def _create_light(self):
+        self._light = bpy.data.lights.new(name='spot', type='SPOT')
+        self._light_ob = bpy.data.objects.new(name='Spot', object_data=light)
+        bpy.context.collection.objects.link(self._light_ob)
 
-    def get_light_object(self):
-        self.light_ob = self.light_ob
+    def _get_light_object(self):
+        self._light_ob = self._light_ob
 
-    def get_light(self):
-        self.light = self.light
+    def _get_light(self):
+        self._light = self.light
 
-    def set_location(self):
-        self.light_ob.location = self.light_data.position
+    def _set_location(self):
+        self._light_ob.location = self.light_data.position
 
-    def set_rotation(self):
-        self.light_ob.rotation_mode = 'EULER'
-        self.light_ob.rotation_euler = self.light_data.orientation
+    def _set_rotation(self):
+        self._light_ob.rotation_mode = 'EULER'
+        self._light_ob.rotation_euler = self.light_data.orientation
 
-    def set_energy(self):
-        self.light.energy = self.light_data.energy
+    def _set_energy(self):
+        self._light.energy = self.light_data.energy
 
     def add_light(self):
         self.create_light()
