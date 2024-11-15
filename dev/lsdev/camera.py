@@ -21,6 +21,8 @@ class CameraData:
     c0 : float | None = None
     c1 : float | None = None
 
+# TODO: write get and set methods for data class variables
+
 class CameraBlender():
     def __init__(self):
         self.camera_data = CameraData
@@ -65,12 +67,6 @@ class CameraBlender():
 
         self.cameras.append(camera) # not sure if need this
         return camera
-
-
-
-
-
-
 
     def stereo_setup():
         # TODO: Write method to create stereo setup given params
