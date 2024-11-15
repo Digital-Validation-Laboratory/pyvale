@@ -24,4 +24,6 @@ In order to use bpy as python module, need to run python on 3.11.*
 ## Loading mesh into Blender
 Best way is to probably use [`mesh.from_pydata(vertices, edges, faces, shade_flat=True)`](https://docs.blender.org/api/current/bpy.types.Mesh.html#bpy.types.Mesh.from_pydata)
 
+Can try 
+
 
