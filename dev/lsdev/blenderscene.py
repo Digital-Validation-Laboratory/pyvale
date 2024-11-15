@@ -1,4 +1,5 @@
 import bpy
+from camera import CameraData, CameraBlender
 
 class BlenderScene:
     def __init__(self):
@@ -30,6 +31,9 @@ class BlenderScene:
     def add_light(self):
 
     def add_camera(self):
+        # TODO: Set variables in dataclass
+        camera = CameraBlender.add_camera()
 
-    
+
+
 
