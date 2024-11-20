@@ -1,13 +1,15 @@
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
+- BUGS!
+    - Higher order mesh node numbering conversion from Exodus to VTK!
+    https://github.com/Applied-Materials-Technology/pycoatl/blob/main/src/pycoatl/spatialdata/importsimdata.py
+    - Spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
+    - Revert to python3.11 for compatibility with blender python
 
 - TODO PRIORITY:
     - Visualisation tools for perturbed field errors:
         - Angle
-
-- BUGS!
-NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
 
 - TODO: EXAMPLES
     - Example showing area averaging as ground truth
