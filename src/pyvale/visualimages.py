@@ -34,7 +34,7 @@ def plot_measurement_image(camera: CameraBasic2D,
     fig.colorbar(cset,
                  label=descriptor.create_label_flat(comp_ind))
 
-    title = "Title"
+    title = f"Time: {camera.get_sample_times()[time_step]}s"
     ax.set_title(title,fontsize=plot_opts.font_head_size)
     ax.set_xlabel(r"x ($px$)",
                 fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)

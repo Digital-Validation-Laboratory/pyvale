@@ -8,20 +8,23 @@
     - Revert to python3.11 for compatibility with blender python
 
 - TODO PRIORITY:
+    - Create option to specify single rotation for all point sensors - links to camerabasic
+        - Build Rory's cimple DIC strain filter on top of the basic camera
     - Visualisation tools for perturbed field errors:
         - Angle
+    - Visualisation tools for animating sensor traces
+    - Visualisation tools for subplots of multiple sensors?
+    - Finish basic camera
 
 - TODO: EXAMPLES
+    - Example showing calibration errors
     - Example showing area averaging as ground truth
+        - With and without area averaging as follow up error
     - Example showing field error chain with other errors and extraction of perturbed sensor data
+    - Example showing a basic camera
 
 - TODO: ErrorIntegrator
     - Simplify the memory efficient and non-memory efficient options
-
-- TODO: Experiment generator/ runner
-    - TODO: Allow user to extract all sources of error for each experiment, need to dig out of `ErrorIntegrator`
-    - TODO: Create example connecting to `mooseherder`, assume user provides `mooseherder` like array of simulations
-    - TODO: Increase plotting capabilities to compare over simulations as well as all sensors on experiments
 
 - TODO: visualisation tools for:
     - TODO: remove methods from sensor descriptor data class

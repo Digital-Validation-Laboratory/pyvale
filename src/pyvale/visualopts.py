@@ -32,11 +32,11 @@ class PlotOptsGeneral:
 
     font_name: str = 'Liberation Sans'
     font_def_weight: str = 'normal'
-    font_def_size: float = 10.0*2
-    font_tick_size: float = 9.0*2
-    font_head_size: float = 10.0*2
-    font_ax_size: float = 10.0*2
-    font_leg_size: float = 9.0*2
+    font_def_size: float = 10.0
+    font_tick_size: float = 9.0
+    font_head_size: float = 10.0
+    font_ax_size: float = 10.0
+    font_leg_size: float = 9.0
 
     ms: float = 3.2
     lw: float = 0.8
