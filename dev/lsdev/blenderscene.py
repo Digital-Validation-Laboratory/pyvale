@@ -60,6 +60,9 @@ class BlenderScene:
         else:
             raise ValueError("Filepath cannot be None or empty")
 
+        # Note: save model method not working
+        
+
 
 
 
