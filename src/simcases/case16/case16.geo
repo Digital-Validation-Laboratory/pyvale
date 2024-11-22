@@ -37,7 +37,7 @@ monoblock_arm_height = 8e-3;
 
 // Specified Mesh variables
 base_divs = 1;
-mesh_ref = 1; //  Must be an integer greater than 0
+mesh_ref = 1; //  Set to 1 for testing, Must be an integer greater than 0
 
 //_* MOOSEHERDER VARIABLES - END
 //------------------------------------------------------------------------------
@@ -62,17 +62,18 @@ monoblock_side_nodes = Round(mesh_ref*5);
 monoblock_arm_nodes = Round(mesh_ref*5);
 monoblock_depth_nodes = Round(mesh_ref*3); // NOTE: this is half the depth!
 monoblock_width_nodes = Floor((pipe_sect_nodes-1)/2)+1;
-/*
+
+
 // This is a more reasonable mesh refinement for the monoblock but solve time
 // is much longer
-pipe_sect_nodes = Round(mesh_ref*11); // Must be odd
-pipe_rad_nodes = Round(mesh_ref*7);
-interlayer_rad_nodes = Round(mesh_ref*7);
-monoblock_side_nodes = Round(mesh_ref*9);
-monoblock_arm_nodes = Round(mesh_ref*11);
-monoblock_depth_nodes = Round(mesh_ref*5);
-monoblock_width_nodes = Floor((pipe_sect_nodes-1)/2)+1;
-*/
+// pipe_sect_nodes = Round(mesh_ref*11); // Must be odd
+// pipe_rad_nodes = Round(mesh_ref*7);
+// interlayer_rad_nodes = Round(mesh_ref*7);
+// monoblock_side_nodes = Round(mesh_ref*9);
+// monoblock_arm_nodes = Round(mesh_ref*11);
+// monoblock_depth_nodes = Round(mesh_ref*5);
+// monoblock_width_nodes = Floor((pipe_sect_nodes-1)/2)+1;
+
 
 // Calculate approx element size by dividing the circumference
 elem_size = 2*Pi*pipe_rad_int/(4*(pipe_sect_nodes-1));

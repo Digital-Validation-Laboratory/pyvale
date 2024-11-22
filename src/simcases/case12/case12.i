@@ -7,7 +7,7 @@
 
 coolantTemp=100.0      # degC
 heatTransCoeff=125.0e3 # W.m^-2.K^-1
-surfHeatFlux=10.0e6    # W.m^-2
+surfHeatFlux=4.67e6    # W.m^-2, Taken from Adel's first paper
 
 # Material Properties:
 # Thermal Props: Copper-Chromium-Zirconium pg.148 at 200degC

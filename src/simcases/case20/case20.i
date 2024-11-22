@@ -6,23 +6,31 @@
 #_* MOOSEHERDER VARIABLES - START
 
 # Thermal Loads/BCs
-coolantTemp = 100.0      # degC
+coolantTemp = 150.0      # degC
 heatTransCoeff = 125.0e3 # W.m^-2.K^-1
-surfHeatFlux = 5.0e6    # W.m^-2
+
+surfHeatPower = 0.25e3     # W
+blockLeng = 49.5e-3
+blockWidth = 37e-3
+surfArea = ${fparse blockLeng*blockWidth}   # m^2
+surfHeatFlux = ${fparse surfHeatPower/surfArea} # W.m^-2
 
 # Material Properties:
-# Thermal Props:OFHC) Copper at 250degC
-ss316LDensity = 8829.0  # kg.m^-3
-ss316LThermCond = 384.0 # W.m^-1.K^-1
-ss316LSpecHeat = 406.0  # J.kg^-1.K^-1
+# Thermal Props: SS316L @ 400degC
+ss316LDensity = 7770.0  # kg.m^-3
+ss316LThermCond = 19.99 # W.m^-1.K^-1
+ss316LSpecHeat = 556.0  # J.kg^-1.K^-1
 
-# Mechanical Props: OFHC Copper 250degC
-ss316LEMod = 108e9       # Pa
-ss316LPRatio = 0.33      # -
+# Mechanical Props: SS316L @ 400degC
+ss316LEMod = 168e9       # Pa
+ss316LPRatio = 0.3      # -
 
 # Thermo-mechanical coupling
 stressFreeTemp = 150 # degC
-cuThermExp = 17.8e-6 # 1/degC
+ss316LThermExp = 17.8e-6 # 1/degC
+
+# Element properties
+elem_order = 'SECOND'
 
 #** MOOSEHERDER VARIABLES - END
 #-------------------------------------------------------------------------
@@ -34,13 +42,13 @@ cuThermExp = 17.8e-6 # 1/degC
 
 [Mesh]
     type = FileMesh
-    file = 'case10.msh'
+    file = 'case20.msh'
 []
 
 [Variables]
     [temperature]
         family = LAGRANGE
-        order = FIRST
+        order = ${elem_order}
         initial_condition = ${coolantTemp}
     []
 []
@@ -84,7 +92,7 @@ cuThermExp = 17.8e-6 # 1/degC
         type = ComputeThermalExpansionEigenstrain
         temperature = temperature
         stress_free_temperature = ${stressFreeTemp}
-        thermal_expansion_coeff = ${cuThermExp}
+        thermal_expansion_coeff = ${ss316LThermExp}
         eigenstrain_name = thermal_expansion_eigenstrain
     []
 
@@ -108,11 +116,10 @@ cuThermExp = 17.8e-6 # 1/degC
         value = ${surfHeatFlux}
     []
 
-    # Lock disp_y for base
-    # NOTE: if locking y on base need to comment all disp_y conditions below
+    # Lock disp_y for whole base
     [mech_bc_c_dispy]
         type = DirichletBC
-       variable = disp_y
+        variable = disp_y
         boundary = 'bc-base-disp'
         value = 0.0
     []
@@ -121,87 +128,82 @@ cuThermExp = 17.8e-6 # 1/degC
     [mech_bc_c_dispx]
         type = DirichletBC
         variable = disp_x
-        boundary = 'bc-c-point-xyz-mech'
+        boundary = 'bc-base-c-loc-xyz'
         value = 0.0
     []
-    #[mech_bc_c_dispy]
-    #    type = DirichletBC
-    #    variable = disp_y
-    #    boundary = 'bc-c-point-xyz-mech'
-    #    value = 0.0
-    #[]
     [mech_bc_c_dispz]
         type = DirichletBC
         variable = disp_z
-        boundary = 'bc-c-point-xyz-mech'
+        boundary = 'bc-base-c-loc-xyz'
         value = 0.0
     []
 
-    # Lock disp yz along the x (left-right) axis
-    #[mech_bc_l_dispy]
-    #    type = DirichletBC
-    #    variable = disp_y
-    #    boundary = 'bc-l-point-yz-mech'
-    #    value = 0.0
-    #[]
-    [mech_bc_l_dispz]
+    # Lock z dof along x axis
+    [mech_bc_px_dispz]
         type = DirichletBC
         variable = disp_z
-        boundary = 'bc-l-point-yz-mech'
-        value = 0.0
-    []
-    #[mech_bc_r_dispy]
-    #    type = DirichletBC
-    #    variable = disp_y
-    #    boundary = 'bc-r-point-yz-mech'
-    #    value = 0.0
-    #[]
-    [mech_bc_r_dispz]
-        type = DirichletBC
-        variable = disp_z
-        boundary = 'bc-r-point-yz-mech'
+        boundary = 'bc-base-nx-loc-z'
         value = 0.0
     []
 
-    # Lock disp xy along the z (front-back) axis
-    [mech_bc_f_dispx]
+    # Lock x dof along z
+    [mech_bc_pz_dispx]
         type = DirichletBC
         variable = disp_x
-        boundary = 'bc-f-point-xy-mech'
+        boundary = 'bc-base-pz-loc-x'
         value = 0.0
     []
-    #[mech_bc_f_dispy]
-    #    type = DirichletBC
-    #    variable = disp_y
-    #    boundary = 'bc-f-point-xy-mech'
-    #    value = 0.0
-    #[]
-    [mech_bc_b_dispx]
+    [mech_bc_nz_dispx]
         type = DirichletBC
         variable = disp_x
-        boundary = 'bc-b-point-xy-mech'
+        boundary = 'bc-base-nz-loc-x'
         value = 0.0
     []
-    #[mech_bc_b_dispy]
-    #    type = DirichletBC
-    #    variable = disp_y
-    #    boundary = 'bc-b-point-xy-mech'
-    #    value = 0.0
-    #[]
 []
 
 [Preconditioning]
-    [smp]
-        type = SMP
-        full = true
-    []
+   [smp]
+       type = SMP
+       full = true
+   []
 []
+
+# LF-PersonalLaptop AMD 8 core / 8 thread
+# Trans, Precon=ON, NEWTON, pctype=lu,  solve time with 7 mpi tasks = 229.18s
+# Trans, Precon=OFF, NEWTON, pctype=lu,  solve time with 7 mpi tasks = 226.52s
+# Steady, Precon=OFF, NEWTON, pctype=lu,  solve time with 7 mpi tasks = 226.52s
+
+# LF-WorkLaptop AMD 8 core/ 16 threads
+# Steady, Precon=OFF, NEWTON, pctype=lu,  solve time with 8 mpi tasks = 275s
+# Steady, Precon=OFF, NEWTON, pctype=lu,  solve time with 6 mpi tasks = ~350s
+# Steady, Precon=OFF, NEWTON, pctype=lu,  solve time with 4 mpi tasks = 458s
 
 [Executioner]
     type = Steady
-    solve_type = 'PJFNK'
+    #---------------------------------------------------------------------------
+    solve_type = PJFNK   # PJNFK or NEWTON
+    l_max_its = 100       # default = 1000
+    nl_max_its = 100
+    l_tol = 1e-5          # default = 1e-5
+    nl_abs_tol = 1e-6     # default = 1e-50, set 1e-6
+    nl_rel_tol = 1e-6     # default = 1e-8, set 1e-6
+
+    line_search = none
     petsc_options_iname = '-pc_type -pc_hypre_type'
-    petsc_options_value = 'hypre    boomeramg'
+    petsc_options_value = 'hypre boomeramg'
+
+    #---------------------------------------------------------------------------
+    # solve_type = 'NEWTON' # NEWTON or PJNFK
+    # petsc_options_iname = '-pc_type'
+    # petsc_options_value = 'lu'
+
+    # l_max_its = 100
+    # nl_max_its = 100
+    # nl_rel_tol = 1e-6
+    # nl_abs_tol = 1e-6
+    # l_tol = 1e-5
+
+    #---------------------------------------------------------------------------
     #end_time= ${endTime}
     #dt = ${timeStep}
 []
@@ -241,15 +243,6 @@ cuThermExp = 17.8e-6 # 1/degC
         type = ElementExtremeValue
         variable = strain_zz
     []
-
-    #[strain_xx_avg]
-    #    type = ElementAverageValue
-    #    variable = strain_xx
-    #[]
-    #[strain_yy_avg]
-    #    type = ElementAverageValue
-    #    variable = strain_yy
-    #[]
 []
 
 [Outputs]

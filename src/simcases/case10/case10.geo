@@ -19,10 +19,10 @@ Geometry.VolumeLabels = 0;
 file_name = "case10.msh";
 
 // Geometric variables
-block_width = 25e-3;
-block_height = block_width+8e-3; // Must be greater than plate width
-block_depth= 50e-3;
-block_diff = block_height-block_width;
+block_width = 37e-3;
+block_height = 35e-3; // Must be greater than plate width
+block_depth= 49.5e-3;
+block_armour = 8e-3;
 
 hole_rad = 6e-3;
 hole_loc_x = 0.0;
@@ -33,7 +33,7 @@ hole_circ = 2*Pi*hole_rad;
 mesh_ref = 1;
 hole_sect_nodes = 5*mesh_ref; // Must be odd
 block_rad_nodes = 5*mesh_ref;
-block_diff_nodes = 5*mesh_ref; // numbers of nodes along the rectangular extension
+block_armour_nodes = 5*mesh_ref; // numbers of nodes along the rectangular extension
 block_halfdepth_divs = 2*mesh_ref;
 
 block_edge_nodes = Floor((hole_sect_nodes-1)/2)+1;
@@ -63,10 +63,10 @@ Rectangle(s4) = {0.0,block_width/2,0.0,
 // Two rectangles above the hole (armour)
 s5 = news;
 Rectangle(s5) = {-block_width/2,block_width,0.0,
-                block_width/2,block_diff};
+                block_width/2,block_armour};
 s6 = news;
 Rectangle(s6) = {0.0,block_width,0.0,
-                block_width/2,block_diff};
+                block_width/2,block_armour};
 
 // Merge coincicent edges of the four overlapping squares
 BooleanFragments{ Surface{s1}; Delete; }
@@ -86,7 +86,7 @@ BooleanDifference{ Surface{s1,s2,s3,s4}; Delete; }{ Surface{s9}; Delete; }
 Transfinite Curve{21,24,28,19} = block_rad_nodes;
 Transfinite Curve{22,26,25,31,12,9,27,18,14,17} = block_edge_nodes;
 Transfinite Curve{20,23,30,29} = hole_sect_nodes;
-Transfinite Curve{15,13,16} = block_diff_nodes;
+Transfinite Curve{15,13,16} = block_armour_nodes;
 
 // Spider web mesh around the 4 quadrants of the hole
 Transfinite Surface{s1} = {17,16,15,13};

@@ -54,15 +54,15 @@ monoblock_height = monoblock_width + monoblock_arm_height;
 pipe_cent_x = 0.0;
 pipe_cent_y = interlayer_rad_ext + monoblock_side;
 
-// Calculated Mesh Variables
-pipe_sect_nodes = Round(mesh_ref*5); // Must be odd
-pipe_rad_nodes = Round(mesh_ref*4);
-interlayer_rad_nodes = Round(mesh_ref*4);
-monoblock_side_nodes = Round(mesh_ref*5);
-monoblock_arm_nodes = Round(mesh_ref*5);
-monoblock_depth_nodes = Round(mesh_ref*3); // NOTE: this is half the depth!
-monoblock_width_nodes = Floor((pipe_sect_nodes-1)/2)+1;
-/*
+// // Calculated Mesh Variables
+// pipe_sect_nodes = Round(mesh_ref*5); // Must be odd
+// pipe_rad_nodes = Round(mesh_ref*4);
+// interlayer_rad_nodes = Round(mesh_ref*4);
+// monoblock_side_nodes = Round(mesh_ref*5);
+// monoblock_arm_nodes = Round(mesh_ref*5);
+// monoblock_depth_nodes = Round(mesh_ref*3); // NOTE: this is half the depth!
+// monoblock_width_nodes = Floor((pipe_sect_nodes-1)/2)+1;
+
 // This is a more reasonable mesh refinement for the monoblock but solve time
 // is much longer
 pipe_sect_nodes = Round(mesh_ref*11); // Must be odd
@@ -72,7 +72,7 @@ monoblock_side_nodes = Round(mesh_ref*9);
 monoblock_arm_nodes = Round(mesh_ref*11);
 monoblock_depth_nodes = Round(mesh_ref*5);
 monoblock_width_nodes = Floor((pipe_sect_nodes-1)/2)+1;
-*/
+
 
 // Calculate approx element size by dividing the circumference
 elem_size = 2*Pi*pipe_rad_int/(4*(pipe_sect_nodes-1));

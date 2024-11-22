@@ -10,7 +10,7 @@ timeStep = 1
 
 coolantTemp=100.0      # degC
 heatTransCoeff=125.0e3 # W.m^-2.K^-1
-surfHeatFlux=10.0e6    # W.m^-2
+surfHeatFlux=4.67e6    # W.m^-2, taken from Adel's first paper
 timeConst = 1   # s
 
 # Material Properties:
