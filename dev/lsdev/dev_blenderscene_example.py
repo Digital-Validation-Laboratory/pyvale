@@ -8,9 +8,10 @@ def main() -> None:
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
+    filepath = '/home/lorna/pyvale/dev/lsdev/trial_blender_part.blend'
     scene = BlenderScene()
 
     scene.add_part(sim_data)
 
-    filepath = '/home/lorna/pyvale/dev/lsdev/trial_blender_part'
+
     scene.save_model(filepath)
