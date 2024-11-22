@@ -1,6 +1,7 @@
 import bpy
 from camera import CameraData, CameraBlender
 from lightingblender import LightData, BlenderLight
+from dev_partblender import BlenderPart
 
 class BlenderScene:
     def __init__(self):
@@ -38,6 +39,18 @@ class BlenderScene:
         # TODO: Set variables in dataclass
         camera = CameraBlender.add_camera()
         return camera
+
+    def add_part(self, sim_data):
+        part = BlenderPart(sim_data).simdata_to_part()
+
+        return part
+
+    def save_model(self, filepath):
+        '''
+        Method to save the blender model to a file
+        '''
+        if self.filepath is not None:
+            bpy.ops.wm.save_as_mainfile(filepath=self.filepath)
 
 
 
