@@ -16,7 +16,7 @@ import numpy as np
 import mooseherder as mh
 
 from pyvale.imagesim.imagedefopts import ImageDefOpts
-from pyvale.imagesim.cameradata import CameraData
+from pyvale.imagesim.cameradataimagedef import CameraImageDef
 import pyvale.imagesim.imagedef as sid
 
 
@@ -113,7 +113,7 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # CREATE CAMERA OBJECT
-    camera = CameraData()
+    camera = CameraImageDef()
     # Need to set the number of pixels in [X,Y], the bit depth and the m/px
 
     # Assume the camera has the same number of pixels as the input image unless we

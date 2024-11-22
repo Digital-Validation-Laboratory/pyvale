@@ -5,6 +5,7 @@ License: MIT
 Copyright (C) 2024 The Digital Validation Team
 ================================================================================
 '''
+from pathlib import Path
 import enum
 from dataclasses import dataclass
 import numpy as np
@@ -27,15 +28,15 @@ class PlotOptsGeneral:
     single_fig_size: tuple[float,float] = (a4_print_width*single_fig_scale,
                         a4_print_width*single_fig_scale/aspect_ratio)
 
-    resolution: int = 200
+    resolution: int = 300
 
     font_name: str = 'Liberation Sans'
     font_def_weight: str = 'normal'
-    font_def_size: float = 10
-    font_tick_size: float = 9
-    font_head_size: float = 10
-    font_ax_size: float = 10
-    font_leg_size: float = 9
+    font_def_size: float = 10.0*2
+    font_tick_size: float = 9.0*2
+    font_head_size: float = 10.0*2
+    font_ax_size: float = 10.0*2
+    font_leg_size: float = 9.0*2
 
     ms: float = 3.2
     lw: float = 0.8
@@ -87,13 +88,15 @@ class TraceOptsExperiment:
 
 
 @dataclass(slots=True)
-class VisOptsSimAndSensors:
-    #pyvista ops
+class VisOptsSimSensors:
+    # pyvista ops
     window_size_px: tuple[int,int] = (1280,800)
     camera_position: np.ndarray | str = "xy"
     show_edges: bool = True
+    interactive: bool = True
 
-    background_colour: str = "black" # "white"
+    font_colour: str = "black"
+    background_colour: str = "white" # "white"
 
     time_label_font_size: float = 12
     time_label_position: str = "upper_left"
@@ -102,26 +105,42 @@ class VisOptsSimAndSensors:
     colour_bar_font_size: float = 18
     colour_bar_show: bool = True
     colour_bar_lims: tuple[float,float] | None = None
+    colour_bar_vertical: bool = True
 
     # pyvale ops
     show_perturbed_pos: bool = True
     sens_colour_nom: str = "red"
     sens_colour_pert: str = "blue"
+    sens_point_size: float = 20
+    sens_label_font_size: float = 30
+    sens_label_colour: str = "grey"
 
+
+class EImageType(enum.Enum):
+    PNG = enum.auto()
+    SVG = enum.auto()
 
 @dataclass(slots=True)
-class VisOptsAnimation:
-    frames_per_second: float = 10.0
+class VisOptsImageSave:
+    path: Path | None = None
+    image_type: EImageType = EImageType.PNG
+    transparent_background: bool = False
+
 
 class EAnimationType(enum.Enum):
     MP4 = enum.auto()
     GIF = enum.auto()
 
 @dataclass(slots=True)
-class VisOptsSaveAnimation:
-    # pyvista ops
+class VisOptsAnimation:
+    frames_per_second: float = 10.0
     off_screen: bool = False
-    save_mode: EAnimationType = EAnimationType.MP4
+
+    # save options
+    save_animation: EAnimationType | None = None
+    save_path: Path | None = None
+
+
 
 
 

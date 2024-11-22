@@ -2,6 +2,7 @@
 # pyvale ignore
 *.mp4
 *.gif
+dev/test_output/*
 
 # vscode / venv
 .vscode/

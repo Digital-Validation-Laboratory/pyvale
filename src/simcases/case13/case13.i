@@ -4,7 +4,7 @@
 
 #-------------------------------------------------------------------------
 #_* MOOSEHERDER VARIABLES - START
-endTime = 300
+endTime = 200
 timeStep = 5
 
 # Geometric Properties
@@ -73,17 +73,30 @@ cuSpecHeat = 406.0  # J.kg^-1.K^-1
 []
 
 [BCs]
-    [heat_flux_out]
+    [heat_flux_out_left]
         type = ConvectiveHeatFluxBC
         variable = temperature
         boundary = 'left'
         T_infinity = ${coolantTemp}
         heat_transfer_coefficient = ${heatTransCoeff}
     []
-    [heat_flux_in]
+    [heat_flux_in_right]
         type = FunctionNeumannBC
         variable = temperature
         boundary = 'right'
+        function = '${fparse surfHeatFlux}*(1-exp(-(1/${timeConst})*t))'
+    []
+    [heat_flux_out_bot]
+        type = ConvectiveHeatFluxBC
+        variable = temperature
+        boundary = 'bottom'
+        T_infinity = ${coolantTemp}
+        heat_transfer_coefficient = ${heatTransCoeff}
+    []
+    [heat_flux_in_top]
+        type = FunctionNeumannBC
+        variable = temperature
+        boundary = 'top'
         function = '${fparse surfHeatFlux}*(1-exp(-(1/${timeConst})*t))'
     []
 []

@@ -7,13 +7,14 @@ Copyright (C) 2024 The Digital Validation Team
 '''
 import numpy as np
 from pyvale.field import IField
+from pyvale.sensor import ISensor
 from pyvale.errorintegrator import ErrIntegrator
 from pyvale.sensordescriptor import SensorDescriptor
 from pyvale.sensordata import SensorData
 from pyvale.fieldsampler import sample_field_with_sensor_data
 
 
-class SensorArrayPoint:
+class SensorArrayPoint(ISensor):
     __slots__ = ("field","descriptor","sensor_data","_truth","_measurements",
                  "error_integrator")
 
@@ -38,8 +39,10 @@ class SensorArrayPoint:
     # accessors
     def get_sample_times(self) -> np.ndarray:
         if self.sensor_data.sample_times is None:
+            #shape=(n_time_steps,)
             return self.field.get_time_steps()
 
+        #shape=(n_time_steps,)
         return self.sensor_data.sample_times
 
     def get_measurement_shape(self) -> tuple[int,int,int]:
@@ -47,17 +50,21 @@ class SensorArrayPoint:
                 len(self.field.get_all_components()),
                 self.get_sample_times().shape[0])
 
+    def get_field(self) -> IField:
+        return self.field
+
     #---------------------------------------------------------------------------
     # Truth calculation from simulation
     def calc_truth_values(self) -> np.ndarray:
         self._truth = sample_field_with_sensor_data(self.field,
                                                     self.sensor_data)
+        #shape=(n_sensors,n_field_comps,n_time_steps)
         return self._truth
 
     def get_truth(self) -> np.ndarray:
         if self._truth is None:
             self._truth = self.calc_truth_values()
-
+        #shape=(n_sensors,n_field_comps,n_time_steps)
         return self._truth
 
     #---------------------------------------------------------------------------
@@ -75,18 +82,21 @@ class SensorArrayPoint:
         if self.error_integrator is None:
             return None
 
+        #shape=(n_sensors,n_field_comps,n_time_steps)
         return self.error_integrator.get_errs_systematic()
 
     def get_errors_random(self) -> np.ndarray | None:
         if self.error_integrator is None:
             return None
 
+        #shape=(n_sensors,n_field_comps,n_time_steps)
         return self.error_integrator.get_errs_random()
 
     def get_errors_total(self) -> np.ndarray | None:
         if self.error_integrator is None:
             return None
 
+        #shape=(n_sensors,n_field_comps,n_time_steps)
         return self.error_integrator.get_errs_total()
 
     #---------------------------------------------------------------------------
@@ -98,10 +108,12 @@ class SensorArrayPoint:
             self._measurements = self.get_truth() + \
                 self.error_integrator.calc_errors_from_chain(self.get_truth())
 
+        #shape=(n_sensors,n_field_comps,n_time_steps)
         return self._measurements
 
     def get_measurements(self) -> np.ndarray:
         if self._measurements is None:
             self._measurements = self.calc_measurements()
 
+        #shape=(n_sensors,n_field_comps,n_time_steps)
         return self._measurements

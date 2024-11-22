@@ -9,7 +9,7 @@ from typing import Any
 
 import numpy as np
 import matplotlib.pyplot as plt
-from pyvale.visualplotopts import (PlotOptsGeneral,
+from pyvale.visualopts import (PlotOptsGeneral,
                                    TraceOptsExperiment)
 from pyvale.experimentsimulator import ExperimentSimulator
 

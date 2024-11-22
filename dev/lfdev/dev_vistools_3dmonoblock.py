@@ -24,10 +24,12 @@ def main() -> None:
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
+    pyvale.print_dimensions(sim_data)
+
     n_sens = (1,4,1)
     x_lims = (12.5,12.5)
-    y_lims = (0,31.0)
-    z_lims = (0.0,12.5)
+    y_lims = (0,33.0)
+    z_lims = (0.0,12.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
     sens_data = pyvale.SensorData(positions=sens_pos)
@@ -41,23 +43,33 @@ def main() -> None:
     measurements = tc_array.get_measurements()
     print(f'\nMeasurements for sensor at top of block:\n{measurements[-1,0,:]}\n')
 
-    vis_opts = pyvale.VisOptsSimAndSensors()
+    vis_opts = pyvale.VisOptsSimSensors()
+    vis_opts.window_size_px = (1200,800)
     vis_opts.camera_position = np.array([(59.354, 43.428, 69.946),
                                          (-2.858, 13.189, 4.523),
                                          (-0.215, 0.948, -0.233)])
+    image_save_opts = pyvale.VisOptsImageSave()
+    image_save_opts.path = Path.cwd() / "dev" / "test_output" / "test_image"
+    image_save_opts.image_type = pyvale.EImageType.SVG
 
-    pv_plot = pyvale.animate_sim_with_sensors(tc_array,
+    anim_opts = pyvale.VisOptsAnimation()
+    anim_opts.save_path = Path.cwd() / "dev" / "test_output" / "test_animation"
+    anim_opts.save_animation = pyvale.EAnimationType.MP4
+
+    pv_plot = pyvale.plot_point_sensors_on_sim(tc_array,
                                               field_name,
-                                              time_steps=None,
-                                              vis_opts=vis_opts)
-    print(f"{measurements.shape=}")
-    print(pv_plot.camera_position)
+                                              time_step=-1,
+                                              vis_opts=vis_opts,
+                                              image_save_opts=None)
+    pv_plot.show()
 
-    # pv_plot = pyvale.plot_point_sensors_on_sim(tc_array,field_name)
-    # pv_plot.camera_position = [(59.354, 43.428, 69.946),
-    #                             (-2.858, 13.189, 4.523),
-    #                             (-0.215, 0.948, -0.233)]
-    # pv_plot.show(cpos="xy")
+    # pv_anim = pyvale.animate_sim_with_sensors(tc_array,
+    #                                           field_name,
+    #                                           time_steps=None,
+    #                                           vis_opts=vis_opts,
+    #                                           anim_opts=anim_opts)
+
+
 
 if __name__ == '__main__':
     main()
