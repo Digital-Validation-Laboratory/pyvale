@@ -49,19 +49,9 @@ class BlenderScene:
         '''
         Method to save the blender model to a file
         '''
-        # if filepath is not None:
-        #     bpy.ops.wm.save_as_mainfile(filepath=filepath)
-        if filepath:
-            try:
-                bpy.data.libraries.write(filepath)
-                print(f"File saved successfully to {filepath}")
-            except Exception as e:
-                print(f"Failed to save file: {e}")
-        else:
-            raise ValueError("Filepath cannot be None or empty")
+        if filepath is not None:
+            bpy.ops.wm.save_as_mainfile(filepath=filepath)
 
-        # Note: save model method not working
-        
 
 
 
