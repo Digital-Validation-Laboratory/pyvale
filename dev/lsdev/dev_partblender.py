@@ -7,22 +7,20 @@ class BlenderPart:
         self.sim_data = sim_data
 
     def _get_elements(self):
-        connectshape = self.sim_data.connect[np.str_('connect1')].shape
-        connect = self.sim_data.connect
+        connect = self.sim_data.connect[np.str_('connect1')]
 
-        fullconnect = np.zeros(connectshape, dtype=np.int32)
+        elements = connect.T
 
-        for vals in connect.values():
-            fullconnect += vals
+        zero_index_elements = elements - 1 # Blender has a zero base index
 
-        elements = fullconnect.T
-
-        return elements
+        return zero_index_elements
 
     def _get_nodes(self):
         nodes = self.sim_data.coords
 
-        return nodes
+        zero_index_nodes = nodes - 1 # Blender has a zero base index
+
+        return zero_index_nodes
 
 
     def simdata_to_part(self):
@@ -37,9 +35,9 @@ class BlenderPart:
 
         return part
 
-    def set_part_location(part, position):
+    def set_part_location(self, part, position):
         part.location = position
 
-    def set_part_rotation(part, rotation):
+    def set_part_rotation(self, part, rotation):
         part.rotation_mode = "EULER"
         part.rotation_euler = rotation
