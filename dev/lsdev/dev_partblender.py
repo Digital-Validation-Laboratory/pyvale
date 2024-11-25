@@ -7,8 +7,15 @@ class BlenderPart:
         self.sim_data = sim_data
 
     def _get_elements(self):
-        connect = self.sim_data.connect[np.str_('connect1')] # Write this so not hardcoded
-        elements = connect.T
+        connectshape = self.sim_data.connect[np.str_('connect1')].shape
+        connect = self.sim_data.connect
+
+        fullconnect = np.zeros(connectshape, dtype=np.int32)
+
+        for vals in connect.values():
+            fullconnect += vals
+
+        elements = fullconnect.T
 
         return elements
 
@@ -18,14 +25,13 @@ class BlenderPart:
         return nodes
 
 
-
-
     def simdata_to_part(self):
         elements = self._get_elements()
         nodes = self._get_nodes()
 
         mesh = bpy.data.meshes.new("part")
-        mesh.from_pydata(nodes, [], elements)
+        mesh.from_pydata(nodes, [], elements, shade_flat=True)
+        mesh.validate(verbose=True, clean_customdata=True)
         part = bpy.data.objects.new("specimen", mesh)
         bpy.context.scene.collection.objects.link(part)
 
