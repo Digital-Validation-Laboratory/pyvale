@@ -13,5 +13,7 @@ def main() -> None:
 
     scene.add_part(sim_data)
 
-
     scene.save_model(filepath)
+
+if __name__ == "__main__":
+    main()
