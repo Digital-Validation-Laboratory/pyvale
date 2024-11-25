@@ -4,20 +4,20 @@ import bpy
 
 @dataclass
 class CameraData:
-    xpix : int | None = None
-    ypix : int | None = None
-    position : np.ndarray | None = None
-    orientation : np.ndarray | None = None
+    xpix : int | None = 2452
+    ypix : int | None = 2056
+    position : tuple | None = (0, 0, 10)
+    orientation : tuple | None = (0, 0, 0)
     object_distance : float | None = None
-    fstop: float | None = None
-    focal_length : float | None = None
-    sensor_size : np.ndarray | None = None
-    sensor_px : np.ndarray | None = None
-    k1 : float | None = None
-    k2 : float | None = None
-    k3 : float | None = None
-    p1 : float | None = None
-    p2 : float | None = None
+    fstop: float | None = 0
+    focal_length : float | None = 50.0
+    sensor_size : tuple | None = (8.4594, 7.0932)
+    sensor_px : tuple | None = (xpix, ypix)
+    k1 : float | None = 0.0
+    k2 : float | None = 0.0
+    k3 : float | None = 0.0
+    p1 : float | None = 0.0
+    p2 : float | None = 0.0
     c0 : float | None = None
     c1 : float | None = None
 
@@ -33,7 +33,7 @@ class CameraBlender():
         bpy.context.collection.objects.link(camera)
 
         camera.location = self.camera_data.position
-        camera.rotation_mode = 'EULER' # TODO: Make this a variable with diff options
+        camera.rotation_mode = 'XYZ' # TODO: Make this a variable with diff options
         camera.rotation_euler = self.camera_data.orientation
 
         camera['sensor_px'] = self.camera_data.sensor_px
@@ -65,14 +65,12 @@ class CameraBlender():
 
         bpy.context.scene.camera = camera
 
-        self.cameras.append(camera) # not sure if need this
         return camera
 
     def stereo_setup(self,
-                     stereo_angle: float):
+                     stereo_angle: float,
+                     orientation1,):
         # TODO: Write method to create stereo setup given params
-        orientation1 = 1
-        orientation2 = 2
         self.add_camera()
         self.set_orientation()
         self.add_camera()
