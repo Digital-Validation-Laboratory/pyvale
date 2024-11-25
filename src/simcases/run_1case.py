@@ -12,10 +12,10 @@ from mooseherder import (MooseConfig,
                          MooseRunner,
                          GmshRunner)
 
-#======================================
+#===============================================================================
 # Change this to run a different case
 CASE_STR = 'case20'
-#======================================
+#===============================================================================
 
 CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')
 CASE_DIR = Path('src/simcases/'+CASE_STR+'/')
