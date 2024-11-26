@@ -1,7 +1,7 @@
 import bpy
 from camera import CameraData, CameraBlender
 from lightingblender import LightData, BlenderLight
-from dev_partblender import *
+from dev_partblender import BlenderPart
 
 class BlenderScene:
     def __init__(self):
@@ -32,7 +32,8 @@ class BlenderScene:
 
     def add_light(self):
         # TODO: Set variables in dataclass
-        light = BlenderLight.add_light()
+        lightmaker = BlenderLight()
+        light = lightmaker.add_light()
         return light
 
     def add_camera(self, location=None, rotation=None):
@@ -42,24 +43,25 @@ class BlenderScene:
 
         return camera
 
-    def add_part(self, sim_data, location, rotation: tuple | None = None ):
+    def add_part(self, sim_data):
         # Structure of this method is confused
         partmaker = BlenderPart(sim_data)
         part = partmaker.simdata_to_part()
 
         part.select_set(True)
 
-        if location is not None:
-            partmaker.set_part_location(part, location) # This doesnt seem to be working
-
-        if rotation is not None:
-            partmaker.set_part_rotation(part, rotation)
-
         part.select_set(False)
 
         self._set_origin(part)
 
         return part
+
+    def set_part_location(self, part, location):
+        part.location = location
+
+    def set_part_roation(self, part, rotation):
+        part.rotation_mode = 'XYZ'
+        part.rotation_euler = rotation
 
     def _set_origin(self, part):
         # Not sure if this is necessary
