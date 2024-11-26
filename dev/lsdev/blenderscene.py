@@ -30,27 +30,20 @@ class BlenderScene:
         bg_node.inputs[0].default_value = [0.5, 0.5, 0.5, 1]
         bg_node.inputs[1].default_value = 0
 
-    def add_light(self):
-        # TODO: Set variables in dataclass
-        lightmaker = BlenderLight()
+    def add_light(self, light_data: LightData):
+        lightmaker = BlenderLight(light_data)
         light = lightmaker.add_light()
         return light
 
-    def add_camera(self, location=None, rotation=None):
-        # TODO: Set variables in dataclass
-        cameramaker = CameraBlender()
+    def add_camera(self, cam_data):
+        cameramaker = CameraBlender(cam_data)
         camera = cameramaker.add_camera()
 
         return camera
 
     def add_part(self, sim_data):
-        # Structure of this method is confused
         partmaker = BlenderPart(sim_data)
         part = partmaker.simdata_to_part()
-
-        part.select_set(True)
-
-        part.select_set(False)
 
         self._set_origin(part)
 
