@@ -35,9 +35,9 @@ class BlenderPart:
 
         return part
 
-    def set_part_location(self, part, position):
-        part.location = position
+# def set_part_location(part, position):
+#     part.location = position
 
-    def set_part_rotation(self, part, rotation):
-        part.rotation_mode = "EULER"
-        part.rotation_euler = rotation
+# def set_part_rotation(part, rotation):
+#     part.rotation_mode = "EULER"
+#     part.rotation_euler = rotation
