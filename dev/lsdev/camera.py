@@ -6,7 +6,7 @@ import bpy
 class CameraData:
     xpix : int | None = 2452
     ypix : int | None = 2056
-    position : tuple | None = (0, 0, 10)
+    position : tuple | None = (0, 0, 5)
     orientation : tuple | None = (0, 0, 0)
     object_distance : float | None = None
     fstop: float | None = 0
