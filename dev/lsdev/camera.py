@@ -4,15 +4,13 @@ import bpy
 
 @dataclass
 class CameraData:
-    xpix : int | None = 2452
-    ypix : int | None = 2056
     position : tuple | None = (0, 0, 5)
     orientation : tuple | None = (0, 0, 0)
     object_distance : float | None = None
     fstop: float | None = 0
     focal_length : float | None = 50.0
     sensor_size : tuple | None = (8.4594, 7.0932)
-    sensor_px : tuple | None = (xpix, ypix)
+    sensor_px : tuple | None = (2452, 2056)
     k1 : float | None = 0.0
     k2 : float | None = 0.0
     k3 : float | None = 0.0
@@ -21,10 +19,9 @@ class CameraData:
     c0 : float | None = None
     c1 : float | None = None
 
-# TODO: write get and set methods for data class variables
 
 class CameraBlender():
-    def __init__(self):
+    def __init__(self, CameraData):
         self.camera_data = CameraData
 
     def add_camera(self):
