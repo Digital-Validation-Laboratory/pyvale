@@ -12,9 +12,9 @@ class LightType(Enum):
 @dataclass
 class LightData():
     type: LightType | None = None
-    position: np.ndarray | None = None
-    orientation: np.ndarray | None = None
-    energy: int | None = None
+    position: np.ndarray | None = (0, 0, 10)
+    orientation: np.ndarray | None = (0, 0, 0)
+    energy: int | None = 10
 
 
 class BlenderLight():
@@ -25,7 +25,7 @@ class BlenderLight():
 
     def _create_light(self):
         self._light = bpy.data.lights.new(name='spot', type='SPOT')
-        self._light_ob = bpy.data.objects.new(name='Spot', object_data=light)
+        self._light_ob = bpy.data.objects.new(name='Spot', object_data=self._light)
         bpy.context.collection.objects.link(self._light_ob)
 
     def _get_light_object(self):
@@ -38,16 +38,18 @@ class BlenderLight():
         self._light_ob.location = self.light_data.position
 
     def _set_rotation(self):
-        self._light_ob.rotation_mode = 'EULER'
+        self._light_ob.rotation_mode = 'XYZ'
         self._light_ob.rotation_euler = self.light_data.orientation
 
     def _set_energy(self):
         self._light.energy = self.light_data.energy
 
     def add_light(self):
-        self.create_light()
-        self.set_location()
-        self.set_rotation()
-        self.set_energy()
+        self._create_light()
+        self._set_location()
+        self._set_rotation()
+        self._set_energy()
+
+        return self._light_ob
 
 
