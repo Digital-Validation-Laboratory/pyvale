@@ -1,4 +1,4 @@
-from multiprocessing import cpu_count#
+from multiprocessing import cpu_count
 from enum import Enum
 from dataclasses import dataclass
 from camera import CameraData
