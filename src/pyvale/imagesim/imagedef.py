@@ -156,6 +156,7 @@ def calc_res_from_nodes(camera: CameraImageDef, nodes: np.ndarray, border_px: in
 
 def norm_dynamic_range(in_image: np.ndarray, bits: int) -> np.ndarray:
 
+    ret_image = in_image
     if bits > 8 and bits < 16:
         ret_image  = ((2**16)/(2**bits))*in_image
     elif bits < 8:
@@ -180,11 +181,15 @@ def rectangle_crop_image(camera: CameraImageDef,
                          corner: tuple[int,int] = (0,0),
                          ) -> np.ndarray:
 
-    if (corner[XI]+camera.num_px[XI]) > image.shape[0]:
+    if (camera.num_px[XI] == image.shape[1] and
+        camera.num_px[YI] == image.shape[0]):
+        return image
+
+    if (corner[XI]+camera.num_px[XI]) > image.shape[1]:
         raise ValueError('Cannot crop image: '+
                          f'crop edge X of {corner[XI]+camera.num_px[XI]} is '+
                          'larger than '+
-                         f'image size {image.shape[0]}\n.')
+                         f'image size {image.shape[1]}\n.')
     if (corner[YI]+camera.num_px[YI]) > image.shape[0]:
         raise ValueError('Cannot crop image: '+
                          f'crop edge Y of {corner[YI]+camera.num_px[YI]} is '+
@@ -284,7 +289,7 @@ def average_subpixel_image(subpx_image,subsample):
 
 
 def preprocess(input_im: np.ndarray,
-                coords: np.ndarray,
+               coords: np.ndarray,
                 disp_x: np.ndarray,
                 disp_y: np.ndarray,
                 camera: CameraImageDef,

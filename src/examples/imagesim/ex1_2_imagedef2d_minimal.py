@@ -56,7 +56,11 @@ def main() -> None:
     # - ImageDefOpts class - see below
     # - CameraData class - see below
 
-    # Could also just extract a sideset here logical indexing
+    coords = np.array(())
+    disp_x = np.array(())
+    disp_y = np.array(())
+
+    # Could also just extract a sideset here with logical indexing
     if sim_data.coords is not None:
         coords = sim_data.coords
     if sim_data.node_vars is not None:

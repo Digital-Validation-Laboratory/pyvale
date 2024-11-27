@@ -60,6 +60,10 @@ def main() -> None:
         with open(sim_path / sim_file,'rb') as sim_load_file:
             sim_data = pickle.load(sim_load_file)
 
+    coords = np.array(())
+    disp_x = np.array(())
+    disp_y = np.array(())
+
     if sim_data.coords is not None:
         coords = sim_data.coords
     if sim_data.node_vars is not None:
@@ -97,7 +101,7 @@ def main() -> None:
     # Calculates the m/px value based on fitting the specimen/ROI within the camera
     # FOV and leaving a set number of pixels as a border on the longest edge
     id_opts.calc_res_from_fe = True
-    id_opts.calc_res_border_px = 5
+    id_opts.calc_res_border_px = 10
 
     # Set this to true to create an undeformed masked image
     if read_exodus:
