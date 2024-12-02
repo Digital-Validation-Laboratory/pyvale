@@ -10,12 +10,12 @@ from lightingblender import LightData, LightType
 def main() -> None:
     # cwd = Path.cwd()
     # data_path = cwd.parents[0] / 'mooseherder/scripts/moose/moose-mech-simple_out.e'
-    data_path = Path('src/data/case17_out.e')
+    data_path = Path('src/data/case13_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
     dir = Path.cwd() / 'dev/lsdev/blender_files'
-    filename = 'case17.blend'
+    filename = 'case13.blend'
     filepath = dir / filename
     all_files = os.listdir(dir)
     for ff in all_files:
@@ -31,17 +31,17 @@ def main() -> None:
     scene.set_part_location(part, part_location)
 
     sensor_px = (2452, 2056)
-    cam_position = (0, 0, 2)
-    focal_length = 25.0
+    cam_position = (0, 0, 200)
+    focal_length = 15.0
     cam_data = CameraData(sensor_px=sensor_px,
                           position=cam_position,
                           focal_length=focal_length)
 
     camera = scene.add_camera(cam_data)
 
-    type = LightType.SPOT
-    light_position = (0, 0, 5)
-    energy = 20
+    type = LightType.POINT
+    light_position = (0, 0, 200)
+    energy = 20 * (10)**6
     light_data = LightData(type=type,
                            position=light_position,
                            energy=energy)
