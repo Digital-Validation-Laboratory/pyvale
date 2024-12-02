@@ -13,7 +13,7 @@ def main() -> None:
 
     part = BlenderPart(sim_data).simdata_to_part()
 
-    
+    part.set_part
 
 
 if __name__ == '__main__':

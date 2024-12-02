@@ -18,20 +18,22 @@ class RenderData:
     engine: RenderEngine = RenderEngine.CYCLES
 
 
+
 class Render:
-    def __init__(self, image_path, output_path):
+    def __init__(self, RenderData, image_path, output_path):
         self.render_data = RenderData
         self.image_path = image_path
         self.output_path = output_path
+        self.scene = bpy.data.scenes['Scene'] # Work out how to integrate this to scene creation
 
     def render_parameters(self,
                           file_name,
                           cores):
         bpy.context.scene.render.engine = self.render_data.engine.CYCLES.value
         bpy.context.scene.cycles.samples = self.render_data.samples
-        self.scene.render.resolution_x = CameraData.xpix
-        self.scene.render.resolution_y = CameraData.ypix
-        self.scene.render.filepath =  self.image_path + '/' + file_name
+        self.scene.render.resolution_x = CameraData.sensor_px[0]
+        self.scene.render.resolution_y = CameraData.sensor_px[1]
+        self.scene.render.filepath =  str(self.image_path / file_name)
         self.scene.render.threads_mode = 'FIXED'
         self.scene.render.threads = cores
 
@@ -40,12 +42,9 @@ class Render:
         bpy.ops.render.render(write_still=True)
 
     def render_image(self, image_count):
-        xpix = CameraData.xpix
-        ypix = CameraData.ypix
-        samples = RenderData.samples
 
         file_name = str(image_count) + '.tiff'
         cores = int(cpu_count())
-        self.render_parameters(xpix, ypix, samples, file_name, cores)
+        self.render_parameters(file_name, cores)
 
 
