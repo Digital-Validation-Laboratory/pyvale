@@ -25,7 +25,7 @@ class BlenderPart:
 
     def simdata_to_part(self):
         elements = self._get_elements()
-        nodes = self._get_nodes()
+        nodes = self._get_nodes() * 1000
 
         mesh = bpy.data.meshes.new("part")
         mesh.from_pydata(nodes, [], elements, shade_flat=True)
