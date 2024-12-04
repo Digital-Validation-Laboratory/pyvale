@@ -2,6 +2,7 @@ import bpy
 from camera import CameraData, CameraBlender
 from lightingblender import LightData, BlenderLight
 from dev_partblender import BlenderPart
+from objectmaterial import BlenderMaterial
 
 class BlenderScene:
     def __init__(self):
@@ -45,6 +46,8 @@ class BlenderScene:
         partmaker = BlenderPart(sim_data)
         part = partmaker.simdata_to_part()
 
+        # part = partmaker.add_thickness(part=part)
+
         self._set_origin(part)
 
         return part
@@ -55,6 +58,12 @@ class BlenderScene:
     def set_part_roation(self, part, rotation):
         part.rotation_mode = 'XYZ'
         part.rotation_euler = rotation
+
+    def add_material(self, mat_data, part, image_path):
+        materialmaker = BlenderMaterial(mat_data, part, image_path)
+        mat = materialmaker.add_material()
+
+        return mat
 
     def _set_origin(self, part):
         # Not sure if this is necessary
