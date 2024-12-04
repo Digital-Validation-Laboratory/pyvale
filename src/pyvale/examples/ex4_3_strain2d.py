@@ -1,0 +1,100 @@
+'''
+================================================================================
+Example: strain sensors on a 2d plate
+
+pyvale: the python validation engine
+License: MIT
+Copyright (C) 2024 The Digital Validation Team
+================================================================================
+'''
+from pathlib import Path
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.spatial.transform import Rotation as R
+import mooseherder as mh
+import pyvale
+
+def main() -> None:
+    """pyvale example: rotation of tensor field sensors
+    """
+    data_path = Path('src/pyvale/data/case17_out.e')
+    data_reader = mh.ExodusReader(data_path)
+    sim_data = data_reader.read_all_sim_data()
+    # Scale to mm to make 3D visualisation scaling easier
+    sim_data.coords = sim_data.coords*1000.0 # type: ignore
+
+    descriptor = pyvale.SensorDescriptorFactory.strain_descriptor()
+
+    spat_dims = 2
+    field_key = 'strain'
+    norm_components = ('strain_xx','strain_yy')
+    dev_components = ('strain_xy',)
+    strain_field = pyvale.FieldTensor(sim_data,
+                                    field_key,
+                                    norm_components,
+                                    dev_components,
+                                    spat_dims)
+
+    n_sens = (2,3,1)
+    x_lims = (0.0,100.0)
+    y_lims = (0.0,150.0)
+    z_lims = (0.0,0.0)
+    sensor_positions = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
+
+    use_sim_time = False
+    if use_sim_time:
+        sample_times = None
+    else:
+        sample_times = np.linspace(0.0,np.max(sim_data.time),50)
+
+    sens_data_norot = pyvale.SensorData(positions=sensor_positions,
+                                        sample_times=sample_times)
+
+    sg_array_norot = pyvale.SensorArrayPoint(sens_data_norot,
+                                             strain_field,
+                                             descriptor)
+
+    meas_norot = sg_array_norot.get_measurements()
+
+    sens_angles = sensor_positions.shape[0] * \
+        (R.from_euler("zyx", [45, 0, 0], degrees=True),)
+
+    sens_data_rot = pyvale.SensorData(positions=sensor_positions,
+                                      sample_times=sample_times,
+                                      angles=sens_angles)
+
+    sg_array_rot = pyvale.SensorArrayPoint(sens_data_rot,
+                                           strain_field,
+                                           descriptor)
+
+    angle_offset = np.zeros_like(sensor_positions)
+    angle_offset[:,0] = 1.0 # only rotate about z in 2D
+    angle_error_data = pyvale.ErrFieldData(ang_offset_zyx=angle_offset)
+
+    sys_err_rot = pyvale.ErrSysField(strain_field,angle_error_data)
+    err_int = pyvale.ErrIntegrator([sys_err_rot],
+                                     sens_data_rot,
+                                     sg_array_rot.get_measurement_shape())
+    sg_array_rot.set_error_integrator(err_int)
+
+
+    meas_rot = sg_array_rot.get_measurements()
+
+
+    print(80*'-')
+    sens_num = 4
+    print('The last 5 time steps (measurements) of sensor {sens_num}:')
+    pyvale.print_measurements(sg_array_rot,
+                              (sens_num-1,sens_num),
+                              (1,2),
+                              (meas_rot.shape[2]-5,meas_rot.shape[2]))
+    print(80*'-')
+
+    plot_comp = 'strain_yy'
+    pyvale.plot_time_traces(sg_array_norot,plot_comp)
+    pyvale.plot_time_traces(sg_array_rot,plot_comp)
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()

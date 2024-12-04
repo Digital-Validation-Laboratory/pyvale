@@ -1,0 +1,24 @@
+# Python coding guide for `pyvale`
+- Work in your own 'feature' branch, merge into 'dev' - don't push to main (it should be protected and yell at you)!
+- Use descriptive variable names, no single letter variables (double letters for iterators in numpy style are ok)
+- Use major function first variable names: e.g. `FieldScalar`, `FieldVector` and `FieldTensor` instead of `ScalarField`, `VectorField` and `TensorField`.
+- Avoid comments unless needed to explain something weird (like 1 vs 0 indexing) – the code and variable names should speak for themselves
+- Type hint everything: e.g. `def add_ints(a: int, b: int) -> int:`. This makes your code easier to understand and you have the possibility of compiling things if you need.
+- `pylint` is a slow linter but will help you if you have type hinted everything.
+- Default mutable data types to `None`.
+- Use `pathlib` and the `Path` class to manage all file io in preference to manual string handling or the `os` module.
+- `numpy` and `scipy` are your friend - avoid for/while loops.
+- Minimise dependencies as much as possible.
+- Avoid decorators unless absolutely necessary (`@dataclass`,  `@abstractmethod` and `@staticmethod` are examples that are ok)
+- Don't use python properties to hide complicated variable initialisation behind the `.` notation
+- No inheritance unless it is an interface (python ABC or protocol) - use composition / dependency injection
+- Only use one layer of abstraction - don't inherit from multiple layers of interfaces and don't use mix-ins.
+- For interfaces (abstract base classes) prefix the name of the class with a capital `I` e.g. `ISensor`
+- Only use abstraction/interfaces when if/else or switch has at least 3 layers and/or becomes annoying
+- Use a mixture of plain functions and classes with methods where and when they make sense
+- Setup good defaults for variables where possible so that the user can get started with minimal input
+- Prefer dataclasses to dictionaries as they tell the user what parameters are needed and can have sensible defaults
+- Use classes with `__slots__` as it is more memory efficient, faster and stops member variables being added dynamically
+- Write docstrings when the code is ready for sharing and use auto docstring to help.
+- Write some good quickstart examples so people can easily use your code
+- Use code reviews to help each other and be nice / constructive as we are not all software engineers!

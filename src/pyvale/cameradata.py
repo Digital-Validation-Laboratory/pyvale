@@ -18,7 +18,7 @@ class CameraData2D:
     #shape=(3,) as (x,y,z)
     roi_center_world: np.ndarray
 
-    # Converts pixels to length units to align with global
+    # Converts pixels to length units to align with global coords
     leng_per_px: float
 
     #shape=(n_time_steps,)
@@ -44,8 +44,6 @@ class CameraData2D:
         for ii,vv in enumerate(self.view_axes):
             self.roi_shift_world[vv] = self.roi_center_world[vv] - \
                 self.field_of_view_center_local[ii]
-
-
 
 
 # NOTE

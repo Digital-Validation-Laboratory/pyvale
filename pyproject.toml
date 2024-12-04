@@ -16,7 +16,7 @@ classifiers = [
     "License :: MIT",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.12"
+requires-python = "==3.11.*"
 dependencies = [
   "numpy>=1.26.0",
   "netCDF4>=1.6.5",
@@ -24,11 +24,13 @@ dependencies = [
   "matplotlib>=3.8",
   "scipy==1.11.3",
   "shapely>=2.0.4",
+  "sympy>=1.13.0",
+  "PyQT6>=6.7.1"
 ]
 
 [project.urls]
-"Repository" = "https://github.com/Applied-Materials-Technology/pyvale"
-"Issue Tracker" = "https://github.com/Applied-Materials-Technology/pyvale/issues"
+"Repository" = "https://github.com/Digital-Validation-Laboratory/pyvale"
+"Issue Tracker" = "https://github.com/Digital-Validation-Laboratory/pyvale/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

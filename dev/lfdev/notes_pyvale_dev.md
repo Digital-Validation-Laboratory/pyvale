@@ -53,64 +53,6 @@
 - TESTING:
     - Need to check rotations are consistent
 
-Gauss Quadrature for the Unit Disc
-http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubature-formulas-for-the-unit-disk/
-
-## Python coding pinciples:
-- Use git and the Ruff linter
-- Use descriptive variable names, no single letter variables (double letters for iterators in numpy style are ok)
-- Avoid comments unless needed to explain something weird (like 1 vs 0 indexing) – the code and variable names should speak for themselves
-- Work in your own 'feature' branch, pull to 'dev' - don't push to main (at least it should be protected)!
-- Type hint everything: e.g. 'def add_ints(a: int, b: int) -> int:'
-- Default mutable data types to None
-- Numpy is your friend - avoid for/while loops
-- No inheritance unless it is an interface (python ABC or protocol) - use composition / dependency injection
-- Only have one layer of abstraction - don't inherit from multiple layers of interfaces and don't use mix ins.
-- Only use abstraction/interfaces when if/else or switch has at least 3 layers and/or becomes annoying
-- Use a mixture of plain functions and classes with methods where and when they make sense
-- Avoid decorators unless absolutely necessary
-- Write good docstrings when the code is ready for sharing – use auto docstring to help.
-- Write some good quickstart examples so people can easily use your code
-- Use code reviews to help each other and be nice / constructive as we are not all software engineers!
-
-## `pyvale` architecture
-- Module: `ExperimentWorkflow`
-    - Manages and builds the overall workflow
-- Module: `Sampler`
-    - Samples from various distributions using monte carlo or latin hypercube
-    - Separates espitemic and aleatory errors? - might not be needed
-- Module: `RandErrGenerator`= Enhanced uncertainty function generation for random errors focusing on point sensors including:
-    - Specification of noise as a function/percentage of sensor measurement value
-- Module: `ErrSysGenerator` = Enhanced uncertainty function generation for systematic errors focusing on point sensors including:
-    - Calibration errors
-    - Digitisation errors
-    - Positioning errors
-    - Spatial averaging errors
-    - Temporal averaging errors
-    - Ability to collapse all of the above into a single empirical/probability density function
-- Module: `SensorLibrary` = Developement of library sensor models.
-    - ABC: `SensorArray`
-    - Module: `ThermocoupleArray`
-    - Module: `CameraSensor`= Developement of simplified camera sensor models for:
-        - Infrared cameras measuring temperature fields
-        - Digital image correlation measuring displacement field on a surface
-- ABC: `Field` - might not be able to be an ABC because scalar vs vector is quite different
-    - Module: `ScalarField`
-    - Module: `VectorField`
-    - **Ext**, Module: `TensorField`
-    - **Ext**, How do these reconstruct fields from sparse values? e.g. using GPs
-
-- Module: `Validator` = A toolbox for calculating validation metrics from sensor data (simulated or real)
-    - Applicable to point sensors for thermal fields
-    - **Ext** Applicable to camera sensors for thermal fields
-- Testing: A software test suite for point sensor functionality after completion of the additional features.
-- Documentation: and worked examples using the following test cases:
-    - Thermo-mechanical analysis of a simple 2D plate
-    - Thermo-mechanical analysis of a 3D divertor monoblock model
-- Modules: `Calibrator` and `Optimiser`
-    - Based on Adel's thermocouple optimiser
-    - Optimiser wraps `pymoo`
-
 ## Sensors
 A sensor should have:
 - A spatial measurement geometry: point, line, area, volume
@@ -161,6 +103,9 @@ t = 0.5*(x + 1)*(b - a) + a
 and then scale the quadrature formula by (b - a)/2:
 
 gauss = sum(w * f(t)) * 0.5*(b - a)
+
+Gauss Quadrature for the Unit Disc
+http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubature-formulas-for-the-unit-disk/
 
 ## Pyvista Cameras
 Tested on monoblock sim:
