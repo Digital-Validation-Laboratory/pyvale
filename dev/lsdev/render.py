@@ -41,9 +41,9 @@ class Render:
 
         bpy.ops.render.render(write_still=True)
 
-    def render_image(self, image_count):
+    def render_image(self, name, image_count):
 
-        file_name = str(image_count) + '.tiff'
+        file_name = name + '_' + str(image_count) + '.tiff'
         cores = int(cpu_count())
         self.render_parameters(file_name, cores)
 
