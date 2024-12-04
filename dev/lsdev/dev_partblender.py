@@ -35,3 +35,22 @@ class BlenderPart:
 
         return part
 
+    def add_thickness(self, part): # Not sure if this is necessary
+        part["solidify"] = True
+        part["thickness"] = 1
+
+        if part["solidify"]:
+            ob = bpy.context.view_layer.objects.active
+            if ob is None:
+                bpy.context.view_layer.objects.active = part
+            bpy.ops.object.editmode_toggle()
+            bpy.ops.mesh.solidify(thickness=1)
+            bpy.ops.object.editmode_toggle()
+
+        return part
+
+
+
+
+
+
