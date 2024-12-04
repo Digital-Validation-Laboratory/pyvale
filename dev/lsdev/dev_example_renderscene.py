@@ -3,6 +3,7 @@ from pathlib import Path
 import mooseherder as mh
 from blenderscene import BlenderScene
 from dev_partblender import *
+from objectmaterial import MaterialData
 from camera import CameraData
 from lightingblender import LightData, LightType
 from render import RenderData, Render
@@ -29,6 +30,11 @@ def main() -> None:
     part = scene.add_part(sim_data)
     scene.set_part_location(part, part_location)
 
+    mat_data = MaterialData()
+    # image_path = str(Path('dev/lsdev/rendered_images/blender_image_texture.tiff'))
+    image_path = '/home/lorna/speckle_generator/images/blender_image_texture.tiff'
+    mat = scene.add_material(mat_data, part, image_path)
+
     sensor_px = (2452, 2056)
     cam_position = (0, 0, 200)
     focal_length = 15.0
@@ -40,7 +46,7 @@ def main() -> None:
 
     type = LightType.POINT
     light_position = (0, 0, 200)
-    energy = 20 * (10)**6
+    energy = 400 * (10)**3
     light_data = LightData(type=type,
                            position=light_position,
                            energy=energy)
@@ -57,9 +63,10 @@ def main() -> None:
     render = Render(render_data, image_path=image_path, output_path=output_path)
 
     render_counter = 0
+    render_name = 'example'
 
     for i in range(render_data.samples):
-        render.render_image(render_counter)
+        render.render_image(render_name, render_counter)
         render_counter += 1
 
 if __name__ == "__main__":
