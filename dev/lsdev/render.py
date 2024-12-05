@@ -32,8 +32,10 @@ class Render:
         bpy.context.scene.render.engine = self.render_data.engine.CYCLES.value
         bpy.context.scene.view_settings.look = 'AgX - Greyscale'
         bpy.context.scene.cycles.samples = self.render_data.samples
-        self.scene.render.resolution_x = CameraData.sensor_px[0]
-        self.scene.render.resolution_y = CameraData.sensor_px[1]
+        # self.scene.render.resolution_x = CameraData.sensor_px[0]
+        # self.scene.render.resolution_y = CameraData.sensor_px[1]
+        self.scene.render.resolution_x = 2464
+        self.scene.render.resolution_y = 2056
         self.scene.render.filepath =  str(self.image_path / file_name)
         self.scene.render.threads_mode = 'FIXED'
         self.scene.render.threads = cores
