@@ -9,7 +9,7 @@ class CameraData:
     object_distance : float | None = None
     fstop: float | None = 0
     focal_length : float | None = 50.0
-    sensor_size : tuple | None = (8.4594, 7.0932)
+    sensor_size : tuple | None = (8.5008, 7.0932) # Need to not hardcode this
     sensor_px : tuple | None = (2452, 2056)
     k1 : float | None = 0.0
     k2 : float | None = 0.0
