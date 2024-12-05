@@ -30,6 +30,7 @@ class Render:
                           file_name,
                           cores):
         bpy.context.scene.render.engine = self.render_data.engine.CYCLES.value
+        bpy.context.scene.view_settings.look = 'AgX - Greyscale'
         bpy.context.scene.cycles.samples = self.render_data.samples
         self.scene.render.resolution_x = CameraData.sensor_px[0]
         self.scene.render.resolution_y = CameraData.sensor_px[1]
