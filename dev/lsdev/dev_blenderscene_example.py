@@ -47,7 +47,7 @@ def main() -> None:
 
     type = LightType.POINT
     light_position = (0, 0, 200)
-    energy = 20 * (10)**6
+    energy = 200 * (10)**3
     light_data = LightData(type=type,
                            position=light_position,
                            energy=energy)

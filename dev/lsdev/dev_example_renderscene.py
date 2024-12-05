@@ -63,7 +63,7 @@ def main() -> None:
     render = Render(render_data, image_path=image_path, output_path=output_path)
 
     render_counter = 0
-    render_name = 'example'
+    render_name = 'px_size_from_python'
 
     for i in range(render_data.samples):
         render.render_image(render_name, render_counter)
