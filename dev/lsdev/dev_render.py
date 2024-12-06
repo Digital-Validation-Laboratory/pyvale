@@ -7,7 +7,6 @@ import bpy
 class RenderEngine(Enum):
     """Different render engines on Blender
     """
-    # TODO: Check if these names are actually correct
     CYCLES = "CYCLES"
     EEVEE = "EEVEE"
     WORKBENCH = "WORKBENCH"
@@ -20,15 +19,15 @@ class RenderData:
 
 
 class Render:
-    def __init__(self, RenderData, image_path, output_path):
+    def __init__(self, RenderData, image_path: str, output_path: str):
         self.render_data = RenderData
         self.image_path = image_path
         self.output_path = output_path
-        self.scene = bpy.data.scenes['Scene'] # Work out how to integrate this to scene creation
+        self.scene = bpy.data.scenes['Scene']
 
     def render_parameters(self,
-                          file_name,
-                          cores):
+                          file_name: str,
+                          cores: int):
         bpy.context.scene.render.engine = self.render_data.engine.CYCLES.value
         bpy.context.scene.view_settings.look = 'AgX - Greyscale'
         bpy.context.scene.cycles.samples = self.render_data.samples
@@ -42,7 +41,7 @@ class Render:
 
         bpy.ops.render.render(write_still=True)
 
-    def render_image(self, name, image_count):
+    def render_image(self, name: int, image_count: int):
 
         file_name = name + '_' + str(image_count) + '.tiff'
         cores = int(cpu_count())
