@@ -1,22 +1,20 @@
 import bpy
-from dev.lsdev.dev_render import RenderData, Render
+from dev_render import RenderData, Render
 
 class RigidBodyMotion:
-    def __init__(self, part, step, part_location, image_path, output_path):
+    def __init__(self, part, step, part_location: tuple, image_path: str, output_path: str):
         self.part = part
         self.step = step
         self.part_location = part_location
         self.image_path = image_path
         self.output_path = output_path
 
-    def rigid_body_motion_z(self, z_lims):
+    def rigid_body_motion_z(self, z_lims: tuple):
         min_z = z_lims[0]
         max_z = z_lims[1]
 
         n_steps = (max_z - min_z) / self.step
         render_counter = 0
-
-        # TODO: Make this loop work with int + float values
 
         for z in range(n_steps):
             z_location = (z * self.step) + min_z
@@ -31,7 +29,7 @@ class RigidBodyMotion:
             render.render_image(render_name, render_counter)
             render_counter += 1
 
-    def rigid_body_motion_x(self, x_lims):
+    def rigid_body_motion_x(self, x_lims: tuple):
         min_x = x_lims[0]
         max_x = x_lims[1]
 
