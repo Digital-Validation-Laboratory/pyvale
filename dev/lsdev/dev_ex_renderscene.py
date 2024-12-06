@@ -1,12 +1,15 @@
+"""Example that creates a scene and renders a single image
+"""
+
 import os
 from pathlib import Path
 import mooseherder as mh
-from blenderscene import BlenderScene
+from dev_blenderscene import BlenderScene
 from dev_partblender import *
-from dev.lsdev.dev_objectmaterial import MaterialData
-from dev.lsdev.dev_blendercamera import CameraData
-from dev.lsdev.dev_lightingblender import LightData, LightType
-from dev.lsdev.dev_render import RenderData, Render
+from dev_objectmaterial import MaterialData
+from dev_blendercamera import CameraData
+from dev_lightingblender import LightData, LightType
+from dev_render import RenderData, Render
 
 def main() -> None:
     # Making Blender scene
