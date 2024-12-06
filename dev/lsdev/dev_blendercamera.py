@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import numpy as np
 import bpy
 
 @dataclass
@@ -10,7 +11,6 @@ class CameraData:
     focal_length : float | None = 50.0
     sensor_px : tuple | None = (2452, 2056)
     px_size: float | None = 3.45
-    sensor_size : tuple | None = None
     k1 : float | None = 0.0
     k2 : float | None = 0.0
     k3 : float | None = 0.0
@@ -23,13 +23,14 @@ class CameraData:
 class CameraBlender():
     def __init__(self, CameraData):
         self.camera_data = CameraData
+        self.sensor_size = [0, 0]
         self._set_sensor_size()
 
     def _set_sensor_size(self):
-        self.camera_data.sensor_size[0] = (self.camera_data.sensor_px[0] *
+        self.sensor_size[0] = (self.camera_data.sensor_px[0] *
                                            (self.camera_data.px_size / 1000 ))
 
-        self.camera_data.sensor_size[1] = (self.camera_data.sensor_px[1] *
+        self.sensor_size[1] = (self.camera_data.sensor_px[1] *
                                            (self.camera_data.px_size / 1000 ))
 
     def add_camera(self):
@@ -42,7 +43,7 @@ class CameraBlender():
         camera.rotation_euler = self.camera_data.orientation
 
         camera['sensor_px'] = self.camera_data.sensor_px
-        camera['px_size'] = [i / j for i, j in zip(self.camera_data.sensor_size,
+        camera['px_size'] = [i / j for i, j in zip(self.sensor_size,
                                                     self.camera_data.sensor_px)]
         camera['k1'] = self.camera_data.k1
         camera['k2'] = self.camera_data.k2
@@ -60,8 +61,8 @@ class CameraBlender():
             camera['c1'] = self.camera_data.c1
 
         new_cam.lens = self.camera_data.focal_length
-        new_cam.sensor_width = self.camera_data.sensor_size[0]
-        new_cam.sensor_height = self.camera_data.sensor_size[1]
+        new_cam.sensor_width = self.sensor_size[0]
+        new_cam.sensor_height = self.sensor_size[1]
 
         if self.camera_data.object_distance is not None:
             new_cam.dof.focus_distance = self.camera_data.object_distance
