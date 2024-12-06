@@ -48,9 +48,3 @@ class BlenderPart:
             bpy.ops.object.editmode_toggle()
 
         return part
-
-
-
-
-
-
