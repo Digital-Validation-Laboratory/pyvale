@@ -46,5 +46,6 @@ class Render:
         file_name = name + '_' + str(image_count) + '.tiff'
         cores = int(cpu_count())
         self.render_parameters(file_name, cores)
+        # TODO: Write progress to output path
 
 
