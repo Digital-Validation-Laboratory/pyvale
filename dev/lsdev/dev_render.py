@@ -1,7 +1,7 @@
 from multiprocessing import cpu_count
 from enum import Enum
 from dataclasses import dataclass
-from dev.lsdev.dev_blendercamera import CameraData
+from dev_blendercamera import CameraData
 import bpy
 
 class RenderEngine(Enum):
