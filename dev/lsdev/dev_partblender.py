@@ -3,10 +3,15 @@ import bpy
 from mooseherder.simdata import SimData
 
 class BlenderPart:
+    """Creates an object in Blender
+    """
     def __init__(self, sim_data: SimData):
         self.sim_data = sim_data
 
     def _get_elements(self):
+        """Gets the connectivity table from the SimData object and converts it
+           into a format Blender can read
+        """
         connect = self.sim_data.connect[np.str_('connect1')]
 
         elements = connect.T
@@ -16,6 +21,9 @@ class BlenderPart:
         return zero_index_elements
 
     def _get_nodes(self):
+        """Gets the node coordinates from the SimData object and converts it
+           into a format Blender can read
+        """
         nodes = self.sim_data.coords
 
         zero_index_nodes = nodes - 1 # Blender has a zero base index
@@ -24,6 +32,8 @@ class BlenderPart:
 
 
     def simdata_to_part(self):
+        """Creates an object from the mesh information in the SimData object
+        """
         elements = self._get_elements()
         nodes = self._get_nodes() * 1000
 
