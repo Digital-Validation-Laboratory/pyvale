@@ -1,16 +1,16 @@
+"""Example to create a scene in Blender and save it as a Blender file
+"""
+
 import os
 from pathlib import Path
-import numpy as np
 import mooseherder as mh
-from blenderscene import BlenderScene
+from dev_blenderscene import BlenderScene
 from dev_partblender import *
-from dev.lsdev.dev_blendercamera import CameraData
-from dev.lsdev.dev_lightingblender import LightData, LightType
-from dev.lsdev.dev_objectmaterial import MaterialData
+from dev_blendercamera import CameraData
+from dev_lightingblender import LightData, LightType
+from dev_objectmaterial import MaterialData
 
 def main() -> None:
-    # cwd = Path.cwd()
-    # data_path = cwd.parents[0] / 'mooseherder/scripts/moose/moose-mech-simple_out.e'
     data_path = Path('src/data/case13_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
@@ -38,6 +38,7 @@ def main() -> None:
 
     sensor_px = (2452, 2056)
     cam_position = (0, 0, 200)
+    # image_path = str(Path('dev/lsdev/rendered_images/blender_image_texture.tiff'))
     focal_length = 15.0
     cam_data = CameraData(sensor_px=sensor_px,
                           position=cam_position,
