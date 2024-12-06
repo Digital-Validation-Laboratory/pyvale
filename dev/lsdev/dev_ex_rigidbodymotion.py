@@ -1,13 +1,17 @@
+"""Example to create a scene and render a set of images of object undergoing
+    in plane rigid body motion
+"""
+
 import os
 from pathlib import Path
 import mooseherder as mh
-from blenderscene import BlenderScene
+from dev_blenderscene import BlenderScene
 from dev_partblender import *
-from dev.lsdev.dev_objectmaterial import MaterialData
-from dev.lsdev.dev_blendercamera import CameraData
-from dev.lsdev.dev_lightingblender import LightData, LightType
-from dev.lsdev.dev_render import RenderData, Render
-from dev.lsdev.dev_rigidbodymotion import RigidBodyMotion
+from dev_objectmaterial import MaterialData
+from dev_blendercamera import CameraData
+from dev_lightingblender import LightData, LightType
+from dev_rigidbodymotion import RigidBodyMotion
+
 
 def main() -> None:
     # Making Blender scene
@@ -32,7 +36,6 @@ def main() -> None:
     scene.set_part_location(part, part_location)
 
     mat_data = MaterialData()
-    # image_path = str(Path('dev/lsdev/rendered_images/blender_image_texture.tiff'))
     image_path = '/home/lorna/speckle_generator/images/blender_image_texture_rad2.tiff'
     mat = scene.add_material(mat_data, part, image_path)
 
@@ -62,7 +65,6 @@ def main() -> None:
     step = 0.04255
     x_lims = [0, 0.04255 * 10]
     rigidbodymotion = RigidBodyMotion(part, step, part_location, image_path, output_path)
-    # rigidbodymotion.rigid_body_motion_z(z_lims)
     rigidbodymotion.rigid_body_motion_x(x_lims)
 
 if __name__ == "__main__":
