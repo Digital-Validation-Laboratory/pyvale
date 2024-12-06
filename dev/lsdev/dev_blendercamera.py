@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-import numpy as np
 import bpy
 
 @dataclass
@@ -9,8 +8,9 @@ class CameraData:
     object_distance : float | None = None
     fstop: float | None = 0
     focal_length : float | None = 50.0
-    sensor_size : tuple | None = (8.5008, 7.0932) # Need to not hardcode this
     sensor_px : tuple | None = (2452, 2056)
+    px_size: float | None = 3.45
+    sensor_size : tuple | None = None
     k1 : float | None = 0.0
     k2 : float | None = 0.0
     k3 : float | None = 0.0
@@ -23,6 +23,14 @@ class CameraData:
 class CameraBlender():
     def __init__(self, CameraData):
         self.camera_data = CameraData
+        self._set_sensor_size()
+
+    def _set_sensor_size(self):
+        self.camera_data.sensor_size[0] = (self.camera_data.sensor_px[0] *
+                                           (self.camera_data.px_size / 1000 ))
+
+        self.camera_data.sensor_size[1] = (self.camera_data.sensor_px[1] *
+                                           (self.camera_data.px_size / 1000 ))
 
     def add_camera(self):
         new_cam = bpy.data.cameras.new('Camera')
