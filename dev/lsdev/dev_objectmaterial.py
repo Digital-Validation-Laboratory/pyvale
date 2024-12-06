@@ -19,6 +19,9 @@ class BlenderMaterial():
         self.nodes = None
 
     def _uv_unwrap(self):
+        """Method to UV unwrap object before adding material.
+           Object needs to be unwrapped for image texture to apply to it
+        """
         self.object.select_set(True)
         bpy.context.view_layer.objects.active = self.object
         bpy.ops.object.mode_set(mode='EDIT')
@@ -28,8 +31,10 @@ class BlenderMaterial():
         self.object.select_set(False)
 
     def _clear_nodes(self):
+        """Method to clear any existing material nodes
+        """        
         self.object.select_set(True)
-        self.mat = bpy.data.materials.new(name='Material') # add this to init?
+        self.mat = bpy.data.materials.new(name='Material')
         self.mat.use_nodes = True
         self.object.active_material = self.mat
         self.tree = self.mat.node_tree
