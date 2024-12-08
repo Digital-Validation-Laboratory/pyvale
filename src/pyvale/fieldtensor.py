@@ -11,10 +11,13 @@ from scipy.spatial.transform import Rotation
 import mooseherder as mh
 
 from pyvale.field import (IField,
-                                  conv_simdata_to_pyvista,
-                                  sample_pyvista)
+                          conv_simdata_to_pyvista,
+                          sample_pyvista)
 from pyvale.fieldtransform import (transform_tensor_2d,
-                                           transform_tensor_3d)
+                                   transform_tensor_2d_batch,
+                                   transform_tensor_3d,
+                                   transform_tensor_3d_batch)
+
 
 class FieldTensor(IField):
     __slots__ = ("_field_key","_spat_dims","_time_steps","_pyvista_grid",
@@ -86,19 +89,31 @@ class FieldTensor(IField):
         # TRANSFORMATION= coords rotate with object fixed
         # For Z transformation: sin negative in row 2, transpose scipy mat.
 
-        #  Need to rotate each sensor using individual rotation = loop :(
-        if self._spat_dims == 2:
-            for ii,rr in enumerate(angles):
-                rmat = rr.as_matrix().T
+
+        # If we only have one angle we assume all sensors have the same angle
+        # and we can batch process the rotations
+        if len(angles) == 1:
+            rmat = angles[0].as_matrix().T
+
+            #TODO: assumes 2D in the x-y plane
+            if self._spat_dims == 2:
                 rmat = rmat[:2,:2]
+                field_data = transform_tensor_2d_batch(rmat,field_data)
+            else:
+                field_data = transform_tensor_3d_batch(rmat,field_data)
 
-                field_data[ii,:,:] = transform_tensor_2d(rmat,field_data[ii,:,:])
+        else: #  Need to rotate each sensor using individual rotation = loop :(
+            #TODO: assumes 2D in the x-y plane
+            if self._spat_dims == 2:
+                for ii,rr in enumerate(angles):
+                    rmat = rr.as_matrix().T
+                    rmat = rmat[:2,:2]
+                    field_data[ii,:,:] = transform_tensor_2d(rmat,field_data[ii,:,:])
 
-        else:
-            for ii,rr in enumerate(angles):
-                rmat = rr.as_matrix().T
-
-                field_data[ii,:,:] = transform_tensor_3d(rmat,field_data[ii,:,:])
+            else:
+                for ii,rr in enumerate(angles):
+                    rmat = rr.as_matrix().T
+                    field_data[ii,:,:] = transform_tensor_3d(rmat,field_data[ii,:,:])
 
 
         return field_data

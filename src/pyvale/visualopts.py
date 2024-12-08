@@ -19,14 +19,25 @@ class PlotOptsGeneral:
     aspect_ratio: float = 1.62
     a4_width: float = 8.25
     a4_height: float = 11.75
-    a4_margin_width: float = 1
-    a4_margin_height: float = 1
+    a4_margin_width: float = 0.5
+    a4_margin_height: float = 0.5
     a4_print_width: float = a4_width-2*a4_margin_width
     a4_print_height: float = a4_height-2*a4_margin_height
 
-    single_fig_scale: float = 0.75
-    single_fig_size: tuple[float,float] = (a4_print_width*single_fig_scale,
-                        a4_print_width*single_fig_scale/aspect_ratio)
+    single_fig_scale: float = 0.5
+
+    single_fig_size_square: tuple[float,float] = (
+        a4_print_width*single_fig_scale,
+        a4_print_width*single_fig_scale
+     )
+    single_fig_size_portrait: tuple[float,float] = (
+        a4_print_width*single_fig_scale/aspect_ratio,
+        a4_print_width*single_fig_scale
+     )
+    single_fig_size_landscape: tuple[float,float] = (
+        a4_print_width*single_fig_scale,
+        a4_print_width*single_fig_scale/aspect_ratio
+     )
 
     resolution: int = 300
 

@@ -1,0 +1,115 @@
+'''
+================================================================================
+Example: displacement sensors on a 2d plate
+
+pyvale: the python validation engine
+License: MIT
+Copyright (C) 2024 The Digital Validation Team
+================================================================================
+'''
+from pathlib import Path
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.spatial.transform import Rotation
+import mooseherder as mh
+import pyvale
+
+def main() -> None:
+    """pyvale example:
+    """
+    #---------------------------------------------------------------------------
+    data_path = Path('src/pyvale/data/case17_out.e')
+    data_reader = mh.ExodusReader(data_path)
+    sim_data = data_reader.read_all_sim_data()
+    # Scale to mm to make 3D visualisation scaling easier
+    sim_data.coords = sim_data.coords*1000.0 # type: ignore
+
+    descriptor = pyvale.SensorDescriptorFactory.displacement_descriptor()
+
+    spat_dims = 2
+    field_key = 'disp'
+    components = ('disp_x','disp_y')
+    disp_field = pyvale.FieldVector(sim_data,field_key,components,spat_dims)
+
+    #---------------------------------------------------------------------------
+    n_sens = (2,2,1)
+    x_lims = (0.0,100.0)
+    y_lims = (0.0,150.0)
+    z_lims = (0.0,0.0)
+    sensor_positions = pyvale.create_sensor_pos_array(n_sens,
+                                                      x_lims,
+                                                      y_lims,
+                                                      z_lims)
+
+    use_sim_time = False
+    if use_sim_time:
+        sample_times = None
+    else:
+        sample_times = np.linspace(0.0,np.max(sim_data.time),50)
+
+    sensor_angles = (Rotation.from_euler("zyx", [180, 0, 0], degrees=True),)
+
+    sensor_data_norot = pyvale.SensorData(positions=sensor_positions,
+                                          sample_times=sample_times)
+
+
+    sensor_data_rot = pyvale.SensorData(positions=sensor_positions,
+                                  sample_times=sample_times,
+                                  angles=sensor_angles)
+
+    #---------------------------------------------------------------------------
+    disp_sensors_norot = pyvale.SensorArrayPoint(sensor_data_norot,
+                                                disp_field,
+                                                descriptor)
+
+
+    disp_sensors_rot = pyvale.SensorArrayPoint(sensor_data_rot,
+                                               disp_field,
+                                               descriptor)
+
+
+    # angle_offset = np.zeros_like(sensor_positions)
+    # angle_offset[:,0] = 5.0 # only rotate about z in 2D
+    # #angle_error_data = pyvale.ErrFieldData(ang_offset_zyx=angle_offset)
+
+    # field_error_data = pyvale.ErrFieldData(ang_offset_zyx=angle_offset)
+
+    # error_chain = []
+    # error_chain.append(pyvale.ErrSysField(disp_field,field_error_data))
+    # error_integrator = pyvale.ErrIntegrator(error_chain,
+    #                                         sensor_data_rot,
+    #                                         disp_sensors.get_measurement_shape())
+
+    # disp_sensors.set_error_integrator(error_integrator)
+
+    measurements_norot = disp_sensors_norot.calc_measurements()
+    measurements_rot = disp_sensors_rot.calc_measurements()
+
+    #---------------------------------------------------------------------------
+    print(80*'-')
+    sens_num = 4
+    print('The last 5 time steps (measurements) of sensor {sens_num}:')
+    pyvale.print_measurements(disp_sensors_rot,
+                              (sens_num-1,sens_num),
+                              (0,1),
+                              (measurements_rot.shape[2]-5,measurements_rot.shape[2]))
+    print(80*'-')
+
+    plot_field = 'disp_x'
+
+    # if plot_field == 'disp_x':
+    #     pv_plot = pyvale.plot_point_sensors_on_sim(disp_sensors,'disp_x')
+    #     pv_plot.show(cpos="xy")
+    # elif plot_field == 'disp_y':
+    #     pv_plot = pyvale.plot_point_sensors_on_sim(disp_sensors,'disp_y')
+    #     pv_plot.show(cpos="xy")
+
+    (fig,ax) = pyvale.plot_time_traces(disp_sensors_norot,plot_field)
+    ax.set_title("No rotation")
+    (fig,ax) = pyvale.plot_time_traces(disp_sensors_rot,plot_field)
+    ax.set_title("Rotated")
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()

@@ -22,7 +22,7 @@ def plot_measurement_image(camera: CameraBasic2D,
     meas_image = camera.get_measurement_images()[:,:,comp_ind,time_step]
     descriptor = camera.get_descriptor()
 
-    (fig, ax) = plt.subplots(figsize=plot_opts.single_fig_size,
+    (fig, ax) = plt.subplots(figsize=plot_opts.single_fig_size_square,
                              layout='constrained')
     fig.set_dpi(plot_opts.resolution)
 

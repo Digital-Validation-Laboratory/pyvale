@@ -1,15 +1,15 @@
 #-------------------------------------------------------------------------------
 # pyvale ignore
-*.mp4
-*.gif
-dev/test_output/*
-
 # vscode / venv
 .vscode/
 .pyvale-env/
 
-# My temp code for checks
-check/
+# Output files
+*.png
+*.svg
+*.mp4
+*.gif
+dev/test_output/*
 
 # MOOSE / gmsh
 *-opt
@@ -18,17 +18,14 @@ check/
 
 # Keep these as they are used for examples
 !src/data/*.e
+!reports/images/*.png
+!reports/images/*.svg
 
 # Example output images
-src/examples/*.png
-src/examples/*.svg
-src/examples/figuregen/*.png
-src/examples/figuregen/*.svg
-
-dev/lfdev/*/*.png
-dev/lfdev/*/*.svg
-dev/lfdev/*.png
-dev/lfdev/*.svg
+src/pyvale/examples/*.png
+src/pyvale/examples/*.svg
+src/pyvale/examples/figuregen/*.png
+src/pyvale/examples/figuregen/*.svg
 
 # Image deformation test cases
 *.pkl

@@ -80,8 +80,13 @@ def build_sensor_data_from_camera(cam_data: CameraData2D) -> SensorData:
     for ii,vv in enumerate(cam_data.view_axes):
         positions[:,vv] = pixels_vectorised[ii] + cam_data.roi_shift_world[ii]
 
+    if cam_data.angle is None:
+        angle = None
+    else:
+        angle = (cam_data.angle,)
+
     sens_data = SensorData(positions=positions,
                            sample_times=cam_data.sample_times,
-                           angles=cam_data.angle)
+                           angles=angle)
 
     return sens_data

@@ -1,6 +1,13 @@
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
+- TESTING/FEATURE EXAMPLES:
+    - Chaining field errors
+    - Area averaging
+    - Sensor angles
+    - Visualisation tools
+    - Camera basic
+
 - BUGS!
     - Higher order mesh node numbering conversion from Exodus to VTK!
     https://github.com/Applied-Materials-Technology/pycoatl/blob/main/src/pycoatl/spatialdata/importsimdata.py
