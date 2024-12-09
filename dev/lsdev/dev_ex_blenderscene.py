@@ -36,9 +36,8 @@ def main() -> None:
     image_path = '/home/lorna/speckle_generator/images/blender_image_texture.tiff'
     mat = scene.add_material(mat_data, part, image_path)
 
-    sensor_px = (2452, 2056)
+    sensor_px = (2464, 2056)
     cam_position = (0, 0, 200)
-    # image_path = str(Path('dev/lsdev/rendered_images/blender_image_texture.tiff'))
     focal_length = 15.0
     cam_data = CameraData(sensor_px=sensor_px,
                           position=cam_position,

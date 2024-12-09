@@ -63,7 +63,7 @@ def main() -> None:
 
 
     render_data = RenderData(samples=1)
-    render = Render(render_data, image_path=image_path, output_path=output_path)
+    render = Render(render_data, image_path=image_path, output_path=output_path, cam_data=cam_data)
 
     render_counter = 0
     render_name = 'px_size_from_python'
