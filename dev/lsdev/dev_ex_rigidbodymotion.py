@@ -39,7 +39,7 @@ def main() -> None:
     image_path = '/home/lorna/speckle_generator/images/blender_image_texture_rad2.tiff'
     mat = scene.add_material(mat_data, part, image_path)
 
-    sensor_px = (2452, 2056)
+    sensor_px = (2464, 2056)
     cam_position = (0, 0, 200)
     focal_length = 15.0
     cam_data = CameraData(sensor_px=sensor_px,
@@ -59,12 +59,12 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # Rendering images
-    image_path = Path.cwd() / 'dev/lsdev/rendered_images/RBM_1-10px_cam-fixed'
+    image_path = Path.cwd() / 'dev/lsdev/rendered_images/RBM_1-5mm'
     output_path = Path.cwd() / 'dev/lsdev/rendered_images'
 
-    step = 0.04255
-    x_lims = [0, 0.04255 * 10]
-    rigidbodymotion = RigidBodyMotion(part, step, part_location, image_path, output_path)
+    step = 1
+    x_lims = [0, 5]
+    rigidbodymotion = RigidBodyMotion(part, step, part_location, image_path, output_path, cam_data)
     rigidbodymotion.rigid_body_motion_x(x_lims)
 
 if __name__ == "__main__":
