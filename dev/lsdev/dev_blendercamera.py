@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import numpy as np
+import math as m
 import bpy
 
 @dataclass
@@ -33,6 +34,22 @@ class CameraBlender():
         self.sensor_size[1] = (self.camera_data.sensor_px[1] *
                                            (self.camera_data.px_size / 1000 ))
 
+    def _calc_FOV_angle(self):
+        working_dist = np.sqrt(self.camera_data.position[0]**2 +
+                               self.camera_data.position[1]**2 +
+                               self.camera_data.position[2]**2)
+        FOV_mm = (((working_dist - self.camera_data.focal_length)
+                  / self.camera_data.focal_length) *
+                  (self.camera_data.px_size / 1000) *
+                  self.camera_data.sensor_px[0])
+        half_FOV_mm = FOV_mm / 2
+        half_FOV_rad = m.atan(half_FOV_mm / working_dist)
+        FOV_deg = m.degrees(half_FOV_rad) * 2
+        print(f"{FOV_deg=}")
+
+        return FOV_deg
+
+
     def add_camera(self):
         new_cam = bpy.data.cameras.new('Camera')
         camera = bpy.data.objects.new('Camera', new_cam)
@@ -60,7 +77,9 @@ class CameraBlender():
         else:
             camera['c1'] = self.camera_data.c1
 
-        new_cam.lens = self.camera_data.focal_length
+        new_cam.lens_unit = 'FOV' # Set using FOV instead of focal length as using focal length doesn't work
+        FOV = self._calc_FOV_angle()
+        new_cam.lens = self.sensor_size[0] / (2 * m.tan(m.radians(FOV) / 2)) # Need to set lens FOV like this as Blender recalculates
         new_cam.sensor_width = self.sensor_size[0]
         new_cam.sensor_height = self.sensor_size[1]
 
