@@ -1,8 +1,8 @@
 from multiprocessing import cpu_count
 from enum import Enum
 from dataclasses import dataclass
-from dev_blendercamera import CameraData
 import bpy
+from dev_blendercamera import CameraData
 
 class RenderEngine(Enum):
     """Different render engines on Blender
@@ -19,10 +19,11 @@ class RenderData:
 
 
 class Render:
-    def __init__(self, RenderData, image_path: str, output_path: str):
+    def __init__(self, RenderData, image_path: str, output_path: str, cam_data: CameraData):
         self.render_data = RenderData
         self.image_path = image_path
         self.output_path = output_path
+        self.cam_data = cam_data
         self.scene = bpy.data.scenes['Scene']
 
     def render_parameters(self,
@@ -31,8 +32,8 @@ class Render:
         bpy.context.scene.render.engine = self.render_data.engine.CYCLES.value
         bpy.context.scene.view_settings.look = 'AgX - Greyscale'
         bpy.context.scene.cycles.samples = self.render_data.samples
-        self.scene.render.resolution_x = CameraData.sensor_px[0]
-        self.scene.render.resolution_y = CameraData.sensor_px[1]
+        self.scene.render.resolution_x = self.cam_data.sensor_px[0]
+        self.scene.render.resolution_y = self.cam_data.sensor_px[1]
         self.scene.render.filepath =  str(self.image_path / file_name)
         self.scene.render.threads_mode = 'FIXED'
         self.scene.render.threads = cores
