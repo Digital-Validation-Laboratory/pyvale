@@ -21,8 +21,8 @@ class CameraData:
 
 
 class CameraBlender():
-    def __init__(self, CameraData):
-        self.camera_data = CameraData
+    def __init__(self, cam_data: CameraData):
+        self.camera_data = cam_data
         self.sensor_size = [0, 0]
         self._set_sensor_size()
 
