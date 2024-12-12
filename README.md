@@ -59,7 +59,7 @@ pip install -e .
 The examples folder in "src/pyvale/examples" includes a sequence of examples of increasing complexity that demonstrate the functionality of `pyvale`.
 
 ## Contributors
-The Digital Validation Team at UKAEA:
+The Computer Aided Validation Team at UKAEA:
 - Lloyd Fletcher, UK Atomic Energy Authority
 - Adel Tayeb, UK Atomic Energy Authority
 - Alex Marsh, UK Atomic Energy Authority

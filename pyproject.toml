@@ -25,7 +25,9 @@ dependencies = [
   "scipy==1.11.3",
   "shapely>=2.0.4",
   "sympy>=1.13.0",
-  "PyQT6>=6.7.1"
+  "PyQT6>=6.7.1",
+  "imageio>=2.36.1",
+  "imageio-ffmpeg>=0.5.1",
 ]
 
 [project.urls]

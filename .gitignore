@@ -9,7 +9,8 @@
 *.svg
 *.mp4
 *.gif
-dev/test_output/*
+dev/test_output/
+test_output/
 
 # MOOSE / gmsh
 *-opt
