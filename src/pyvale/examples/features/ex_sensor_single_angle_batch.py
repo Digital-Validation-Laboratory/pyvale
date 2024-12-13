@@ -7,7 +7,6 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 """
-from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation
@@ -18,8 +17,7 @@ def main() -> None:
     """pyvale example: tests that when only one sensor rotation is provided that
     all sensors are assumed to have the same rotation and batch processed.
     """
-    #---------------------------------------------------------------------------
-    data_path = Path("src/pyvale/data/case17_out.e")
+    data_path = pyvale.DataSet.mechanical_2d_path()
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier

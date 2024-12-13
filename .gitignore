@@ -10,8 +10,8 @@
 *.mp4
 *.gif
 *.tiff
-dev/test_output/
 test_output/
+example_output/
 
 # MOOSE / gmsh
 *-opt

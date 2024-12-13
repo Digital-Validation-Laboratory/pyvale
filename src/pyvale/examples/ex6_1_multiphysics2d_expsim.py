@@ -7,7 +7,6 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
-from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import mooseherder as mh
@@ -16,13 +15,12 @@ import pyvale
 def main() -> None:
     """pyvale example: thermo-mechanical multi-physics sensors on a 3D monoblock
     ----------------------------------------------------------------------------
+    - Demonstrates the experiment module for running many monte-carlo style
+      experiments and statistically analysing the results.
     """
-    #===========================================================================
     # Load Simulations as mooseherder.SimData objects
-    base_path = Path("src/pyvale/data")
-    data_paths = [base_path / 'case18_1_out.e',
-                  base_path / 'case18_2_out.e',
-                  base_path / 'case18_3_out.e']
+    #base_path = Path("src/pyvale/data")
+    data_paths = pyvale.DataSet.thermomechanical_3d_experiment_paths()
 
     sim_list = []
     for pp in data_paths:

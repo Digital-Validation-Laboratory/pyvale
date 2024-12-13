@@ -11,6 +11,8 @@ Copyright (C) 2024 The Computer Aided Validation Team
 
 from pyvale.imagesim import *
 
+from pyvale.dataset import *
+
 from pyvale.field import *
 from pyvale.fieldscalar import *
 from pyvale.fieldvector import *

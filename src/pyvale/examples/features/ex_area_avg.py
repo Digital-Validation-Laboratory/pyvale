@@ -7,7 +7,6 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 """
-from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import mooseherder as mh
@@ -19,7 +18,7 @@ def main() -> None:
     ----------------------------------------------------------------------------
     - Demonstrates area averaging for truth and for systematic errors
     """
-    data_path = Path("src/pyvale/data/case13_out.e")
+    data_path = pyvale.DataSet.thermal_2d_path()
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier

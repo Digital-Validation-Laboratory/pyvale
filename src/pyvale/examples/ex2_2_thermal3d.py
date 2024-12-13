@@ -7,7 +7,6 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
-from pathlib import Path
 import mooseherder as mh
 import pyvale
 
@@ -16,8 +15,7 @@ def main() -> None:
     """pyvale example: thermocouples on a 3D divertor monoblock heatsink
     ----------------------------------------------------------------------------
     """
-    # Use mooseherder to read the exodus and get a SimData object
-    data_path = Path('src/pyvale/data/case16_out.e')
+    data_path = pyvale.DataSet.thermal_3d_path()
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     field_name = 'temperature'

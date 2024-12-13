@@ -7,7 +7,6 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
-from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation as R
@@ -19,7 +18,7 @@ def main() -> None:
     ----------------------------------------------------------------------------
     - Demonstrates rotation of tensor fields
     """
-    data_path = Path('src/pyvale/data/case17_out.e')
+    data_path = pyvale.DataSet.mechanical_2d_path()
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier

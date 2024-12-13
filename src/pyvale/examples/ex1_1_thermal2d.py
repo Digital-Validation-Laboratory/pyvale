@@ -11,6 +11,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import mooseherder as mh
 import pyvale
+import pyvale.dataset
 
 
 def main() -> None:
@@ -22,8 +23,7 @@ def main() -> None:
       wrapper for pyvista and matplotlib.
     """
 
-    #data_path = Path("src/simcases/case18/case18_1_out.e")
-    data_path = Path("src/pyvale/data/case13_out.e")
+    data_path = pyvale.DataSet.thermal_2d_path()
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     field_key = "temperature"

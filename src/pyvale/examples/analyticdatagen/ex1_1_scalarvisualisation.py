@@ -12,7 +12,6 @@ import pyvale
 
 def main() -> None:
 
-
     (sim_data,data_gen) = pyvale.AnalyticCaseFactory.scalar_linear_2d()
 
     (grid_x,grid_y,grid_field) = data_gen.get_visualisation_grid()

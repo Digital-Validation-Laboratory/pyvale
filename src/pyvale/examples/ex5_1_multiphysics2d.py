@@ -7,7 +7,6 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
-from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import mooseherder as mh
@@ -20,7 +19,7 @@ def main() -> None:
     """
     #===========================================================================
     # Load Simulations as mooseherder.SimData objects
-    data_path = Path("src/pyvale/data/case18_1_out.e")
+    data_path = pyvale.DataSet.thermomechanical_3d_path()
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
