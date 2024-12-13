@@ -7,11 +7,11 @@ Copyright (C) 2024 The Computer Aided Validation Team
 '''
 from typing import Callable
 import numpy as np
-from pyvale.errorcalculator import (IErrCalculator,
+from pyvale.core.errorcalculator import (IErrCalculator,
                                     EErrType,
                                     EErrDependence)
-from pyvale.generatorsrandom import IGeneratorRandom
-from pyvale.sensordata import SensorData
+from pyvale.core.generatorsrandom import IGeneratorRandom
+from pyvale.core.sensordata import SensorData
 
 
 class ErrSysOffset(IErrCalculator):

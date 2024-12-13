@@ -7,10 +7,10 @@ Copyright (C) 2024 The Computer Aided Validation Team
 '''
 import numpy as np
 from scipy.spatial.transform import Rotation
-from pyvale.field import IField
+from pyvale.core.field import IField
 from pyvale.integratorspatial import (IIntegratorSpatial,
                                                 create_int_pt_array)
-from pyvale.sensordata import SensorData
+from pyvale.core.sensordata import SensorData
 
 # NOTE: code below is very similar to quadrature integrator should be able to
 # refactor into injected classes/functions

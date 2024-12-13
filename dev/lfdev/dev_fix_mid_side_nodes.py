@@ -7,7 +7,6 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
-import matplotlib.pyplot as plt
 import mooseherder as mh
 import pyvale
 
@@ -20,6 +19,11 @@ def main() -> None:
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
+
+    #---------------------------------------------------------------------------
+    
+
+    #---------------------------------------------------------------------------
 
     n_sens = (2,3,1)
     x_lims = (0.0,100.0)
@@ -38,10 +42,6 @@ def main() -> None:
     plot_field = 'disp_x'
     pv_plot = pyvale.plot_point_sensors_on_sim(disp_sens_array,plot_field)
     pv_plot.show(cpos="xy")
-
-    pyvale.plot_time_traces(disp_sens_array,'disp_x')
-    pyvale.plot_time_traces(disp_sens_array,'disp_y')
-    plt.show()
 
 
 if __name__ == "__main__":

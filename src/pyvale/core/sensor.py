@@ -7,7 +7,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 '''
 from abc import ABC, abstractmethod
 import numpy as np
-from pyvale.field import IField
+from pyvale.core.field import IField
 
 class ISensor(ABC):
     @abstractmethod

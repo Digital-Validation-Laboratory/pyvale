@@ -7,10 +7,10 @@ Copyright (C) 2024 The Computer Aided Validation Team
 '''
 from typing import Callable
 import numpy as np
-from pyvale.field import IField
+from pyvale.core.field import IField
 from pyvale.integratorspatial import (IIntegratorSpatial,
                                      create_int_pt_array)
-from pyvale.sensordata import SensorData
+from pyvale.core.sensordata import SensorData
 
 
 def create_gauss_weights_2d_4pts(meas_shape: tuple[int,int,int]) -> np.ndarray:

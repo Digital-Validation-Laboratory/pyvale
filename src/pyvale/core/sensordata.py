@@ -8,7 +8,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 from dataclasses import dataclass
 import numpy as np
 from scipy.spatial.transform import Rotation
-from pyvale.integratortype import EIntSpatialType
+from pyvale.core.integratortype import EIntSpatialType
 
 @dataclass(slots=True)
 class SensorData:

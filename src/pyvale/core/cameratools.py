@@ -7,8 +7,8 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 import numpy as np
-from pyvale.cameradata import CameraData2D
-from pyvale.sensordata import SensorData
+from pyvale.core.cameradata import CameraData2D
+from pyvale.core.sensordata import SensorData
 
 #-------------------------------------------------------------------------------
 def build_pixel_vec_px(cam_data: CameraData2D) -> tuple[np.ndarray,np.ndarray]:

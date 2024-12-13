@@ -9,7 +9,7 @@ from typing import Any
 
 import numpy as np
 import matplotlib.pyplot as plt
-from pyvale.sensorarraypoint import SensorArrayPoint
+from pyvale.core.sensorarraypoint import SensorArrayPoint
 from pyvale.visualopts import (PlotOptsGeneral,
                                     TraceOptsSensor,
                                     TraceOptsExperiment)

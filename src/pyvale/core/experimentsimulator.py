@@ -7,7 +7,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 '''
 from dataclasses import dataclass
 import numpy as np
-from pyvale.sensor import ISensor
+from pyvale.core.sensor import ISensor
 import mooseherder as mh
 
 

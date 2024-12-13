@@ -13,8 +13,8 @@ import pyvista as pv
 
 import mooseherder as mh
 
-from pyvale.sensorarraypoint import SensorArrayPoint
-from pyvale.field import conv_simdata_to_pyvista
+from pyvale.core.sensorarraypoint import SensorArrayPoint
+from pyvale.core.field import conv_simdata_to_pyvista
 from pyvale.visualopts import (VisOptsSimSensors,VisOptsImageSave)
 from pyvale.visualtools import (create_pv_plotter,
                                 get_colour_lims,

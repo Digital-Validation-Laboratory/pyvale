@@ -13,7 +13,7 @@ import numpy as np
 # See: https://github.com/pyvista/pyvista/discussions/2928
 #NOTE: causes output to console to be suppressed unfortunately
 import pyvista as pv
-from pyvale.sensorarraypoint import SensorArrayPoint
+from pyvale.core.sensorarraypoint import SensorArrayPoint
 from pyvale.visualopts import VisOptsSimSensors, VisOptsAnimation
 from pyvale.visualtools import (create_pv_plotter,
                                 get_colour_lims,
