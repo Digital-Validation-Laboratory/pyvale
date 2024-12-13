@@ -3,10 +3,6 @@
 
 ## TODO: `pyvale`
 - TESTING/FEATURE EXAMPLES:
-    - Chaining field errors
-    - Area averaging
-    - Sensor angles
-    - Visualisation tools
     - Camera basic
 
 - BUGS!
@@ -15,8 +11,7 @@
     - Spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
 
 - TODO PRIORITY:
-    - Create option to specify single rotation for all point sensors - links to camerabasic
-        - Build Rory's simple DIC strain filter on top of the basic camera
+    - Build Rory's simple DIC strain filter on top of the basic camera
     - Visualisation tools for perturbed field errors:
         - Angle
     - Visualisation tools for animating sensor traces
@@ -24,10 +19,6 @@
     - Finish basic camera
 
 - TODO: EXAMPLES
-    - Example showing calibration errors
-    - Example showing area averaging as ground truth
-        - With and without area averaging as follow up error
-    - Example showing field error chain with other errors and extraction of perturbed sensor data
     - Example showing a basic camera
 
 - TODO: ErrorIntegrator

@@ -9,6 +9,7 @@
 *.svg
 *.mp4
 *.gif
+*.tiff
 dev/test_output/
 test_output/
 
@@ -18,15 +19,10 @@ test_output/
 *.msh
 
 # Keep these as they are used for examples
-!src/data/*.e
+!src/pyvale/data/*.tiff
+!src/pyvale/data/*.e
 !reports/images/*.png
 !reports/images/*.svg
-
-# Example output images
-src/pyvale/examples/*.png
-src/pyvale/examples/*.svg
-src/pyvale/examples/figuregen/*.png
-src/pyvale/examples/figuregen/*.svg
 
 # Image deformation test cases
 *.pkl

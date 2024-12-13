@@ -34,5 +34,10 @@ dependencies = [
 "Repository" = "https://github.com/Digital-Validation-Laboratory/pyvale"
 "Issue Tracker" = "https://github.com/Digital-Validation-Laboratory/pyvale/issues"
 
+
+[tool.setuptools.package-data]
+"pyvale.data" = ["*.e","*.tiff"]
+"pyvale.simcases" = ["*.i","*.geo"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
