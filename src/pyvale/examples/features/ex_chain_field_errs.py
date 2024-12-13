@@ -1,4 +1,4 @@
-'''
+"""
 ================================================================================
 example: displacement sensors on a 2d plate
 
@@ -6,7 +6,7 @@ pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,7 +14,7 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
-    data_path = Path('src/data/case17_out.e')
+    data_path = Path("src/pyvale/data/case17_out.e")
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier
@@ -23,8 +23,8 @@ def main() -> None:
     descriptor = pyvale.SensorDescriptorFactory.displacement_descriptor()
 
     spat_dims = 2
-    field_key = 'disp'
-    components = ('disp_x','disp_y')
+    field_key = "disp"
+    components = ("disp_x","disp_y")
     disp_field = pyvale.FieldVector(sim_data,field_key,components,spat_dims)
 
     n_sens = (2,3,1)
@@ -97,7 +97,7 @@ def main() -> None:
                 print()
                 print("ANGLES")
                 for aa in ss.angles:
-                    print(aa.as_euler('zyx',degrees=True))
+                    print(aa.as_euler("zyx",degrees=True))
                 print()
             print(80*"-")
 
@@ -112,31 +112,30 @@ def main() -> None:
     print()
     print("ANGLES")
     for aa in sens_data_accumulated.angles:
-        print(aa.as_euler('zyx',degrees=True))
+        print(aa.as_euler("zyx",degrees=True))
     print()
     print(80*"=")
 
-    print(80*'-')
+    print(80*"-")
     sens_num = 4
-    print('The last 5 time steps (measurements) of sensor {sens_num}:')
+    print("The last 5 time steps (measurements) of sensor {sens_num}:")
     pyvale.print_measurements(disp_sens_array,
                               (sens_num-1,sens_num),
                               (0,1),
                               (measurements.shape[2]-5,measurements.shape[2]))
-    print(80*'-')
+    print(80*"-")
 
+    plot_field = "disp_x"
 
-    # plot_field = 'disp_x'
-    # if plot_field == 'disp_x':
-    #     pv_plot = pyvale.plot_point_sensors_on_sim(disp_sens_array,'disp_x')
-    #     pv_plot.show()
-    # elif plot_field == 'disp_y':
-    #     pv_plot = pyvale.plot_point_sensors_on_sim(disp_sens_array,'disp_y')
-    #     pv_plot.show()
+    if plot_field == "disp_x":
+        pv_plot = pyvale.plot_point_sensors_on_sim(disp_sens_array,"disp_x")
+        pv_plot.show()
+    elif plot_field == "disp_y":
+        pv_plot = pyvale.plot_point_sensors_on_sim(disp_sens_array,"disp_y")
+        pv_plot.show()
 
-    return
-    pyvale.plot_time_traces(disp_sens_array,'disp_x')
-    pyvale.plot_time_traces(disp_sens_array,'disp_y')
+    pyvale.plot_time_traces(disp_sens_array,"disp_x")
+    pyvale.plot_time_traces(disp_sens_array,"disp_y")
     plt.show()
 
 

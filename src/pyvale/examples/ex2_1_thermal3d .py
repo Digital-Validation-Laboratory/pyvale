@@ -14,7 +14,8 @@ import pyvale
 
 
 def main() -> None:
-    """pyvale example:
+    """pyvale example: thermocouples on a 3D divertor monoblock heatsink
+    ----------------------------------------------------------------------------
     """
     data_path = Path('src/pyvale/data/case16_out.e')
     data_reader = mh.ExodusReader(data_path)

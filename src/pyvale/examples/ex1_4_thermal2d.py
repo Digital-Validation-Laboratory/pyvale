@@ -1,4 +1,4 @@
-'''
+"""
 ================================================================================
 Example: thermocouples on a 2d plate
 
@@ -6,7 +6,7 @@ pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,11 +15,12 @@ import pyvale
 
 
 def main() -> None:
-    """Pyvale example: Point sensors on a 2D thermal simulation
+    """pyvale example: point sensors on a 2D thermal simulation
     ----------------------------------------------------------------------------
-    -
+    - Demonstrates options for controlling plots of points sensor traces using
+      matplotlib
     """
-    data_path = Path('src/pyvale/data/case13_out.e')
+    data_path = Path("src/pyvale/data/case13_out.e")
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     field_key = list(sim_data.node_vars.keys())[0] # type: ignore
@@ -50,13 +51,13 @@ def main() -> None:
 
     measurements = tc_array.get_measurements()
 
-    print(80*'-')
-    print('Looking at the last 5 time steps (measurements) of sensor 0:')
+    print(80*"-")
+    print("Looking at the last 5 time steps (measurements) of sensor 0:")
     pyvale.print_measurements(tc_array,
                               (0,1),
                               (0,1),
                               (measurements.shape[2]-5,measurements.shape[2]))
-    print(80*'-')
+    print(80*"-")
 
     trace_props = pyvale.TraceOptsSensor()
 
@@ -64,9 +65,9 @@ def main() -> None:
     trace_props.sim_line = None
     pyvale.plot_time_traces(tc_array,field_key,trace_props)
 
-    trace_props.meas_line = '--o'
-    trace_props.truth_line = '-x'
-    trace_props.sim_line = ':+'
+    trace_props.meas_line = "--o"
+    trace_props.truth_line = "-x"
+    trace_props.sim_line = ":+"
     pyvale.plot_time_traces(tc_array,field_key,trace_props)
 
     trace_props.sensors_to_plot = np.arange(measurements.shape[0]-2
@@ -86,5 +87,5 @@ def main() -> None:
     pv_plot.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

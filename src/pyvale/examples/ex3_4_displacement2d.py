@@ -1,4 +1,4 @@
-'''
+"""
 ================================================================================
 Example: displacement sensors on a 2d plate
 
@@ -6,7 +6,7 @@ pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,10 +15,11 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
-    """pyvale example:
+    """pyvale example: displacement sensors on a 2D plate with a hole
+    ----------------------------------------------------------------------------
     """
     #---------------------------------------------------------------------------
-    data_path = Path('src/pyvale/data/case17_out.e')
+    data_path = Path("src/pyvale/data/case17_out.e")
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier
@@ -27,8 +28,8 @@ def main() -> None:
     descriptor = pyvale.SensorDescriptorFactory.displacement_descriptor()
 
     spat_dims = 2
-    field_key = 'disp'
-    components = ('disp_x','disp_y')
+    field_key = "disp"
+    components = ("disp_x","disp_y")
     disp_field = pyvale.FieldVector(sim_data,field_key,components,spat_dims)
 
     #---------------------------------------------------------------------------
@@ -63,14 +64,11 @@ def main() -> None:
 
     pos_offset = -10.0*np.ones_like(sensor_positions)
     pos_offset[:,2] = 0 # in 2d we only have offset in x and y so zero z
-    #pos_error_data = pyvale.ErrFieldData(pos_offset_xyz=pos_offset)
 
     angle_offset = np.zeros_like(sensor_positions)
     angle_offset[:,0] = 5.0 # only rotate about z in 2D
-    #angle_error_data = pyvale.ErrFieldData(ang_offset_zyx=angle_offset)
 
     time_offset = 1.0*np.ones_like(disp_sensors.get_sample_times())
-    #time_error_data = pyvale.ErrFieldData(time_offset=time_offset)
 
     field_error_data = pyvale.ErrFieldData(pos_offset_xyz=pos_offset,
                                            ang_offset_zyx=angle_offset,
@@ -87,26 +85,23 @@ def main() -> None:
     measurements = disp_sensors.calc_measurements()
 
     #---------------------------------------------------------------------------
-    print(80*'-')
+    print(80*"-")
     sens_num = 4
-    print('The last 5 time steps (measurements) of sensor {sens_num}:')
+    print("The last 5 time steps (measurements) of sensor {sens_num}:")
     pyvale.print_measurements(disp_sensors,
                               (sens_num-1,sens_num),
                               (0,1),
                               (measurements.shape[2]-5,measurements.shape[2]))
-    print(80*'-')
+    print(80*"-")
 
-    plot_field = 'disp_x'
-    if plot_field == 'disp_x':
-        pv_plot = pyvale.plot_point_sensors_on_sim(disp_sensors,'disp_x')
-        pv_plot.show(cpos="xy")
-    elif plot_field == 'disp_y':
-        pv_plot = pyvale.plot_point_sensors_on_sim(disp_sensors,'disp_y')
-        pv_plot.show(cpos="xy")
+    #---------------------------------------------------------------------------
+    plot_field = "disp_x"
 
-    # pyvale.plot_time_traces(disp_sensors,plot_field)
-    # pyvale.plot_time_traces(disp_sensors,plot_field)
-    # plt.show()
+    pv_plot = pyvale.plot_point_sensors_on_sim(disp_sensors,plot_field)
+    pv_plot.show(cpos="xy")
+
+    pyvale.plot_time_traces(disp_sensors,plot_field)
+    plt.show()
 
 
 if __name__ == "__main__":

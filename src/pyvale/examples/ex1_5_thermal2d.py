@@ -15,7 +15,7 @@ import pyvale
 
 
 def main() -> None:
-    """pyvale example: Point sensors on a 2D thermal simulation
+    """pyvale example: point sensors on a 2D thermal simulation
     ----------------------------------------------------------------------------
     """
     data_path = Path('src/pyvale/data/case13_out.e')

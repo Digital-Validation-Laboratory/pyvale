@@ -14,6 +14,9 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
+    """pyvale example: thermo-mechanical multi-physics sensors on a 3D monoblock
+    ----------------------------------------------------------------------------
+    """
     #===========================================================================
     # Load Simulations as mooseherder.SimData objects
     base_path = Path("src/pyvale/data")

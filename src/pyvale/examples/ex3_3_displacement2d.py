@@ -15,7 +15,9 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
-    """pyvale example: rotation of vector field sensors
+    """pyvale example: displacement sensors on a 2D plate with a hole
+    ----------------------------------------------------------------------------
+    - Demonstrates sensor rotation for vector fields
     """
     data_path = Path('src/pyvale/data/case17_out.e')
     data_reader = mh.ExodusReader(data_path)

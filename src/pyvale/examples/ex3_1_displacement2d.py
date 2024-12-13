@@ -13,7 +13,8 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
-    """pyvale example:
+    """pyvale example: displacement sensors on a 2D plate with a hole
+    ----------------------------------------------------------------------------
     """
     data_path = Path('src/pyvale/data/case17_out.e')
     data_reader = mh.ExodusReader(data_path)

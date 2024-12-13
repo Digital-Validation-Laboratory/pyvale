@@ -13,7 +13,8 @@ import pyvale
 
 
 def main() -> None:
-    """pyvale example:
+    """pyvale example: thermocouples on a 3D divertor monoblock heatsink
+    ----------------------------------------------------------------------------
     """
     # Use mooseherder to read the exodus and get a SimData object
     data_path = Path('src/pyvale/data/case16_out.e')

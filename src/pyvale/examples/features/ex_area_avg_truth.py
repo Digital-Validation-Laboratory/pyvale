@@ -1,6 +1,6 @@
 """
 ================================================================================
-Example: thermocouples on a 2d plate
+example: thermocouples on a 2d plate
 
 pyvale: the python validation engine
 License: MIT
@@ -15,12 +15,8 @@ import pyvale
 
 
 def main() -> None:
-    """pyvale example: Point sensors on a 2D thermal simulation
+    """pyvale example: thermocouples on a 2d plate
     ----------------------------------------------------------------------------
-    - Full construction of a point sensor array from scratch
-    - Explanation of the different types of error models
-    - There are flags throughout the example allowing the user to toggle on/off
-      parts of the sensor array construction
     """
     data_path = Path("src/pyvale/data/case13_out.e")
     data_reader = mh.ExodusReader(data_path)
@@ -28,17 +24,7 @@ def main() -> None:
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore
 
-    use_auto_descriptor = "blank"
-    if use_auto_descriptor == "factory":
-        descriptor = pyvale.SensorDescriptorFactory.temperature_descriptor()
-    elif use_auto_descriptor == "manual":
-        descriptor = pyvale.SensorDescriptor()
-        descriptor.name = "Temperature"
-        descriptor.symbol = "T"
-        descriptor.units = r"^{\circ}C"
-        descriptor.tag = "TC"
-    else:
-        descriptor = pyvale.SensorDescriptor()
+    descriptor = pyvale.SensorDescriptorFactory.temperature_descriptor()
 
     field_key = "temperature"
     t_field = pyvale.FieldScalar(sim_data,
@@ -51,44 +37,32 @@ def main() -> None:
     z_lims = (0.0,0.0)
     sens_pos = pyvale.create_sensor_pos_array(n_sens,x_lims,y_lims,z_lims)
 
-    use_sim_time = False
+    use_sim_time = True
     if use_sim_time:
         sample_times = None
     else:
         sample_times = np.linspace(0.0,np.max(sim_data.time),50)
 
     sensor_data = pyvale.SensorData(positions=sens_pos,
-                                   sample_times=sample_times)
+                                   sample_times=sample_times,
+                                   spatial_averager=pyvale.EIntSpatialType.QUAD4PT,
+                                   spatial_dims=np.array([10.0,10.0,0]))
 
     tc_array = pyvale.SensorArrayPoint(sensor_data,
                                        t_field,
                                        descriptor)
 
-    errors_on = {"indep_sys": True,
-                 "rand": True,
-                 "dep_sys": True}
+    #spat_int_err = pyvale.IntegratorSpatialFactory.rect_2d_1pt(t_field,sensor_data)
 
-    error_chain = []
-    if errors_on["indep_sys"]:
-        error_chain.append(pyvale.ErrSysOffset(offset=-5.0))
-        error_chain.append(pyvale.ErrSysUniform(low=-5.0,
-                                                high=5.0))
+    # sys_errs = []
+    # sys_errs.append(pyvale.ErrSysSpatialAverage(t_field,
+    #                                             spat_int_err,
+    #                                             sample_times))
 
-    if errors_on["rand"]:
-        error_chain.append(pyvale.ErrRandNormPercent(std_percent=1.0))
-        error_chain.append(pyvale.ErrRandUnifPercent(low_percent=-1.0,
-                                            high_percent=1.0))
+    # indep_sys_err_int = pyvale.ErrIntegrator(sys_errs,
+    #                                     tc_array.get_measurement_shape())
 
-    if errors_on["dep_sys"]:
-        error_chain.append(pyvale.ErrSysDigitisation(bits_per_unit=2**8/100))
-        error_chain.append(pyvale.ErrSysSaturation(meas_min=0.0,meas_max=300.0))
-
-    if len(error_chain) > 0:
-        error_integrator = pyvale.ErrIntegrator(error_chain,
-                                                  sensor_data,
-                                                  tc_array.get_measurement_shape())
-        tc_array.set_error_integrator(error_integrator)
-
+    # tc_array.set_systematic_err_integrator_independent(indep_sys_err_int)
 
     measurements = tc_array.get_measurements()
 
@@ -104,7 +78,7 @@ def main() -> None:
     pyvale.print_measurements(tc_array,
                               (0,1),
                               (0,1),
-                              (measurements.shape[2]-5,measurements.shape[2]))
+                              (0,10))
     print(80*"-")
 
     pyvale.plot_time_traces(tc_array,field_key)
