@@ -1,38 +1,37 @@
+
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
-
-- TODO PRIORITY:
-    - Visualisation tools for perturbed field errors:
-        - Perturbed pos, time, angle
+- TESTING/FEATURE EXAMPLES:
+    - Camera basic
 
 - BUGS!
-NOTE: spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
+    - Higher order mesh node numbering conversion from Exodus to VTK!
+    https://github.com/Applied-Materials-Technology/pycoatl/blob/main/src/pycoatl/spatialdata/importsimdata.py
+    - Spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
+
+- TODO PRIORITY:
+    - Build Rory's simple DIC strain filter on top of the basic camera
+    - Visualisation tools for perturbed field errors:
+        - Angle
+    - Visualisation tools for animating sensor traces
+    - Visualisation tools for subplots of multiple sensors?
+    - Finish basic camera
 
 - TODO: EXAMPLES
-    - Example showing area averaging as ground truth
-    - Example showing field error chain with other errors and extraction of perturbed sensor data
+    - Example showing a basic camera
 
 - TODO: ErrorIntegrator
     - Simplify the memory efficient and non-memory efficient options
 
-- TODO: Experiment generator/ runner
-    - TODO: Allow user to extract all sources of error for each experiment, need to dig out of `ErrorIntegrator`
-    - TODO: Create example connecting to `mooseherder`, assume user provides `mooseherder` like array of simulations
-    - TODO: Increase plotting capabilities to compare over simulations as well as all sensors on experiments
-
 - TODO: visualisation tools for:
     - TODO: remove methods from sensor descriptor data class
-    - TODO: presentation animations - create pyvista animation synced to matplotlib traces
-    - TODO: visualisation of perturbed time / sensor locations
+    - TODO: presentation animations - animate traces
     - TODO: experiment - allow extraction of different conditions for comparison plots
     - TODO: visualise all components of vector / tensor field
         - See this example for subplots: https://docs.pyvista.org/examples/02-plot/cmap#sphx-glr-examples-02-plot-cmap-py
 
 - TODO: Field based errors:
-    - HALF DONE: Spatial averaging error
-        - Set an integration area
-        - Set a weighting function
     - TODO: Temporal averaging error
         - Set an integration time
         - Set a weighting function
@@ -51,64 +50,6 @@ NOTE: spatial averaging with rectangle or quadrature makes assumptions about sen
 
 - TESTING:
     - Need to check rotations are consistent
-
-Gauss Quadrature for the Unit Disc
-http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubature-formulas-for-the-unit-disk/
-
-## Python coding pinciples:
-- Use git and the Ruff linter
-- Use descriptive variable names, no single letter variables (double letters for iterators in numpy style are ok)
-- Avoid comments unless needed to explain something weird (like 1 vs 0 indexing) – the code and variable names should speak for themselves
-- Work in your own 'feature' branch, pull to 'dev' - don't push to main (at least it should be protected)!
-- Type hint everything: e.g. 'def add_ints(a: int, b: int) -> int:'
-- Default mutable data types to None
-- Numpy is your friend - avoid for/while loops
-- No inheritance unless it is an interface (python ABC or protocol) - use composition / dependency injection
-- Only have one layer of abstraction - don't inherit from multiple layers of interfaces and don't use mix ins.
-- Only use abstraction/interfaces when if/else or switch has at least 3 layers and/or becomes annoying
-- Use a mixture of plain functions and classes with methods where and when they make sense
-- Avoid decorators unless absolutely necessary
-- Write good docstrings when the code is ready for sharing – use auto docstring to help.
-- Write some good quickstart examples so people can easily use your code
-- Use code reviews to help each other and be nice / constructive as we are not all software engineers!
-
-## `pyvale` architecture
-- Module: `ExperimentWorkflow`
-    - Manages and builds the overall workflow
-- Module: `Sampler`
-    - Samples from various distributions using monte carlo or latin hypercube
-    - Separates espitemic and aleatory errors? - might not be needed
-- Module: `RandErrGenerator`= Enhanced uncertainty function generation for random errors focusing on point sensors including:
-    - Specification of noise as a function/percentage of sensor measurement value
-- Module: `ErrSysGenerator` = Enhanced uncertainty function generation for systematic errors focusing on point sensors including:
-    - Calibration errors
-    - Digitisation errors
-    - Positioning errors
-    - Spatial averaging errors
-    - Temporal averaging errors
-    - Ability to collapse all of the above into a single empirical/probability density function
-- Module: `SensorLibrary` = Developement of library sensor models.
-    - ABC: `SensorArray`
-    - Module: `ThermocoupleArray`
-    - Module: `CameraSensor`= Developement of simplified camera sensor models for:
-        - Infrared cameras measuring temperature fields
-        - Digital image correlation measuring displacement field on a surface
-- ABC: `Field` - might not be able to be an ABC because scalar vs vector is quite different
-    - Module: `ScalarField`
-    - Module: `VectorField`
-    - **Ext**, Module: `TensorField`
-    - **Ext**, How do these reconstruct fields from sparse values? e.g. using GPs
-
-- Module: `Validator` = A toolbox for calculating validation metrics from sensor data (simulated or real)
-    - Applicable to point sensors for thermal fields
-    - **Ext** Applicable to camera sensors for thermal fields
-- Testing: A software test suite for point sensor functionality after completion of the additional features.
-- Documentation: and worked examples using the following test cases:
-    - Thermo-mechanical analysis of a simple 2D plate
-    - Thermo-mechanical analysis of a 3D divertor monoblock model
-- Modules: `Calibrator` and `Optimiser`
-    - Based on Adel's thermocouple optimiser
-    - Optimiser wraps `pymoo`
 
 ## Sensors
 A sensor should have:
@@ -160,6 +101,9 @@ t = 0.5*(x + 1)*(b - a) + a
 and then scale the quadrature formula by (b - a)/2:
 
 gauss = sum(w * f(t)) * 0.5*(b - a)
+
+Gauss Quadrature for the Unit Disc
+http://www.holoborodko.com/pavel/numerical-methods/numerical-integration/cubature-formulas-for-the-unit-disk/
 
 ## Pyvista Cameras
 Tested on monoblock sim:

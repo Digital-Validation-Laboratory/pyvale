@@ -2,7 +2,7 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Digital Validation Team
+Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 from abc import ABC, abstractmethod
@@ -123,14 +123,13 @@ def sample_pyvista(components: tuple,
     for ii,cc in enumerate(components):
         sample_at_sim_time[:,ii,:] = np.array(sample_data[cc])
 
-
     # If sensor times are sim times then we return
     if times is None:
         return sample_at_sim_time
 
     # Use linear interpolation to extract sensor times
     def sample_time_interp(x):
-        return np.interp(times, time_steps, x) # type: ignore
+        return np.interp(times, time_steps, x)
 
     n_time_steps = times.shape[0]
     sample_at_spec_time = np.empty((n_sensors,n_comps,n_time_steps))

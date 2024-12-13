@@ -3,7 +3,7 @@
 pyvale: the python computer aided validation engine
 
 License: MIT
-Copyright (C) 2024 The Digital Validation Team
+Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 """
 import time
@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import mooseherder as mh
 
 from pyvale.imagesim.imagedefopts import ImageDefOpts
-from pyvale.imagesim.cameradata import CameraData
+from pyvale.imagesim.cameradataimagedef import CameraImageDef
 import pyvale.imagesim.imagedef as sid
 import pyvale.imagesim.imagedefdiags as idd
 
@@ -114,7 +114,7 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # CREATE CAMERA OBJECT
-    camera = CameraData()
+    camera = CameraImageDef()
     # Need to set the number of pixels in [X,Y], the bit depth and the m/px
 
     # Assume the camera has the same number of pixels as the input image unless we

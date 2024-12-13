@@ -2,14 +2,14 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Digital Validation Team
+Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 from typing import Any
 
 import numpy as np
 import matplotlib.pyplot as plt
-from pyvale.visualplotopts import (PlotOptsGeneral,
+from pyvale.visualopts import (PlotOptsGeneral,
                                    TraceOptsExperiment)
 from pyvale.experimentsimulator import ExperimentSimulator
 
@@ -42,7 +42,7 @@ def plot_exp_traces(exp_sim: ExperimentSimulator,
 
     #---------------------------------------------------------------------------
     # Figure canvas setup
-    fig, ax = plt.subplots(figsize=plot_opts.single_fig_size,
+    fig, ax = plt.subplots(figsize=plot_opts.single_fig_size_landscape,
                            layout='constrained')
     fig.set_dpi(plot_opts.resolution)
 
