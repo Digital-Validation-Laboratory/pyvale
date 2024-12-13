@@ -6,6 +6,7 @@
 - Type hint everything: e.g. `def add_ints(a: int, b: int) -> int:`. This makes your code easier to understand and you have the possibility of compiling things if you need.
 - Use guard clauses (if statements) with returns at the top of functions to reduce the number of nested if/else structures.
 - `pylint` is a slow linter but will help you if you have type hinted everything.
+- Follow the PEP8 style guide: https://peps.python.org/pep-0008/ 
 - Default mutable data types to `None`.
 - Use `pathlib` and the `Path` class to manage all file io in preference to manual string handling or the `os` module.
 - `numpy` and `scipy` are your friend - avoid for/while loops.
