@@ -1,3 +1,4 @@
+
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
@@ -12,11 +13,10 @@
     - Higher order mesh node numbering conversion from Exodus to VTK!
     https://github.com/Applied-Materials-Technology/pycoatl/blob/main/src/pycoatl/spatialdata/importsimdata.py
     - Spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
-    - Revert to python3.11 for compatibility with blender python
 
 - TODO PRIORITY:
     - Create option to specify single rotation for all point sensors - links to camerabasic
-        - Build Rory's cimple DIC strain filter on top of the basic camera
+        - Build Rory's simple DIC strain filter on top of the basic camera
     - Visualisation tools for perturbed field errors:
         - Angle
     - Visualisation tools for animating sensor traces
