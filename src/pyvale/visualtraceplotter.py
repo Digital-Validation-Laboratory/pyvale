@@ -2,7 +2,7 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Digital Validation Team
+Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 from typing import Any
@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 import matplotlib.pyplot as plt
 from pyvale.sensorarraypoint import SensorArrayPoint
-from pyvale.visualplotopts import (PlotOptsGeneral,
+from pyvale.visualopts import (PlotOptsGeneral,
                                     TraceOptsSensor,
                                     TraceOptsExperiment)
 from pyvale.experimentsimulator import ExperimentSimulator
@@ -22,13 +22,16 @@ def plot_time_traces(sensor_array: SensorArrayPoint,
                      plot_opts: PlotOptsGeneral | None = None
                      ) -> tuple[Any,Any]:
 
+    #---------------------------------------------------------------------------
     field = sensor_array.field
     comp_ind = sensor_array.field.get_component_index(component)
     samp_time = sensor_array.get_sample_times()
     measurements = sensor_array.get_measurements()
     n_sensors = sensor_array.sensor_data.positions.shape[0]
     descriptor = sensor_array.descriptor
+    sensors_perturbed = sensor_array.get_sensor_data_perturbed()
 
+    #---------------------------------------------------------------------------
     if plot_opts is None:
         plot_opts = PlotOptsGeneral()
 
@@ -40,7 +43,7 @@ def plot_time_traces(sensor_array: SensorArrayPoint,
 
     #---------------------------------------------------------------------------
     # Figure canvas setup
-    fig, ax = plt.subplots(figsize=plot_opts.single_fig_size,
+    fig, ax = plt.subplots(figsize=plot_opts.single_fig_size_landscape,
                            layout='constrained')
     fig.set_dpi(plot_opts.resolution)
 
@@ -75,7 +78,12 @@ def plot_time_traces(sensor_array: SensorArrayPoint,
     sensor_tags = descriptor.create_sensor_tags(n_sensors)
     for ss in range(n_sensors):
         if ss in trace_opts.sensors_to_plot:
-            ax.plot(samp_time,
+            sensor_time = samp_time
+            if sensors_perturbed is not None:
+                if sensors_perturbed.sample_times is not None:
+                    sensor_time = sensors_perturbed.sample_times
+
+            ax.plot(sensor_time,
                     measurements[ss,comp_ind,:],
                     trace_opts.meas_line,
                     label=sensor_tags[ss],
@@ -91,7 +99,9 @@ def plot_time_traces(sensor_array: SensorArrayPoint,
                 fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
 
     if trace_opts.time_min_max is None:
-        ax.set_xlim((np.min(samp_time),np.max(samp_time))) # type: ignore
+        min_time = np.min((np.min(samp_time),np.min(sensor_time)))
+        max_time = np.max((np.max(samp_time),np.max(sensor_time)))
+        ax.set_xlim((min_time,max_time)) # type: ignore
     else:
         ax.set_xlim(trace_opts.time_min_max)
 
@@ -132,7 +142,7 @@ def plot_exp_traces(exp_sim: ExperimentSimulator,
 
     #---------------------------------------------------------------------------
     # Figure canvas setup
-    fig, ax = plt.subplots(figsize=plot_opts.single_fig_size,
+    fig, ax = plt.subplots(figsize=plot_opts.single_fig_size_landscape,
                            layout='constrained')
     fig.set_dpi(plot_opts.resolution)
 

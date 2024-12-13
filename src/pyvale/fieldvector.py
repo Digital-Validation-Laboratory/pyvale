@@ -2,7 +2,7 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Digital Validation Team
+Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 import numpy as np
@@ -11,8 +11,12 @@ from scipy.spatial.transform import Rotation
 import mooseherder as mh
 
 from pyvale.field import (IField,
-                                  conv_simdata_to_pyvista,
-                                  sample_pyvista)
+                          conv_simdata_to_pyvista,
+                          sample_pyvista)
+from pyvale.fieldtransform import (transform_vector_2d,
+                                   transform_vector_2d_batch,
+                                   transform_vector_3d,
+                                   transform_vector_3d_batch)
 
 class FieldVector(IField):
     __slots__ = ("_field_key","_components","_spat_dims","_sim_data",
@@ -79,14 +83,31 @@ class FieldVector(IField):
         # TRANSFORMATION= coords rotate with object fixed
         # For Z transformation: sin negative in row 2, transpose scipy mat.
 
-        #  Need to rotate each sensor using individual rotation = loop :(
-        for ii,rr in enumerate(angles):
-            rmat = rr.as_matrix().T
+        # If we only have one angle we assume all sensors have the same angle
+        # and we can batch process the rotations
+        if len(angles) == 1:
+            rmat = angles[0].as_matrix().T
 
+            #TODO: assumes 2D in the x-y plane
             if self._spat_dims == 2:
                 rmat = rmat[:2,:2]
+                field_data = transform_vector_2d_batch(rmat,field_data)
+            else:
+                field_data = transform_vector_3d_batch(rmat,field_data)
 
-            field_data[ii,:,:] = np.matmul(rmat,field_data[ii,:,:])
+        else: # Need to rotate each sensor using individual rotation = loop :(
+            #TODO: assumes 2D in the x-y plane
+            if self._spat_dims == 2:
+                for ii,rr in enumerate(angles):
+                    rmat = rr.as_matrix().T
+                    rmat = rmat[:2,:2]
+                    field_data[ii,:,:] = transform_vector_2d(rmat,field_data[ii,:,:])
 
+            else:
+                for ii,rr in enumerate(angles):
+                    rmat = rr.as_matrix().T
+                    field_data[ii,:,:] = transform_vector_3d(rmat,field_data[ii,:,:])
+
+            #field_data[ii,:,:] = np.matmul(rmat,field_data[ii,:,:])
         return field_data
 

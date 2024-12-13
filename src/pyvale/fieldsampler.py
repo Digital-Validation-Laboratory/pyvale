@@ -2,7 +2,7 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Digital Validation Team
+Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 import numpy as np
@@ -20,6 +20,8 @@ def sample_field_with_sensor_data(field: IField, sensor_data: SensorData
 
     spatial_integrator = build_spatial_averager(field,sensor_data)
     return spatial_integrator.calc_averages()
+
+
 
 
 

@@ -2,11 +2,11 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Digital Validation Team
+Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 import numpy as np
-
+import mooseherder as mh
 from pyvale.sensorarraypoint import SensorArrayPoint
 
 
@@ -71,4 +71,17 @@ def print_measurements(sens_array: SensorArrayPoint,
         print(f"total errors = \n    {print_syserrs}")
 
     print()
+
+
+def print_dimensions(sim_data: mh.SimData) -> None:
+
+    print(80*"-")
+    print(f"x [min,max] = [{np.min(sim_data.coords[:,0])}," + \
+          f"{np.max(sim_data.coords[:,0])}]")
+    print(f"y [min,max] = [{np.min(sim_data.coords[:,1])}," + \
+          f"{np.max(sim_data.coords[:,1])}]")
+    print(f"z [min,max] = [{np.min(sim_data.coords[:,2])}," + \
+          f"{np.max(sim_data.coords[:,2])}]")
+    print(f"t [min,max] = [{np.min(sim_data.time)},{np.max(sim_data.time)}]")
+    print(80*"-")
 
