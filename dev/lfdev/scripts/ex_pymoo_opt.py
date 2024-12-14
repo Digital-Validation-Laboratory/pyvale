@@ -8,7 +8,7 @@ from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.termination.default import DefaultSingleObjectiveTermination
 from pymoo.optimize import minimize
 
-from pyvale.visualopts import PlotOptsGeneral
+from pyvale.core.visualopts import PlotOptsGeneral
 import pyvale.optimcheckfuncs as cf
 
 #-------------------------------------------------------------------------------
