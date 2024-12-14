@@ -8,6 +8,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 '''
 import time
 from pathlib import Path
+from importlib.resources import files
 from mooseherder import (MooseConfig,
                          MooseRunner,
                          GmshRunner)
@@ -18,7 +19,7 @@ CASE_STR = 'case20'
 #===============================================================================
 
 CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')
-CASE_DIR = Path('src/simcases/'+CASE_STR+'/')
+CASE_DIR = Path(files("pyvale.simcases").joinpath(CASE_FILES[1])).parent
 
 USER_DIR = Path.home()
 

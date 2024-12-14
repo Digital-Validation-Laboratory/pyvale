@@ -14,8 +14,10 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
-    """pyvale example: tests that when only one sensor rotation is provided that
-    all sensors are assumed to have the same rotation and batch processed.
+    """pyvale example: single rotation batch processing
+    ----------------------------------------------------------------------------
+    - Tests that when only one sensor rotation is provided that
+      all sensors are assumed to have the same rotation and batch processed.
     """
     data_path = pyvale.DataSet.mechanical_2d_path()
     data_reader = mh.ExodusReader(data_path)
@@ -31,7 +33,7 @@ def main() -> None:
     disp_field = pyvale.FieldVector(sim_data,field_key,components,spat_dims)
 
     #---------------------------------------------------------------------------
-    n_sens = (2,2,1)
+    n_sens = (2,3,1)
     x_lims = (0.0,100.0)
     y_lims = (0.0,150.0)
     z_lims = (0.0,0.0)
@@ -46,6 +48,7 @@ def main() -> None:
     else:
         sample_times = np.linspace(0.0,np.max(sim_data.time),50)
 
+    # Provide only a single rotation for the 6 sensors
     sensor_angles = (Rotation.from_euler("zyx", [180, 0, 0], degrees=True),)
 
     sensor_data_norot = pyvale.SensorData(positions=sensor_positions,
@@ -72,7 +75,7 @@ def main() -> None:
     measurements_rot = disp_sensors_rot.calc_measurements()
 
     #---------------------------------------------------------------------------
-    sens_to_print = 4
+    sens_to_print = 1
     print(80*"-")
     print(f"The last 5 time steps (measurements) of non-rotated sensor {sens_to_print}:")
     pyvale.print_measurements(disp_sensors_norot,
@@ -87,6 +90,7 @@ def main() -> None:
                               (measurements_rot.shape[2]-5,measurements_rot.shape[2]))
     print(80*"-")
 
+    #---------------------------------------------------------------------------
     plot_field = "disp_x"
 
     if plot_field == "disp_x":

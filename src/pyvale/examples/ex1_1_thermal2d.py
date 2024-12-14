@@ -11,7 +11,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import mooseherder as mh
 import pyvale
-import pyvale.dataset
 
 
 def main() -> None:
