@@ -6,6 +6,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 from abc import ABC, abstractmethod
+import warnings
 import numpy as np
 from scipy.spatial.transform import Rotation
 import pyvista as pv
@@ -71,6 +72,7 @@ def conv_simdata_to_pyvista(sim_data: mh.SimData,
         flat_connect = np.hstack((flat_connect,temp_connect),dtype=np.int64)
 
     cells = flat_connect
+
     points = sim_data.coords
     pv_grid = pv.UnstructuredGrid(cells, cell_types, points)
     pv_grid_vis = pv.UnstructuredGrid(cells, cell_types, points)
@@ -90,14 +92,32 @@ def get_cell_type(nodes_per_elem: int, spat_dim: int) -> int:
             cell_type = CellType.QUAD
         elif nodes_per_elem == 3:
             cell_type = CellType.TRIANGLE
+        elif nodes_per_elem == 6:
+            cell_type = CellType.QUADRATIC_TRIANGLE
+        elif nodes_per_elem == 7:
+            cell_type = CellType.BIQUADRATIC_TRIANGLE
+        elif nodes_per_elem == 8:
+            cell_type = CellType.QUADRATIC_QUAD
+        elif nodes_per_elem == 9:
+            cell_type = CellType.BIQUADRATIC_QUAD
         else:
+            warnings.warn(f"Cell type 2D with {nodes_per_elem} "
+                          + "nodes not recognised. Defaulting to 4 node QUAD")
             cell_type = CellType.QUAD
     else:
         if nodes_per_elem == 8:
             cell_type =  CellType.HEXAHEDRON
         elif nodes_per_elem == 4:
             cell_type = CellType.TETRA
+        elif nodes_per_elem == 10:
+            cell_type = CellType.QUADRATIC_TETRA
+        elif nodes_per_elem == 20:
+            cell_type = CellType.QUADRATIC_HEXAHEDRON
+        elif nodes_per_elem == 27:
+            cell_type = CellType.TRIQUADRATIC_HEXAHEDRON
         else:
+            warnings.warn(f"Cell type 3D with {nodes_per_elem} "
+                + "nodes not recognised. Defaulting to 8 node HEX")
             cell_type = CellType.HEXAHEDRON
 
     return cell_type

@@ -8,7 +8,8 @@ Copyright (C) 2024 The Computer Aided Validation Team
 from typing import Any
 import matplotlib.pyplot as plt
 from pyvale.core.camera import CameraBasic2D
-from pyvale.visualopts import PlotOptsGeneral
+from pyvale.core.visualopts import PlotOptsGeneral
+
 
 def plot_measurement_image(camera: CameraBasic2D,
                            component: str,

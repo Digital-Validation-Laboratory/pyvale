@@ -8,10 +8,10 @@ Copyright (C) 2024 The Computer Aided Validation Team
 import numpy as np
 from pyvale.core.field import IField
 from pyvale.core.sensordata import SensorData
-from pyvale.integratorspatial import IIntegratorSpatial
+from pyvale.core.integratorspatial import IIntegratorSpatial
 from pyvale.core.integratortype import EIntSpatialType
-from pyvale.integratorrectangle import Rectangle2D
-from pyvale.integratorquadrature import (Quadrature2D,
+from pyvale.core.integratorrectangle import Rectangle2D
+from pyvale.core.integratorquadrature import (Quadrature2D,
                                         create_gauss_weights_2d_4pts,
                                         create_gauss_weights_2d_9pts)
 

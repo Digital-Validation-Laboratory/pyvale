@@ -10,6 +10,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 from pyvale.core.integratortype import EIntSpatialType
 
+
 @dataclass(slots=True)
 class SensorData:
     #shape=(n_sensors,3) where second dim=[x,y,z]

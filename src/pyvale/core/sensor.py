@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 from pyvale.core.field import IField
 
+
 class ISensor(ABC):
     @abstractmethod
     def get_measurement_shape(self) -> tuple[int,int,int]:

@@ -14,11 +14,11 @@ import numpy as np
 #NOTE: causes output to console to be suppressed unfortunately
 import pyvista as pv
 from pyvale.core.sensorarraypoint import SensorArrayPoint
-from pyvale.visualopts import VisOptsSimSensors, VisOptsAnimation
-from pyvale.visualtools import (create_pv_plotter,
+from pyvale.core.visualopts import VisOptsSimSensors, VisOptsAnimation
+from pyvale.core.visualtools import (create_pv_plotter,
                                 get_colour_lims,
                                 set_animation_writer)
-from pyvale.visualsimplotter import (add_sensor_points_nom,
+from pyvale.core.visualsimplotter import (add_sensor_points_nom,
                                      add_sensor_points_pert,
                                      add_sim_field)
 

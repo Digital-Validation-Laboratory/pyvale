@@ -11,6 +11,7 @@ from dataclasses import dataclass
 import numpy as np
 import matplotlib as plt
 
+
 @dataclass(slots=True)
 class PlotOptsGeneral:
     """ Helper class to set properties in matplotlib for scaling to use in a

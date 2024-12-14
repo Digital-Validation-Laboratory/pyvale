@@ -9,6 +9,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 from dataclasses import dataclass
 import numpy as np
 
+
 @dataclass(slots=True)
 class SensorDescriptor:
     name: str = 'Measured Value'

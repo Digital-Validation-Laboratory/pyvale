@@ -9,9 +9,9 @@ from typing import Any
 
 import numpy as np
 import matplotlib.pyplot as plt
-from pyvale.visualopts import (PlotOptsGeneral,
+from pyvale.core.visualopts import (PlotOptsGeneral,
                                    TraceOptsExperiment)
-from pyvale.experimentsimulator import ExperimentSimulator
+from pyvale.core.experimentsimulator import ExperimentSimulator
 
 
 def plot_exp_traces(exp_sim: ExperimentSimulator,

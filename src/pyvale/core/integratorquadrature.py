@@ -8,7 +8,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 from typing import Callable
 import numpy as np
 from pyvale.core.field import IField
-from pyvale.integratorspatial import (IIntegratorSpatial,
+from pyvale.core.integratorspatial import (IIntegratorSpatial,
                                      create_int_pt_array)
 from pyvale.core.sensordata import SensorData
 
