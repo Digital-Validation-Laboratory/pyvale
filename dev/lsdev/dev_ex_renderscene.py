@@ -62,7 +62,7 @@ def main() -> None:
     output_path = Path.cwd() / 'dev/lsdev/rendered_images'
 
 
-    render_data = RenderData(samples=1)
+    render_data = RenderData(samples=1024)
     render = Render(render_data, image_path=image_path, output_path=output_path, cam_data=cam_data)
 
     render_counter = 0
