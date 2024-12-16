@@ -59,13 +59,13 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # Rendering images
-    image_path = Path.cwd() / 'dev/lsdev/rendered_images/RBM_1-5mm'
+    image_path = Path.cwd() / 'dev/lsdev/rendered_images/RBM_z'
     output_path = Path.cwd() / 'dev/lsdev/rendered_images'
 
-    step = 1
-    x_lims = [0, 5]
+    step = 0.5
+    z_lims = [0, 5]
     rigidbodymotion = RigidBodyMotion(part, step, part_location, image_path, output_path, cam_data)
-    rigidbodymotion.rigid_body_motion_x(x_lims)
+    rigidbodymotion.rigid_body_motion_z(z_lims)
 
 if __name__ == "__main__":
     main()
