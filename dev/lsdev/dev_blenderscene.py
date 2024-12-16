@@ -1,4 +1,5 @@
 import bpy
+import numpy as np
 from mooseherder import SimData
 from dev_blendercamera import CameraData, CameraBlender
 from dev_lightingblender import LightData, BlenderLight
@@ -42,8 +43,11 @@ class BlenderScene:
 
         return camera
 
-    def add_part(self, sim_data: SimData):
-        partmaker = BlenderPart(sim_data)
+    def add_part(self,
+                 sim_data: SimData,
+                 elements:np.ndarray | None = None,
+                 nodes: np.ndarray | None = None):
+        partmaker = BlenderPart(sim_data, elements, nodes)
         part = partmaker.simdata_to_part()
 
         self._set_origin(part)
