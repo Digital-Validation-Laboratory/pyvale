@@ -5,8 +5,21 @@ from mooseherder.simdata import SimData
 class BlenderPart:
     """Creates an object in Blender
     """
-    def __init__(self, sim_data: SimData):
+    def __init__(self,
+                 sim_data: SimData,
+                 elements:np.ndarray | None = None,
+                 nodes: np.ndarray | None = None):
         self.sim_data = sim_data
+        if elements is None:
+            self.elements = self._get_elements()
+        else:
+            self.elements = elements
+
+        if nodes is None:
+            self.nodes = self._get_nodes() * 1000
+        else:
+            self.nodes = nodes * 1000
+
 
     def _get_elements(self):
         """Gets the connectivity table from the SimData object and converts it
@@ -26,7 +39,7 @@ class BlenderPart:
         """
         nodes = self.sim_data.coords
 
-        zero_index_nodes = nodes - 1 # Blender has a zero base index
+        zero_index_nodes = nodes  # Blender has a zero base index
 
         return zero_index_nodes
 
@@ -34,11 +47,9 @@ class BlenderPart:
     def simdata_to_part(self):
         """Creates an object from the mesh information in the SimData object
         """
-        elements = self._get_elements()
-        nodes = self._get_nodes() * 1000
 
         mesh = bpy.data.meshes.new("part")
-        mesh.from_pydata(nodes, [], elements, shade_flat=True)
+        mesh.from_pydata(self.nodes, [], self.elements, shade_flat=True)
         mesh.validate(verbose=True, clean_customdata=True)
         part = bpy.data.objects.new("specimen", mesh)
         bpy.context.scene.collection.objects.link(part)
