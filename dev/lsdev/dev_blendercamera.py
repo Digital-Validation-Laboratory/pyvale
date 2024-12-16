@@ -45,7 +45,6 @@ class CameraBlender():
         half_FOV_mm = FOV_mm / 2
         half_FOV_rad = m.atan(half_FOV_mm / working_dist)
         FOV_deg = m.degrees(half_FOV_rad) * 2
-        print(f"{FOV_deg=}")
 
         return FOV_deg
 
