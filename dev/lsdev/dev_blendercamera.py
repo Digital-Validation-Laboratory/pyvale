@@ -48,7 +48,6 @@ class CameraBlender():
 
         return FOV_deg
 
-
     def add_camera(self):
         new_cam = bpy.data.cameras.new('Camera')
         camera = bpy.data.objects.new('Camera', new_cam)
