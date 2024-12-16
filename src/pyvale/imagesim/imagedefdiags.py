@@ -2,13 +2,13 @@
 ================================================================================
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Digital Validation Team
+Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pyvale.visualopts import PlotOptsGeneral
+from pyvale.core.visualopts import PlotOptsGeneral
 
 plot_opts = PlotOptsGeneral()
 I_CMAP = 'gray'

@@ -1,19 +1,16 @@
 #-------------------------------------------------------------------------------
-# pyvale ignore
-*.mp4
-*.gif
-dev/lsdev/blender_files/*
-dev/lsdev/__pycache__/*
-dev/lsdev/notes_blender.md
-dev/lsdev/rendered_images/*
-dev/test_output/*
-
 # vscode / venv
 .vscode/
 .pyvale-env/
 
-# My temp code for checks
-check/
+# Output files
+*.png
+*.svg
+*.mp4
+*.gif
+*.tiff
+test_output/
+example_output/
 
 # MOOSE / gmsh
 *-opt
@@ -21,18 +18,10 @@ check/
 *.msh
 
 # Keep these as they are used for examples
-!src/data/*.e
-
-# Example output images
-src/examples/*.png
-src/examples/*.svg
-src/examples/figuregen/*.png
-src/examples/figuregen/*.svg
-
-dev/lfdev/*/*.png
-dev/lfdev/*/*.svg
-dev/lfdev/*.png
-dev/lfdev/*.svg
+!src/pyvale/data/*.tiff
+!src/pyvale/data/*.e
+!reports/images/*.png
+!reports/images/*.svg
 
 # Image deformation test cases
 *.pkl

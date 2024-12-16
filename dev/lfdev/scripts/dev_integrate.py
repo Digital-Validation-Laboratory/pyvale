@@ -4,7 +4,7 @@ Analytic test case data - linear
 
 pyvale: the python validation engine
 License: MIT
-Copyright (C) 2024 The Digital Validation Team
+Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 '''
 import numpy as np
@@ -13,7 +13,7 @@ from sympy import *
 import scipy.integrate
 import mooseherder as mh
 import pyvale
-import pyvale.visualisation.visualplotters
+import pyvale.core.visualisation.visualplotters
 
 
 def rectangle_mesh_2d(leng_x: float,
@@ -145,7 +145,7 @@ def main() -> None:
     plt.axis('scaled')
     #plt.show()
 
-    pv_plot = pyvale.visualisation.visualplotters.plot_sim_data(sim_data,
+    pv_plot = pyvale.core.visualisation.visualplotters.plot_sim_data(sim_data,
                                                           field_key,
                                                           time_step=-1)
     #pv_plot.show(cpos="xy")
