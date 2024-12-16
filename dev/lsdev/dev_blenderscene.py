@@ -50,7 +50,7 @@ class BlenderScene:
         partmaker = BlenderPart(sim_data, elements, nodes)
         part = partmaker.simdata_to_part()
 
-        self._set_origin(part)
+        set_origin(part)
 
         return part
 
@@ -67,11 +67,6 @@ class BlenderScene:
 
         return mat
 
-    def _set_origin(self, part):
-        # Not sure if this is necessary
-        bpy.ops.object.select_all(action='DESELECT')
-        part.select_set(True)
-        bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
 
     def save_model(self, filepath: str):
         '''
@@ -79,6 +74,11 @@ class BlenderScene:
         '''
         if filepath is not None:
             bpy.ops.wm.save_as_mainfile(filepath=filepath)
+
+def set_origin(part):
+        bpy.ops.object.select_all(action='DESELECT')
+        part.select_set(True)
+        bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
 
 
 
