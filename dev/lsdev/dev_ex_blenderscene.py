@@ -11,10 +11,9 @@ from dev_lightingblender import LightData, LightType
 from dev_objectmaterial import MaterialData
 
 def main() -> None:
-    data_path = Path('src/data/case13_out.e')
+    data_path = Path('src/pyvale/data/case13_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
-    print(f"{sim_data.connect[np.str_('connect1')].shape=}")
 
     dir = Path.cwd() / 'dev/lsdev/blender_files'
     filename = 'case13.blend'
