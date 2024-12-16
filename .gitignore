@@ -2,6 +2,10 @@
 # pyvale ignore
 *.mp4
 *.gif
+dev/lsdev/blender_files/*
+dev/lsdev/__pycache__/*
+dev/lsdev/notes_blender.md
+dev/lsdev/rendered_images/*
 dev/test_output/*
 
 # vscode / venv
