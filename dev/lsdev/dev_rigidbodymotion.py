@@ -15,7 +15,7 @@ class RigidBodyMotion:
         min_z = z_lims[0]
         max_z = z_lims[1]
 
-        n_steps = (max_z - min_z) / self.step
+        n_steps = int((max_z - min_z) / self.step)
         render_counter = 0
 
         for z in range(n_steps):
