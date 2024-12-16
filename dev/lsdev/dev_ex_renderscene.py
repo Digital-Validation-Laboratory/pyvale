@@ -13,12 +13,12 @@ from dev_render import RenderData, Render
 
 def main() -> None:
     # Making Blender scene
-    data_path = Path('src/data/case13_out.e')
+    data_path = Path('src/pyvale/data/case13_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
     dir = Path.cwd() / 'dev/lsdev/blender_files'
-    filename = 'case13.blend'
+    filename = 'case13_deformed.blend'
     filepath = dir / filename
     all_files = os.listdir(dir)
     for ff in all_files:
