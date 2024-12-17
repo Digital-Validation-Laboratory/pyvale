@@ -15,7 +15,7 @@ from mooseherder import (MooseConfig,
 
 #===============================================================================
 # Change this to run a different case
-CASE_STR = 'case20'
+CASE_STR = 'case21'
 #===============================================================================
 
 CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')
@@ -33,7 +33,7 @@ def main() -> None:
         gmsh_runner = GmshRunner(USER_DIR / 'gmsh/bin/gmsh')
 
         gmsh_start = time.perf_counter()
-        gmsh_runner.run(CASE_DIR / CASE_FILES[0])
+        gmsh_runner.run(CASE_DIR / CASE_FILES[0],parse_only=False)
         gmsh_run_time = time.perf_counter()-gmsh_start
     else:
         print('Bypassing gmsh.')

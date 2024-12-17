@@ -2,12 +2,12 @@
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
+- Create simple mechanical examples of cylinder, plate and plate with hole
+
 - TESTING/FEATURE EXAMPLES:
     - Camera basic
 
 - BUGS!
-    - Higher order mesh node numbering conversion from Exodus to VTK!
-    https://github.com/Applied-Materials-Technology/pycoatl/blob/main/src/pycoatl/spatialdata/importsimdata.py
     - Spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
 
 - TODO PRIORITY:
@@ -41,6 +41,7 @@
 - CAMERAS:
     - Need CameraData class
     - Create 'CameraBasic' class or Simple?
+    - Create 'CameraProjection' class
     - Create 'CameraRayTracing' class
     - Create 'CameraIRThermo'
     - Create 'CameraDIC2D'
