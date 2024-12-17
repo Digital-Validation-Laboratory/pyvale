@@ -240,3 +240,37 @@ simulation_cases:
           mechanical: temp_indep
     time_dependence: steady
 
+  - name: case21.i
+    geometry: 3D_1mat_cylinder_compression
+    physics: mechanical
+    BC: disp
+    material:
+      - material_model:
+          mechanical: temp_indep
+      - material_model:
+          mechanical: temp_indep
+    time_dependence: transient
+
+  - name: case22.i
+    geometry: 3D_1mat_plate_tension
+    physics: mechanical
+    BC: disp
+    material:
+      - material_model:
+          mechanical: temp_indep
+      - material_model:
+          mechanical: temp_indep
+    time_dependence: transient
+
+  - name: case22.i
+    geometry: 3D_1mat_plate_with_hole_tension
+    physics: mechanical
+    BC: disp
+    material:
+      - material_model:
+          mechanical: temp_indep
+      - material_model:
+          mechanical: temp_indep
+    time_dependence: transient
+
+
