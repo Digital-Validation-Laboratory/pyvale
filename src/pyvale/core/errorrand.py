@@ -14,57 +14,124 @@ from pyvale.core.generatorsrandom import IGeneratorRandom
 
 
 class ErrRandUniform(IErrCalculator):
-    __slots__ = ("_low","_high","_rng","_err_dep")
+    """Sensor random error calculator based on uniform sampling of an interval
+    specified by its upper and lower bound. This
+
+    Parameters
+    ----------
+    IErrCalculator : Implements the error calculator interface
+    """
+    __slots__ = ("low","high","rng","err_dep")
 
     def __init__(self,
                  low: float,
                  high: float,
                  err_dep: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
-        self._low = low
-        self._high = high
-        self._rng = np.random.default_rng(seed)
-        self._err_dep = err_dep
+        """Initialiser for ErrRandUniform class.
+
+        Parameters
+        ----------
+        low : float
+            Lower bound of the uniform random generator
+        high : float
+            Upper bound of the uniform random generator
+        err_dep : EErrDependence, optional
+            Error calculation dependence, by default EErrDependence.INDEPENDENT
+        seed : int | None, optional
+            Optional seed for the random generator to allow for replicable
+            behaviour, by default None
+        """
+        self.low = low
+        self.high = high
+        self.rng = np.random.default_rng(seed)
+        self.err_dep = err_dep
 
     def get_error_dep(self) -> EErrDependence:
-        return self._err_dep
+        """Gets the error dependence state for this error calculator. An
+        independent error is calculated based on the input truth values as the
+        error basis. A dependent error is calculated based on the accumulated
+        sensor reading from all preceeding errors in the chain.
+
+        For this class errors are calculated independently regardless.
+
+        Returns
+        -------
+        EErrDependence
+            Enumeration defining INDEPENDENT or DEPENDENT behaviour.
+        """
+        return self.err_dep
 
     def set_error_dep(self, dependence: EErrDependence) -> None:
-        self._err_dep = dependence
+        """Sets the error dependence state for this error calculator. An
+        independent error is calculated based on the input truth values as the
+        error basis. A dependent error is calculated based on the accumulated
+        sensor reading from all preceeding errors in the chain.
+
+        For this class errors are calculated independently regardless.
+
+        Parameters
+        ----------
+        dependence : EErrDependence
+            Enumeration defining INDEPENDENT or DEPENDENT behaviour.
+        """
+        self.err_dep = dependence
 
     def get_error_type(self) -> EErrType:
+        """Gets the error type.
+
+        Returns
+        -------
+        EErrType
+            Enumeration definining RANDOM or SYSTEMATIC error types.
+        """
         return EErrType.RANDOM
 
     def calc_errs(self,
                   err_basis: np.ndarray,
                   sens_data: SensorData,
                   ) -> tuple[np.ndarray, SensorData]:
+        """Calculates the error array based on the size of the input 
 
-        rand_errs = self._rng.uniform(low=self._low,
-                                    high=self._high,
-                                    size=err_basis.shape)
+        Parameters
+        ----------
+        err_basis : np.ndarray
+            Array of values with the same dimensions as the sensor measurement
+            matrix.
+        sens_data : SensorData
+            A sensor data object
+
+        Returns
+        -------
+        tuple[np.ndarray, SensorData]
+            Tuple containing the calculated error array and pass through of the
+            sensor data object as it is not modified by this class.
+        """
+        rand_errs = self.rng.uniform(low=self.low,
+                                     high=self.high,
+                                     size=err_basis.shape)
 
         return (rand_errs,sens_data)
 
 
 class ErrRandUnifPercent(IErrCalculator):
-    __slots__ = ("_low","_high","_rng","_err_dep")
+    __slots__ = ("low","high","rng","err_dep")
 
     def __init__(self,
                  low_percent: float,
                  high_percent: float,
                  err_dep: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
-        self._low = low_percent
-        self._high = high_percent
-        self._rng = np.random.default_rng(seed)
-        self._err_dep = err_dep
+        self.low = low_percent/100
+        self.high = high_percent/100
+        self.rng = np.random.default_rng(seed)
+        self.err_dep = err_dep
 
     def get_error_dep(self) -> EErrDependence:
-        return self._err_dep
+        return self.err_dep
 
     def set_error_dep(self, dependence: EErrDependence) -> None:
-        self._err_dep = dependence
+        self.err_dep = dependence
 
     def get_error_type(self) -> EErrType:
         return EErrType.RANDOM
@@ -74,29 +141,29 @@ class ErrRandUnifPercent(IErrCalculator):
                   sens_data: SensorData,
                   ) -> tuple[np.ndarray, SensorData]:
 
-        norm_rand = self._rng.uniform(low=self._low/100,
-                                    high=self._high/100,
+        norm_rand = self.rng.uniform(low=self.low,
+                                    high=self.high,
                                     size=err_basis.shape)
 
         return (err_basis*norm_rand,sens_data)
 
 
 class ErrRandNormal(IErrCalculator):
-    __slots__ = ("_std","_rng","_err_dep")
+    __slots__ = ("std","rng","err_dep")
 
     def __init__(self,
                  std: float,
                  err_dep: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
-        self._std = std
-        self._rng = np.random.default_rng(seed)
-        self._err_dep = err_dep
+        self.std = np.abs(std)
+        self.rng = np.random.default_rng(seed)
+        self.err_dep = err_dep
 
     def get_error_dep(self) -> EErrDependence:
-        return self._err_dep
+        return self.err_dep
 
     def set_error_dep(self, dependence: EErrDependence) -> None:
-        self._err_dep = dependence
+        self.err_dep = dependence
 
     def get_error_type(self) -> EErrType:
         return EErrType.RANDOM
@@ -105,8 +172,8 @@ class ErrRandNormal(IErrCalculator):
                   err_basis: np.ndarray,
                   sens_data: SensorData,
                   ) -> tuple[np.ndarray, SensorData]:
-        rand_errs = self._rng.normal(loc=0.0,
-                                    scale=self._std,
+        rand_errs = self.rng.normal(loc=0.0,
+                                    scale=self.std,
                                     size=err_basis.shape)
 
         return (rand_errs,sens_data)
@@ -119,7 +186,7 @@ class ErrRandNormPercent(IErrCalculator):
                  std_percent: float,
                  err_dep: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
-        self._std = std_percent/100
+        self._std = np.abs(std_percent)/100
         self._rng = np.random.default_rng(seed)
         self._err_dep = err_dep
 
