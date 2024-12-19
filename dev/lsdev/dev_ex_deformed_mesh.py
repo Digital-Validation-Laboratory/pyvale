@@ -8,16 +8,16 @@ from dev_blendercamera import CameraData
 from dev_lightingblender import LightData, LightType
 from dev_objectmaterial import MaterialData
 from dev_render import RenderData, Render
-from dev_deform_part import DeformMesh, DeformPart
+from dev_deform_part import DeformMesh, DeformSimData, DeformPart
 
 def main() -> None:
     # Making Blender scene
-    data_path = Path('src/pyvale/data/case13_out.e')
+    data_path = Path('src/pyvale/simcases/case22_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
     dir = Path.cwd() / 'dev/lsdev/blender_files'
-    filename = 'case13_deformed.blend'
+    filename = 'case22_deformed.blend'
     filepath = dir / filename
     all_files = os.listdir(dir)
     for ff in all_files:
@@ -56,7 +56,7 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # Rendering images
-    image_path = Path.cwd() / 'dev/lsdev/rendered_images/deforming'
+    image_path = Path.cwd() / 'dev/lsdev/rendered_images/Deform_from_moose'
     output_path = Path.cwd() / 'dev/lsdev/rendered_images'
 
 
@@ -70,21 +70,20 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # Deform mesh
-    deform_number = 5
-    scale = 0.99
-    for i in range(deform_number):
-        defgrad = np.array([[scale, 0, 0], [0, scale, 0], [0, 0, 1]])
-        meshdeformer = DeformMesh(sim_data, defgrad)
-        deformed_nodes = meshdeformer.map_coords()
+    timesteps = sim_data.time.shape[0]
+    for timestep in range(timesteps):
+        timestep += 1 # Adding at start of loop as timestep = 0 is the original mesh
+        meshdeformer = DeformSimData(sim_data)
+        deformed_nodes = meshdeformer.add_displacement(timestep)
 
-        partdeformer = DeformPart(part, deformed_nodes)
-        part = partdeformer.deform_part()
-        partdeformer.set_new_frame()
+        if deformed_nodes is not None:
+            partdeformer = DeformPart(part, deformed_nodes)
+            part = partdeformer.deform_part()
+            partdeformer.set_new_frame()
 
-        render_name = 'def'
-        render.render_image(render_name, render_counter)
-        render_counter += 1
-        scale -= 0.01
+            render_name = 'def_sim_data'
+            render.render_image(render_name, timestep)
+
 
     # scene.save_model(filepath)
 
