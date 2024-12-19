@@ -1,10 +1,10 @@
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 from typing import Callable
 import numpy as np
 from pyvale.core.field import IField

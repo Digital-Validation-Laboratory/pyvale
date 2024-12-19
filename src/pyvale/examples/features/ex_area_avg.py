@@ -18,7 +18,7 @@ def main() -> None:
     ----------------------------------------------------------------------------
     - Demonstrates area averaging for truth and for systematic errors
     """
-    data_path = pyvale.DataSet.thermal_2d_path()
+    data_path = pyvale.DataSet.thermal_2d_output_path()
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier

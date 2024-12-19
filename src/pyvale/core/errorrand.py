@@ -1,15 +1,15 @@
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 import numpy as np
 from pyvale.core.sensordata import SensorData
 from pyvale.core.errorcalculator import (IErrCalculator,
-                                    EErrType,
-                                    EErrDependence)
+                                         EErrType,
+                                         EErrDependence)
 from pyvale.core.generatorsrandom import IGeneratorRandom
 
 
@@ -91,7 +91,7 @@ class ErrRandUniform(IErrCalculator):
                   err_basis: np.ndarray,
                   sens_data: SensorData,
                   ) -> tuple[np.ndarray, SensorData]:
-        """Calculates the error array based on the size of the input 
+        """Calculates the error array based on the size of the input
 
         Parameters
         ----------

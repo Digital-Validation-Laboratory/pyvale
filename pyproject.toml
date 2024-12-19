@@ -5,7 +5,8 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pyvale"
 version = "0.0.1"
-description = "A python validation engine (pyvale)"
+description = "A python validation engine (pyvale) for simulating sensors and
+measurement uncertainties on physical fields."
 authors = [
   { name = "scepticalrabbit", email = "thescepticalrabbit@gmail.com" },
 ]

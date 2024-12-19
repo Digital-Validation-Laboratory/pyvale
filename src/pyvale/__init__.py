@@ -1,10 +1,10 @@
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 # NOTE: this simplifies and decouples how the user calls pyvale from the
 # underlying project structure: the user should always be able to use 'pyvale.'
 # and access everything in one layer without multiple import dots

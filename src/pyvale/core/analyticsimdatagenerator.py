@@ -1,11 +1,10 @@
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
-from typing import Self
+"""
 from dataclasses import dataclass
 import numpy as np
 import sympy

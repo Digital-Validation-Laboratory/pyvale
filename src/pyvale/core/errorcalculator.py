@@ -1,10 +1,10 @@
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 import enum
 from abc import ABC, abstractmethod
 import numpy as np
@@ -15,12 +15,12 @@ class EErrType(enum.Enum):
     """Enumeration defining the error type for separation of error types for
     later analysis.
 
-    SYSTEMATIC:
+    EErrType.SYSTEMATIC:
         Also known as an epistemic error and is due to a lack of
         knowledge. Common examples include spatial or temporal averaging,
         digitisation / round off error and calibration errors.
 
-    RANDOM:
+    EErrType.RANDOM:
         Also known as aleatory error and is generally a result of sensor
         noise.
     """
@@ -29,13 +29,13 @@ class EErrType(enum.Enum):
 
 
 class EErrDependence(enum.Enum):
-    """Enumeration defining error dependence:
+    """Enumeration defining error dependence.
 
-    INDEPENDENT:
+    EErrDependence.INDEPENDENT:
         Errors are calculated based on the ground truth sensor values
         interpolated from the input simulation.
 
-    DEPENDENT:
+    EErrDependence.DEPENDENT:
         Errors are calculated based on the accumulated sensor reading due
         to all preceeding errors in the chain.
     """
@@ -44,6 +44,9 @@ class EErrDependence(enum.Enum):
 
 
 class IErrCalculator(ABC):
+    """Interface (abstract base class) for sensor error calculation allows for
+    chaining of errors.
+    """
     @abstractmethod
     def get_error_type(self) -> EErrType:
         """Abstract method for getting the error type.
@@ -99,7 +102,8 @@ class IErrCalculator(ABC):
             Tuple containing the error array from this calculator and a
             SensorData object with the current accumulated sensor state starting
             from the nominal state up to and including this error calculator in
-            the error chain.
+            the error chain. Note that many errors do not modify the sensor data
+            so the sensor data class is passed through this function unchanged.
         """
         pass
 

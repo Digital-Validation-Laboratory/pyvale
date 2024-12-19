@@ -17,7 +17,7 @@ def main() -> None:
     """pyvale example: point sensors on a 2D thermal simulation
     ----------------------------------------------------------------------------
     """
-    data_path = pyvale.DataSet.thermal_2d_path()
+    data_path = pyvale.DataSet.thermal_2d_output_path()
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
     field_key = list(sim_data.node_vars.keys())[0] # type: ignore
