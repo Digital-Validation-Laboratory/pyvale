@@ -15,8 +15,7 @@ import mooseherder as mh
 
 def main() -> None:
     data_path = Path('data/examplesims/case01_out_4x3.e')
-    data_reader = mh.ExodusReader(data_path)
-    sim_data = data_reader.read_all_sim_data()
+sim_data = mh.ExodusReader(data_path).read_all_sim_data()
     field_key = list(sim_data.node_vars.keys())[0] # type: ignore
 
     print()

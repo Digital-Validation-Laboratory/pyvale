@@ -10,9 +10,9 @@ import pyvista as pv
 from scipy.spatial.transform import Rotation
 import mooseherder as mh
 
-from pyvale.core.field import (IField,
-                          conv_simdata_to_pyvista,
-                          sample_pyvista)
+from pyvale.core.field import IField
+from pyvale.core.fieldconverter import conv_simdata_to_pyvista
+from pyvale.core.fieldsampler import sample_pyvista_grid
 from pyvale.core.fieldtransform import (transform_tensor_2d,
                                    transform_tensor_2d_batch,
                                    transform_tensor_3d,
@@ -74,7 +74,7 @@ class FieldTensor(IField):
                     angles: tuple[Rotation,...] | None = None,
                     ) -> np.ndarray:
 
-        field_data =  sample_pyvista(self._norm_components+self._dev_components,
+        field_data =  sample_pyvista_grid(self._norm_components+self._dev_components,
                                     self._pyvista_grid,
                                     self._sim_data.time,
                                     points,

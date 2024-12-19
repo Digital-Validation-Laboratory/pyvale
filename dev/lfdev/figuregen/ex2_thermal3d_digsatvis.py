@@ -18,8 +18,7 @@ def main() -> None:
     """pyvale example:
     """
     data_path = Path('data/examplesims/monoblock_3d_thermal_out.e')
-    data_reader = mh.ExodusReader(data_path)
-    sim_data = data_reader.read_all_sim_data()
+sim_data = mh.ExodusReader(data_path).read_all_sim_data()
     field_name = list(sim_data.node_vars.keys())[0] # type: ignore
 
     # Scale to mm to make 3D visualisation scaling easier

@@ -10,6 +10,9 @@ import numpy as np
 
 
 class IDriftCalculator(ABC):
+    """Interface (abstract base class) for ...
+    """
+
     @abstractmethod
     def calc_drift(self,time_steps_by_sensor: np.ndarray) -> np.ndarray:
         pass

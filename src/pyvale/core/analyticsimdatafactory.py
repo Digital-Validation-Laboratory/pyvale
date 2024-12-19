@@ -11,6 +11,8 @@ import mooseherder as mh
 from pyvale.core.analyticsimdatagenerator import (AnalyticCaseData2D,
                                                   AnalyticSimDataGenerator)
 
+# NOTE: This module is a feature under developement.
+
 def standard_case_2d() -> AnalyticCaseData2D:
     case_data = AnalyticCaseData2D()
     case_data.length_x = 10.0

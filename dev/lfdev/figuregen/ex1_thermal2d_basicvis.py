@@ -23,8 +23,7 @@ def main() -> None:
     """
 
     data_path = Path('src/data/case13_out.e')
-    data_reader = mh.ExodusReader(data_path)
-    sim_data = data_reader.read_all_sim_data()
+sim_data = mh.ExodusReader(data_path).read_all_sim_data()
     field_key = list(sim_data.node_vars.keys())[0] # type: ignore
 
     n_sens = (3,2,1)

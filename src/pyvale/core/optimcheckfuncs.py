@@ -1,9 +1,9 @@
-'''
+"""
 OPTIMISATION TEST FUNCTIONS - N DIMS
 https://gist.github.com/denis-bz/da697d8bc74fae4598bf
 https://www.sfu.ca/~ssurjano/optimization.html
 https://en.wikipedia.org/wiki/Test_functions_for_optimization
-'''
+"""
 from typing import Callable,Any
 import numpy as np
 import matplotlib.pyplot as plt
@@ -136,7 +136,7 @@ def plot_fun_2d(tStr: str,
     # Plot the function
     pp = PlotOptsGeneral()
     fig, ax = plt.subplots(figsize=pp.single_fig_size_square,
-                           layout='constrained')
+                           layout="constrained")
     fig.set_dpi(pp.resolution)
 
     plt.contourf(xm1, xm2, f_mesh, 20, cmap=pp.cmap_seq)
@@ -147,7 +147,7 @@ def plot_fun_2d(tStr: str,
     plt.ylabel("x2",fontsize=pp.font_ax_size,fontname=pp.font_name)
 
     #plt.show()
-    #plt.savefig(save_path+save_name, dpi=pp.resolution, format='png', bbox_inches='tight')
+    #plt.savefig(save_path+save_name, dpi=pp.resolution, format="png", bbox_inches="tight")
     return fig,ax
 
 

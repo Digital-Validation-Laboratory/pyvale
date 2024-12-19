@@ -7,6 +7,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 """
 import numpy as np
 
+# NOTE: This module is a feature under developement.
 
 def rectangle_mesh_2d(leng_x: float,
                       leng_y: float,

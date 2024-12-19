@@ -14,12 +14,12 @@ import pyvale
 
 
 def main() -> None:
-    """pyvale example: thermo-mechanical multi-physics sensors on a 3D monoblock
+    """pyvale example: thermo-mechanical multi-physics sensors on a 2D plate
     ----------------------------------------------------------------------------
     """
     #===========================================================================
     # Load Simulations as mooseherder.SimData objects
-    data_path = pyvale.DataSet.thermomechanical_3d_output_path()
+    data_path = pyvale.DataSet.thermomechanical_2d_output_path()
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore

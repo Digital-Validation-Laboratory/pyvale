@@ -14,7 +14,8 @@ from pyvale.core.visualopts import PlotOptsGeneral
 def plot_measurement_image(camera: CameraBasic2D,
                            component: str,
                            time_step: int = -1,
-                           plot_opts: PlotOptsGeneral | None = None) -> tuple[Any,Any]:
+                           plot_opts: PlotOptsGeneral | None = None
+                           ) -> tuple[Any,Any]:
 
     if plot_opts is None:
         plot_opts = PlotOptsGeneral()

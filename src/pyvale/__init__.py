@@ -17,6 +17,7 @@ from pyvale.core.field import *
 from pyvale.core.fieldscalar import *
 from pyvale.core.fieldvector import *
 from pyvale.core.fieldtensor import *
+from pyvale.core.fieldconverter import *
 from pyvale.core.fieldtransform import *
 
 from pyvale.core.integratorspatial import *
