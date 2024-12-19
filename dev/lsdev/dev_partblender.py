@@ -33,6 +33,13 @@ class BlenderPart:
 
         return zero_index_elements
 
+    def _centre_nodes(self, nodes):
+        max = np.max(nodes, axis=0)
+        min = np.min(nodes, axis=0)
+        middle = max - ((max - min) / 2)
+        centred = np.subtract(nodes, middle)
+        return centred
+
     def _get_nodes(self):
         """Gets the node coordinates from the SimData object and converts it
            into a format Blender can read
@@ -41,7 +48,10 @@ class BlenderPart:
 
         zero_index_nodes = nodes  # Blender has a zero base index
 
-        return zero_index_nodes
+        centred = self._centre_nodes(zero_index_nodes)
+
+        return centred
+
 
 
     def simdata_to_part(self):
