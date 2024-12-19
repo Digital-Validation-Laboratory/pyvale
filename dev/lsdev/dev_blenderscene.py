@@ -50,7 +50,7 @@ class BlenderScene:
         partmaker = BlenderPart(sim_data, elements, nodes)
         part = partmaker.simdata_to_part()
 
-        set_origin(part)
+        # set_origin(part)
 
         return part
 
