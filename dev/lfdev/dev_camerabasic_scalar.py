@@ -13,7 +13,7 @@ import pyvale
 
 def main() -> None:
     data_path = Path('src/data/case13_out.e')
-sim_data = mh.ExodusReader(data_path).read_all_sim_data()
+    sim_data = mh.ExodusReader(data_path).read_all_sim_data()
     field_key = list(sim_data.node_vars.keys())[0] # type: ignore
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0 # type: ignore

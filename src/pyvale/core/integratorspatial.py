@@ -32,9 +32,11 @@ def create_int_pt_array(sens_data: SensorData,
 
 
 class IIntegratorSpatial(ABC):
+    """Interface (abstract base class) for ...
+    """
+    
     @abstractmethod
-    def calc_averages(self,
-                      sens_data: SensorData) -> np.ndarray:
+    def calc_averages(self, sens_data: SensorData) -> np.ndarray:
         pass
 
     @abstractmethod

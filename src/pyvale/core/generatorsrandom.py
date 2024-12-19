@@ -10,6 +10,9 @@ import numpy as np
 
 
 class IGeneratorRandom(ABC):
+    """Interface (abstract base class) for ...
+    """
+    
     @abstractmethod
     def generate(self, size: tuple[int,...]) -> np.ndarray:
         pass

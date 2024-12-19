@@ -9,6 +9,23 @@ import enum
 
 
 class EIntSpatialType(enum.Enum):
+    """Enumeration specifying the type of spatial integrator to build.
+
+    RECT1PT
+        Rectangular 2D integrator splitting the area into 1 part.
+
+    RECT4PT
+        Rectangular 2D integrator splitting the area into 4 equal parts.
+
+    RECT9PT
+        Rectangular 2D integrator splitting the area into 9 equal parts.
+
+    QUAD4PT
+        Gaussian quadrature 2D integrator over 4 points.
+
+    QUAD9PT
+        Gaussia quadrature 2D integrator over 9 points.
+    """
     RECT1PT = enum.auto()
     RECT4PT = enum.auto()
     RECT9PT = enum.auto()
