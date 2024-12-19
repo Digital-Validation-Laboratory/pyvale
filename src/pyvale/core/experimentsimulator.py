@@ -7,7 +7,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 """
 from dataclasses import dataclass
 import numpy as np
-from pyvale.core.sensor import ISensor
+from pyvale.core.sensorarray import ISensorArray
 import mooseherder as mh
 
 
@@ -30,7 +30,7 @@ class ExperimentSimulator:
 
     def __init__(self,
                  sim_list: list[mh.SimData],
-                 sensor_arrays: list[ISensor],
+                 sensor_arrays: list[ISensorArray],
                  num_exp_per_sim: int
                  ) -> None:
 

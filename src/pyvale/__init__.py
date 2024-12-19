@@ -27,6 +27,7 @@ from pyvale.core.integratorfactory import *
 
 from pyvale.core.sensordescriptor import *
 from pyvale.core.sensortools import *
+from pyvale.core.sensorarray import *
 from pyvale.core.sensorarrayfactory import *
 from pyvale.core.sensorarraypoint import *
 from pyvale.core.sensordata import *

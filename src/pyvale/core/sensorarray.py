@@ -10,7 +10,7 @@ import numpy as np
 from pyvale.core.field import IField
 
 
-class ISensor(ABC):
+class ISensorArray(ABC):
     """Interface (abstract base class) for an array of sensors of the same
     type sampling a given physical field.
     """

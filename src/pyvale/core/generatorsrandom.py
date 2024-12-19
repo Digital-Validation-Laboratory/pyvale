@@ -10,57 +10,144 @@ import numpy as np
 
 
 class IGeneratorRandom(ABC):
-    """Interface (abstract base class) for ...
+    """Interface (abstract base class) for wrapping numpy random number
+    generation to allow probability distribution parameters to be specified in
+    the initialiser whereas the generation of random numbers has a common
+    method. Allows for easy subsitution of different probability distributions.
     """
-    
+
     @abstractmethod
     def generate(self, size: tuple[int,...]) -> np.ndarray:
+        """Abstract method. Generates an array of random numbers with a shape
+        based on the specified size.
+
+        Parameters
+        ----------
+        size : tuple[int,...]
+            Shape of the array of random numbers to be returns.
+
+        Returns
+        -------
+        np.ndarray
+            Array of random numbers with shape specified by the input size.
+        """
         pass
 
 
 class GeneratorNormal(IGeneratorRandom):
+    """Class wrapping the numpy normal random number generator. Implements the
+    IGeneratorRandom interface to allow for interchangeability with other random
+    number generators.
+    """
     __slots__ = ("_std","_mean","_rng")
 
     def __init__(self,
                  std: float = 1.0,
                  mean: float = 0.0,
                  seed: int | None = None) -> None:
+        """Initialiser taking the parameters of the probability distribution and
+        an optional seed for the random generator to allow for reproducibility.
 
+        Parameters
+        ----------
+        std : float, optional
+            _description_, by default 1.0
+        mean : float, optional
+            _description_, by default 0.0
+        seed : int | None, optional
+            _description_, by default None
+        """
         self._std =std
         self._mean = mean
         self._rng = np.random.default_rng(seed)
 
     def generate(self, size: tuple[int,...]) -> np.ndarray:
+        """Initialiser taking the parameters of the probability distribution and
+        an optional seed for the random generator to allow for reproducibility.
+
+        Parameters
+        ----------
+        size : tuple[int,...]
+            _description_
+
+        Returns
+        -------
+        np.ndarray
+            _description_
+        """
         return self._rng.normal(loc = self._mean,
                                 scale = self._std,
                                 size = size)
 
 
 class GeneratorLogNormal(IGeneratorRandom):
+    """Class wrapping the numpy lognormal random generator. Implements the
+    IGeneratorRandom interface to allow for interchangeability with other random
+    number generators.
+    """
     __slots__ = ("_std","_mean","_rng")
 
     def __init__(self,
                  std: float = 1.0,
                  mean: float = 0.0,
                  seed: int | None = None) -> None:
+        """Initialiser taking the parameters of the probability distribution and
+        an optional seed for the random generator to allow for reproducibility.
 
+        Parameters
+        ----------
+        std : float, optional
+            _description_, by default 1.0
+        mean : float, optional
+            _description_, by default 0.0
+        seed : int | None, optional
+            _description_, by default None
+        """
         self._std =std
         self._mean = mean
         self._rng = np.random.default_rng(seed)
 
     def generate(self, size: tuple[int,...]) -> np.ndarray:
+        """_summary_
+
+        Parameters
+        ----------
+        size : tuple[int,...]
+            _description_
+
+        Returns
+        -------
+        np.ndarray
+            _description_
+        """
         return self._rng.lognormal(mean = self._mean,
                                    sigma = self._std,
                                    size = size)
 
 
 class GeneratorUniform(IGeneratorRandom):
+    """Class wrapping the numpy uniform random number generator. Implements the
+    IGeneratorRandom interface to allow for interchangeability with other random
+    number generators.
+    """
     __slots__ = ("_low","_high","_rng")
 
     def __init__(self,
                  low: float = -1.0,
                  high: float = 1.0,
                  seed: int | None = None) -> None:
+        """Initialiser taking the parameters of the probability distribution and
+        an optional seed for the random generator to allow for reproducibility.
+
+        Parameters
+        ----------
+        low : float, optional
+            _description_, by default -1.0
+        high : float, optional
+            _description_, by default 1.0
+        seed : int | None, optional
+            _description_, by default None
+        """
 
         self._low = low
         self._high = high
@@ -73,36 +160,84 @@ class GeneratorUniform(IGeneratorRandom):
 
 
 class GeneratorExponential(IGeneratorRandom):
+    """_summary_
+
+    """
     __slots__ = ("_scale","_rng")
 
     def __init__(self,
                  scale: float = 1.0,
                  seed: int | None = None) -> None:
+        """Initialiser taking the parameters of the probability distribution and
+        an optional seed for the random generator to allow for reproducibility.
 
+        Parameters
+        ----------
+        scale : float, optional
+            _description_, by default 1.0
+        seed : int | None, optional
+            _description_, by default None
+        """
         self._scale = scale
         self._rng = np.random.default_rng(seed)
 
     def generate(self, size: tuple[int,...]) -> np.ndarray:
+        """_summary_
+
+        Parameters
+        ----------
+        size : tuple[int,...]
+            _description_
+
+        Returns
+        -------
+        np.ndarray
+            _description_
+        """        
         return self._rng.exponential(scale = self._scale,
                                      size = size)
 
 
 class GeneratorChiSquare(IGeneratorRandom):
+    """_summary_
+    """
     __slots__ = ("_dofs","_rng")
 
     def __init__(self,
                  dofs: float,
                  seed: int | None = None) -> None:
+        """Initialiser taking the parameters of the probability distribution and
+        an optional seed for the random generator to allow for reproducibility.
 
+        Parameters
+        ----------
+        dofs : float
+            _description_
+        seed : int | None, optional
+            _description_, by default None
+        """
         self._dofs = np.abs(dofs)
         self._rng = np.random.default_rng(seed)
 
     def generate(self, size: tuple[int,...]) -> np.ndarray:
+        """_summary_
+
+        Parameters
+        ----------
+        size : tuple[int,...]
+            _description_
+
+        Returns
+        -------
+        np.ndarray
+            _description_
+        """
         return self._rng.chisquare(df = self._dofs,
                                    size = size)
 
 
 class GeneratorDirichlet(IGeneratorRandom):
+
     __slots__ = ("_alpha","_rng")
 
     def __init__(self,
@@ -117,6 +252,7 @@ class GeneratorDirichlet(IGeneratorRandom):
 
 
 class GeneratorF(IGeneratorRandom):
+
     __slots__ = ("_dofs","_rng")
 
     def __init__(self,
@@ -131,6 +267,7 @@ class GeneratorF(IGeneratorRandom):
 
 
 class GeneratorGamma(IGeneratorRandom):
+
     __slots__ = ("_shape","_scale","_rng")
 
     def __init__(self,
@@ -148,6 +285,7 @@ class GeneratorGamma(IGeneratorRandom):
 
 
 class GeneratorStudentT(IGeneratorRandom):
+
     __slots__ = ("_dofs","_rng")
 
     def __init__(self,
@@ -163,6 +301,7 @@ class GeneratorStudentT(IGeneratorRandom):
 
 
 class GeneratorBeta(IGeneratorRandom):
+
     __slots__ = ("_a","_b","_rng")
 
     def __init__(self,
@@ -181,6 +320,7 @@ class GeneratorBeta(IGeneratorRandom):
 
 
 class GeneratorTriangular(IGeneratorRandom):
+
     __slots__ = ("_left","_mode","_right","_rng")
 
     def __init__(self,

@@ -7,14 +7,20 @@ Copyright (C) 2024 The Computer Aided Validation Team
 """
 import numpy as np
 from pyvale.core.field import IField
-from pyvale.core.sensor import ISensor
+from pyvale.core.sensorarray import ISensorArray
 from pyvale.core.errorintegrator import ErrIntegrator
 from pyvale.core.sensordescriptor import SensorDescriptor
 from pyvale.core.sensordata import SensorData
 from pyvale.core.fieldsampler import sample_field_with_sensor_data
 
 
-class SensorArrayPoint(ISensor):
+class SensorArrayPoint(ISensorArray):
+    """A class for creating arrays of point sensors applied to a simulated
+    physical field. Examples include: thermocouples used to measure temperature
+    (a scalar field) or strain gauges used to measure strain (a tensor field).
+    Implements the ISensorArray interface.
+    """
+
     __slots__ = ("field","descriptor","sensor_data","_truth","_measurements",
                  "error_integrator")
 
@@ -35,27 +41,34 @@ class SensorArrayPoint(ISensor):
         self._measurements = None
 
 
-    #---------------------------------------------------------------------------
-    # accessors
     def get_sample_times(self) -> np.ndarray:
+        """Gets the times at which the sensors sample the given physical field.
+        This is specified by the user in the SensorData object or defaults to
+        the time steps in the underlying simulation if unspecified.
+
+        Returns
+        -------
+        np.ndarray
+            Sample times with shape: (num_time_steps,)
+        """
         if self.sensor_data.sample_times is None:
-            #shape=(n_time_steps,)
             return self.field.get_time_steps()
 
-        #shape=(n_time_steps,)
         return self.sensor_data.sample_times
 
     def get_measurement_shape(self) -> tuple[int,int,int]:
+
         return (self.sensor_data.positions.shape[0],
                 len(self.field.get_all_components()),
                 self.get_sample_times().shape[0])
 
     def get_field(self) -> IField:
+
         return self.field
 
-    #---------------------------------------------------------------------------
-    # Truth calculation from simulation
+
     def calc_truth_values(self) -> np.ndarray:
+
         self._truth = sample_field_with_sensor_data(self.field,
                                                     self.sensor_data)
         #shape=(n_sensors,n_field_comps,n_time_steps)
@@ -68,7 +81,7 @@ class SensorArrayPoint(ISensor):
         return self._truth
 
     #---------------------------------------------------------------------------
-    # Errors
+    # errors
     def set_error_integrator(self, err_int: ErrIntegrator) -> None:
         self.error_integrator = err_int
 
