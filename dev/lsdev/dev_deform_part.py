@@ -26,6 +26,54 @@ class DeformMesh:
 
         return coords_new
 
+class DeformSimData:
+    def __init__(self, sim_data: SimData):
+        self.sim_data = sim_data
+
+    def _get_nodes(self):
+        mesh_builder = BlenderPart(self.sim_data)
+        nodes = mesh_builder._get_nodes()
+        return nodes
+
+    def _get_node_vars(self):
+        node_vars = self.sim_data.node_vars
+        node_vars_names = list(node_vars.keys())
+        return node_vars_names
+
+    def _check_for_displacements(self, node_var_names: list):
+        disp = {'x_disp': False, 'y_disp': False, 'z_disp': False}
+
+        if 'disp_x' in node_var_names:
+            disp['x_disp'] = True
+        if 'disp_y' in node_var_names:
+            disp['y_disp'] = True
+        if 'disp_z' in node_var_names:
+            disp['z_disp'] = True
+
+        return disp
+
+    def add_displacement(self, timestep: int):
+        nodes = self._get_nodes()
+        node_var_names = self._get_node_vars()
+        disp = self._check_for_displacements(node_var_names)
+        if True in disp.values():
+            deformed_nodes = nodes
+            dim = 0
+            for disp in disp:
+                if disp is True:
+                    added_disp = self.sim_data.node_vars[disp][timestep]
+                    node_dim = nodes[dim]
+                    deformed_nodes[dim] = node_dim + added_disp
+                    dim += 1
+            print(f"{deformed_nodes=}")
+            return deformed_nodes
+        else:
+            return None
+
+
+
+
+
 class DeformPart:
     def __init__(self, part, deformed_nodes):
         self.part = part
