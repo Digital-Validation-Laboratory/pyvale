@@ -16,7 +16,26 @@ def conv_simdata_to_pyvista(sim_data: mh.SimData,
                             components: tuple[str,...] | None,
                             spat_dim: int
                             ) -> tuple[pv.UnstructuredGrid,pv.UnstructuredGrid]:
+    """Converts the mesh and field data in a `SimData` object into a pyvista
+    UnstructuredGrid for sampling (interpolating) the data and visualisation.
 
+    Parameters
+    ----------
+    sim_data : mh.SimData
+        Object containing a mesh and associated field data from a simulation.
+    components : tuple[str,...] | None
+        String keys for the components of the field to extract from the
+        simulation data.
+    spat_dim : int
+        Number of spatial dimensions (2 or 3) used to determine the element
+        types in the mesh from the number of nodes per element.
+
+    Returns
+    -------
+    tuple[pv.UnstructuredGrid,pv.UnstructuredGrid]
+        The first UnstructuredGrid has the field components attached as dataset
+        arrays. The second has no field data attached for visualisation.
+    """
     flat_connect = np.array([],dtype=np.int64)
     cell_types = np.array([],dtype=np.int64)
 
@@ -29,7 +48,7 @@ def conv_simdata_to_pyvista(sim_data: mh.SimData,
         idxs = np.arange(0,n_elems*nodes_per_elem,nodes_per_elem,dtype=np.int64)
         temp_connect = np.insert(temp_connect,idxs,nodes_per_elem)
 
-        this_cell_type = get_cell_type(nodes_per_elem,spat_dim)
+        this_cell_type = _get_pyvista_cell_type(nodes_per_elem,spat_dim)
         cell_types = np.hstack((cell_types,np.full(n_elems,this_cell_type)))
         flat_connect = np.hstack((flat_connect,temp_connect),dtype=np.int64)
 
@@ -46,7 +65,21 @@ def conv_simdata_to_pyvista(sim_data: mh.SimData,
     return (pv_grid,pv_grid_vis)
 
 
-def get_cell_type(nodes_per_elem: int, spat_dim: int) -> int:
+def _get_pyvista_cell_type(nodes_per_elem: int, spat_dim: int) -> CellType:
+    """Helper function to identify the pyvista element type in the mesh.
+
+    Parameters
+    ----------
+    nodes_per_elem : int
+        Number of nodes per element.
+    spat_dim : int
+        Number of spatial dimensions in the mesh (2 or 3).
+
+    Returns
+    -------
+    CellType
+        Enumeration describing the element type in pyvista.
+    """
     cell_type = 0
 
     if spat_dim == 2:
