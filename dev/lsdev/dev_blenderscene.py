@@ -54,8 +54,8 @@ class BlenderScene:
 
         return part
 
-    def add_stl_part(self, filename):
-        partmaker = BlenderPart(filename=filename)
+    def add_stl_part(self, filename:str | None = None, sim_data: SimData | None = None):
+        partmaker = BlenderPart(filename=filename, sim_data=sim_data)
         part = partmaker.import_from_stl()
         return part
 
