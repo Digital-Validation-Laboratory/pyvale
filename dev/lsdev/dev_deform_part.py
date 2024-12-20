@@ -41,31 +41,30 @@ class DeformSimData:
         return node_vars_names
 
     def _check_for_displacements(self, node_var_names: list):
-        disp = {'x_disp': False, 'y_disp': False, 'z_disp': False}
+        disp = {'disp_x': False, 'disp_y': False, 'disp_z': False}
 
         if 'disp_x' in node_var_names:
-            disp['x_disp'] = True
+            disp['disp_x'] = True
         if 'disp_y' in node_var_names:
-            disp['y_disp'] = True
+            disp['disp_y'] = True
         if 'disp_z' in node_var_names:
-            disp['z_disp'] = True
+            disp['disp_z'] = True
 
         return disp
 
     def add_displacement(self, timestep: int):
         nodes = self._get_nodes()
         node_var_names = self._get_node_vars()
-        disp = self._check_for_displacements(node_var_names)
-        if True in disp.values():
+        disps = self._check_for_displacements(node_var_names)
+        if True in disps.values():
             deformed_nodes = nodes
             dim = 0
-            for disp in disp:
-                if disp is True:
-                    added_disp = self.sim_data.node_vars[disp][timestep]
-                    node_dim = nodes[dim]
-                    deformed_nodes[dim] = node_dim + added_disp
+            for disp, value in disps.items():
+                if value is True:
+                    added_disp = self.sim_data.node_vars[disp][:, timestep]
+                    node_dim = nodes[:, dim]
+                    deformed_nodes[:, dim] = node_dim + added_disp
                     dim += 1
-            print(f"{deformed_nodes=}")
             return deformed_nodes
         else:
             return None
