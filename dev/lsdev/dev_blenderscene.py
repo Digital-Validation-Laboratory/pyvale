@@ -54,6 +54,12 @@ class BlenderScene:
 
         return part
 
+    def add_stl_part(self, filename):
+        partmaker = BlenderPart(filename=filename)
+        part = partmaker.import_from_stl()
+        return part
+
+
     def set_part_location(self, part, location: tuple):
         part.location = location
 
