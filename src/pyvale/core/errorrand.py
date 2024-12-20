@@ -28,7 +28,7 @@ class ErrRandUniform(IErrCalculator):
                  high: float,
                  err_dep: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
-        """Initialiser for ErrRandUniform class.
+        """Initialiser for `ErrRandUniform` class.
 
         Parameters
         ----------

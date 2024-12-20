@@ -34,9 +34,9 @@ class IField(ABC):
 
     @abstractmethod
     def get_sim_data(self) -> mh.SimData:
-        """Gets the simulation data object associated with this field. Used by
-        pyvale visualisation tools to display simulation data with simulated
-        sensor values.
+        """Abstract method. Gets the simulation data object associated with this
+        field. Used by pyvale visualisation tools to display simulation data
+        with simulated sensor values.
 
         Returns
         -------
@@ -48,7 +48,8 @@ class IField(ABC):
 
     @abstractmethod
     def get_time_steps(self) -> np.ndarray:
-        """Gets a 1D array of time steps from the simulation data.
+        """Abstract method. Gets a 1D array of time steps from the simulation
+        data.
 
         Returns
         -------
@@ -59,7 +60,8 @@ class IField(ABC):
 
     @abstractmethod
     def get_visualiser(self) -> pv.UnstructuredGrid:
-        """Gets a pyvista unstructured grid object for visualisation purposes.
+        """Abstract method. Gets a pyvista unstructured grid object for
+        visualisation purposes.
 
         Returns
         -------
