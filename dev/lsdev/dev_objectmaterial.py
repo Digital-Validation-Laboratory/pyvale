@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass
-import bpy
+import numpy as np
+import bpy, bmesh
 
 @dataclass
 class MaterialData():
@@ -26,13 +27,13 @@ class BlenderMaterial():
         bpy.context.view_layer.objects.active = self.object
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.uv.smart_project()
+        bpy.ops.uv.cube_project(correct_aspect=True)
         bpy.ops.object.mode_set(mode='OBJECT')
         self.object.select_set(False)
 
     def _clear_nodes(self):
         """Method to clear any existing material nodes
-        """        
+        """
         self.object.select_set(True)
         self.mat = bpy.data.materials.new(name='Material')
         self.mat.use_nodes = True
@@ -68,9 +69,9 @@ class BlenderMaterial():
             obj.active_material = self.mat
 
     def add_material(self):
-        self._uv_unwrap()
         self._clear_nodes()
         self._set_image_texture()
+        self._uv_unwrap()
 
         return self.mat
 
