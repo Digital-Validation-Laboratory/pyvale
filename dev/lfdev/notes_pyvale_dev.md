@@ -2,21 +2,24 @@
 # Notes: `pyvale` developement
 
 ## TODO: `pyvale`
-- Create simple mechanical examples of cylinder, plate and plate with hole
-
-- TESTING/FEATURE EXAMPLES:
-    - Camera basic
+- TODO PRIORITY:
+    - Docstrings
+    - Tests
+    - Support for surface mech extraction to simplify projections 
 
 - BUGS!
     - Spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
 
-- TODO PRIORITY:
+- TODO GENERAL:
     - Build Rory's simple DIC strain filter on top of the basic camera
     - Visualisation tools for perturbed field errors:
         - Angle
     - Visualisation tools for animating sensor traces
     - Visualisation tools for subplots of multiple sensors?
     - Finish basic camera
+
+- TESTING/FEATURE EXAMPLES:
+    - Camera basic
 
 - TODO: EXAMPLES
     - Example showing a basic camera

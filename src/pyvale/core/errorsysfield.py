@@ -107,9 +107,6 @@ class ErrSysField(IErrCalculator):
         return (sys_errs,self._sensor_data_perturbed)
 
 
-
-
-#-------------------------------------------------------------------------------
 def perturb_sensor_positions(sens_pos_nominal: np.ndarray,
                              pos_offset_xyz: np.ndarray | None,
                              pos_rand_xyz: tuple[IGeneratorRandom | None,
@@ -194,4 +191,3 @@ def perturb_sensor_angles(n_sensors: int,
 
     return tuple(angles_perturbed)
 
-#-------------------------------------------------------------------------------

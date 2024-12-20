@@ -155,9 +155,6 @@ def plot_point_sensors_on_sim(sensor_array: SensorArrayPoint,
     if vis_opts is None:
         vis_opts = VisOptsSimSensors()
 
-
-
-
     sim_data = sensor_array.field.get_sim_data()
     vis_opts.colour_bar_lims = get_colour_lims(
         sim_data.node_vars[component][:,time_step],

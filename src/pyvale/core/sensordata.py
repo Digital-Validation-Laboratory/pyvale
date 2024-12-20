@@ -13,15 +13,52 @@ from pyvale.core.integratortype import EIntSpatialType
 
 @dataclass(slots=True)
 class SensorData:
-    #shape=(n_sensors,3) where second dim=[x,y,z]
+    """Data class used for specifying sensor array parameters including:
+    position, sample times, angles (for vector/tensor fields), spatial averaging
+    and spatial dimensions of the sensor for spatial averaging. The number of
+    sensor positions specified determines the number of sensors in the array.
+    """
+
     positions: np.ndarray | None = None
-    #shape=(n_time_steps,)
+    """Numpy array of sensor positions where each row is for an individual
+    sensor and the columns specify the X, Y and Z coordinates respectively. To
+    create a sensor array the positions must be specified and the number of rows
+    of the position array determines the number of sensors in the array.
+
+    shape=(num_sensors,3)
+    """
+
     sample_times: np.ndarray | None = None
-    #shape=(n_sensors,)
+    """Numpy array of times at which the sensors will take measurements (sample
+    the field). This does not need to be specified to create a sensor array and
+    if it is set to None then the sample times will be assumed to be the same as
+    the simulation time steps.
+
+    shape=(num_time_steps,)
+    """
+
     angles: tuple[Rotation,...] | None = None
+    """The angles for each sensor in the array specified using scipy Rotation
+    objects. This is only used for sensors applied to vector or tensor fields.
+    Specifying a single rotation in the tuple will cause all sensors to have the
+    same rotation and they will be batch processed increasing speed. Otherwise
+    this tuple must have a length equal to the number of sensors (i.e. the
+    number of rows in the position array above).
+
+    shape=(num_sensor,) | (1,)
+    """
+
     spatial_averager: EIntSpatialType | None = None
-    #shape=(3,) where  dim=[x,y,z]
+    """
+
+    """
+
     spatial_dims: np.ndarray | None = None
+    """The spatial dimension of the sensor in its local X,Y,Z coordinates. Only
+    used if spatial averager is specified above.
+
+    shape=(3,)
+    """
 
 
 
