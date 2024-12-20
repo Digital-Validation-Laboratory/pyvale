@@ -12,12 +12,12 @@ from dev_deform_part import DeformMesh, DeformSimData, DeformPart
 
 def main() -> None:
     # Making Blender scene
-    data_path = Path('src/pyvale/simcases/case22_out.e')
+    data_path = Path('src/pyvale/data/case18_1_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
     dir = Path.cwd() / 'dev/lsdev/blender_files'
-    filename = 'case22_deformed.blend'
+    filename = 'case18_1_deformed.blend'
     filepath = dir / filename
     all_files = os.listdir(dir)
     for ff in all_files:
@@ -56,7 +56,7 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # Rendering images
-    image_path = Path.cwd() / 'dev/lsdev/rendered_images/Deform_from_moose'
+    image_path = Path.cwd() / 'dev/lsdev/rendered_images/case18_1_deformed'
     output_path = Path.cwd() / 'dev/lsdev/rendered_images'
 
 
@@ -71,7 +71,7 @@ def main() -> None:
     #---------------------------------------------------------------------------
     # Deform mesh
     timesteps = sim_data.time.shape[0]
-    for timestep in range(timesteps):
+    for timestep in range((timesteps - 1)):
         timestep += 1 # Adding at start of loop as timestep = 0 is the original mesh
         meshdeformer = DeformSimData(sim_data)
         deformed_nodes = meshdeformer.add_displacement(timestep)
@@ -79,13 +79,16 @@ def main() -> None:
         if deformed_nodes is not None:
             partdeformer = DeformPart(part, deformed_nodes)
             part = partdeformer.deform_part()
+            print(part.dimensions)
             partdeformer.set_new_frame()
 
             render_name = 'def_sim_data'
             render.render_image(render_name, timestep)
 
 
-    # scene.save_model(filepath)
+
+
+    scene.save_model(filepath)
 
 
 
