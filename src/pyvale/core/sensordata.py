@@ -49,8 +49,9 @@ class SensorData:
     """
 
     spatial_averager: EIntSpatialType | None = None
-    """
-
+    """Type of spatial averaging to use for this sensor. If None then no spatial
+    averaging is performed and sensor values are taken directly from the
+    specified positions.
     """
 
     spatial_dims: np.ndarray | None = None
