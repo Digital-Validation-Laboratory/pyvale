@@ -39,7 +39,12 @@ class SensorData:
 
     angles: tuple[Rotation,...] | None = None
     """The angles for each sensor in the array specified using scipy Rotation
-    objects. This is only used for sensors applied to vector or tensor fields.
+    objects. For scalar fields the rotation only has an effect if a spatial
+    averager is specified and the locations of the integration points are
+    rotated. For vector and tensor fields the field is transformed using this
+    rotation as well as rotating the positions of the integration points if a
+    spatial averager is specified.
+
     Specifying a single rotation in the tuple will cause all sensors to have the
     same rotation and they will be batch processed increasing speed. Otherwise
     this tuple must have a length equal to the number of sensors (i.e. the

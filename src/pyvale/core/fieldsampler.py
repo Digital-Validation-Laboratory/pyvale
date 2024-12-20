@@ -14,7 +14,22 @@ from pyvale.core.integratorfactory import build_spatial_averager
 
 def sample_field_with_sensor_data(field: IField, sensor_data: SensorData
                                   ) -> np.ndarray:
+    """Samples (interpolated) and `IField` object using the parameters specified
+    in the `SensorData` object.
 
+    Parameters
+    ----------
+    field : IField
+        Interface for
+    sensor_data : SensorData
+        Contains sensor array parameters including: number of sensors, positions
+        and sample times. See the `SensorData` class for more information.
+
+    Returns
+    -------
+    np.ndarray
+        Array
+    """
     if sensor_data.spatial_averager is None:
         return field.sample_field(sensor_data.positions,
                                   sensor_data.sample_times,
