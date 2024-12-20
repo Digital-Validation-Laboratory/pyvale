@@ -6,10 +6,19 @@ class BlenderPart:
     """Creates an object in Blender
     """
     def __init__(self,
-                 sim_data: SimData,
+                 sim_data: SimData | None = None,
                  elements:np.ndarray | None = None,
-                 nodes: np.ndarray | None = None):
+                 nodes: np.ndarray | None = None,
+                 filename: str | None = None):
         self.sim_data = sim_data
+        self.filename = filename
+        if sim_data is not None:
+            self._initialise_nodes_elements(elements, nodes)
+
+
+
+
+    def _initialise_nodes_elements(self, elements, nodes):
         if elements is None:
             self.elements = self._get_elements()
         else:
@@ -64,6 +73,12 @@ class BlenderPart:
         part = bpy.data.objects.new("specimen", mesh)
         bpy.context.scene.collection.objects.link(part)
 
+        return part
+
+    def import_from_stl(self):
+        bpy.ops.wm.stl_import(filepath=self.filename)
+
+        part = bpy.context.selected_objects[0]
         return part
 
     def add_thickness(self, part): # Not sure if this is necessary
