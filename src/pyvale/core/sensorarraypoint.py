@@ -29,6 +29,17 @@ class SensorArrayPoint(ISensorArray):
                  field: IField,
                  descriptor: SensorDescriptor | None = None,
                  ) -> None:
+        """Initialiser for the `SensorArrayPoint` class.
+
+        Parameters
+        ----------
+        sensor_data : SensorData
+            _description_
+        field : IField
+            _description_
+        descriptor : SensorDescriptor | None, optional
+            _description_, by default None
+        """        
         self.sensor_data = sensor_data
         self.field = field
         self.error_integrator = None
