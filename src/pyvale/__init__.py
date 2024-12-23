@@ -1,4 +1,11 @@
 """
+`pyvale`: the python validation engine. Used to simulate experimental data from
+an input multi-physics simulation by explicitly modelling sensors with realistic
+uncertainties. Useful for experimental design, sensor placement optimisation, 
+testing simulation validation metrics and testing digital shadows/twins.
+"""
+
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT

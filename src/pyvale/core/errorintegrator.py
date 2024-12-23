@@ -16,52 +16,52 @@ from pyvale.core.sensordata import SensorData
 
 @dataclass(slots=True)
 class ErrIntOpts:
-    """Error integration options dataclass. Allows the user to control how 
+    """Error integration options dataclass. Allows the user to control how
     errors are calculated and stored in memory for later use.
     """
 
     force_dependence: bool = False
     """Forces all errors to be calculated as dependent if True. Otherwise errors
-    will use individual dependence set in the errors initialiser. Independent 
-    errors are calculated based on the ground truth whereas dependent errors are 
-    calculated based on the accumulated sensor measurement at that stage in the 
-    error chain. 
-    
-    Note that some errors are inherently independent so will not change. For 
+    will use individual dependence set in the errors initialiser. Independent
+    errors are calculated based on the ground truth whereas dependent errors are
+    calculated based on the accumulated sensor measurement at that stage in the
+    error chain.
+
+    Note that some errors are inherently independent so will not change. For
     example: `ErrRandNormal` is purely independent whereas `ErrRandNormPercent`
-    can have the percentage error calculated based on the ground truth 
+    can have the percentage error calculated based on the ground truth
     (independent) or based on the accumulated sensor measurement (dependent).
-    """    
+    """
 
     store_all_errs: bool = False
     """Stores all errors for individual error in the chain if True. Also stores
-    a list of SensorData objects showing perturbations to the sensor array 
-    parameters caused by individual errors. Consumes significantly more memory 
-    but is useful for finding which errors contribute most to the total 
+    a list of SensorData objects showing perturbations to the sensor array
+    parameters caused by individual errors. Consumes significantly more memory
+    but is useful for finding which errors contribute most to the total
     measurement error. For large sensor arrays (>100 sensors)
-    """    
+    """
 
 
 class ErrIntegrator:
     """Class for managing sensor error integration. Takes a list of objects that
-    implement the `IErrCalculator` interface (i.e. the error chain) and loops 
-    through them calculating each errors contribution to the total measurement 
-    error and sums this over all errors in the chain. In addition to the total 
-    error a sum of the random and systematic errors (see `EErrType`) is 
+    implement the `IErrCalculator` interface (i.e. the error chain) and loops
+    through them calculating each errors contribution to the total measurement
+    error and sums this over all errors in the chain. In addition to the total
+    error a sum of the random and systematic errors (see `EErrType`) is
     calculated and stored.
 
     This class also accumulates perturbations to the sensor array parameters due
-    to errors (i.e. sensor positioning error or temporal drift). The accumulated 
+    to errors (i.e. sensor positioning error or temporal drift). The accumulated
     sensor array parameters are stored as a `SensorData` object.
-    
-    The errors are calculated in the order specified in the list. For dependent 
-    errors (`EErrDependence.DEPENDENT`) the position of the error within the 
-    error chain determines the accumulated sensor measurement that will be used 
+
+    The errors are calculated in the order specified in the list. For dependent
+    errors (`EErrDependence.DEPENDENT`) the position of the error within the
+    error chain determines the accumulated sensor measurement that will be used
     to calculate the error.
 
     The user can control how the errors are calculated using the `ErrIntOpts`
     dataclass.
-    """    
+    """
     __slots__ = ("_err_chain","_meas_shape","_errs_by_chain",
                  "_errs_systematic","_errs_random","_errs_total",
                  "_sens_data_by_chain","_err_int_opts","_sens_data_accumulated",
@@ -72,7 +72,7 @@ class ErrIntegrator:
                  sensor_data_initial: SensorData,
                  meas_shape: tuple[int,int,int],
                  err_int_opts: ErrIntOpts | None = None) -> None:
-        """Initialiser for the `ErrIntregrator` class.
+        """Initialiser for the `ErrIntegrator` class.
 
         Parameters
         ----------
@@ -83,7 +83,7 @@ class ErrIntegrator:
             modified by the error chain.
         meas_shape : tuple[int,int,int]
             Shape of the sensor measurement array. shape=(num_sensors,
-            num_field_components,num_time_steps) 
+            num_field_components,num_time_steps)
         err_int_opts : ErrIntOpts | None, optional
             Options for controlling how errors are calculated/summed and how
             they are store in memory, by default None. If None then the default
@@ -124,7 +124,7 @@ class ErrIntegrator:
         ----------
         err_chain : list[IErrCalculator]
             List of error calculators implementing the IErrCalculator interface.
-        """        
+        """
         self._err_chain = err_chain
 
         if self._err_int_opts.force_dependence:
@@ -135,19 +135,19 @@ class ErrIntegrator:
     def calc_errors_from_chain(self, truth: np.ndarray) -> np.ndarray:
         """Calculates all errors by looping over the error chain. The total
          measurement error is summed as each error is calculated in order. Note
-         that this causes all errors based on probability distributions to be 
+         that this causes all errors based on probability distributions to be
          resampled and any required interpolations to be performed (e.g. from
          randomly perturbing the sensor positions). Accumulated errors are also
-         stored for random and systematic errors separately (see `EErrType`). 
+         stored for random and systematic errors separately (see `EErrType`).
 
-         If the `store_all_errs = True` in the `ErrIntOpts` dataclass then each 
-         individual error is stored in a numpy array (see `get_errs_by_chain()`) 
-         along with the accumulated errors in another numpy array. 
+         If the `store_all_errs = True` in the `ErrIntOpts` dataclass then each
+         individual error is stored in a numpy array (see `get_errs_by_chain()`)
+         along with the accumulated errors in another numpy array.
 
         Parameters
         ----------
         truth : np.ndarray
-            Array of ground truth sensor measurements interpolated from the 
+            Array of ground truth sensor measurements interpolated from the
             simulated physical field. shape=(num_sensors,num_field_components,
             num_time_steps).
 
@@ -156,7 +156,7 @@ class ErrIntegrator:
         np.ndarray
             Array of total errors summed over all errors in the chain. shape=(
             num_sensors,num_field_components,num_time_steps).
-        """        
+        """
         if self._err_int_opts.store_all_errs:
             return self._calc_errors_store_by_chain(truth)
 
@@ -166,13 +166,13 @@ class ErrIntegrator:
     def _calc_errors_store_by_chain(self, truth: np.ndarray) -> np.ndarray:
         """Helper function for calculating all errors in the chain and summing
         them. Returns the total error and stores sums of the random and
-        systematic errors in member variables. This function also stores each 
-        individual error calculation in a separate numpy array for analysis.  
+        systematic errors in member variables. This function also stores each
+        individual error calculation in a separate numpy array for analysis.
 
         Parameters
         ----------
         truth : np.ndarray
-            Array of ground truth sensor measurements interpolated from the 
+            Array of ground truth sensor measurements interpolated from the
             simulated physical field. shape=(num_sensors,num_field_components,
             num_time_steps).
 
@@ -181,7 +181,7 @@ class ErrIntegrator:
         np.ndarray
             Array of total errors summed over all errors in the chain. shape=(
             num_sensors,num_field_components,num_time_steps).
-        """        
+        """
         accumulated_error = np.zeros_like(truth)
         self._errs_by_chain = np.zeros((len(self._err_chain),) + \
                                            self._meas_shape)
@@ -213,14 +213,14 @@ class ErrIntegrator:
     def _calc_errors_mem_eff(self, truth: np.ndarray) -> np.ndarray:
         """Helper function for calculating all errors in the chain and summing
         them. Returns the total error and stores sums of the random and
-        systematic errors in member variables. The individual error 
-        contributions are not stored in this case for memory efficiency, only 
+        systematic errors in member variables. The individual error
+        contributions are not stored in this case for memory efficiency, only
         the summed total, random and systematic error arrays are stored.
 
         Parameters
         ----------
         truth : np.ndarray
-            Array of ground truth sensor measurements interpolated from the 
+            Array of ground truth sensor measurements interpolated from the
             simulated physical field. shape=(num_sensors,num_field_components,
             num_time_steps).
 
@@ -229,7 +229,7 @@ class ErrIntegrator:
         np.ndarray
             Array of total errors summed over all errors in the chain. shape=(
             num_sensors,num_field_components,num_time_steps).
-        """  
+        """
         accumulated_error = np.zeros_like(truth)
 
         for ee in self._err_chain:
@@ -265,12 +265,12 @@ class ErrIntegrator:
             Array of all errors in the chain. shape=(num_errs_in_chain,
             num_sensors,num_field_components,num_time_steps). Returns None if
             `ErrIntOpts.store_all_errs=False`.
-        """        
+        """
         return self._errs_by_chain
 
     def get_sens_data_by_chain(self) -> list[SensorData] | None:
-        """Gets the list of sensor data objects storing how each error in the 
-        chain has perturbed the underlying sensor parameters. If 
+        """Gets the list of sensor data objects storing how each error in the
+        chain has perturbed the underlying sensor parameters. If
         `store_all_errs` is False in `ErrIntOpts` then this will return None.
         If no sensor array parameters are modified by the error chain then all
         SensorData objects in the list will be identical to the SensorData
@@ -279,47 +279,47 @@ class ErrIntegrator:
         Returns
         -------
         list[SensorData] | None
-            List of perturbed sensors array parameters for each error in the 
+            List of perturbed sensors array parameters for each error in the
             chain. Returns None if `ErrIntOpts.store_all_errs=False`.
-        """        
+        """
         return self._sens_data_by_chain
 
     def get_sens_data_accumulated(self) -> SensorData:
-        """Gets the final accumulated sensor array parameters based on all 
-        errors in the chain as a SensorData object. If no errors modify the 
-        sensor array parameters then the SensorData object returns will be 
+        """Gets the final accumulated sensor array parameters based on all
+        errors in the chain as a SensorData object. If no errors modify the
+        sensor array parameters then the SensorData object returns will be
         identical to the SensorData object used to create the sensor array.
 
         Returns
         -------
         SensorData
-            The final sensor array parameters based on accumulating all 
+            The final sensor array parameters based on accumulating all
             perturbations from all errors in the error chain.
-        """        
+        """
         return self._sens_data_accumulated
 
     def get_errs_systematic(self) -> np.ndarray:
-        """Gets the array of summed systematic errors over the error chain. If 
-        the errors have not been calculated then an array of zeros is returned.  
+        """Gets the array of summed systematic errors over the error chain. If
+        the errors have not been calculated then an array of zeros is returned.
 
         Returns
         -------
         np.ndarray
             Array of total systematic errors. shape=(num_sensors,
-            num_field_components,num_time_steps) 
-        """        
+            num_field_components,num_time_steps)
+        """
         return self._errs_systematic
 
     def get_errs_random(self) -> np.ndarray:
-        """Gets the array of summed random errors over the error chain. If the 
-        errors have not been calculated then an array of zeros is returned.  
+        """Gets the array of summed random errors over the error chain. If the
+        errors have not been calculated then an array of zeros is returned.
 
         Returns
         -------
         np.ndarray
             Array of total random errors. shape=(num_sensors,
-            num_field_components,num_time_steps) 
-        """        
+            num_field_components,num_time_steps)
+        """
         return self._errs_random
 
     def get_errs_total(self) -> np.ndarray:
@@ -332,8 +332,8 @@ class ErrIntegrator:
         -------
         np.ndarray
             Array of total errors. shape=(num_sensors,num_field_components,
-            num_time_steps)  
-        """        
+            num_time_steps)
+        """
         return self._errs_total
 
 

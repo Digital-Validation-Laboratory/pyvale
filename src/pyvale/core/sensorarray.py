@@ -13,6 +13,38 @@ from pyvale.core.field import IField
 class ISensorArray(ABC):
     """Interface (abstract base class) for an array of sensors of the same
     type sampling a given physical field.
+
+    This class implements the `pyvale` sensor measurement simulation model. Here
+    a measurement is taken as: measurement = truth + random errors + systematic
+    errors. The truth value for each sensor is interpolated from the physical
+    field (an implementation of the `IField` interface, nominally a
+    `FieldScalar`, `FieldVector` or `FieldTensor` object).
+
+    The random and systematic errors are calculated by a user specified error
+    integrator (`ErrIntegrator` class). This class contains a chain of different
+    types of user selected errors (implementations of the `IErrCalculator`
+    interface). Further information can be found in the `ErrIntegrator` class
+    and in implementations of the `IErrCalculator` interface.
+
+    In `pyvale`, function and methods with `calc` in their name will cause
+    probability distributions to be resampled and any additional calculations,
+    such as interpolation, to be performed. Functions and methods with `get` in
+    the name will directly return the previously calculated values without
+    resampling probability distributions.
+
+    Calling the class method `calc_measurements()` will create and return an
+    array of simulated sensor measurements with the following shape=(num_sensors
+    ,num_field_component,num_time_steps). When calling `calc_measurements()` all
+    sensor errors that are based on probability distributions are resampled and
+    any required interpolations are performed (e.g. a random perturbation of the
+    sensor positions requiring interpolation at the perturbed sensor location).
+
+    Calling the class method `get_measurements()` just returns the previously
+    calculated set of sensor measurements without resampling of probability.
+    Distributions.
+
+    Without an error integrator this class can be used for interpolating
+    simulated physical fields quickly using finite element shape functions.
     """
 
     @abstractmethod
@@ -53,8 +85,9 @@ class ISensorArray(ABC):
         interpolated from the input simulation field. The errors are calculated
         based on the user specified error chain.
 
-        NOTE: this method will sample all probability distributions in the error
-        chain returning a new simulated experiment for this sensor array.
+        NOTE: this is a 'calc' method and will sample all probability
+        distributions in the error chain returning a new simulated experiment
+        for this sensor array.
 
         Returns
         -------
@@ -69,11 +102,11 @@ class ISensorArray(ABC):
         """Abstract method. Returns the current set of simulated measurements if
         theses have been calculated. If these have not been calculated then
         'calc_measurements()' is called and a set of measurements in then
-        returnes.
+        returned.
 
-        NOTE: this method does not sample from probability distributions in the
-        error chain and directly returns the current set of measurements if they
-        exist.
+        NOTE: this is a 'get' method and does not sample from probability
+        distributions in the error chain and directly returns the current set of
+        measurements if they exist.
 
         Returns
         -------
