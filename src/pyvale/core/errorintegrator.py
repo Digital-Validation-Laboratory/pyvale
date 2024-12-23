@@ -16,11 +16,38 @@ from pyvale.core.sensordata import SensorData
 
 @dataclass(slots=True)
 class ErrIntOpts:
+    """Error integration options dataclass. Allows the user to control how 
+    errors are calculated and stored in memory for later use.
+    """
+
     force_dependence: bool = False
+    """Forces all errors to be calculated as dependent if True. Otherwise errors
+    will use individual dependence set in the errors initialiser. Independent 
+    errors are calculated based on the ground truth whereas dependent errors are 
+    calculated based on the accumulated sensor measurement at that stage in the 
+    error chain. 
+    
+    Note that some errors are inherently independent so will not change. For 
+    example: `ErrRandNormal` is purely independent whereas `ErrRandNormPercent`
+    can have the percentage error calculated based on the ground truth 
+    (independent) or based on the accumulated sensor measurement (dependent).
+    """    
+
     store_errs_by_func: bool = False
+    """Stores all errors for individual error in the chain if True. Consumes 
+    significantly more memory but is useful for finding which errors contribute 
+    most to the total measurement error.
+    """    
 
 
 class ErrIntegrator:
+    """_summary_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """    
     __slots__ = ("_err_chain","_meas_shape","_errs_by_chain",
                  "_errs_systematic","_errs_random","_errs_total",
                  "_sens_data_by_chain","_err_int_opts","_sens_data_accumulated",
