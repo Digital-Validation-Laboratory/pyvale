@@ -15,11 +15,8 @@ from pyvale.core.generatorsrandom import IGeneratorRandom
 
 class ErrRandUniform(IErrCalculator):
     """Sensor random error calculator based on uniform sampling of an interval
-    specified by its upper and lower bound. This
-
-    Parameters
-    ----------
-    IErrCalculator : Implements the error calculator interface
+    specified by its upper and lower bound. This class implements the
+    `IErrCalculator` interface.
     """
     __slots__ = ("low","high","rng","err_dep")
 
@@ -33,14 +30,14 @@ class ErrRandUniform(IErrCalculator):
         Parameters
         ----------
         low : float
-            Lower bound of the uniform random generator
+            Lower bound of the uniform random generator.
         high : float
-            Upper bound of the uniform random generator
+            Upper bound of the uniform random generator.
         err_dep : EErrDependence, optional
-            Error calculation dependence, by default EErrDependence.INDEPENDENT
+            Error calculation dependence, by default EErrDependence.INDEPENDENT.
         seed : int | None, optional
             Optional seed for the random generator to allow for replicable
-            behaviour, by default None
+            behaviour, by default None.
         """
         self.low = low
         self.high = high
@@ -115,6 +112,10 @@ class ErrRandUniform(IErrCalculator):
 
 
 class ErrRandUnifPercent(IErrCalculator):
+    """Sensor random error calculator based on a percentage error taken from
+    uniform sampling of an interval specified by its upper and lower bound (in
+    percent). This class implements the `IErrCalculator` interface.
+    """
     __slots__ = ("low","high","rng","err_dep")
 
     def __init__(self,
@@ -122,18 +123,59 @@ class ErrRandUnifPercent(IErrCalculator):
                  high_percent: float,
                  err_dep: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
+        """_summary_
+
+        Parameters
+        ----------
+        low_percent : float
+            Lower percentage bound of the uniform random generator.
+        high_percent : float
+            Upper percentage bound of the uniform random generator.
+        err_dep : EErrDependence, optional
+            Error calculation dependence, by default EErrDependence.INDEPENDENT.
+        seed : int | None, optional
+            Optional seed for the random generator to allow for replicable
+            behaviour, by default None.
+        """
         self.low = low_percent/100
         self.high = high_percent/100
         self.rng = np.random.default_rng(seed)
         self.err_dep = err_dep
 
     def get_error_dep(self) -> EErrDependence:
+        """Gets the error dependence state for this error calculator. An
+        independent error is calculated based on the input truth values as the
+        error basis. A dependent error is calculated based on the accumulated
+        sensor reading from all preceeding errors in the chain.
+
+        Returns
+        -------
+        EErrDependence
+            Enumeration defining INDEPENDENT or DEPENDENT behaviour.
+        """
         return self.err_dep
 
     def set_error_dep(self, dependence: EErrDependence) -> None:
+        """Sets the error dependence state for this error calculator. An
+        independent error is calculated based on the input truth values as the
+        error basis. A dependent error is calculated based on the accumulated
+        sensor reading from all preceeding errors in the chain.
+
+        Parameters
+        ----------
+        dependence : EErrDependence
+            Enumeration defining INDEPENDENT or DEPENDENT behaviour.
+        """
         self.err_dep = dependence
 
     def get_error_type(self) -> EErrType:
+        """Gets the error type.
+
+        Returns
+        -------
+        EErrType
+            Enumeration definining RANDOM or SYSTEMATIC error types.
+        """
         return EErrType.RANDOM
 
     def calc_errs(self,
