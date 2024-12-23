@@ -54,14 +54,14 @@ class SensorData:
     """
 
     spatial_averager: EIntSpatialType | None = None
-    """Type of spatial averaging to use for this sensor. If None then no spatial
-    averaging is performed and sensor values are taken directly from the
+    """Type of spatial averaging to use for this sensor array. If None then no
+    spatial averaging is performed and sensor values are taken directly from the
     specified positions.
     """
 
     spatial_dims: np.ndarray | None = None
-    """The spatial dimension of the sensor in its local X,Y,Z coordinates. Only
-    used if spatial averager is specified above.
+    """The spatial dimension of the sensor array in its local X,Y,Z coordinates.
+    Only used if spatial averager is specified above.
 
     shape=(3,)
     """
