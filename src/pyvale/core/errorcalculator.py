@@ -44,7 +44,7 @@ class EErrDependence(enum.Enum):
 
 
 class IErrCalculator(ABC):
-    """Interface (abstract base class) for sensor error calculation allows for
+    """Interface (abstract base class) for sensor error calculation allowing for
     chaining of errors.
     """
     @abstractmethod
