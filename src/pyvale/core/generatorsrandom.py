@@ -13,23 +13,24 @@ class IGeneratorRandom(ABC):
     """Interface (abstract base class) for wrapping numpy random number
     generation to allow probability distribution parameters to be specified in
     the initialiser whereas the generation of random numbers has a common
-    method. Allows for easy subsitution of different probability distributions.
+    method that just takes the require shape to return. Allows for easy
+    subsitution of different probability distributions.
     """
 
     @abstractmethod
-    def generate(self, size: tuple[int,...]) -> np.ndarray:
+    def generate(self, shape: tuple[int,...]) -> np.ndarray:
         """Abstract method. Generates an array of random numbers with a shape
-        based on the specified size.
+        based on the specified shape.
 
         Parameters
         ----------
-        size : tuple[int,...]
+        shape : tuple[int,...]
             Shape of the array of random numbers to be returns.
 
         Returns
         -------
         np.ndarray
-            Array of random numbers with shape specified by the input size.
+            Array of random numbers with shape specified by the input shape.
         """
         pass
 
@@ -61,13 +62,13 @@ class GeneratorNormal(IGeneratorRandom):
         self._mean = mean
         self._rng = np.random.default_rng(seed)
 
-    def generate(self, size: tuple[int,...]) -> np.ndarray:
+    def generate(self, shape: tuple[int,...]) -> np.ndarray:
         """Initialiser taking the parameters of the probability distribution and
         an optional seed for the random generator to allow for reproducibility.
 
         Parameters
         ----------
-        size : tuple[int,...]
+        shape : tuple[int,...]
             _description_
 
         Returns
@@ -77,7 +78,7 @@ class GeneratorNormal(IGeneratorRandom):
         """
         return self._rng.normal(loc = self._mean,
                                 scale = self._std,
-                                size = size)
+                                shape = shape)
 
 
 class GeneratorLogNormal(IGeneratorRandom):
@@ -107,12 +108,12 @@ class GeneratorLogNormal(IGeneratorRandom):
         self._mean = mean
         self._rng = np.random.default_rng(seed)
 
-    def generate(self, size: tuple[int,...]) -> np.ndarray:
+    def generate(self, shape: tuple[int,...]) -> np.ndarray:
         """_summary_
 
         Parameters
         ----------
-        size : tuple[int,...]
+        shape : tuple[int,...]
             _description_
 
         Returns
@@ -122,7 +123,7 @@ class GeneratorLogNormal(IGeneratorRandom):
         """
         return self._rng.lognormal(mean = self._mean,
                                    sigma = self._std,
-                                   size = size)
+                                   shape = shape)
 
 
 class GeneratorUniform(IGeneratorRandom):
@@ -153,10 +154,10 @@ class GeneratorUniform(IGeneratorRandom):
         self._high = high
         self._rng = np.random.default_rng(seed)
 
-    def generate(self, size: tuple[int,...]) -> np.ndarray:
+    def generate(self, shape: tuple[int,...]) -> np.ndarray:
         return self._rng.uniform(low = self._low,
                                  high = self._high,
-                                 size = size)
+                                 shape = shape)
 
 
 class GeneratorExponential(IGeneratorRandom):
@@ -181,21 +182,21 @@ class GeneratorExponential(IGeneratorRandom):
         self._scale = scale
         self._rng = np.random.default_rng(seed)
 
-    def generate(self, size: tuple[int,...]) -> np.ndarray:
+    def generate(self, shape: tuple[int,...]) -> np.ndarray:
         """_summary_
 
         Parameters
         ----------
-        size : tuple[int,...]
+        shape : tuple[int,...]
             _description_
 
         Returns
         -------
         np.ndarray
             _description_
-        """        
+        """
         return self._rng.exponential(scale = self._scale,
-                                     size = size)
+                                     shape = shape)
 
 
 class GeneratorChiSquare(IGeneratorRandom):
@@ -219,12 +220,12 @@ class GeneratorChiSquare(IGeneratorRandom):
         self._dofs = np.abs(dofs)
         self._rng = np.random.default_rng(seed)
 
-    def generate(self, size: tuple[int,...]) -> np.ndarray:
+    def generate(self, shape: tuple[int,...]) -> np.ndarray:
         """_summary_
 
         Parameters
         ----------
-        size : tuple[int,...]
+        shape : tuple[int,...]
             _description_
 
         Returns
@@ -233,7 +234,7 @@ class GeneratorChiSquare(IGeneratorRandom):
             _description_
         """
         return self._rng.chisquare(df = self._dofs,
-                                   size = size)
+                                   shape = shape)
 
 
 class GeneratorDirichlet(IGeneratorRandom):
@@ -247,8 +248,8 @@ class GeneratorDirichlet(IGeneratorRandom):
         self._alpha = alpha
         self._rng = np.random.default_rng(seed)
 
-    def generate(self, size: tuple[int,...]) -> np.ndarray:
-        return self._rng.dirichlet(alpha = self._alpha, size = size)
+    def generate(self, shape: tuple[int,...]) -> np.ndarray:
+        return self._rng.dirichlet(alpha = self._alpha, shape = shape)
 
 
 class GeneratorF(IGeneratorRandom):
@@ -262,8 +263,8 @@ class GeneratorF(IGeneratorRandom):
         self._dofs = np.abs(dofs)
         self._rng = np.random.default_rng(seed)
 
-    def generate(self, size: tuple[int,...]) -> np.ndarray:
-        return self._rng.f(dfnum = self._dofs, size = size)
+    def generate(self, shape: tuple[int,...]) -> np.ndarray:
+        return self._rng.f(dfnum = self._dofs, shape = shape)
 
 
 class GeneratorGamma(IGeneratorRandom):
@@ -279,9 +280,9 @@ class GeneratorGamma(IGeneratorRandom):
         self._scale = scale
         self._rng = np.random.default_rng(seed)
 
-    def generate(self, size: tuple[int,...]) -> np.ndarray:
+    def generate(self, shape: tuple[int,...]) -> np.ndarray:
         return self._rng.gamma(scale = self._scale,
-                                     size = size)
+                                     shape = shape)
 
 
 class GeneratorStudentT(IGeneratorRandom):
@@ -295,9 +296,9 @@ class GeneratorStudentT(IGeneratorRandom):
         self._dofs = np.abs(dofs)
         self._rng = np.random.default_rng(seed)
 
-    def generate(self, size: tuple[int,...]) -> np.ndarray:
+    def generate(self, shape: tuple[int,...]) -> np.ndarray:
         return self._rng.standard_t(df = self._dofs,
-                                   size = size)
+                                   shape = shape)
 
 
 class GeneratorBeta(IGeneratorRandom):
@@ -313,10 +314,10 @@ class GeneratorBeta(IGeneratorRandom):
         self._b = np.abs(b)
         self._rng = np.random.default_rng(seed)
 
-    def generate(self, size: tuple[int,...]) -> np.ndarray:
+    def generate(self, shape: tuple[int,...]) -> np.ndarray:
         return self._rng.beta(a = self._a,
                               b = self._b,
-                              size = size)
+                              shape = shape)
 
 
 class GeneratorTriangular(IGeneratorRandom):
@@ -335,8 +336,8 @@ class GeneratorTriangular(IGeneratorRandom):
 
         self._rng = np.random.default_rng(seed)
 
-    def generate(self, size: tuple[int,...]) -> np.ndarray:
+    def generate(self, shape: tuple[int,...]) -> np.ndarray:
         return self._rng.triangular(left = self._left,
                                     mode = self._mode,
                                     right = self._right,
-                                    size = size)
+                                    shape = shape)

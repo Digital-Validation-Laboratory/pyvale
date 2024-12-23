@@ -38,7 +38,17 @@ class ErrRandUniform(IErrCalculator):
         seed : int | None, optional
             Optional seed for the random generator to allow for replicable
             behaviour, by default None.
+
+        Raises
+        ------
+        ValueError
+            Raised if the user specified a lower bound that is higher than the
+            upper bound.
         """
+
+        if low > high:
+            raise ValueError("The upper bound must be higher than the lower "
+                              + "bound for this error.")
         self.low = low
         self.high = high
         self.rng = np.random.default_rng(seed)
@@ -124,7 +134,7 @@ class ErrRandUnifPercent(IErrCalculator):
                  high_percent: float,
                  err_dep: EErrDependence = EErrDependence.INDEPENDENT,
                  seed: int | None = None) -> None:
-        """_summary_
+        """Initialiser for the `ErrRandUnifPercent` class.
 
         Parameters
         ----------
@@ -137,7 +147,18 @@ class ErrRandUnifPercent(IErrCalculator):
         seed : int | None, optional
             Optional seed for the random generator to allow for replicable
             behaviour, by default None.
+
+        Raises
+        ------
+        ValueError
+            Raised if the user specified a lower bound that is higher than the
+            upper bound.
         """
+
+        if low_percent > high_percent:
+            raise ValueError("The upper percentage bound must be higher than "
+                              + "the lower percentage bound for this error.")
+
         self.low = low_percent/100
         self.high = high_percent/100
         self.rng = np.random.default_rng(seed)
