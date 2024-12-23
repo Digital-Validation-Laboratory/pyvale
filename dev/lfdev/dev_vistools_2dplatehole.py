@@ -73,7 +73,7 @@ def main() -> None:
                                         angle_error_data))
 
     err_int_opts = pyvale.ErrIntOpts(force_dependence=True,
-                                               store_errs_by_func=True)
+                                               store_all_errs=True)
     error_int = pyvale.ErrIntegrator(field_errs,
                                        sensor_data,
                                        disp_sens_array.get_measurement_shape(),
