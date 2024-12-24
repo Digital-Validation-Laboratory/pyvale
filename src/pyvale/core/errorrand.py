@@ -14,9 +14,10 @@ from pyvale.core.generatorsrandom import IGeneratorRandom
 
 
 class ErrRandUniform(IErrCalculator):
-    """Sensor random error calculator based on uniform sampling of an interval
-    specified by its upper and lower bound. This class implements the
-    `IErrCalculator` interface.
+    """Random error calculator based on uniform sampling of an interval
+    specified by its upper and lower bound.
+
+    Implements the `IErrCalculator` interface.
     """
     __slots__ = ("low","high","rng","err_dep")
 
@@ -123,9 +124,15 @@ class ErrRandUniform(IErrCalculator):
 
 
 class ErrRandUnifPercent(IErrCalculator):
-    """Sensor random error calculator based on a percentage error taken from
-    uniform sampling of an interval specified by its upper and lower bound (in
-    percent). This class implements the `IErrCalculator` interface.
+    """Random error calculator based on a percentage error based on sampling
+    from a uniform probability distribution specified by its upper and lower
+    bound (in percent).
+
+    The percentage error is calculated based on the ground truth if the error
+    dependence is `INDEPENDENT` or based on the accumulated sensor measurement
+    if the dependence is `DEPENDENT`.
+
+    Implements the `IErrCalculator` interface.
     """
     __slots__ = ("low","high","rng","err_dep")
 
@@ -229,10 +236,12 @@ class ErrRandUnifPercent(IErrCalculator):
 
 
 class ErrRandNormal(IErrCalculator):
-    """Sensor random error calculator based on sampling of a normal (Gaussian)
+    """Random error calculator based on sampling of a normal (Gaussian)
     distribution specified using the standard deviation with an assumed zero
     mean. A non-zero mean is a systematic error and should be specified using
-    `ErrSysOffset`. This class implements the `IErrCalculator` interface.
+    `ErrSysOffset`.
+
+    Implements the `IErrCalculator` interface.
     """
     __slots__ = ("std","rng","err_dep")
 
@@ -329,7 +338,13 @@ class ErrRandNormPercent(IErrCalculator):
     distribution specified using the standard deviation with an assumed zero
     mean. This error is calculated as a percentage of the input error basis.
     Note that a non-zero mean is a systematic error and should be specified
-    using `ErrSysOffset`. This class implements the `IErrCalculator` interface.
+    using `ErrSysOffset`.
+
+    The percentage error is calculated based on the ground truth if the error
+    dependence is `INDEPENDENT` or based on the accumulated sensor measurement
+    if the dependence is `DEPENDENT`.
+
+    Implements the `IErrCalculator` interface.
     """
     __slots__ = ("_std","_rng","_err_dep")
 
@@ -420,8 +435,9 @@ class ErrRandNormPercent(IErrCalculator):
 
 class ErrRandGenerator(IErrCalculator):
     """Sensor random error calculator based on sampling a user specified random
-    number generator implementing the `IGeneratorRandom` interface. This class
-    implements the `IErrCalculator` interface.
+    number generator implementing the `IGeneratorRandom` interface.
+
+    Implements the `IErrCalculator` interface.
     """
     __slots__ = ("_generator","_err_dep")
 
@@ -510,8 +526,13 @@ class ErrRandGenPercent(IErrCalculator):
     """Sensor random error calculator based on sampling a user specified random
     number generator implementing the `IGeneratorRandom` interface. This class
     assumes the random generator is for a percentage error based on the input
-    error basis and therefore it supports error dependence. This class
-    implements the `IErrCalculator` interface.
+    error basis and therefore it supports error dependence.
+
+    The percentage error is calculated based on the ground truth if the error
+    dependence is `INDEPENDENT` or based on the accumulated sensor measurement
+    if the dependence is `DEPENDENT`.
+
+    Implements the `IErrCalculator` interface.
     """
     __slots__ = ("_generator","_err_dep")
 
