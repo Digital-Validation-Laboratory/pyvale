@@ -605,7 +605,10 @@ class ErrSysNormPercent(IErrCalculator):
 
 
 class ErrSysGenerator(IErrCalculator):
-    """Systematic error calculator for .
+    """Systematic error calculator for applying a unique offset to each sensor
+    by sample from a user specified probability distribution (an implementation
+    of the `IGeneratorRandom` interface).
+
     Implements the `IErrCalculator` interface.
     """
     __slots__ = ("_generator","_err_dep")
@@ -686,20 +689,136 @@ class ErrSysGenerator(IErrCalculator):
         return (sys_errs,sens_data)
 
 
+class ErrSysGenPercent(IErrCalculator):
+    """Systematic error calculator for applying a unique percentage offset to
+    each sensor by sample from a user specified probability distribution (an
+    implementation of the `IGeneratorRandom` interface). This class assumes the
+    random generator is for a percentage error based on the input error basis
+    and therefore it supports error dependence.
+
+    The percentage error is calculated based on the ground truth if the error
+    dependence is `INDEPENDENT` or based on the accumulated sensor measurement
+    if the dependence is `DEPENDENT`.
+
+    Implements the `IErrCalculator` interface.
+    """
+    __slots__ = ("_generator","_err_dep")
+
+    def __init__(self,
+                 generator: IGeneratorRandom,
+                 err_dep: EErrDependence = EErrDependence.INDEPENDENT) -> None:
+
+        self._generator = generator
+        self._err_dep = err_dep
+
+    def get_error_dep(self) -> EErrDependence:
+        """Gets the error dependence state for this error calculator. An
+        independent error is calculated based on the input truth values as the
+        error basis. A dependent error is calculated based on the accumulated
+        sensor reading from all preceeding errors in the chain.
+
+        Returns
+        -------
+        EErrDependence
+            Enumeration defining INDEPENDENT or DEPENDENT behaviour.
+        """
+        return self._err_dep
+
+    def set_error_dep(self, dependence: EErrDependence) -> None:
+        """Sets the error dependence state for this error calculator. An
+        independent error is calculated based on the input truth values as the
+        error basis. A dependent error is calculated based on the accumulated
+        sensor reading from all preceeding errors in the chain.
+
+        Parameters
+        ----------
+        dependence : EErrDependence
+            Enumeration defining INDEPENDENT or DEPENDENT behaviour.
+        """
+        self._err_dep = dependence
+
+    def get_error_type(self) -> EErrType:
+        """Gets the error type.
+
+        Returns
+        -------
+        EErrType
+            Enumeration definining RANDOM or SYSTEMATIC error types.
+        """
+        return EErrType.SYSTEMATIC
+
+    def calc_errs(self,
+                  err_basis: np.ndarray,
+                  sens_data: SensorData,
+                  ) -> tuple[np.ndarray, SensorData]:
+        """Calculates the error array based on the size of the input.
+
+        Parameters
+        ----------
+        err_basis : np.ndarray
+            Array of values with the same dimensions as the sensor measurement
+            matrix.
+        sens_data : SensorData
+            The accumulated sensor state data for all errors prior to this one.
+
+        Returns
+        -------
+        tuple[np.ndarray, SensorData]
+            Tuple containing the calculated error array and pass through of the
+            sensor data object as it is not modified by this class. The returned
+            error array has the same shape as the input error basis.
+        """
+        err_shape = np.array(err_basis.shape)
+        err_shape[-1] = 1
+
+        sys_errs = self._generator.generate(size=err_shape)
+
+        tile_shape = np.array(err_basis.shape)
+        tile_shape[0:-1] = 1
+        sys_errs = np.tile(sys_errs,tuple(tile_shape))
+        sys_errs = err_basis * sys_errs
+
+        return (sys_errs,sens_data)
+
+
 class ErrSysCalibration(IErrCalculator):
-    """Systematic error calculator for calibration errors.
+    """Systematic error calculator for calibration errors. The user specifies an
+    assumed calibration and a ground truth calibration function. The ground
+    truth calibration function is inverted and linearly interpolated numerically
+    based on the number of divisions specified by the user.
+
     Implements the `IErrCalculator` interface.
     """
     __slots__ = ("_assumed_cali","_truth_calib","_cal_range","_n_cal_divs",
                  "_err_dep","_truth_calc_table")
 
     def __init__(self,
-                 assumed_calib: Callable,
-                 truth_calib: Callable,
+                 assumed_calib: Callable[[np.ndarray],np.ndarray],
+                 truth_calib: Callable[[np.ndarray],np.ndarray],
                  cal_range: tuple[float,float],
                  n_cal_divs: int = 10000,
                  err_dep: EErrDependence = EErrDependence.INDEPENDENT) -> None:
+        """_summary_
 
+        Parameters
+        ----------
+        assumed_calib : Callable[[np.ndarray],np.ndarray]
+            Assumed calibration function taking the input unitless 'signal' and
+            converting it to the same units as the physical field being sampled
+            by the sensor array.
+        truth_calib : Callable[[np.ndarray],np.ndarray]
+            Assumed calibration function taking the input unitless 'signal' and
+            converting it to the same units as the physical field being sampled
+            by the sensor array.
+        cal_range : tuple[float,float]
+            Range over which the calibration functions are valid. This is
+            normally based on a voltage range such as (0,10) volts.
+        n_cal_divs : int, optional
+            Number of divisions to discretise the the truth calibration function
+            for numerical inversion, by default 10000.
+        err_dep : EErrDependence, optional
+            Error calculation dependence, by default EErrDependence.INDEPENDENT.
+        """
         self._assumed_calib = assumed_calib
         self._truth_calib = truth_calib
         self._cal_range = cal_range

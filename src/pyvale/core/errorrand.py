@@ -523,7 +523,7 @@ class ErrRandGenerator(IErrCalculator):
 
 
 class ErrRandGenPercent(IErrCalculator):
-    """Sensor random error calculator based on sampling a user specified random
+    """Random error calculator based on sampling a user specified random
     number generator implementing the `IGeneratorRandom` interface. This class
     assumes the random generator is for a percentage error based on the input
     error basis and therefore it supports error dependence.
