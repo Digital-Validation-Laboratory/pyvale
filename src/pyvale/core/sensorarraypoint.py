@@ -66,11 +66,15 @@ class SensorArrayPoint(ISensorArray):
         Parameters
         ----------
         sensor_data : SensorData
-            _description_
+            Specifies sensor array parameters including: positions, sample times
+            , angles, and area averaging. See the `SensorData` dataclass for
+            details.
         field : IField
-            _description_
+            The simulated physical field that the sensors will samples from.
+            This is normally a `FieldScalar`, `FieldVector` or `FieldTensor`.
         descriptor : SensorDescriptor | None, optional
-            _description_, by default None
+            Contains descriptive information about the sensor array for display
+            and visualisations, by default None.
         """
         self.sensor_data = sensor_data
         self.field = field

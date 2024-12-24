@@ -10,9 +10,13 @@ import numpy as np
 from pyvale.core.sensorarray import ISensorArray
 import mooseherder as mh
 
+# NOTE: This module is a feature under developement.
 
 @dataclass(slots=True)
 class ExperimentStats:
+    """Dataclass holding summary statistics for a series of simulated
+    experiments.
+    """
     mean: np.ndarray | None = None
     std: np.ndarray | None = None
     cov: np.ndarray | None = None
@@ -25,6 +29,11 @@ class ExperimentStats:
 
 
 class ExperimentSimulator:
+    """An experiment simulator for running monte-carlo analysis by applying a
+    list of sensor arrays to a list of simulations over a given number of user
+    defined experiments. Calculates summary statistics for each sensor array
+    applied to each simulation.
+    """
     __slots__ = ("sim_list","sensor_arrays","num_exp_per_sim","_exp_data",
                  "_exp_stats")
 
@@ -66,7 +75,7 @@ class ExperimentSimulator:
         return self._exp_data
 
 
-    def calc_stats(self) -> list[np.ndarray]:
+    def calc_stats(self) -> list[ExperimentStats]:
         # shape=list[n_arrays](n_sims,n_exps,n_sens,n_comps,n_time_steps)
         self._exp_stats = [None]*len(self.sensor_arrays)
         for ii,_ in enumerate(self.sensor_arrays):
