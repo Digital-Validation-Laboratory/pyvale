@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 from pyvale.core.camera import CameraBasic2D
 from pyvale.core.visualopts import PlotOptsGeneral
 
+# NOTE: This module is a feature under developement. Linked to the basic camera
+# class.
 
 def plot_measurement_image(camera: CameraBasic2D,
                            component: str,

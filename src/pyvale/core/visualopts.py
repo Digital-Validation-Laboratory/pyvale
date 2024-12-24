@@ -14,8 +14,9 @@ import matplotlib as plt
 
 @dataclass(slots=True)
 class PlotOptsGeneral:
-    """ Helper class to set properties in matplotlib for scaling to use in a
-    journal article or report.
+    """ Dataclass for controlling the properties of figures and graphs such as
+    figure size, resolution, font sizes, marker sizes, line widths and
+    colormaps.
     """
     aspect_ratio: float = 1.62
     a4_width: float = 8.25
@@ -62,6 +63,8 @@ class PlotOptsGeneral:
 
 @dataclass(slots=True)
 class TraceOptsSensor:
+    """Dataclass for controlling the properties of sensor trace plots.
+    """
     legend: bool = True
 
     x_label: str = r"x [$m$]"
@@ -79,6 +82,9 @@ class TraceOptsSensor:
 
 @dataclass(slots=True)
 class TraceOptsExperiment:
+    """Dataclass for contorlling the properties of sensor trace plots from
+    batches of simulated experiments.
+    """
     legend: bool = True
 
     x_label: str = r"x [$m$]"
@@ -101,6 +107,9 @@ class TraceOptsExperiment:
 
 @dataclass(slots=True)
 class VisOptsSimSensors:
+    """Dataclass for controlling displays of the simulation mesh and sensor
+    locations using pyvista.
+    """
     # pyvista ops
     window_size_px: tuple[int,int] = (1280,800)
     camera_position: np.ndarray | str = "xy"
@@ -134,6 +143,8 @@ class EImageType(enum.Enum):
 
 @dataclass(slots=True)
 class VisOptsImageSave:
+    """Dataclass for image save options.
+    """
     path: Path | None = None
     image_type: EImageType = EImageType.PNG
     transparent_background: bool = False
@@ -145,6 +156,8 @@ class EAnimationType(enum.Enum):
 
 @dataclass(slots=True)
 class VisOptsAnimation:
+    """Dataclass for animation save options.
+    """
     frames_per_second: float = 10.0
     off_screen: bool = False
 

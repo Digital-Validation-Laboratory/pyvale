@@ -79,6 +79,65 @@ class ISensorArray(ABC):
         pass
 
     @abstractmethod
+    def get_truth(self) -> np.ndarray:
+        """Abstract method. Gets the ground truth sensor values that were
+        calculated previously. If the ground truth values have not been
+        calculated then `calc_truth_values()` is called first.
+
+        Returns
+        -------
+        np.ndarray
+            Array of ground truth sensor values. shape=(num_sensors,
+            num_field_components,num_time_steps).
+        """
+        pass
+
+    @abstractmethod
+    def get_errors_systematic(self) -> np.ndarray | None:
+        """Abstract method. Gets the systematic error array from the previously
+        calculated sensor measurements. Returns None is no error integrator has
+        been specified.
+
+        Returns
+        -------
+        np.ndarray | None
+            Array of systematic errors for this sensor array. shape=(num_sensors
+            ,num_field_components,num_time_steps). Returns None if no error
+            integrator has been set.
+        """
+        pass
+
+    @abstractmethod
+    def get_errors_random(self) -> np.ndarray | None:
+        """Abstract method. Gets the random error array from the previously
+        calculated sensor measurements. Returns None is no error integrator has
+        been specified.
+
+        Returns
+        -------
+        np.ndarray | None
+            Array of random errors for this sensor array. shape=(num_sensors
+            ,num_field_components,num_time_steps). Returns None if no error
+            integrator has been set.
+        """
+        pass
+
+    @abstractmethod
+    def get_errors_total(self) -> np.ndarray | None:
+        """Abstract method. Gets the total error array from the previously
+        calculated sensor measurements. Returns None is no error integrator has
+        been specified.
+
+        Returns
+        -------
+        np.ndarray | None
+            Array of total errors for this sensor array. shape=(num_sensors
+            ,num_field_components,num_time_steps). Returns None if no error
+            integrator has been set.
+        """
+        pass
+
+    @abstractmethod
     def calc_measurements(self) -> np.ndarray:
         """Abstract method. Calculates measurements as: measurement = truth +
         systematic errors + random errors. The truth is calculated once and is
@@ -115,4 +174,6 @@ class ISensorArray(ABC):
             (num_sensors,num_field_components,num_time_steps)
         """
         pass
+
+
 
