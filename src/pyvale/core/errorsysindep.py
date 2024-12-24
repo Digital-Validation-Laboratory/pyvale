@@ -15,28 +15,90 @@ from pyvale.core.sensordata import SensorData
 
 
 class ErrSysOffset(IErrCalculator):
+    """Systematic error calculator applying a constant offset to all simulated
+    sensor measurements. Implements the `IErrCalculator` interface.
+    """
     __slots__ = ("_offset","_err_dep")
 
     def __init__(self,
                  offset: float,
                  err_dep: EErrDependence = EErrDependence.INDEPENDENT) -> None:
+        """Initialiser for the `ErrSysOffset` class.
+
+        Parameters
+        ----------
+        offset : float
+            Constant offset to apply to all simulated measurements from the
+            sensor array.
+        err_dep : EErrDependence, optional
+            Error , by default EErrDependence.INDEPENDENT
+        """
         self._offset = offset
         self._err_dep = err_dep
 
     def get_error_dep(self) -> EErrDependence:
+        """Gets the error dependence state for this error calculator. An
+        independent error is calculated based on the input truth values as the
+        error basis. A dependent error is calculated based on the accumulated
+        sensor reading from all preceeding errors in the chain.
+
+        NOTE: for this error the calculation is independent regardless of this
+        setting as the offset is constant.
+
+        Returns
+        -------
+        EErrDependence
+            Enumeration defining INDEPENDENT or DEPENDENT behaviour.
+        """
         return self._err_dep
 
     def set_error_dep(self, dependence: EErrDependence) -> None:
+        """Sets the error dependence state for this error calculator. An
+        independent error is calculated based on the input truth values as the
+        error basis. A dependent error is calculated based on the accumulated
+        sensor reading from all preceeding errors in the chain.
+
+        NOTE: for this error the calculation is independent regardless of this
+        setting as the offset is constant.
+
+        Parameters
+        ----------
+        dependence : EErrDependence
+            Enumeration defining INDEPENDENT or DEPENDENT behaviour.
+        """
         self._err_dep = dependence
 
     def get_error_type(self) -> EErrType:
+        """Gets the error type.
+
+        Returns
+        -------
+        EErrType
+            Enumeration definining RANDOM or SYSTEMATIC error types.
+        """
         return EErrType.SYSTEMATIC
 
     def calc_errs(self,
                   err_basis: np.ndarray,
                   sens_data: SensorData,
                   ) -> tuple[np.ndarray, SensorData]:
+        """Calculates the error array based on the size of the input.
 
+        Parameters
+        ----------
+        err_basis : np.ndarray
+            Array of values with the same dimensions as the sensor measurement
+            matrix.
+        sens_data : SensorData
+            The accumulated sensor state data for all errors prior to this one.
+
+        Returns
+        -------
+        tuple[np.ndarray, SensorData]
+            Tuple containing the calculated error array and pass through of the
+            sensor data object as it is not modified by this class. The returned
+            error array has the same shape as the input error basis.
+        """
         return (self._offset*np.ones(shape=err_basis.shape),sens_data)
 
 

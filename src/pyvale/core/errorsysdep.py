@@ -63,9 +63,9 @@ class ErrSysRoundOff(IErrCalculator):
             Enumeration specifying the rounding method, by default
             ERoundMethod.ROUND.
         base : float, optional
-            _description_, by default 1.0
+            Base to round to, by default 1.0.
         err_dep : EErrDependence, optional
-            _description_, by default EErrDependence.DEPENDENT
+            Error calculation dependence, by default EErrDependence.DEPENDENT.
         """
         self._base = base
         self._method = _select_round_method(method)
