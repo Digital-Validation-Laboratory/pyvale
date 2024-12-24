@@ -8,11 +8,12 @@ Copyright (C) 2024 The Computer Aided Validation Team
 import numpy as np
 from pyvale.core.field import IField
 from pyvale.core.integratorspatial import (IIntegratorSpatial,
-                                                create_int_pt_array)
+                                           create_int_pt_array)
 from pyvale.core.sensordata import SensorData
 
 # NOTE: code below is very similar to quadrature integrator should be able to
 # refactor into injected classes/functions
+
 class Rectangle2D(IIntegratorSpatial):
     __slots__ = ("_field","sens_data","_area","_area_int","_n_int_pts",
                  "_int_pt_offsets","_int_pts","_averages")
@@ -25,9 +26,8 @@ class Rectangle2D(IIntegratorSpatial):
         self._field = field
         self._sens_data = sens_data
 
-        # TODO: check that this works for non-square averages
-        self._area = self._sens_data.spatial_dims[0] * \
-            self._sens_data.spatial_dims[1]
+        self._area = (self._sens_data.spatial_dims[0]
+                      * self._sens_data.spatial_dims[1])
         self._area_int = self._area/int_pt_offsets.shape[0]
 
         self._n_int_pts = int_pt_offsets.shape[0]
