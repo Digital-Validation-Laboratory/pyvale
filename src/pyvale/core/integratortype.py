@@ -9,7 +9,8 @@ import enum
 
 
 class EIntSpatialType(enum.Enum):
-    """Enumeration specifying the type of spatial integrator to build.
+    """Enumeration specifying the type of spatial integrator to build. Used for
+    spatial averaging for sensors.
 
     RECT1PT
         Rectangular 2D integrator splitting the area into 1 part.
