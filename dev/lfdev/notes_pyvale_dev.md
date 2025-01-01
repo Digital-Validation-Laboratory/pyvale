@@ -6,7 +6,7 @@
     - Docstrings
     - Tests
     - Field errors assume all sensors sample at the same time but it should be possible to have all sensors sampling at different times.
-    - Support for surface mech extraction to simplify projections
+    - Support for surface mesh extraction to simplify projections
 
 - BUGS!
     - Spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.

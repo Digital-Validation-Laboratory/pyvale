@@ -12,7 +12,7 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
-    data_path = Path('src/data/case13_out.e')
+    data_path = Path('src/pyvale/data/case13_out.e')
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
     field_key = list(sim_data.node_vars.keys())[0] # type: ignore
     # Scale to mm to make 3D visualisation scaling easier
