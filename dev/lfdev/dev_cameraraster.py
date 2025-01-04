@@ -13,47 +13,6 @@ from scipy.spatial.transform import Rotation
 import mooseherder as mh
 import pyvale
 
-@dataclass(slots=True)
-class CameraDataRaster:
-    num_pixels: np.ndarray
-    sensor_size: np.ndarray
-    view_angle: np.ndarray
-    field_of_view: np.ndarray
-
-    position_world: np.ndarray
-    roi_center_world: np.ndarray
-
-    focal_length: float = 25.0
-
-
-def render_raster(cam_data: CameraDataRaster) -> np.ndarray:
-    # 1) Take the surface mesh using pyvista
-    # Extract the coords and the connectivity table
-
-
-    # 2) Transform everything from world into camera coords
-    # This should have everything at -'ve z for the camera
-    # Check this by viewing the surface mesh in pyvista
-
-
-    # 2.1) Perform backface culling using the normal for each triangle and its
-    # angle relative to the camera
-
-
-    # 3) Perform the perspective divide to project everything into 2D onto the
-    # camera sensor
-
-
-    # 3.1) Perform a crop and remove any triangle that is outside the canvas
-
-    # 4) Rasterise the image:
-    # - For each triangle left create a bounding box using its max and min
-    #   coords
-    # - Loop over all pixels in the bounding box and determine if the center is
-    #   in the triangle using the edge function
-    # - Store the z coordinate of the triangle in the depth buffer
-
-    pass
 
 def bound_box_low(coord_min: np.ndarray) -> np.ndarray:
     bound_elem = np.floor(coord_min).astype(np.int32)

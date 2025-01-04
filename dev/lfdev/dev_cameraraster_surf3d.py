@@ -6,7 +6,6 @@ Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 """
 import time
-from dataclasses import dataclass
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,47 +14,6 @@ from scipy.signal import convolve2d
 import mooseherder as mh
 import pyvale
 
-@dataclass(slots=True)
-class CameraDataRaster:
-    num_pixels: np.ndarray
-    sensor_size: np.ndarray
-    view_angle: np.ndarray
-    field_of_view: np.ndarray
-
-    position_world: np.ndarray
-    roi_center_world: np.ndarray
-
-    focal_length: float = 25.0
-
-
-def render_raster(cam_data: CameraDataRaster) -> np.ndarray:
-    # 1) Take the surface mesh using pyvista
-    # Extract the coords and the connectivity table
-
-
-    # 2) Transform everything from world into camera coords
-    # This should have everything at -'ve z for the camera
-    # Check this by viewing the surface mesh in pyvista
-
-
-    # 2.1) Perform backface culling using the normal for each triangle and its
-    # angle relative to the camera
-
-
-    # 3) Perform the perspective divide to project everything into 2D onto the
-    # camera sensor
-
-
-    # 3.1) Perform a crop and remove any triangle that is outside the canvas
-
-    # 4) Rasterise the image:
-    # - For each triangle left create a bounding box using its max and min
-    #   coords
-    # - Loop over all pixels in the bounding box and determine if the center is
-    #   in the triangle using the edge function
-    # - Store the z coordinate of the triangle in the depth buffer
-
-    pass
 
 def bound_box_low(coord_min: np.ndarray) -> np.ndarray:
     bound_elem = np.floor(coord_min).astype(np.int32)
@@ -94,30 +52,75 @@ def average_subpixel_image(subpx_image: np.ndarray,
 
 
 def main() -> None:
-    data_path = Path('src/pyvale/simcases/case24_out.e')
-    #data_path = Path('src/pyvale/data/case13_out.e')
+    test_case_str = "cyl"
+
+    if test_case_str == "temp":
+        # 2D plate, thermal, triangles
+        data_path = Path('src/pyvale/simcases/case24_out.e')
+    else:
+        # 3D cylinder, mechanical, tets
+        data_path = Path('src/pyvale/simcases/case21_out.e')
+
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
-    field_key = list(sim_data.node_vars.keys())[0]
+    field_keys = tuple(sim_data.node_vars.keys())
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0
+
+    if test_case_str == "temp":
+        field_key = "temperature"
+        components = ("temperature",)
+        (pv_grid,_) = pyvale.conv_simdata_to_pyvista(sim_data,
+                                                    components,
+                                                    spat_dim=2)
+
+        roi_pos_world = np.mean(sim_data.coords,axis=0)
+
+    else:
+        field_key = "disp_y"
+        components = ("disp_x","disp_y","disp_z")
+        (pv_grid,_) = pyvale.conv_simdata_to_pyvista(sim_data,
+                                                    components,
+                                                    spat_dim=3)
+
+
     pyvale.print_dimensions(sim_data)
 
-    descriptor = pyvale.SensorDescriptorFactory.temperature_descriptor()
+    pv_surf = pv_grid.extract_surface()
+    faces = np.array(pv_surf.faces)
 
-    field_key = 'temperature'
-    t_field = pyvale.FieldScalar(sim_data,
-                                 field_key=field_key,
-                                 spat_dims=2)
+    first_elem_nodes_per_face = faces[0]
+    nodes_per_face_vec = faces[0::(first_elem_nodes_per_face+1)]
+    assert np.all(nodes_per_face_vec == first_elem_nodes_per_face), \
+    "Not all elements in the simdata object have the same number of nodes per element"
 
-    num_px = np.array((510,260))
-    leng_per_px = pyvale.calc_resolution_from_sim(num_px,
-                                                  sim_data.coords,
-                                                  border_px=5)
-    roi_center_world = pyvale.calc_centre_from_sim(sim_data.coords)
+    nodes_per_face = first_elem_nodes_per_face
+    num_faces = int(faces.shape[0] / (nodes_per_face+1))
 
-    cam_data = pyvale.CameraData2D(num_pixels=num_px,
-                                   leng_per_px=leng_per_px,
-                                   roi_center_world=roi_center_world)
+    # Reshape the faces table and slice off the first column which is just the
+    # number of nodes per element and should be the same for all elements
+    pv_connect = np.reshape(faces,(num_faces,nodes_per_face+1))
+    pv_connect = pv_connect[:,1:].T
+    pv_coords = np.array(pv_surf.points).T
+
+    print()
+    print(80*"-")
+    print("EXTRACTED SURFACE MESH DATA")
+    print(pv_surf)
+    print()
+    print("Attached array names:")
+    print(pv_surf.array_names)
+    print()
+    print(f"{nodes_per_face=}")
+    print(f"{num_faces=}")
+    print()
+    print("NOTE: shape needs to be coord/node_per_elem first.")
+    print(f"{pv_coords.shape=}")
+    print(f"{pv_connect.shape=}")
+    print()
+    print(f"{pv_surf[components[0]].shape=}")
+    print()
+    print(80*"-")
+    print()
 
     #===========================================================================
     # NOTE
@@ -135,14 +138,17 @@ def main() -> None:
     # The WorldToCamera matrix is the inverse of the above matrix!
     (xx,yy,zz,ww) = (0,1,2,3)
 
-    coords_world = sim_data.coords.T #shape=(3,num_coords)
+    #shape=(3,num_coords)
+    coords_world = pv_coords
     coords_count = coords_world.shape[1]
-
+    # shape=(4,num_nodes)
     coords_world_with_w = np.vstack((coords_world,np.ones((1,coords_count))))
-    connect = sim_data.connect["connect1"]
-    field_scalar = sim_data.node_vars["temperature"]
+    # shape=(nodes_per_elem,num_elems)
+    connect = pv_connect
+    # shape=(num_nodes,num_time_steps)
+    field_scalar = np.array(pv_surf[field_key])
 
-    rot_axis: str = "y"
+    rot_axis: str = "x"
     phi_y_degs: float = 45
     theta_x_degs: float = 45
 
@@ -150,8 +156,10 @@ def main() -> None:
     theta_x_rads: float = theta_x_degs * np.pi/180.0
 
     # Set this to 0.0 to get some of the plate outside the FOV
-    roi_pos_world = np.array([50.0,25.0,0.0])
-    #roi_pos_world = np.array([0.0,0.0,0.0])
+    roi_pos_world = np.mean(sim_data.coords,axis=0)
+
+    # Number of divisions (subsamples) for each pixel for anti-aliasing
+    sub_samp: int = 1
 
     cam_type = "Test"
     if cam_type == "AV507":
@@ -171,7 +179,6 @@ def main() -> None:
                                 image_dist*np.cos(phi_y_rads)])
 
         cam_rot = Rotation.from_euler("zyx", [0, -phi_y_degs, 0], degrees=True)
-
     elif rot_axis == "x":
         cam_pos_world = np.array([roi_pos_world[xx] ,
                                   roi_pos_world[yy] + image_dist*np.sin(theta_x_rads),
@@ -216,33 +223,8 @@ def main() -> None:
     print()
     print(80*"-")
 
-    #resolution = 0.2 # mm/px - can be used to find the camera distance from ROI
     sensor_size = cam_num_px*pixel_size
-    #image_dims_from_res = resolution*cam_num_px
     image_dims = dist_cam_to_roi * sensor_size / focal_leng
-    #res_check = image_dims / cam_num_px
-
-    left = -image_dims[0]/2
-    right = image_dims[0]/2
-    top = image_dims[1]/2
-    bot = -image_dims[1]/2
-
-    offset_lr = (right+left) / (right-left)
-    offset_tb = (top+bot) / (top - bot)
-
-    print()
-    print(80*"-")
-    print(f"{sensor_size=}")
-    print()
-    print(f"{right-left=}")
-    print(f"{right+left=}")
-    print(f"{top-bot=}")
-    print(f"{top+bot=}")
-    print()
-    print(f"{offset_lr=}")
-    print(f"{offset_tb=}")
-    print(80*"-")
-
     #///////////////////////////////////////////////////////////////////////////
 
     #---------------------------------------------------------------------------
@@ -281,15 +263,13 @@ def main() -> None:
 
     nodes_per_elem = connect.shape[0]
     num_elems = connect.shape[1]
-    # NOTE: need the -1 here for zero indexing!
     # shape=(coord[X,Y,Z],node_per_elem,elem_num)
-    elem_world_coords = coords_world[:,connect-1]
+    elem_world_coords = coords_world[:,connect]
     # shape=(nodes_per_elem,coord[X,Y,Z],elem_num)
     elem_world_coords = np.swapaxes(elem_world_coords,0,1)
 
-    # NOTE: need the -1 here for zero indexing as element nums start from 1!
     # shape=(coord[X,Y,Z],node_per_elem,elem_num)
-    elem_raster_coords = coords_raster[:,connect-1]
+    elem_raster_coords = coords_raster[:,connect]
     # shape=(nodes_per_elem,coord[X,Y,Z],elem_num)
     elem_raster_coords = np.swapaxes(elem_raster_coords,0,1)
 
@@ -298,7 +278,7 @@ def main() -> None:
     # shape=(n_nodes,num_time_steps)
     field_divide_z = (field_scalar.T * coords_raster[zz,:]).T
     # shape=(nodes_per_elem,num_elems,num_time_steps)
-    field_divide_z = field_divide_z[connect-1,:]
+    field_divide_z = field_divide_z[connect,:]
 
     #shape=(coord[X,Y,Z],elem_num)
     elem_raster_coord_min = np.min(elem_raster_coords,axis=0)
@@ -362,7 +342,6 @@ def main() -> None:
     # Option 3: If we have to loop then we should probably use Numba or Cython
 
     # Create a depth buffer and an image buffer upsampled for anti-aliasing
-    sub_samp: int = 4
     depth_buffer = 1e6*np.ones(sub_samp*cam_num_px).T
     image_buffer = np.full(sub_samp*cam_num_px,0.0).T
 
@@ -488,7 +467,6 @@ def main() -> None:
         image_buffer[subpx_inds_y_inside,subpx_inds_x_inside] = image_buffer_depth_masked
 
     # END RASTER LOOP
-
     depth_avg = average_subpixel_image(depth_buffer,sub_samp)
     image_avg = average_subpixel_image(image_buffer,sub_samp)
 
@@ -506,8 +484,9 @@ def main() -> None:
     print(80*"=")
     print()
 
-    im_to_plot = image_avg
     plot_on = True
+    depth_to_plot = depth_avg
+    depth_to_plot[depth_avg > 10*image_dist] = np.NaN
     #===========================================================================
     if plot_on:
         plot_opts = pyvale.PlotOptsGeneral()
@@ -515,44 +494,30 @@ def main() -> None:
         (fig, ax) = plt.subplots(figsize=plot_opts.single_fig_size_square,
                                 layout='constrained')
         fig.set_dpi(plot_opts.resolution)
-        cset = plt.imshow(im_to_plot,
+        cset = plt.imshow(depth_to_plot,
                         cmap=plt.get_cmap(plot_opts.cmap_seq))
                         #origin='lower')
         ax.set_aspect('equal','box')
         fig.colorbar(cset)
-        ax.set_title("Origin normal",fontsize=plot_opts.font_head_size)
+        ax.set_title("Depth buffer",fontsize=plot_opts.font_head_size)
         ax.set_xlabel(r"x ($px$)",
                     fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
         ax.set_ylabel(r"y ($px$)",
                     fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
 
-        # (fig, ax) = plt.subplots(figsize=plot_opts.single_fig_size_square,
-        #                         layout='constrained')
-        # fig.set_dpi(plot_opts.resolution)
-        # cset = plt.imshow(im_to_plot,
-        #                 cmap=plt.get_cmap(plot_opts.cmap_seq),
-        #                 origin='lower')
-        # ax.set_aspect('equal','box')
-        # fig.colorbar(cset)
-        # ax.set_title("Origin lower",fontsize=plot_opts.font_head_size)
-        # ax.set_xlabel(r"x ($px$)",
-        #             fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
-        # ax.set_ylabel(r"y ($px$)",
-        #             fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
-
-        # camera = pyvale.CameraBasic2D(cam_data=cam_data,
-        #                             field=t_field,
-        #                             descriptor=descriptor)
-
-        # measurements = camera.calc_measurements()
-        # meas_images = camera.get_measurement_images()
-
-        # print(80*"=")
-        # print(f"{measurements.shape=}")
-        # print(f"{meas_images.shape=}")
-        # print(80*"=")
-
-        # (fig,ax) = pyvale.plot_measurement_image(camera,field_key)
+        (fig, ax) = plt.subplots(figsize=plot_opts.single_fig_size_square,
+                                layout='constrained')
+        fig.set_dpi(plot_opts.resolution)
+        cset = plt.imshow(image_avg,
+                        cmap=plt.get_cmap(plot_opts.cmap_seq))
+                        #origin='lower')
+        ax.set_aspect('equal','box')
+        fig.colorbar(cset)
+        ax.set_title("Image",fontsize=plot_opts.font_head_size)
+        ax.set_xlabel(r"x ($px$)",
+                    fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
+        ax.set_ylabel(r"y ($px$)",
+                    fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
 
         plt.show()
 

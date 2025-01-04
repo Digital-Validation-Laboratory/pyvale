@@ -8,7 +8,7 @@ import pyvale
 def main() -> None:
     data_path = Path("src/pyvale/simcases/case21_out.e")
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
-        # Scale to mm to make 3D visualisation scaling easier
+    # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0
 
     components = ("disp_x","disp_y","disp_z")
