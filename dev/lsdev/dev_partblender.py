@@ -1,6 +1,9 @@
+import os
 import numpy as np
+from pathlib import Path
 import bpy
 from mooseherder.simdata import SimData
+import pyvale
 
 class BlenderPart:
     """Creates an object in Blender
@@ -12,17 +15,15 @@ class BlenderPart:
                  filename: str | None = None):
         self.sim_data = sim_data
         self.filename = filename
-        if sim_data is not None:
-            self._initialise_nodes_elements(elements, nodes)
-
-
+        # if sim_data is not None:
+        #     self._initialise_nodes_elements(elements, nodes)
 
 
     def _initialise_nodes_elements(self, elements, nodes):
         if elements is None:
-            self.elements = self._get_elements()
+            self.elements = self._get_elements() * 1000
         else:
-            self.elements = elements
+            self.elements = elements * 1000
 
         if nodes is None:
             self.nodes = self._get_nodes() * 1000
@@ -75,7 +76,32 @@ class BlenderPart:
 
         return part
 
+    def _simdata_to_stl(self):
+        self.sim_data.coords = self.sim_data.coords * 1000
+        (pv_grid, pv_grid_vis) = pyvale.conv_simdata_to_pyvista(self.sim_data,
+                                                                None,
+                                                                spat_dim=3)
+        pv_surf = pv_grid.extract_surface()
+
+        save_path = Path().cwd() / "test_output"
+        if not save_path.is_dir():
+            save_path.mkdir()
+        name = "test_mesh.stl"
+        save_file = save_path / name
+
+        all_files = os.listdir(save_path)
+        for ff in all_files:
+            if name == ff:
+                os.remove(save_path / ff)
+
+        self.filename = str(save_file)
+        pv_surf.save(save_file, binary=False)
+
+
     def import_from_stl(self):
+        if self.filename is None:
+            self._simdata_to_stl()
+
         bpy.ops.wm.stl_import(filepath=self.filename)
 
         part = bpy.context.selected_objects[0]
