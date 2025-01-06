@@ -94,8 +94,7 @@ def main() -> None:
     print(80*"-")
     print()
 
-
-    rot_axis: str = "n"
+    rot_axis: str = "y"
     phi_y_degs: float = 45
     theta_x_degs: float = 45
 
@@ -118,7 +117,7 @@ def main() -> None:
     else:
         cam_num_px = np.array([510,260],dtype=np.int32)
         pixel_size = np.array([10.0e-3,10.0e-3])
-        image_dist: float = 500.0
+        image_dist: float = 300.0
         focal_leng = 25.0
 
     if rot_axis == "y":
@@ -141,14 +140,14 @@ def main() -> None:
                                   image_dist])
         cam_rot = Rotation.from_euler("zyx", [0, 0, 0], degrees=True)
 
-    dist_cam_to_roi = np.linalg.norm(cam_pos_world - roi_pos_world)
+    image_dist = np.linalg.norm(cam_pos_world - roi_pos_world)
 
     time_start_setup = time.perf_counter()
 
     print()
     print(80*"-")
     print(f"{cam_pos_world=}")
-    print(f"{dist_cam_to_roi=}")
+    print(f"{image_dist=}")
     print(80*"-")
 
     cam_to_world_mat = np.zeros((4,4))
@@ -173,8 +172,7 @@ def main() -> None:
     print(80*"-")
 
     sensor_size = cam_num_px*pixel_size
-    image_dims = dist_cam_to_roi * sensor_size / focal_leng
-    resolution = image_dims / cam_num_px
+    image_dims = image_dist*sensor_size/focal_leng
     #///////////////////////////////////////////////////////////////////////////
 
     #---------------------------------------------------------------------------
@@ -251,14 +249,24 @@ def main() -> None:
     elem_raster_coord_max = elem_raster_coord_max[:,mask]
     elem_raster_coords = elem_raster_coords[:,:,mask]
     num_elems_in_scene = elem_raster_coords.shape[2]
+    # shape=(nodes_per_elem,elems_in_scene,num_time_steps)
+    field_divide_z = field_divide_z[:,mask,:]
+
     print()
     print(80*"-")
+    print("MASKING CHECKS:")
     print("Mask =")
     print(mask)
     print()
     print(f"Elems in mask =      {np.sum(np.sum(mask))}")
     print(f"Total elems =        {num_elems}")
     print(f"Num elems in scene = {num_elems_in_scene}")
+    print()
+    print(f"{elem_raster_coords.shape=}")
+    print(f"{elem_raster_coord_min.shape=}")
+    print(f"{elem_raster_coord_max.shape=}")
+    print()
+    print(f"{field_divide_z.shape=}")
     print(80*"-")
 
     # Find the indices of the bounding box that each element lies within on the
@@ -437,8 +445,10 @@ def main() -> None:
     print()
 
     plot_on = True
-    depth_to_plot = depth_avg
+    depth_to_plot = np.copy(depth_avg)
     depth_to_plot[depth_avg > 10*image_dist] = np.NaN
+    image_to_plot = np.copy(image_avg)
+    image_to_plot[depth_avg > 10*image_dist] = np.NaN
     #===========================================================================
     if plot_on:
         plot_opts = pyvale.PlotOptsGeneral()
@@ -460,7 +470,7 @@ def main() -> None:
         (fig, ax) = plt.subplots(figsize=plot_opts.single_fig_size_square,
                                 layout='constrained')
         fig.set_dpi(plot_opts.resolution)
-        cset = plt.imshow(image_avg,
+        cset = plt.imshow(image_to_plot,
                         cmap=plt.get_cmap(plot_opts.cmap_seq))
                         #origin='lower')
         ax.set_aspect('equal','box')

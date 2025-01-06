@@ -230,13 +230,13 @@ def main() -> None:
     # Number of divisions (subsamples) for each pixel for anti-aliasing
     sub_samp: int = 1
 
-    cam_type = "Test"
+    cam_type = "AV507"
     if cam_type == "AV507":
         cam_num_px = np.array([2464,2056],dtype=np.int32)
         pixel_size = np.array([3.45e-3,3.45e-3]) # in millimeters!
         focal_leng = 25.0
 
-        imaging_rad: float = 300.0 # Not needed for camera data, just for cam pos below
+        imaging_rad: float = 100.0 # Not needed for camera data, just for cam pos below
     else:
         cam_num_px = np.array([510,260],dtype=np.int32)
         pixel_size = np.array([10.0e-3,10.0e-3])
@@ -270,7 +270,7 @@ def main() -> None:
                                 rot_world=cam_rot,
                                 roi_center_world=roi_pos_world,
                                 focal_length=focal_leng,
-                                sub_samp=1)
+                                sub_samp=sub_samp)
 
     print()
     print(80*"-")
@@ -304,29 +304,26 @@ def main() -> None:
     #---------------------------------------------------------------------------
     # BACK FACE CULLING
     num_elems = connect.shape[1]
-    coords_cam = np.matmul(cam_data.world_to_cam_mat,coords_world_with_w)
+    # coords_cam = np.matmul(cam_data.world_to_cam_mat,coords_world_with_w)
 
-    # shape=(coord[X,Y,Z,W],node_per_elem,elem_num)
-    elem_cam_coords = coords_cam[:,connect]
-    # shape=(nodes_per_elem,coord[X,Y,Z,W],elem_num)
-    elem_cam_coords = np.swapaxes(elem_cam_coords,0,1)
+    # # shape=(coord[X,Y,Z,W],node_per_elem,elem_num)
+    # elem_cam_coords = coords_cam[:,connect]
+    # # shape=(nodes_per_elem,coord[X,Y,Z,W],elem_num)
+    # elem_cam_coords = np.swapaxes(elem_cam_coords,0,1)
 
-    # Calculate the normal vectors for all of the elements
-    elem_cam_edge0 = elem_cam_coords[1,:-1,:] - elem_cam_coords[0,:-1,:]
-    elem_cam_edge1 = elem_cam_coords[2,:-1,:] - elem_cam_coords[0,:-1,:]
-    elem_cam_normals = np.cross(elem_cam_edge0,elem_cam_edge1,
-                                axisa=0,axisb=0).T
-    # Normalise to unit vectors
-    elem_cam_normals = elem_cam_normals / np.linalg.norm(elem_cam_normals,axis=0)
+    # # Calculate the normal vectors for all of the elements
+    # elem_cam_edge0 = elem_cam_coords[1,:-1,:] - elem_cam_coords[0,:-1,:]
+    # elem_cam_edge1 = elem_cam_coords[2,:-1,:] - elem_cam_coords[0,:-1,:]
+    # elem_cam_normals = np.cross(elem_cam_edge0,elem_cam_edge1,
+    #                             axisa=0,axisb=0).T
+    # # Normalise to unit vectors
+    # elem_cam_normals = elem_cam_normals / np.linalg.norm(elem_cam_normals,axis=0)
 
-    print()
-    print(elem_cam_edge0.shape)
-    print(elem_cam_edge1.shape)
-    print(elem_cam_normals.shape)
-    print()
-
-    return
-
+    # print()
+    # print(elem_cam_edge0.shape)
+    # print(elem_cam_edge1.shape)
+    # print(elem_cam_normals.shape)
+    # print()
 
     # TODO
     # Pass the masked coordinates in camera world to the world_to_raster function
@@ -337,8 +334,6 @@ def main() -> None:
 
     # Convert to perspective correct hyperbolic interpolation for z interp
     coords_raster[zz,:] = 1/coords_raster[zz,:]
-
-
 
     # shape=(coord[X,Y,Z],node_per_elem,elem_num)
     elem_raster_coords = coords_raster[:,connect]
@@ -371,14 +366,24 @@ def main() -> None:
     elem_raster_coord_max = elem_raster_coord_max[:,mask]
     elem_raster_coords = elem_raster_coords[:,:,mask]
     num_elems_in_scene = elem_raster_coords.shape[2]
+    # shape=(nodes_per_elem,elems_in_scene,num_time_steps)
+    field_divide_z = field_divide_z[:,mask,:]
+
     print()
     print(80*"-")
+    print("MASKING CHECKS:")
     print("Mask =")
     print(mask)
     print()
     print(f"Elems in mask =      {np.sum(np.sum(mask))}")
     print(f"Total elems =        {num_elems}")
     print(f"Num elems in scene = {num_elems_in_scene}")
+    print()
+    print(f"{elem_raster_coords.shape=}")
+    print(f"{elem_raster_coord_min.shape=}")
+    print(f"{elem_raster_coord_max.shape=}")
+    print()
+    print(f"{field_divide_z.shape=}")
     print(80*"-")
 
     # Find the indices of the bounding box that each element lies within on the
@@ -560,8 +565,10 @@ def main() -> None:
     print()
 
     plot_on = True
-    depth_to_plot = depth_avg
+    depth_to_plot = np.copy(depth_avg)
     depth_to_plot[depth_avg > 10*cam_data.image_dist] = np.NaN
+    image_to_plot = np.copy(image_avg)
+    image_to_plot[depth_avg > 10*cam_data.image_dist] = np.NaN
     #===========================================================================
     if plot_on:
         plot_opts = pyvale.PlotOptsGeneral()
@@ -583,12 +590,12 @@ def main() -> None:
         (fig, ax) = plt.subplots(figsize=plot_opts.single_fig_size_square,
                                 layout='constrained')
         fig.set_dpi(plot_opts.resolution)
-        cset = plt.imshow(image_avg,
+        cset = plt.imshow(image_to_plot,
                         cmap=plt.get_cmap(plot_opts.cmap_seq))
                         #origin='lower')
         ax.set_aspect('equal','box')
         fig.colorbar(cset)
-        ax.set_title("Image",fontsize=plot_opts.font_head_size)
+        ax.set_title("Field Image",fontsize=plot_opts.font_head_size)
         ax.set_xlabel(r"x ($px$)",
                     fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
         ax.set_ylabel(r"y ($px$)",

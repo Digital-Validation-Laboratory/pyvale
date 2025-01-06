@@ -85,7 +85,7 @@ def main() -> None:
     connect = sim_data.connect["connect1"]
     field_scalar = sim_data.node_vars["temperature"]
 
-    rot_axis: str = "x"
+    rot_axis: str = "n"
     phi_y_degs: float = 45
     theta_x_degs: float = 45
 
@@ -93,7 +93,7 @@ def main() -> None:
     theta_x_rads: float = theta_x_degs * np.pi/180.0
 
     # Set this to 250 to zoom in
-    image_dist: float = 600.0
+    image_dist: float = 200.0
     #image_dist: float = 250.0
 
     # Set this to 0.0 to get some of the plate outside the FOV
@@ -120,12 +120,12 @@ def main() -> None:
                                   image_dist])
         cam_rot = Rotation.from_euler("zyx", [0, 0, 0], degrees=True)
 
-    dist_cam_to_roi = np.linalg.norm(cam_pos_world - roi_pos_world)
+    image_dist = np.linalg.norm(cam_pos_world - roi_pos_world)
 
     print()
     print(80*"-")
     print(f"{cam_pos_world=}")
-    print(f"{dist_cam_to_roi=}")
+    print(f"{image_dist=}")
     print(80*"-")
 
     cam_to_world_mat = np.zeros((4,4))
@@ -157,7 +157,7 @@ def main() -> None:
     sensor_size = cam_num_px*pixel_size
 
     image_dims_from_res = resolution*cam_num_px
-    image_dims = dist_cam_to_roi * sensor_size / focal_leng
+    image_dims = image_dist * sensor_size / focal_leng
     res_check = image_dims / cam_num_px
 
     left = -image_dims[0]/2
@@ -256,14 +256,24 @@ def main() -> None:
     elem_raster_coord_max = elem_raster_coord_max[:,mask]
     elem_raster_coords = elem_raster_coords[:,:,mask]
     num_elems_in_scene = elem_raster_coords.shape[2]
+    # shape=(nodes_per_elem,elems_in_scene,num_time_steps)
+    field_divide_z = field_divide_z[:,mask,:]
+
     print()
     print(80*"-")
+    print("MASKING CHECKS:")
     print("Mask =")
     print(mask)
     print()
     print(f"Elems in mask =      {np.sum(np.sum(mask))}")
     print(f"Total elems =        {num_elems}")
     print(f"Num elems in scene = {num_elems_in_scene}")
+    print()
+    print(f"{elem_raster_coords.shape=}")
+    print(f"{elem_raster_coord_min.shape=}")
+    print(f"{elem_raster_coord_max.shape=}")
+    print()
+    print(f"{field_divide_z.shape=}")
     print(80*"-")
 
     # Pixel coords
@@ -385,9 +395,9 @@ def main() -> None:
                       + vert_2[zz] * interp_weights[2,:])
 
         field_interp = ((field_frame_divide_z[0,ee] * interp_weights[0,:]
-                    + field_frame_divide_z[1,ee] * interp_weights[1,:]
-                    + field_frame_divide_z[2,ee] * interp_weights[2,:])
-                    * px_coord_z)
+                       + field_frame_divide_z[1,ee] * interp_weights[1,:]
+                       + field_frame_divide_z[2,ee] * interp_weights[2,:])
+                       * px_coord_z)
 
         # Get the pixel indices that are inside the element
         px_inds_x_inside = px_inds_grid_x[edge_mask_grid]
@@ -395,7 +405,8 @@ def main() -> None:
 
         # Build a mask to replace the depth information if there is already an
         # element in front of the one we are rendering
-        px_coord_z_depth_mask = px_coord_z < depth_buffer[px_inds_y_inside,px_inds_x_inside]
+        px_coord_z_depth_mask = (px_coord_z
+                                 < depth_buffer[px_inds_y_inside,px_inds_x_inside])
 
         # Initialise the z coord to the value in the depth buffer
         px_coord_z_masked = depth_buffer[px_inds_y_inside,px_inds_x_inside]
@@ -419,8 +430,11 @@ def main() -> None:
     print("RASTER LOOP END")
     print(80*"=")
 
-    im_to_plot = image_buffer
     plot_on = True
+    depth_to_plot = np.copy(depth_buffer)
+    depth_to_plot[depth_buffer > 10*image_dist] = np.NaN
+    image_to_plot = np.copy(image_buffer)
+    image_to_plot[depth_buffer > 10*image_dist] = np.NaN
     #===========================================================================
     if plot_on:
         plot_opts = pyvale.PlotOptsGeneral()
@@ -428,7 +442,21 @@ def main() -> None:
         (fig, ax) = plt.subplots(figsize=plot_opts.single_fig_size_square,
                                 layout='constrained')
         fig.set_dpi(plot_opts.resolution)
-        cset = plt.imshow(im_to_plot,
+        cset = plt.imshow(depth_to_plot,
+                        cmap=plt.get_cmap(plot_opts.cmap_seq))
+                        #origin='lower')
+        ax.set_aspect('equal','box')
+        fig.colorbar(cset)
+        ax.set_title("Depth buffer",fontsize=plot_opts.font_head_size)
+        ax.set_xlabel(r"x ($px$)",
+                    fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
+        ax.set_ylabel(r"y ($px$)",
+                    fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
+
+        (fig, ax) = plt.subplots(figsize=plot_opts.single_fig_size_square,
+                                layout='constrained')
+        fig.set_dpi(plot_opts.resolution)
+        cset = plt.imshow(image_to_plot,
                         cmap=plt.get_cmap(plot_opts.cmap_seq))
                         #origin='lower')
         ax.set_aspect('equal','box')
@@ -438,34 +466,6 @@ def main() -> None:
                     fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
         ax.set_ylabel(r"y ($px$)",
                     fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
-
-        (fig, ax) = plt.subplots(figsize=plot_opts.single_fig_size_square,
-                                layout='constrained')
-        fig.set_dpi(plot_opts.resolution)
-        cset = plt.imshow(im_to_plot,
-                        cmap=plt.get_cmap(plot_opts.cmap_seq),
-                        origin='lower')
-        ax.set_aspect('equal','box')
-        fig.colorbar(cset)
-        ax.set_title("Origin lower",fontsize=plot_opts.font_head_size)
-        ax.set_xlabel(r"x ($px$)",
-                    fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
-        ax.set_ylabel(r"y ($px$)",
-                    fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
-
-        # camera = pyvale.CameraBasic2D(cam_data=cam_data,
-        #                             field=t_field,
-        #                             descriptor=descriptor)
-
-        # measurements = camera.calc_measurements()
-        # meas_images = camera.get_measurement_images()
-
-        # print(80*"=")
-        # print(f"{measurements.shape=}")
-        # print(f"{meas_images.shape=}")
-        # print(80*"=")
-
-        # (fig,ax) = pyvale.plot_measurement_image(camera,field_key)
 
         plt.show()
 
