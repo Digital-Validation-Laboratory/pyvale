@@ -50,18 +50,20 @@ class BlenderScene:
         partmaker = BlenderPart(sim_data, elements, nodes)
         part = partmaker.simdata_to_part()
 
-        # set_origin(part)
+        set_origin(part)
 
         return part
 
     def add_stl_part(self, filename:str | None = None, sim_data: SimData | None = None):
         partmaker = BlenderPart(filename=filename, sim_data=sim_data)
         part = partmaker.import_from_stl()
+        set_origin(part)
         return part
 
 
     def set_part_location(self, part, location: tuple):
-        part.location = location
+        z_location = int(part.dimensions[2])
+        part.location = (location[0], location[1], (location[2] - z_location))
 
     def set_part_roation(self, part, rotation: tuple):
         part.rotation_mode = 'XYZ'
@@ -85,6 +87,11 @@ def set_origin(part):
         bpy.ops.object.select_all(action='DESELECT')
         part.select_set(True)
         bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
+        # dimensions = part.dimensions
+        # z_location = int(dimensions[2])
+        # if z_location != 0:
+        #     location = (0, 0, (0 - z_location))
+        #     part.location(location)
 
 
 
