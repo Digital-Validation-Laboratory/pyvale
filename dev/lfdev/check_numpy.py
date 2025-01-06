@@ -1,20 +1,19 @@
 import numpy as np
 
 def main() -> None:
-    n_px = 10
-    ss = 2
-    px = np.arange(0,n_px)
-    subpx = np.arange(0,2*n_px)
-
-    start = 2
-    end = 3
-    check1 = subpx[2*start:2*end]
+    v0 = np.array([[0,1,0],
+                   [1,0,0]])
+    v0 = v0.T
+    v1 = np.array([[1,0,0],
+                   [0,1,0]])
+    v1 = v1.T
 
     print()
-    print(px)
-    print(subpx)
+    print(f"{v0.shape=}")
+    print(f"{v1.shape=}")
     print()
-    print(check1)
+    print(np.cross(v0,v1,axisa=0,axisb=0))
+    print()
 
 if __name__ == "__main__":
     main()

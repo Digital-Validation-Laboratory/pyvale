@@ -5,6 +5,7 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 """
+from dataclasses import dataclass, field
 import time
 from pathlib import Path
 import numpy as np
@@ -13,6 +14,39 @@ from scipy.spatial.transform import Rotation
 from scipy.signal import convolve2d
 import mooseherder as mh
 import pyvale
+
+
+@dataclass(slots=True)
+class CameraRasterData:
+    num_pixels: np.ndarray
+    pixel_size: np.ndarray
+
+    pos_world: np.ndarray
+    rot_world: Rotation
+
+    roi_center_world: np.ndarray
+
+    focal_length: float = 50.0
+    sub_samp: int = 2
+
+    sensor_size: np.ndarray = field(init=False)
+    image_dims: np.ndarray = field(init=False)
+    image_dist: float = field(init=False)
+    cam_to_world_mat: np.ndarray = field(init=False)
+    world_to_cam_mat: np.ndarray = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.image_dist = np.linalg.norm(self.pos_world - self.roi_center_world)
+        self.sensor_size = self.num_pixels*self.pixel_size
+        self.image_dims = (self.image_dist
+                           *self.sensor_size/self.focal_length)
+
+        self.cam_to_world_mat = np.zeros((4,4))
+        self.cam_to_world_mat[0:3,0:3] = self.rot_world.as_matrix()
+        self.cam_to_world_mat[-1,-1] = 1.0
+        self.cam_to_world_mat[0:3,-1] = self.pos_world
+        self.world_to_cam_mat = np.linalg.inv(self.cam_to_world_mat)
+
 
 
 def bound_box_low(coord_min: np.ndarray) -> np.ndarray:
@@ -28,6 +62,40 @@ def bound_box_high(coord_max: np.ndarray,
     bound_mat = np.vstack((bound_elem,bound_high))
     bound = np.min(bound_mat,axis=0)
     return bound
+
+def world_to_raster_coords(cam_data: CameraRasterData,
+                           coords_world_with_w: np.ndarray) -> np.ndarray:
+
+    (xx,yy,zz,ww) = (0,1,2,3)
+    coords_count = coords_world_with_w.shape[1]
+
+    # Project onto camera coords
+    coords_cam = np.matmul(cam_data.world_to_cam_mat,coords_world_with_w)
+
+    # NOTE: w is not 1 when the matrix is a perspective projection! It is only 1
+    # here because this is an affine transformation.
+    coords_cam[xx,:] = coords_cam[xx,:] / coords_cam[ww,:]
+    coords_cam[yy,:] = coords_cam[yy,:] / coords_cam[ww,:]
+    coords_cam[zz,:] = coords_cam[zz,:] / coords_cam[ww,:]
+
+    # Perspective divide
+    coords_image = np.zeros((2,coords_count))
+    coords_image[xx,:] = cam_data.image_dist * coords_cam[xx,:] / -coords_cam[zz,:]
+    coords_image[yy,:] = cam_data.image_dist * coords_cam[yy,:] / -coords_cam[zz,:]
+
+    # Convert to normalised device coords in the range [-1,1]
+    coords_ndc = np.zeros((2,coords_count))
+    coords_ndc[xx,:] = 2*coords_image[xx,:] / cam_data.image_dims[xx]
+    coords_ndc[yy,:] = 2*coords_image[yy,:] / cam_data.image_dims[yy]
+
+    # Covert to pixel (raster) coords
+    # Shape = ([X,Y,Z],num_nodes)
+    coords_raster = np.zeros((3,coords_count))
+    coords_raster[xx,:] = (coords_ndc[xx,:] + 1)/2 * cam_data.num_pixels[xx]
+    coords_raster[yy,:] = (1-coords_ndc[yy,:])/2 * cam_data.num_pixels[yy]
+    coords_raster[zz,:] = -coords_cam[zz,:]
+
+    return coords_raster
 
 def edge_function(vert_a: np.ndarray,
                   vert_b: np.ndarray,
@@ -50,7 +118,8 @@ def average_subpixel_image(subpx_image: np.ndarray,
 
     return avg_image
 
-
+#===============================================================================
+# MAIN
 def main() -> None:
     test_case_str = "cyl"
 
@@ -81,9 +150,9 @@ def main() -> None:
         (pv_grid,_) = pyvale.conv_simdata_to_pyvista(sim_data,
                                                     components,
                                                     spat_dim=3)
-
-
     pyvale.print_dimensions(sim_data)
+
+    time_start_setup = time.perf_counter()
 
     pv_surf = pv_grid.extract_surface()
     faces = np.array(pv_surf.faces)
@@ -165,108 +234,111 @@ def main() -> None:
     if cam_type == "AV507":
         cam_num_px = np.array([2464,2056],dtype=np.int32)
         pixel_size = np.array([3.45e-3,3.45e-3]) # in millimeters!
-        image_dist: float = 300.0
         focal_leng = 25.0
+
+        imaging_rad: float = 300.0 # Not needed for camera data, just for cam pos below
     else:
         cam_num_px = np.array([510,260],dtype=np.int32)
         pixel_size = np.array([10.0e-3,10.0e-3])
-        image_dist: float = 500.0
         focal_leng = 25.0
 
+        imaging_rad: float = 500.0 # Not needed for camera data, just for cam pos below
+
     if rot_axis == "y":
-        cam_pos_world = np.array([roi_pos_world[xx] - image_dist*np.sin(phi_y_rads),
-                                roi_pos_world[yy],
-                                image_dist*np.cos(phi_y_rads)])
+        cam_pos_world = np.array([roi_pos_world[xx] - imaging_rad*np.sin(phi_y_rads),
+                                  roi_pos_world[yy],
+                                  imaging_rad*np.cos(phi_y_rads)])
 
         cam_rot = Rotation.from_euler("zyx", [0, -phi_y_degs, 0], degrees=True)
     elif rot_axis == "x":
         cam_pos_world = np.array([roi_pos_world[xx] ,
-                                  roi_pos_world[yy] + image_dist*np.sin(theta_x_rads),
-                                  image_dist*np.cos(theta_x_rads)])
+                                  roi_pos_world[yy] + imaging_rad*np.sin(theta_x_rads),
+                                  imaging_rad*np.cos(theta_x_rads)])
 
         cam_rot = Rotation.from_euler("zyx", [0, 0, -theta_x_degs], degrees=True)
 
     else:
         cam_pos_world = np.array([roi_pos_world[xx],
                                   roi_pos_world[yy],
-                                  image_dist])
+                                  imaging_rad])
         cam_rot = Rotation.from_euler("zyx", [0, 0, 0], degrees=True)
 
-    dist_cam_to_roi = np.linalg.norm(cam_pos_world - roi_pos_world)
-
-    time_start_setup = time.perf_counter()
-
-    print()
-    print(80*"-")
-    print(f"{cam_pos_world=}")
-    print(f"{dist_cam_to_roi=}")
-    print(80*"-")
-
-    cam_to_world_mat = np.zeros((4,4))
-    cam_to_world_mat[0:3,0:3] = cam_rot.as_matrix()
-    cam_to_world_mat[-1,-1] = 1.0
-    cam_to_world_mat[0:3,-1] = cam_pos_world
-    world_to_cam_mat = np.linalg.inv(cam_to_world_mat)
+    #---------------------------------------------------------------------------
+    cam_data = CameraRasterData(num_pixels=cam_num_px,
+                                pixel_size=pixel_size,
+                                pos_world=cam_pos_world,
+                                rot_world=cam_rot,
+                                roi_center_world=roi_pos_world,
+                                focal_length=focal_leng,
+                                sub_samp=1)
 
     print()
     print(80*"-")
-    print("Camera to world matrix:")
-    print(cam_to_world_mat)
-    print()
-    print("World to camera matrix:")
-    print(world_to_cam_mat)
-    print()
-    print("Mesh data:")
+    print("MESH DATA:")
     print(f"Total Nodes = {coords_world.shape[1]}")
     print(f"Total Elems = {connect.shape[1]}")
     print(f"Nodes per elem = {connect.shape[0]}")
+    print(80*"-")
+    print()
+    print(80*"-")
+    print("CAMERA DATA:")
+    print(f"Number of pixels [X,Y] = {cam_data.num_pixels}")
+    print(f"Pixel size [X,Y] = {cam_data.pixel_size}")
+    print(f"Focal length = {cam_data.focal_length}")
+    print()
+    print(f"Pos. world = {cam_data.pos_world}")
+    print(f"ROI center world = {cam_data.roi_center_world}")
+    print()
+    print(f"Sensor size = {cam_data.sensor_size}")
+    print(f"Image dims. = {cam_data.image_dims}")
+    print(f"Image dist. = {cam_data.image_dist}")
+    print()
+    print("Camera to world matrix:")
+    print(cam_data.cam_to_world_mat)
+    print()
+    print("World to camera matrix:")
+    print(cam_data.world_to_cam_mat)
     print()
     print(80*"-")
 
-    sensor_size = cam_num_px*pixel_size
-    image_dims = dist_cam_to_roi * sensor_size / focal_leng
-    #///////////////////////////////////////////////////////////////////////////
-
     #---------------------------------------------------------------------------
-    # FUNCTION: convert to raster coords
+    # BACK FACE CULLING
+    num_elems = connect.shape[1]
+    coords_cam = np.matmul(cam_data.world_to_cam_mat,coords_world_with_w)
 
-    # Project onto camera coords
-    coords_cam = np.matmul(world_to_cam_mat,coords_world_with_w)
+    # shape=(coord[X,Y,Z,W],node_per_elem,elem_num)
+    elem_cam_coords = coords_cam[:,connect]
+    # shape=(nodes_per_elem,coord[X,Y,Z,W],elem_num)
+    elem_cam_coords = np.swapaxes(elem_cam_coords,0,1)
 
-    # NOTE: w is not 1 when the matrix is a perspective projection! It is only 1
-    # here because this is an affine transformation.
+    # Calculate the normal vectors for all of the elements
+    elem_cam_edge0 = elem_cam_coords[1,:-1,:] - elem_cam_coords[0,:-1,:]
+    elem_cam_edge1 = elem_cam_coords[2,:-1,:] - elem_cam_coords[0,:-1,:]
+    elem_cam_normals = np.cross(elem_cam_edge0,elem_cam_edge1,
+                                axisa=0,axisb=0).T
+    # Normalise to unit vectors
+    elem_cam_normals = elem_cam_normals / np.linalg.norm(elem_cam_normals,axis=0)
 
-    coords_cam[xx,:] = coords_cam[xx,:] / coords_cam[ww,:]
-    coords_cam[yy,:] = coords_cam[yy,:] / coords_cam[ww,:]
-    coords_cam[zz,:] = coords_cam[zz,:] / coords_cam[ww,:]
+    print()
+    print(elem_cam_edge0.shape)
+    print(elem_cam_edge1.shape)
+    print(elem_cam_normals.shape)
+    print()
 
-    # Perspective divide
-    coords_image = np.zeros((2,coords_count))
-    coords_image[xx,:] = image_dist * coords_cam[xx,:] / -coords_cam[zz,:]
-    coords_image[yy,:] = image_dist * coords_cam[yy,:] / -coords_cam[zz,:]
+    return
 
-    # Convert to normalised device coords in the range [-1,1]
-    coords_ndc = np.zeros((2,coords_count))
-    coords_ndc[xx,:] = 2*coords_image[xx,:] / image_dims[xx]
-    coords_ndc[yy,:] = 2*coords_image[yy,:] / image_dims[yy]
 
-    # Covert to pixel (raster) coords
-    # Shape = ([X,Y,Z],num_nodes)
-    coords_raster = np.zeros((3,coords_count))
-    coords_raster[xx,:] = (coords_ndc[xx,:] + 1)/2 * cam_num_px[xx]
-    coords_raster[yy,:] = (1-coords_ndc[yy,:])/2 * cam_num_px[yy]
-    coords_raster[zz,:] = -coords_cam[zz,:]
+    # TODO
+    # Pass the masked coordinates in camera world to the world_to_raster function
     #---------------------------------------------------------------------------
+
+    # Convert world coords of all elements in the scene
+    coords_raster = world_to_raster_coords(cam_data,coords_world_with_w)
 
     # Convert to perspective correct hyperbolic interpolation for z interp
     coords_raster[zz,:] = 1/coords_raster[zz,:]
 
-    nodes_per_elem = connect.shape[0]
-    num_elems = connect.shape[1]
-    # shape=(coord[X,Y,Z],node_per_elem,elem_num)
-    elem_world_coords = coords_world[:,connect]
-    # shape=(nodes_per_elem,coord[X,Y,Z],elem_num)
-    elem_world_coords = np.swapaxes(elem_world_coords,0,1)
+
 
     # shape=(coord[X,Y,Z],node_per_elem,elem_num)
     elem_raster_coords = coords_raster[:,connect]
@@ -287,8 +359,8 @@ def main() -> None:
     # Check that which nodes are within the 4 edges of the camera image
     #shape=(4_edges_to_check,num_elems)
     mask = np.zeros([4,num_elems])
-    mask[0,elem_raster_coord_min[xx,:] <= (cam_num_px[xx]-1)] = 1
-    mask[1,elem_raster_coord_min[yy,:] <= (cam_num_px[yy]-1)] = 1
+    mask[0,elem_raster_coord_min[xx,:] <= (cam_data.num_pixels[xx]-1)] = 1
+    mask[1,elem_raster_coord_min[yy,:] <= (cam_data.num_pixels[yy]-1)] = 1
     mask[2,elem_raster_coord_max[xx,:] >= 0] = 1
     mask[3,elem_raster_coord_max[yy,:] >= 0] = 1
     mask = np.sum(mask,0) == 4
@@ -314,10 +386,10 @@ def main() -> None:
     elem_bound_boxes_px_inds = np.zeros([4,num_elems_in_scene],dtype=np.int32)
     elem_bound_boxes_px_inds[0,:] = bound_box_low(elem_raster_coord_min[xx,:])
     elem_bound_boxes_px_inds[1,:] = bound_box_high(elem_raster_coord_max[xx,:],
-                                                   cam_num_px[xx]-1)
+                                                   cam_data.num_pixels[xx]-1)
     elem_bound_boxes_px_inds[2,:] = bound_box_low(elem_raster_coord_min[yy,:])
     elem_bound_boxes_px_inds[3,:] = bound_box_high(elem_raster_coord_max[yy,:],
-                                                   cam_num_px[yy]-1)
+                                                   cam_data.num_pixels[yy]-1)
 
     # NOTE: edge function
     # for 3 vectors in 2d A, B and C. The edge function is:
@@ -342,8 +414,8 @@ def main() -> None:
     # Option 3: If we have to loop then we should probably use Numba or Cython
 
     # Create a depth buffer and an image buffer upsampled for anti-aliasing
-    depth_buffer = 1e6*np.ones(sub_samp*cam_num_px).T
-    image_buffer = np.full(sub_samp*cam_num_px,0.0).T
+    depth_buffer = 1e6*np.ones(cam_data.sub_samp*cam_data.num_pixels).T
+    image_buffer = np.full(cam_data.sub_samp*cam_data.num_pixels,0.0).T
 
     # We only need to loop over elements and slice out and process the bound box
     (x_start,x_end,y_start,y_end) = (0,1,2,3)
@@ -368,10 +440,10 @@ def main() -> None:
         # edge function. Use the pixel indices of the bounding box.
         bound_subpx_x = np.arange(elem_bound_boxes_px_inds[x_start,ee],
                                   elem_bound_boxes_px_inds[x_end,ee],
-                                  1/sub_samp) + 1/(2*sub_samp)
+                                  1/cam_data.sub_samp) + 1/(2*cam_data.sub_samp)
         bound_subpx_y = np.arange(elem_bound_boxes_px_inds[y_start,ee],
                                   elem_bound_boxes_px_inds[y_end,ee],
-                                  1/sub_samp) + 1/(2*sub_samp)
+                                  1/cam_data.sub_samp) + 1/(2*cam_data.sub_samp)
         (bound_subpx_grid_x,bound_subpx_grid_y) = np.meshgrid(bound_subpx_x,
                                                               bound_subpx_y)
         bound_coords_grid_shape = bound_subpx_grid_x.shape
@@ -379,10 +451,10 @@ def main() -> None:
                                              bound_subpx_grid_y.flatten()))
 
         # Create the subpixel indices for buffer slicing later
-        subpx_inds_x = np.arange(sub_samp*elem_bound_boxes_px_inds[x_start,ee],
-                                 sub_samp*elem_bound_boxes_px_inds[x_end,ee])
-        subpx_inds_y = np.arange(sub_samp*elem_bound_boxes_px_inds[y_start,ee],
-                                 sub_samp*elem_bound_boxes_px_inds[y_end,ee])
+        subpx_inds_x = np.arange(cam_data.sub_samp*elem_bound_boxes_px_inds[x_start,ee],
+                                 cam_data.sub_samp*elem_bound_boxes_px_inds[x_end,ee])
+        subpx_inds_y = np.arange(cam_data.sub_samp*elem_bound_boxes_px_inds[y_start,ee],
+                                 cam_data.sub_samp*elem_bound_boxes_px_inds[y_end,ee])
         (subpx_inds_grid_x,subpx_inds_grid_y) = np.meshgrid(subpx_inds_x,
                                                             subpx_inds_y)
 
@@ -423,6 +495,9 @@ def main() -> None:
             print(f"Vertex 1 = {vert_1}")
             print(f"Vertex 2 = {vert_2}")
             print()
+            print("Element Normal:")
+            #print(f"{}")
+            print()
             print("Edge Function:")
             print(f"Sub-pixels inside = {np.sum(edge_mask_flat)}")
             print(80*"-")
@@ -437,9 +512,9 @@ def main() -> None:
                       + vert_2[zz] * interp_weights[2,:])
 
         field_interp = ((field_frame_divide_z[0,ee] * interp_weights[0,:]
-                    + field_frame_divide_z[1,ee] * interp_weights[1,:]
-                    + field_frame_divide_z[2,ee] * interp_weights[2,:])
-                    * px_coord_z)
+                       + field_frame_divide_z[1,ee] * interp_weights[1,:]
+                       + field_frame_divide_z[2,ee] * interp_weights[2,:])
+                       * px_coord_z)
 
         # Get the pixel indices that are inside the element
         subpx_inds_x_inside = subpx_inds_grid_x[edge_mask_grid]
@@ -486,7 +561,7 @@ def main() -> None:
 
     plot_on = True
     depth_to_plot = depth_avg
-    depth_to_plot[depth_avg > 10*image_dist] = np.NaN
+    depth_to_plot[depth_avg > 10*cam_data.image_dist] = np.NaN
     #===========================================================================
     if plot_on:
         plot_opts = pyvale.PlotOptsGeneral()
