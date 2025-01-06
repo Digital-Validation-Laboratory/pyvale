@@ -1,6 +1,7 @@
 import numpy as np
 from pathlib import Path
 import bpy
+import pyvale
 import mooseherder as mh
 from mooseherder import SimData
 from dev_partblender import BlenderPart
@@ -65,10 +66,20 @@ class DeformSimData:
                     node_dim = nodes[:, dim]
                     deformed_nodes[:, dim] = node_dim + added_disp
                     dim += 1
-            return deformed_nodes
+            deformed_surface = self._nodes_to_surface_mesh(deformed_nodes)
+            return deformed_surface
         else:
             return None
 
+    def _nodes_to_surface_mesh(self, deformed_nodes):
+        self.sim_data.coords = deformed_nodes
+        (pv_grid, pv_grid_vis) = pyvale.conv_simdata_to_pyvista(self.sim_data,
+                                                                None,
+                                                                spat_dim=3)
+        pv_surf = pv_grid.extract_surface()
+        surface_points = pv_surf.points
+
+        return surface_points
 
 
 
@@ -76,7 +87,7 @@ class DeformSimData:
 class DeformPart:
     def __init__(self, part, deformed_nodes):
         self.part = part
-        self.deformed_nodes = deformed_nodes * 1000
+        self.deformed_nodes = deformed_nodes
 
     def set_new_frame(self):
         frame_incr = 20
