@@ -78,7 +78,6 @@ class DeformSimData:
                                                                 spat_dim=3)
         pv_surf = pv_grid.extract_surface()
         surface_points = pv_surf.points
-        print(f"{surface_points=}")
 
         return surface_points
 
