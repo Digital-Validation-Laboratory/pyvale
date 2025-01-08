@@ -56,12 +56,13 @@ class BlenderScene:
 
     def add_stl_part(self, filename:str | None = None, sim_data: SimData | None = None):
         partmaker = BlenderPart(filename=filename, sim_data=sim_data)
-        part = partmaker.import_from_stl()
+        part, points = partmaker.import_from_stl()
         set_origin(part)
-        return part
+        return part, points
 
 
     def set_part_location(self, part, location: tuple):
+        print(f"{part=}")
         z_location = int(part.dimensions[2])
         part.location = (location[0], location[1], (location[2] - z_location))
 
