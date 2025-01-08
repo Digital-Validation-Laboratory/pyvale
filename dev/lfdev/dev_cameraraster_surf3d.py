@@ -228,19 +228,19 @@ def main() -> None:
     roi_pos_world = np.mean(sim_data.coords,axis=0)
 
     # Number of divisions (subsamples) for each pixel for anti-aliasing
-    sub_samp: int = 1
+    sub_samp: int = 2
 
     cam_type = "AV507"
     if cam_type == "AV507":
         cam_num_px = np.array([2464,2056],dtype=np.int32)
         pixel_size = np.array([3.45e-3,3.45e-3]) # in millimeters!
-        focal_leng = 25.0
+        focal_leng: float = 25.0
 
-        imaging_rad: float = 100.0 # Not needed for camera data, just for cam pos below
+        imaging_rad: float = 140.0 # Not needed for camera data, just for cam pos below
     else:
         cam_num_px = np.array([510,260],dtype=np.int32)
         pixel_size = np.array([10.0e-3,10.0e-3])
-        focal_leng = 25.0
+        focal_leng: float = 25.0
 
         imaging_rad: float = 500.0 # Not needed for camera data, just for cam pos below
 
@@ -304,30 +304,32 @@ def main() -> None:
     #---------------------------------------------------------------------------
     # BACK FACE CULLING
     num_elems = connect.shape[1]
-    # coords_cam = np.matmul(cam_data.world_to_cam_mat,coords_world_with_w)
+    coords_cam = np.matmul(cam_data.world_to_cam_mat,coords_world_with_w)
 
-    # # shape=(coord[X,Y,Z,W],node_per_elem,elem_num)
-    # elem_cam_coords = coords_cam[:,connect]
-    # # shape=(nodes_per_elem,coord[X,Y,Z,W],elem_num)
-    # elem_cam_coords = np.swapaxes(elem_cam_coords,0,1)
+    # shape=(coord[X,Y,Z,W],node_per_elem,elem_num)
+    elem_cam_coords = coords_cam[:,connect]
+    # shape=(nodes_per_elem,coord[X,Y,Z,W],elem_num)
+    elem_cam_coords = np.swapaxes(elem_cam_coords,0,1)
 
-    # # Calculate the normal vectors for all of the elements
-    # elem_cam_edge0 = elem_cam_coords[1,:-1,:] - elem_cam_coords[0,:-1,:]
-    # elem_cam_edge1 = elem_cam_coords[2,:-1,:] - elem_cam_coords[0,:-1,:]
-    # elem_cam_normals = np.cross(elem_cam_edge0,elem_cam_edge1,
-    #                             axisa=0,axisb=0).T
-    # # Normalise to unit vectors
-    # elem_cam_normals = elem_cam_normals / np.linalg.norm(elem_cam_normals,axis=0)
+    # Calculate the normal vectors for all of the elements, remove the w coord
+    # shape=(coord[X,Y,Z],elem_num)
+    elem_cam_edge0 = elem_cam_coords[1,:-1,:] - elem_cam_coords[0,:-1,:]
+    elem_cam_edge1 = elem_cam_coords[2,:-1,:] - elem_cam_coords[0,:-1,:]
+    elem_cam_normals = np.cross(elem_cam_edge0,elem_cam_edge1,
+                                axisa=0,axisb=0).T
+    # Normalise to unit vectors
+    elem_cam_normals = elem_cam_normals / np.linalg.norm(elem_cam_normals,axis=0)
 
-    # print()
-    # print(elem_cam_edge0.shape)
-    # print(elem_cam_edge1.shape)
-    # print(elem_cam_normals.shape)
-    # print()
+    print()
+    print(elem_cam_edge0.shape)
+    print(elem_cam_edge1.shape)
+    print(elem_cam_normals.shape)
+    print()
 
     # TODO
     # Pass the masked coordinates in camera world to the world_to_raster function
     #---------------------------------------------------------------------------
+    return
 
     # Convert world coords of all elements in the scene
     coords_raster = world_to_raster_coords(cam_data,coords_world_with_w)
@@ -557,7 +559,7 @@ def main() -> None:
     print(80*"=")
     print()
     print(80*"=")
-    print("PERF TIMERS")
+    print("PERFORMANCE TIMERS")
     print(f"Setup time = {time_end_setup-time_start_setup} seconds")
     print(f"Loop time  = {time_end_loop-time_start_loop} seconds")
     print(f"Total time = {time_end_loop-time_start_setup} seconds")
