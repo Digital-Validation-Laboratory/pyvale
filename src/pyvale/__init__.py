@@ -1,10 +1,17 @@
-'''
+"""
+`pyvale`: the python validation engine. Used to simulate experimental data from
+an input multi-physics simulation by explicitly modelling sensors with realistic
+uncertainties. Useful for experimental design, sensor placement optimisation, 
+testing simulation validation metrics and testing digital shadows/twins.
+"""
+
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 # NOTE: this simplifies and decouples how the user calls pyvale from the
 # underlying project structure: the user should always be able to use 'pyvale.'
 # and access everything in one layer without multiple import dots
@@ -17,6 +24,7 @@ from pyvale.core.field import *
 from pyvale.core.fieldscalar import *
 from pyvale.core.fieldvector import *
 from pyvale.core.fieldtensor import *
+from pyvale.core.fieldconverter import *
 from pyvale.core.fieldtransform import *
 
 from pyvale.core.integratorspatial import *
@@ -26,6 +34,7 @@ from pyvale.core.integratorfactory import *
 
 from pyvale.core.sensordescriptor import *
 from pyvale.core.sensortools import *
+from pyvale.core.sensorarray import *
 from pyvale.core.sensorarrayfactory import *
 from pyvale.core.sensorarraypoint import *
 from pyvale.core.sensordata import *

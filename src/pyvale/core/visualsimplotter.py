@@ -1,11 +1,10 @@
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
-#import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
+"""#import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
 # See: https://github.com/pyvista/pyvista/discussions/2928
 #NOTE: causes output to console to be suppressed unfortunately
 import pyvista as pv
@@ -13,7 +12,7 @@ import pyvista as pv
 import mooseherder as mh
 
 from pyvale.core.sensorarraypoint import SensorArrayPoint
-from pyvale.core.field import conv_simdata_to_pyvista
+from pyvale.core.fieldconverter import conv_simdata_to_pyvista
 from pyvale.core.visualopts import (VisOptsSimSensors,VisOptsImageSave)
 from pyvale.core.visualtools import (create_pv_plotter,
                                 get_colour_lims,
@@ -155,9 +154,6 @@ def plot_point_sensors_on_sim(sensor_array: SensorArrayPoint,
 
     if vis_opts is None:
         vis_opts = VisOptsSimSensors()
-
-
-
 
     sim_data = sensor_array.field.get_sim_data()
     vis_opts.colour_bar_lims = get_colour_lims(

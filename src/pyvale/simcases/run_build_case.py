@@ -15,7 +15,7 @@ from mooseherder import (MooseConfig,
 
 #===============================================================================
 # Change this to run a different case
-CASE_STR = 'case23'
+CASE_STR = 'case24'
 #===============================================================================
 
 CASE_FILES = (CASE_STR+'.geo',CASE_STR+'.i')

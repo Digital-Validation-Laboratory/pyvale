@@ -1,10 +1,10 @@
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 import numpy as np
 
 import mooseherder as mh
@@ -22,12 +22,37 @@ from pyvale.core.errorsysdep import (ErrSysDigitisation,
 
 
 class SensorArrayFactory:
+    """Namespace for static methods used to build common types of sensor arrays
+    simplifying sensor array creation for users.
+    """
+    
     @staticmethod
     def thermocouples_no_errs(sim_data: mh.SimData,
                               sensor_data: SensorData,
                               field_name: str = "temperature",
                               spat_dims: int = 3,
                               ) -> SensorArrayPoint:
+        """Builds and returns a point sensor array with common parameters used
+        for thermocouples applied to a temperature field without any simulated
+        measurement errors. Allows the
+
+        Parameters
+        ----------
+        sim_data : mh.SimData
+            Simulation data containing a mesh and a temperature field for the
+            thermocouple array to sample.
+        sensor_data : SensorData
+            _description_
+        field_name : str, optional
+            _description_, by default "temperature"
+        spat_dims : int, optional
+            , by default 3
+
+        Returns
+        -------
+        SensorArrayPoint
+            _description_
+        """
         descriptor = SensorDescriptorFactory.temperature_descriptor()
 
         t_field = FieldScalar(sim_data,field_name,spat_dims)
@@ -151,10 +176,32 @@ class SensorArrayFactory:
 
 
 def basic_err_integrator(meas_shape: np.ndarray,
-                         sensor_data,
-                         errs_pc: float = 1.0) -> ErrIntegrator:
+                         sensor_data: SensorData,
+                         sys_err_pc: float = 1.0,
+                         rand_err_pc: float = 1.0) -> ErrIntegrator:
+    """Builds a basic error integrator with uniform percentage systematic error
+    calculator and a percentage normal random error calculator.
+
+    Parameters
+    ----------
+    meas_shape : np.ndarray
+        Shape of the measurement array which is (num_sensors,
+        num_field_components,num_time_steps)
+    sensor_data : SensorData
+        Sensor array parameters for feeding through the error chain.
+    sys_err_pc : float, optional
+        Percentage systematic error, by default 1.0.
+    rand_err_pc : float, optional
+        Percentage random error, by default 1.0.
+
+    Returns
+    -------
+    ErrIntegrator
+        A basic error integrator with a uniform percentage systematic error and
+        a normal percentage random error.
+    """
     err_chain = []
-    err_chain.append(ErrSysUniformPercent(-errs_pc,errs_pc))
-    err_chain.append(ErrRandNormPercent(errs_pc))
+    err_chain.append(ErrSysUniformPercent(-sys_err_pc,sys_err_pc))
+    err_chain.append(ErrRandNormPercent(rand_err_pc))
     err_int = ErrIntegrator(err_chain,sensor_data,meas_shape)
     return err_int

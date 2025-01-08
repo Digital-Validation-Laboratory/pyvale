@@ -1,14 +1,15 @@
-
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 import numpy as np
 from pyvale.core.cameradata import CameraData2D
 from pyvale.core.sensordata import SensorData
+
+# NOTE: This module is a feature under developement.
 
 #-------------------------------------------------------------------------------
 def build_pixel_vec_px(cam_data: CameraData2D) -> tuple[np.ndarray,np.ndarray]:
