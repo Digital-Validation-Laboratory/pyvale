@@ -15,8 +15,7 @@ class BlenderPart:
                  filename: str | None = None):
         self.sim_data = sim_data
         self.filename = filename
-        # if sim_data is not None:
-        #     self._initialise_nodes_elements(elements, nodes)
+        # self._initialise_nodes_elements(elements, nodes)
 
 
     def _initialise_nodes_elements(self, elements, nodes):
@@ -82,6 +81,8 @@ class BlenderPart:
                                                                 None,
                                                                 spat_dim=3)
         pv_surf = pv_grid.extract_surface()
+        surface_points = pv_surf.points
+        centre_points = self._centre_nodes(surface_points)
 
         save_path = Path().cwd() / "test_output"
         if not save_path.is_dir():
@@ -97,15 +98,17 @@ class BlenderPart:
         self.filename = str(save_file)
         pv_surf.save(save_file, binary=False)
 
+        return centre_points
+
 
     def import_from_stl(self):
         if self.filename is None:
-            self._simdata_to_stl()
+            points = self._simdata_to_stl()
 
         bpy.ops.wm.stl_import(filepath=self.filename)
 
         part = bpy.context.selected_objects[0]
-        return part
+        return part, points
 
     def add_thickness(self, part): # Not sure if this is necessary
         part["solidify"] = True
