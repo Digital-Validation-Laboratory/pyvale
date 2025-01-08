@@ -7,8 +7,7 @@ from mooseherder import SimData
 from dev_partblender import BlenderPart
 
 class DeformMesh:
-    def __init__(self, nodes, sim_data: SimData):
-        self.nodes = nodes
+    def __init__(self,sim_data: SimData):
         self.sim_data = sim_data
 
     def _get_node_vars(self):
@@ -27,7 +26,7 @@ class DeformMesh:
             disp['disp_z'] = True
         return disp
 
-    def add_displacement(self, timestep: int):
+    def add_displacement(self, timestep: int, nodes: np.ndarray):
         node_var_names = self._get_node_vars()
         disps = self._check_for_displacements(node_var_names)
         if True in disps.values():
@@ -35,12 +34,14 @@ class DeformMesh:
             added_disp = np.empty(shape)
             dim = 0
             for disp, value in disps.items():
-                added_disp_1d = self.sim_data.node_vars[disp][:, timestep]
-                added_disp[:, dim] = added_disp_1d
+                if value is True:
+                    added_disp_1d = self.sim_data.node_vars[disp][:, timestep]
+                    added_disp[:, dim] = added_disp_1d
+                    print(f"{added_disp=}")
             added_disp_suface = self._nodes_to_surface_mesh(added_disp)
+            print(f"{added_disp_suface=}")
 
-            deformed_nodes = self.nodes + added_disp_suface
-            self.nodes = deformed_nodes
+            deformed_nodes = nodes + added_disp_suface
             return deformed_nodes
         else:
             return None
