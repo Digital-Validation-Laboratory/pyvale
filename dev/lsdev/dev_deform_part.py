@@ -7,29 +7,58 @@ from mooseherder import SimData
 from dev_partblender import BlenderPart
 
 class DeformMesh:
-    def __init__(self, sim_data:SimData, defgrad):
+    def __init__(self, nodes, sim_data: SimData):
+        self.nodes = nodes
         self.sim_data = sim_data
-        self.defgrad = defgrad
-        self.nodes = self._get_nodes()
 
-    def _get_nodes(self):
-        mesh_builder = BlenderPart(self.sim_data)
-        nodes = mesh_builder._get_nodes()
-        return nodes
+    def _get_node_vars(self):
+        node_vars = self.sim_data.node_vars
+        node_vars_names = list(node_vars.keys())
+        return node_vars_names
 
-    def map_coords(self):
-        mid = np.max(self.nodes, axis=0)  / 2
-        centred = np.subtract(self.nodes, mid)
+    def _check_for_displacements(self, node_var_names: list):
+        disp = {'disp_x': False, 'disp_y': False, 'disp_z': False}
 
-        defgrad_inv = np.linalg.inv(self.defgrad)
+        if 'disp_x' in node_var_names:
+            disp['disp_x'] = True
+        if 'disp_y' in node_var_names:
+            disp['disp_y'] = True
+        if 'disp_z' in node_var_names:
+            disp['disp_z'] = True
+        return disp
 
-        coords_new = np.einsum('ij,nj->ni', defgrad_inv, centred)
+    def add_displacement(self, timestep: int):
+        node_var_names = self._get_node_vars()
+        disps = self._check_for_displacements(node_var_names)
+        if True in disps.values():
+            shape = self.sim_data.coords.shape
+            added_disp = np.empty(shape)
+            dim = 0
+            for disp, value in disps.items():
+                added_disp_1d = self.sim_data.node_vars[disp][:, timestep]
+                added_disp[:, dim] = added_disp_1d
+            added_disp_suface = self._nodes_to_surface_mesh(added_disp)
 
-        return coords_new
+            deformed_nodes = self.nodes + added_disp_suface
+            self.nodes = deformed_nodes
+            return deformed_nodes
+        else:
+            return None
+
+    def _nodes_to_surface_mesh(self, deformed_nodes):
+        self.sim_data.coords = deformed_nodes
+        (pv_grid, pv_grid_vis) = pyvale.conv_simdata_to_pyvista(self.sim_data,
+                                                                None,
+                                                                spat_dim=3)
+        pv_surf = pv_grid.extract_surface()
+        surface_points = pv_surf.points
+
+        return surface_points
 
 class DeformSimData:
     def __init__(self, sim_data: SimData):
         self.sim_data = sim_data
+        self.sim_data2 = sim_data
 
     def _get_nodes(self):
         mesh_builder = BlenderPart(self.sim_data)
