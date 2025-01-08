@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import numpy as np
 import mooseherder as mh
+from dev_partblender import BlenderPart
 from dev_blenderscene import BlenderScene, set_origin
 from dev_partblender import *
 from dev_blendercamera import CameraData
@@ -12,12 +13,12 @@ from dev_deform_part import DeformMesh, DeformSimData, DeformPart
 
 def main() -> None:
     # Making Blender scene
-    data_path = Path('src/pyvale/data/case18_1_out.e')
+    data_path = Path('src/pyvale/simcases/case23_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
     dir = Path.cwd() / 'dev/lsdev/blender_files'
-    filename = 'case18_1_deformed.blend'
+    filename = 'case23_deformed.blend'
     filepath = dir / filename
     all_files = os.listdir(dir)
     for ff in all_files:
@@ -29,8 +30,9 @@ def main() -> None:
     scene = BlenderScene()
 
     part_location = (0, 0, 0)
-    part = scene.add_part(sim_data)
+    part, points = scene.add_stl_part(sim_data=sim_data)
     scene.set_part_location(part, part_location)
+
 
     mat_data = MaterialData()
     image_path = '/home/lorna/speckle_generator/images/blender_image_texture.tiff'
@@ -56,7 +58,7 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # Rendering images
-    image_path = Path.cwd() / 'dev/lsdev/rendered_images/case18_1_deformed'
+    image_path = Path.cwd() / 'dev/lsdev/rendered_images/case23_deformed'
     output_path = Path.cwd() / 'dev/lsdev/rendered_images'
 
 
@@ -66,24 +68,25 @@ def main() -> None:
     render_counter = 0
     render_name = 'ref_image'
 
-    render.render_image(render_name, render_counter)
+    # render.render_image(render_name, render_counter)
 
     #---------------------------------------------------------------------------
     # Deform mesh
     timesteps = sim_data.time.shape[0]
+    meshdeformer = DeformMesh(sim_data=sim_data, nodes=points)
     for timestep in range((timesteps - 1)):
         timestep += 1 # Adding at start of loop as timestep = 0 is the original mesh
-        meshdeformer = DeformSimData(sim_data)
         deformed_nodes = meshdeformer.add_displacement(timestep)
 
         if deformed_nodes is not None:
             partdeformer = DeformPart(part, deformed_nodes)
             part = partdeformer.deform_part()
-            print(part.dimensions)
+            print(f"{timestep=}")
+            print(f"{part.dimensions=}")
             partdeformer.set_new_frame()
 
             render_name = 'def_sim_data'
-            render.render_image(render_name, timestep)
+            # render.render_image(render_name, timestep)
 
 
 
