@@ -59,7 +59,6 @@ class DeformMesh:
 class DeformSimData:
     def __init__(self, sim_data: SimData):
         self.sim_data = sim_data
-        self.sim_data2 = sim_data
 
     def _get_nodes(self):
         mesh_builder = BlenderPart(self.sim_data)
@@ -96,7 +95,11 @@ class DeformSimData:
                     node_dim = nodes[:, dim]
                     deformed_nodes[:, dim] = node_dim + added_disp
                     dim += 1
-            deformed_surface = self._nodes_to_surface_mesh(deformed_nodes)
+            check_if_2d = np.count_nonzero(nodes, axis=0)
+            if check_if_2d[2] != 0:
+                deformed_surface = self._nodes_to_surface_mesh(deformed_nodes)
+            else:
+                deformed_surface = deformed_nodes
             return deformed_surface
         else:
             return None
@@ -141,18 +144,9 @@ class DeformPart:
         self.part.data.shape_keys.use_relative = False
 
         n_nodes_layer = int(len(self.part.data.vertices))
-        all_nodes = np.array([sk.data[i].co for i in range(len(self.part.data.vertices))])
-        first_layer = all_nodes[0:n_nodes_layer, :]
-
-        count = 0
         for i in range(len(self.part.data.vertices)):
             if i < n_nodes_layer:
                 sk.data[i].co = self.deformed_nodes[i]
-                count += 1
-            else:
-                dist = np.linalg.norm(first_layer - sk.data[i].co, axis=1)
-                cn = np.argmin(dist)
-                sk.data[i].co = self.deformed_nodes[cn]
 
         return self.part
 
