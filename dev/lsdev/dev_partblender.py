@@ -15,7 +15,8 @@ class BlenderPart:
                  filename: str | None = None):
         self.sim_data = sim_data
         self.filename = filename
-        # self._initialise_nodes_elements(elements, nodes)
+        self.elements = elements
+        self.nodes = nodes
 
 
     def _initialise_nodes_elements(self, elements, nodes):
@@ -66,9 +67,10 @@ class BlenderPart:
     def simdata_to_part(self):
         """Creates an object from the mesh information in the SimData object
         """
-
+        nodes = self._get_nodes() * 1000
+        elements = self._get_elements()
         mesh = bpy.data.meshes.new("part")
-        mesh.from_pydata(self.nodes, [], self.elements, shade_flat=True)
+        mesh.from_pydata(nodes, [], elements, shade_flat=True)
         mesh.validate(verbose=True, clean_customdata=True)
         part = bpy.data.objects.new("specimen", mesh)
         bpy.context.scene.collection.objects.link(part)
@@ -80,8 +82,13 @@ class BlenderPart:
         (pv_grid, pv_grid_vis) = pyvale.conv_simdata_to_pyvista(self.sim_data,
                                                                 None,
                                                                 spat_dim=3)
-        pv_surf = pv_grid.extract_surface()
-        surface_points = pv_surf.points
+
+        check_if_2d = np.count_nonzero(self.sim_data.coords, axis=0)
+        if check_if_2d[2] == 0:
+            surface_points = pv_grid.points
+        else:
+            pv_surf = pv_grid.extract_surface()
+            surface_points = pv_surf.points
         centre_points = self._centre_nodes(surface_points)
 
         save_path = Path().cwd() / "test_output"
@@ -97,6 +104,7 @@ class BlenderPart:
 
         self.filename = str(save_file)
         pv_surf.save(save_file, binary=False)
+
 
         return centre_points
 

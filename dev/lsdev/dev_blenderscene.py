@@ -45,6 +45,19 @@ class BlenderScene:
 
     def add_part(self,
                  sim_data: SimData,
+                 elements: np.ndarray | None = None,
+                 nodes: np.ndarray | None = None,
+                 filename: str | None = None):
+        check_if_2d = np.count_nonzero(sim_data.coords, axis=0)
+        if check_if_2d[2] == 0:
+            part = self.add_simdata_part(sim_data, elements, nodes)
+        else:
+            part, points = self.add_stl_part(sim_data=sim_data, filename=filename)
+
+        return part
+
+    def add_simdata_part(self,
+                 sim_data: SimData,
                  elements:np.ndarray | None = None,
                  nodes: np.ndarray | None = None):
         partmaker = BlenderPart(sim_data, elements, nodes)
