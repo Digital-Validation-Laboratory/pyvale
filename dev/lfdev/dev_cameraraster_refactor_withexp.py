@@ -8,13 +8,10 @@ Copyright (C) 2024 The Computer Aided Validation Team
 from dataclasses import dataclass, field
 import time
 from pathlib import Path
-from multiprocessing.pool import Pool
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation
 from scipy.signal import convolve2d
-
 import mooseherder as mh
 import pyvale
 
@@ -335,191 +332,6 @@ class Rasteriser:
                 subpx_inds_grid_x[edge_mask_grid],
                 subpx_inds_grid_y[edge_mask_grid])
 
-    @staticmethod
-    def raster_loop_sequential(cam_data: CameraRasterData,
-                               elem_raster_coords: np.ndarray,
-                               elem_bound_box_inds: np.ndarray,
-                               elem_areas: np.ndarray,
-                               field_frame_divide_z: np.ndarray
-                               ) -> tuple[np.ndarray,np.ndarray,int]:
-
-        # NOTE: this version cannot be run in parallel as the depth buffer is
-        # filled on the fly as we process each element. This version will be
-        # more memory efficient as we do not need to store each rastered
-        # element fragment in memory.
-
-        depth_buffer = 1e6*np.ones(cam_data.sub_samp*cam_data.num_pixels).T
-        image_buffer = np.full(cam_data.sub_samp*cam_data.num_pixels,0.0).T
-
-        for ee in range(elem_raster_coords.shape[-1]):
-            (px_coord_z,
-            field_interp,
-            subpx_inds_x_in,
-            subpx_inds_y_in) = Rasteriser.raster_one_element(
-                                                cam_data,
-                                                elem_raster_coords[:,:,ee],
-                                                elem_bound_box_inds[:,ee],
-                                                elem_areas[ee],
-                                                field_frame_divide_z[:,ee])
-
-
-            #  Build a mask to replace the depth information if there is already an
-            # element in front of the one we are rendering
-            px_coord_z_depth_mask = (px_coord_z
-                < depth_buffer[subpx_inds_y_in,subpx_inds_x_in])
-
-            # Initialise the z coord to the value in the depth buffer
-            px_coord_z_masked = depth_buffer[subpx_inds_y_in,subpx_inds_x_in]
-            # Use the depth mask to overwrite the depth buffer values if points are in
-            # front of the values in the depth buffer
-            px_coord_z_masked[px_coord_z_depth_mask] = px_coord_z[px_coord_z_depth_mask]
-
-            # Push the masked values into the depth buffer
-            depth_buffer[subpx_inds_y_in,subpx_inds_x_in] = px_coord_z_masked
-
-            # Mask the image buffer using the depth mask
-            image_buffer_depth_masked = image_buffer[subpx_inds_y_in,subpx_inds_x_in]
-            image_buffer_depth_masked[px_coord_z_depth_mask] = field_interp[px_coord_z_depth_mask]
-
-            # Push the masked values into the image buffer
-            image_buffer[subpx_inds_y_in,subpx_inds_x_in] = image_buffer_depth_masked
-
-        #---------------------------------------------------------------------------
-        # END RASTER LOOP
-        depth_buffer = average_subpixel_image(depth_buffer,cam_data.sub_samp)
-        image_buffer = average_subpixel_image(image_buffer,cam_data.sub_samp)
-
-        return (image_buffer,depth_buffer,elem_raster_coords.shape[-1])
-
-    @staticmethod
-    def raster_loop(cam_data: CameraRasterData,
-                    elem_raster_coords: np.ndarray,
-                    elem_bound_box_inds: np.ndarray,
-                    elem_areas: np.ndarray,
-                    field_frame_divide_z: np.ndarray
-                    ) -> tuple[np.ndarray,np.ndarray,int]:
-
-        num_elems_in_scene = elem_raster_coords.shape[-1]
-        px_coord_z = [None]*num_elems_in_scene
-        field_interp = [None]*num_elems_in_scene
-        subpx_inds_x_in = [None]*num_elems_in_scene
-        subpx_inds_y_in = [None]*num_elems_in_scene
-
-        for ee in range(num_elems_in_scene):
-            (px_coord_z[ee],
-            field_interp[ee],
-            subpx_inds_x_in[ee],
-            subpx_inds_y_in[ee]) = Rasteriser.raster_one_element(
-                                                cam_data,
-                                                elem_raster_coords[:,:,ee],
-                                                elem_bound_box_inds[:,ee],
-                                                elem_areas[ee],
-                                                field_frame_divide_z[:,ee])
-
-        depth_buffer = 1e6*np.ones(cam_data.sub_samp*cam_data.num_pixels).T
-        image_buffer = np.full(cam_data.sub_samp*cam_data.num_pixels,0.0).T
-
-        # This loop cannot be parallelised as we need to know which element is
-        # in front an push it into the image buffer
-        for ee in range(num_elems_in_scene):
-            #  Build a mask to replace the depth information if there is already an
-            # element in front of the one we are rendering
-            px_coord_z_depth_mask = (px_coord_z[ee]
-                < depth_buffer[subpx_inds_y_in[ee],subpx_inds_x_in[ee]])
-
-            # Initialise the z coord to the value in the depth buffer
-            px_coord_z_masked = depth_buffer[subpx_inds_y_in[ee],subpx_inds_x_in[ee]]
-            # Use the depth mask to overwrite the depth buffer values if points are in
-            # front of the values in the depth buffer
-            px_coord_z_masked[px_coord_z_depth_mask] = px_coord_z[ee][px_coord_z_depth_mask]
-
-            # Push the masked values into the depth buffer
-            depth_buffer[subpx_inds_y_in[ee],subpx_inds_x_in[ee]] = px_coord_z_masked
-
-            # Mask the image buffer using the depth mask
-            image_buffer_depth_masked = image_buffer[subpx_inds_y_in[ee],subpx_inds_x_in[ee]]
-            image_buffer_depth_masked[px_coord_z_depth_mask] = field_interp[ee][px_coord_z_depth_mask]
-
-            # Push the masked values into the image buffer
-            image_buffer[subpx_inds_y_in[ee],subpx_inds_x_in[ee]] = image_buffer_depth_masked
-
-        #---------------------------------------------------------------------------
-        # END RASTER LOOP
-        depth_buffer = average_subpixel_image(depth_buffer,cam_data.sub_samp)
-        image_buffer = average_subpixel_image(image_buffer,cam_data.sub_samp)
-
-        return (image_buffer,depth_buffer,num_elems_in_scene)
-
-    @staticmethod
-    def raster_loop_parallel(cam_data: CameraRasterData,
-                            elem_raster_coords: np.ndarray,
-                            elem_bound_box_inds: np.ndarray,
-                            elem_areas: np.ndarray,
-                            field_frame_divide_z: np.ndarray,
-                            num_para: int = 4
-                            ) -> tuple[np.ndarray,np.ndarray,int]:
-
-        with Pool(num_para) as pool:
-            processes = list([])
-
-            num_elems_in_scene = elem_raster_coords.shape[-1]
-            fragments = [None]*num_elems_in_scene
-
-            for ee in range(num_elems_in_scene):
-                processes.append(pool.apply_async(
-                    Rasteriser.raster_one_element,
-                    args=(cam_data,
-                          elem_raster_coords[:,:,ee],
-                          elem_bound_box_inds[:,ee],
-                          elem_areas[ee],
-                          field_frame_divide_z[:,ee]
-                          )))
-
-            fragments = [pp.get() for pp in processes]
-
-        # NOTE: fragements should be a list of tuples of numpy arrays returned
-        # by the rasteriser
-
-        # Tuple indices for variables in the fragments list
-        px_co_z: int = 0
-        field_int: int = 1
-        inds_x: int = 2
-        inds_y: int = 3
-
-        depth_buffer = 1e6*np.ones(cam_data.sub_samp*cam_data.num_pixels).T
-        image_buffer = np.full(cam_data.sub_samp*cam_data.num_pixels,0.0).T
-
-        # This loop cannot be parallelised as we need to know which element is
-        # in front an push it into the image buffer
-        for ee in range(num_elems_in_scene):
-            #  Build a mask to replace the depth information if there is already an
-            # element in front of the one we are rendering
-            px_coord_z_depth_mask = (fragments[ee][px_co_z]
-                < depth_buffer[fragments[ee][inds_y],fragments[ee][inds_x]])
-
-            # Initialise the z coord to the value in the depth buffer
-            px_coord_z_masked = depth_buffer[fragments[ee][inds_y],fragments[ee][inds_x]]
-            # Use the depth mask to overwrite the depth buffer values if points are in
-            # front of the values in the depth buffer
-            px_coord_z_masked[px_coord_z_depth_mask] = fragments[ee][px_co_z][px_coord_z_depth_mask]
-
-            # Push the masked values into the depth buffer
-            depth_buffer[fragments[ee][inds_y],fragments[ee][inds_x]] = px_coord_z_masked
-
-            # Mask the image buffer using the depth mask
-            image_buffer_depth_masked = image_buffer[fragments[ee][inds_y],fragments[ee][inds_x]]
-            image_buffer_depth_masked[px_coord_z_depth_mask] = fragments[ee][field_int][px_coord_z_depth_mask]
-
-            # Push the masked values into the image buffer
-            image_buffer[fragments[ee][inds_y],fragments[ee][inds_x]] = image_buffer_depth_masked
-
-        #---------------------------------------------------------------------------
-        # END RASTER LOOP
-        depth_buffer = average_subpixel_image(depth_buffer,cam_data.sub_samp)
-        image_buffer = average_subpixel_image(image_buffer,cam_data.sub_samp)
-
-        return (image_buffer,depth_buffer,num_elems_in_scene)
-
 
 def edge_function(vert_a: np.ndarray,
                   vert_b: np.ndarray,
@@ -548,21 +360,35 @@ def average_subpixel_image(subpx_image: np.ndarray,
 #===============================================================================
 # MAIN
 def main() -> None:
-    # 3D cylinder, mechanical, tets
-    data_path = Path("dev/lfdev/rastermeshbenchmarks")
-    data_path = data_path / "case21_m5_out.e"
+    test_case_str = "cyl"
+
+    if test_case_str == "temp":
+        # 2D plate, thermal, triangles
+        data_path = Path('src/pyvale/simcases/case24_out.e')
+    else:
+        # 3D cylinder, mechanical, tets
+        data_path = Path('src/pyvale/simcases/case21_out.e')
 
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
     field_keys = tuple(sim_data.node_vars.keys())
     # Scale to mm to make 3D visualisation scaling easier
     sim_data.coords = sim_data.coords*1000.0
 
+    if test_case_str == "temp":
+        field_key = "temperature"
+        components = ("temperature",)
+        (pv_grid,_) = pyvale.conv_simdata_to_pyvista(sim_data,
+                                                    components,
+                                                    spat_dim=2)
 
-    field_key = "disp_y"
-    components = ("disp_x","disp_y","disp_z")
-    (pv_grid,_) = pyvale.conv_simdata_to_pyvista(sim_data,
-                                                components,
-                                                spat_dim=3)
+        roi_pos_world = np.mean(sim_data.coords,axis=0)
+
+    else:
+        field_key = "disp_y"
+        components = ("disp_x","disp_y","disp_z")
+        (pv_grid,_) = pyvale.conv_simdata_to_pyvista(sim_data,
+                                                    components,
+                                                    spat_dim=3)
     pyvale.print_dimensions(sim_data)
 
     time_start_setup = time.perf_counter()
@@ -605,7 +431,19 @@ def main() -> None:
     print()
 
     #===========================================================================
-    # RASTER SETUP
+    # NOTE
+    # - If user specified the roi location and the camera location we know the
+    #   imaging distance
+    # - We know the focal length and sensor size we can find the view angle
+    #   - Any combination of 2 of focal length, sensor size and view angle
+    # - The camera matrix is given as (column major): CameraToWorld
+    #   [[x0, y0, z0, Tx],
+    #    [x1, y1, z1, Ty],
+    #    [x2, y2, z2, Tz],
+    #    [0 ,  0 , 0, 1 ]]
+    # Unit vector [x0,x1,x2] specified the x axis, [Tx,Ty,Tz] is the camera pos
+    # in world coords.
+    # The WorldToCamera matrix is the inverse of the above matrix!
     (xx,yy,zz,ww) = (0,1,2,3)
 
     #shape=(3,num_coords)
@@ -631,15 +469,15 @@ def main() -> None:
     roi_pos_world = np.mean(sim_data.coords,axis=0)
 
     # Number of divisions (subsamples) for each pixel for anti-aliasing
-    sub_samp: int = 4
+    sub_samp: int = 2
 
-    cam_type = "AV507"
+    cam_type = "Test"
     if cam_type == "AV507":
         cam_num_px = np.array([2464,2056],dtype=np.int32)
         pixel_size = np.array([3.45e-3,3.45e-3]) # in millimeters!
         focal_leng: float = 25.0
 
-        imaging_rad: float = 100.0 # Not needed for camera data, just for cam pos below
+        imaging_rad: float = 500.0 # Not needed for camera data, just for cam pos below
     else:
         cam_num_px = np.array([510,260],dtype=np.int32)
         pixel_size = np.array([10.0e-3,10.0e-3])
@@ -684,54 +522,68 @@ def main() -> None:
                                               connectivity,
                                               field_scalar)
 
-    # We only need to loop over elements and slice out and process the bound box
-    frame = -1  # render the last frame
-    field_frame_divide_z = field_divide_z[:,:,frame]
-
-    time_end_setup = time.perf_counter()
-
-    #---------------------------------------------------------------------------
-    # RASTER LOOP START
     print()
     print(80*"=")
     print("RASTER ELEMENT LOOP START")
     print(80*"=")
 
-    print("Running sequential element loop")
+    # Create a depth buffer and an image buffer upsampled for anti-aliasing
+    depth_buffer = 1e6*np.ones(cam_data.sub_samp*cam_data.num_pixels).T
+    image_buffer = np.full(cam_data.sub_samp*cam_data.num_pixels,0.0).T
+
+    # We only need to loop over elements and slice out and process the bound box
+    frame = -1  # render the last frame
+    field_frame_divide_z = field_divide_z[:,:,frame]
+
+
+    time_end_setup = time.perf_counter()
+
+    #---------------------------------------------------------------------------
+    # RASTER LOOP START
     time_start_loop = time.perf_counter()
-    (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_sequential(
-        cam_data,
-        elem_raster_coords,
-        elem_bound_box_inds,
-        elem_areas,
-        field_frame_divide_z)
+    for ee in range(elem_raster_coords.shape[-1]):
+
+        (px_coord_z,
+        field_interp,
+        subpx_inds_x_in,
+        subpx_inds_y_in) = Rasteriser.raster_one_element(
+                                            cam_data,
+                                            elem_raster_coords[:,:,ee],
+                                            elem_bound_box_inds[:,ee],
+                                            elem_areas[ee],
+                                            field_frame_divide_z[:,ee])
+
+        #-----------------------------------------------------------------------
+        # MASK AND PUSH INTO BUFFER
+        # Split into separate loop
+
+        #  Build a mask to replace the depth information if there is already an
+        # element in front of the one we are rendering
+        px_coord_z_depth_mask = (px_coord_z
+            < depth_buffer[subpx_inds_y_in,subpx_inds_x_in])
+
+        # Initialise the z coord to the value in the depth buffer
+        px_coord_z_masked = depth_buffer[subpx_inds_y_in,subpx_inds_x_in]
+        # Use the depth mask to overwrite the depth buffer values if points are in
+        # front of the values in the depth buffer
+        px_coord_z_masked[px_coord_z_depth_mask] = px_coord_z[px_coord_z_depth_mask]
+
+        # Push the masked values into the depth buffer
+        depth_buffer[subpx_inds_y_in,subpx_inds_x_in] = px_coord_z_masked
+
+        # Mask the image buffer using the depth mask
+        image_buffer_depth_masked = image_buffer[subpx_inds_y_in,subpx_inds_x_in]
+        image_buffer_depth_masked[px_coord_z_depth_mask] = field_interp[px_coord_z_depth_mask]
+
+        # Push the masked values into the image buffer
+        image_buffer[subpx_inds_y_in,subpx_inds_x_in] = image_buffer_depth_masked
+
+    #---------------------------------------------------------------------------
+    # END RASTER LOOP
+    depth_buffer = average_subpixel_image(depth_buffer,sub_samp)
+    image_buffer = average_subpixel_image(image_buffer,sub_samp)
+
     time_end_loop = time.perf_counter()
-    time_seq_loop = time_end_loop - time_start_loop
-
-    print("Running separated element loop")
-    time_start_loop = time.perf_counter()
-    (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop(
-        cam_data,
-        elem_raster_coords,
-        elem_bound_box_inds,
-        elem_areas,
-        field_frame_divide_z)
-    time_end_loop = time.perf_counter()
-    time_sep_loop = time_end_loop - time_start_loop
-
-    print("Running parallel element loop")
-    time_start_loop = time.perf_counter()
-    (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_parallel(
-        cam_data,
-        elem_raster_coords,
-        elem_bound_box_inds,
-        elem_areas,
-        field_frame_divide_z,
-        num_para=8)
-    time_end_loop = time.perf_counter()
-    time_par_loop = time_end_loop - time_start_loop
-
-
     print()
     print(80*"=")
     print("RASTER LOOP END")
@@ -739,19 +591,15 @@ def main() -> None:
     print()
     print(80*"=")
     print("PERFORMANCE TIMERS")
-    print(f"Total elements:    {connectivity.shape[1]}")
-    print(f"Elements in image: {num_elems_in_image}")
-    print()
     print(f"Setup time = {time_end_setup-time_start_setup} seconds")
-    print(f"Seq. Loop time  = {time_seq_loop} seconds")
-    print(f"Sep. Loop time  = {time_sep_loop} seconds")
-    print(f"Par. Loop time  = {time_par_loop} seconds")
+    print(f"Loop time  = {time_end_loop-time_start_loop} seconds")
+    print(f"Total time = {time_end_loop-time_start_setup} seconds")
     print(80*"=")
 
     #===========================================================================
     # REGRESSION TESTING FOR REFACTOR
     save_regression_test_arrays = False
-    check_regression_test_arrays = False
+    check_regression_test_arrays = True
 
     test_path = Path.cwd() / "tests" / "regression"
     test_image = test_path / "image_buffer.npy"
@@ -776,7 +624,7 @@ def main() -> None:
 
     #===========================================================================
     # PLOTTING
-    plot_on = True
+    plot_on = False
     depth_to_plot = np.copy(depth_buffer)
     depth_to_plot[depth_buffer > 10*cam_data.image_dist] = np.NaN
     image_to_plot = np.copy(image_buffer)

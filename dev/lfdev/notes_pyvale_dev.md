@@ -157,3 +157,12 @@ Start with xy then azimuth 90
 (0.0, 16.0, 5.5),
 (0.0, 1.0, 0.0)]
 
+## Memory Profiling with `mprof`
+Install into a virtual environment:
+`pip install memory-profiler`
+
+Run a script to profile the memory (output is stored in a time stamped dat file in the working directory):
+mprof run --python PATH/TO/MAIN.py
+
+Plot the output and save to png:
+mprof plot -o memory_profile.png

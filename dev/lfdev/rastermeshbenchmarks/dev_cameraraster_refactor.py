@@ -457,7 +457,8 @@ class Rasteriser:
                             elem_areas: np.ndarray,
                             field_frame_divide_z: np.ndarray,
                             num_para: int = 4
-                            ) -> tuple[np.ndarray,np.ndarray,int]:
+                            ) -> tuple[np.ndarray,np.ndarray]:
+
 
         with Pool(num_para) as pool:
             processes = list([])
@@ -474,6 +475,7 @@ class Rasteriser:
                           elem_areas[ee],
                           field_frame_divide_z[:,ee]
                           )))
+
 
             fragments = [pp.get() for pp in processes]
 
@@ -550,7 +552,7 @@ def average_subpixel_image(subpx_image: np.ndarray,
 def main() -> None:
     # 3D cylinder, mechanical, tets
     data_path = Path("dev/lfdev/rastermeshbenchmarks")
-    data_path = data_path / "case21_m5_out.e"
+    data_path = data_path / "case21_m3_out.e"
 
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
     field_keys = tuple(sim_data.node_vars.keys())
@@ -631,7 +633,7 @@ def main() -> None:
     roi_pos_world = np.mean(sim_data.coords,axis=0)
 
     # Number of divisions (subsamples) for each pixel for anti-aliasing
-    sub_samp: int = 4
+    sub_samp: int = 2
 
     cam_type = "AV507"
     if cam_type == "AV507":
@@ -697,7 +699,6 @@ def main() -> None:
     print("RASTER ELEMENT LOOP START")
     print(80*"=")
 
-    print("Running sequential element loop")
     time_start_loop = time.perf_counter()
     (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_sequential(
         cam_data,
@@ -708,7 +709,6 @@ def main() -> None:
     time_end_loop = time.perf_counter()
     time_seq_loop = time_end_loop - time_start_loop
 
-    print("Running separated element loop")
     time_start_loop = time.perf_counter()
     (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop(
         cam_data,
@@ -719,7 +719,6 @@ def main() -> None:
     time_end_loop = time.perf_counter()
     time_sep_loop = time_end_loop - time_start_loop
 
-    print("Running parallel element loop")
     time_start_loop = time.perf_counter()
     (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_parallel(
         cam_data,
