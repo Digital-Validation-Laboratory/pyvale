@@ -30,7 +30,7 @@ def main() -> None:
     scene = BlenderScene()
 
     part_location = (0, 0, 0)
-    part, points = scene.add_stl_part(sim_data=sim_data)
+    part = scene.add_part(sim_data=sim_data)
     scene.set_part_location(part, part_location)
 
 
@@ -73,9 +73,9 @@ def main() -> None:
     #---------------------------------------------------------------------------
     # Deform mesh
     timesteps = sim_data.time.shape[0]
-    meshdeformer = DeformMesh(sim_data=sim_data, nodes=points)
     for timestep in range((timesteps - 1)):
         timestep += 1 # Adding at start of loop as timestep = 0 is the original mesh
+        meshdeformer = DeformSimData(sim_data=sim_data)
         deformed_nodes = meshdeformer.add_displacement(timestep)
 
         if deformed_nodes is not None:
