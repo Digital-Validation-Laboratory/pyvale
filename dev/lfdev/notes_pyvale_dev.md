@@ -2,20 +2,20 @@
 # Notes: `pyvale` developement
 
 ## TODO: `CameraRaster`
- - Implement with surface mesh of 3D volume
- - Implement back face culling
- - Speed up edge function calculation using stepwise optimisation on SAP
- - Try to setup tiling optimisation
+- Refactor into functions and classes
 
- - Deal with quads: edge function and interpolation
- - Multi-threading over the element loop
+- Speed up edge function calculation using stepwise optimisation on SAP
+- Try to setup tiling optimisation
 
- - Setup a set of performance benchmarks:
-   - How much RAM, process time per image?
-   - Single and multi-core
-   - Anti-alias subsample: 1,2,4
-   - 1Mpx, 5Mpx, 24Mpx images
-   - 100, 1000, 10,000, 100,000 triangles
+- Deal with quads: edge function and interpolation
+- Multi-threading over the element loop
+
+- Setup a set of performance benchmarks:
+    - How much RAM, process time per image?
+    - Single and multi-core
+    - Anti-alias subsample: 1,2,4
+    - 1Mpx, 5Mpx, 24Mpx images
+    - 100, 1000, 10,000, 100,000 triangles
 
 - Look into compilation with Numba etc
 - Write a Cython version

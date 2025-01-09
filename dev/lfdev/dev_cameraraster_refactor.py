@@ -99,6 +99,7 @@ def world_to_raster_coords(cam_data: CameraRasterData,
 
     return coords_raster
 
+# TODO: try Numba on this
 def edge_function(vert_a: np.ndarray,
                   vert_b: np.ndarray,
                   vert_c: np.ndarray) -> np.ndarray:
@@ -107,6 +108,7 @@ def edge_function(vert_a: np.ndarray,
               - (vert_c[yy] - vert_a[yy]) * (vert_b[xx] - vert_a[xx]))
     return edge_fun
 
+# TODO: try Numba on this too
 def average_subpixel_image(subpx_image: np.ndarray,
                            subsample: int) -> np.ndarray:
     conv_mask = np.ones((subsample,subsample))/(subsample**2)
@@ -119,6 +121,80 @@ def average_subpixel_image(subpx_image: np.ndarray,
         avg_image = subpx_image
 
     return avg_image
+
+
+def raster_element(cam_data: CameraRasterData,
+                   elem_bound_boxes_px_inds: np.ndarray,
+                   elem_raster_coords: np.ndarray,
+                   elem_area: float,
+                   field_divide_z: np.ndarray
+                   ) -> tuple[np.ndarray,np.ndarray,np.ndarray,np.ndarray]:
+    (xx,yy,zz) = (0,1,2)
+    (x_start,x_end,y_start,y_end) = (0,1,2,3)
+    (v0,v1,v2) = (0,1,2)
+
+    # Create the subpixel coords inside the bounding box to test with the
+    # edge function. Use the pixel indices of the bounding box.
+    bound_subpx_x = np.arange(elem_bound_boxes_px_inds[x_start],
+                                elem_bound_boxes_px_inds[x_end],
+                                1/cam_data.sub_samp) + 1/(2*cam_data.sub_samp)
+    bound_subpx_y = np.arange(elem_bound_boxes_px_inds[y_start],
+                                elem_bound_boxes_px_inds[y_end],
+                                1/cam_data.sub_samp) + 1/(2*cam_data.sub_samp)
+    (bound_subpx_grid_x,bound_subpx_grid_y) = np.meshgrid(bound_subpx_x,
+                                                            bound_subpx_y)
+    bound_coords_grid_shape = bound_subpx_grid_x.shape
+    bound_subpx_coords_flat = np.vstack((bound_subpx_grid_x.flatten(),
+                                            bound_subpx_grid_y.flatten()))
+
+    # Create the subpixel indices for buffer slicing later
+    subpx_inds_x = np.arange(cam_data.sub_samp*elem_bound_boxes_px_inds[x_start],
+                                cam_data.sub_samp*elem_bound_boxes_px_inds[x_end])
+    subpx_inds_y = np.arange(cam_data.sub_samp*elem_bound_boxes_px_inds[y_start],
+                                cam_data.sub_samp*elem_bound_boxes_px_inds[y_end])
+    (subpx_inds_grid_x,subpx_inds_grid_y) = np.meshgrid(subpx_inds_x,
+                                                        subpx_inds_y)
+
+    # We compute the edge function for all pixels in the box to determine if the
+    # pixel is inside the element or not
+    edge = np.zeros((3,bound_subpx_coords_flat.shape[1]))
+    edge[0,:] = edge_function(elem_raster_coords[v1,:],
+                              elem_raster_coords[v2,:],
+                              bound_subpx_coords_flat)
+    edge[1,:] = edge_function(elem_raster_coords[v2,:],
+                              elem_raster_coords[v0,:],
+                              bound_subpx_coords_flat)
+    edge[2,:] = edge_function(elem_raster_coords[v0,:],
+                              elem_raster_coords[v1,:],
+                              bound_subpx_coords_flat)
+
+    # Now we check where the edge function is above zero for all edges
+    edge_check = np.zeros_like(edge,dtype=np.int8)
+    edge_check[edge >= 0.0] = 1
+    edge_check = np.sum(edge_check, axis=0)
+    # Create a mask with the check, TODO check the 3 here for non triangles
+    edge_mask_flat = edge_check == 3
+    edge_mask_grid = np.reshape(edge_mask_flat,bound_coords_grid_shape)
+
+    # Calculate the weights for the masked pixels
+    edge_masked = edge[:,edge_mask_flat]
+    interp_weights = edge_masked / elem_area
+
+    # Compute the depth of all pixels using hyperbolic interp
+    px_coord_z = 1/(elem_raster_coords[v0,zz] * interp_weights[0,:]
+                  + elem_raster_coords[v1,zz] * interp_weights[1,:]
+                  + elem_raster_coords[v2,zz] * interp_weights[2,:])
+
+    field_interp = ((field_divide_z[v0] * interp_weights[0,:]
+                   + field_divide_z[v1] * interp_weights[1,:]
+                   + field_divide_z[v2] * interp_weights[2,:])
+                   * px_coord_z)
+
+
+    return (px_coord_z,
+            field_interp,
+            subpx_inds_grid_x[edge_mask_grid],
+            subpx_inds_grid_y[edge_mask_grid])
 
 #===============================================================================
 # MAIN
@@ -497,95 +573,23 @@ def main() -> None:
     print(80*"=")
     print("RASTER ELEMENT LOOP START")
     print(80*"=")
-    print()
-
+    #---------------------------------------------------------------------------
     time_start_loop = time.perf_counter()
     for ee in range(num_elems_in_scene):
-        # Create the subpixel coords inside the bounding box to test with the
-        # edge function. Use the pixel indices of the bounding box.
-        bound_subpx_x = np.arange(elem_bound_boxes_px_inds[x_start,ee],
-                                  elem_bound_boxes_px_inds[x_end,ee],
-                                  1/cam_data.sub_samp) + 1/(2*cam_data.sub_samp)
-        bound_subpx_y = np.arange(elem_bound_boxes_px_inds[y_start,ee],
-                                  elem_bound_boxes_px_inds[y_end,ee],
-                                  1/cam_data.sub_samp) + 1/(2*cam_data.sub_samp)
-        (bound_subpx_grid_x,bound_subpx_grid_y) = np.meshgrid(bound_subpx_x,
-                                                              bound_subpx_y)
-        bound_coords_grid_shape = bound_subpx_grid_x.shape
-        bound_subpx_coords_flat = np.vstack((bound_subpx_grid_x.flatten(),
-                                             bound_subpx_grid_y.flatten()))
 
-        # Create the subpixel indices for buffer slicing later
-        subpx_inds_x = np.arange(cam_data.sub_samp*elem_bound_boxes_px_inds[x_start,ee],
-                                 cam_data.sub_samp*elem_bound_boxes_px_inds[x_end,ee])
-        subpx_inds_y = np.arange(cam_data.sub_samp*elem_bound_boxes_px_inds[y_start,ee],
-                                 cam_data.sub_samp*elem_bound_boxes_px_inds[y_end,ee])
-        (subpx_inds_grid_x,subpx_inds_grid_y) = np.meshgrid(subpx_inds_x,
-                                                            subpx_inds_y)
+        (px_coord_z,
+        field_interp,
+        subpx_inds_x_inside,
+        subpx_inds_y_inside) = raster_element(cam_data,
+                                              elem_bound_boxes_px_inds[:,ee],
+                                              elem_raster_coords[:,:,ee],
+                                              elem_areas[ee],
+                                              field_frame_divide_z[:,ee])
 
-        # We compute the edge function for all pixels in the box to determine if the
-        # pixel is inside the element or not
-        vert_0 = elem_raster_coords[v0,:,ee]
-        vert_1 = elem_raster_coords[v1,:,ee]
-        vert_2 = elem_raster_coords[v2,:,ee]
-        edge = np.zeros((3,bound_subpx_coords_flat.shape[1]))
-        edge[0,:] = edge_function(vert_1,vert_2,bound_subpx_coords_flat)
-        edge[1,:] = edge_function(vert_2,vert_0,bound_subpx_coords_flat)
-        edge[2,:] = edge_function(vert_0,vert_1,bound_subpx_coords_flat)
+        #-----------------------------------------------------------------------
+        # MASK AND PUSH INTO BUFFER
 
-        # Now we check where the edge function is above zero for all edges
-        edge_check = np.zeros_like(edge,dtype=np.int8)
-        edge_check[edge >= 0.0] = 1
-        edge_check = np.sum(edge_check, axis=0)
-        # Create a mask with the check, TODO check the 3 here for non triangles
-        edge_mask_flat = edge_check == 3
-        edge_mask_grid = np.reshape(edge_mask_flat,bound_coords_grid_shape)
-
-        if loop_print:
-            print()
-            print(80*"-")
-            print(f"ELEMENT: {ee}")
-            print()
-            print("Bounding Box:")
-            print(f"Sub-px in box = {bound_subpx_coords_flat.shape[-1]}")
-            print(f"X range = [{elem_bound_boxes_px_inds[x_start,ee]},"
-                            +f"{elem_bound_boxes_px_inds[x_end,ee]}]")
-            print(f"X range = [{elem_bound_boxes_px_inds[x_start,ee]},"
-                            +f"{elem_bound_boxes_px_inds[x_end,ee]}]")
-            print(f"Grid shape = {bound_coords_grid_shape}")
-            print(f"Flat shape = {bound_subpx_coords_flat.shape}")
-            print()
-            print("Raster Coords:")
-            print(f"Vertex 0 = {vert_0}")
-            print(f"Vertex 1 = {vert_1}")
-            print(f"Vertex 2 = {vert_2}")
-            print()
-            print("Element Normal:")
-            #print(f"{}")
-            print()
-            print("Edge Function:")
-            print(f"Sub-pixels inside = {np.sum(edge_mask_flat)}")
-            print(80*"-")
-
-        # Calculate the weights for the masked pixels
-        edge_masked = edge[:,edge_mask_flat]
-        interp_weights = edge_masked / elem_areas[ee]
-
-        # Compute the depth of all pixels using hyperbolic interp
-        px_coord_z = 1/(vert_0[zz] * interp_weights[0,:]
-                      + vert_1[zz] * interp_weights[1,:]
-                      + vert_2[zz] * interp_weights[2,:])
-
-        field_interp = ((field_frame_divide_z[0,ee] * interp_weights[0,:]
-                       + field_frame_divide_z[1,ee] * interp_weights[1,:]
-                       + field_frame_divide_z[2,ee] * interp_weights[2,:])
-                       * px_coord_z)
-
-        # Get the pixel indices that are inside the element
-        subpx_inds_x_inside = subpx_inds_grid_x[edge_mask_grid]
-        subpx_inds_y_inside = subpx_inds_grid_y[edge_mask_grid]
-
-        # Build a mask to replace the depth information if there is already an
+        #  Build a mask to replace the depth information if there is already an
         # element in front of the one we are rendering
         px_coord_z_depth_mask = (px_coord_z
                                  < depth_buffer[subpx_inds_y_inside,subpx_inds_x_inside])
@@ -605,7 +609,8 @@ def main() -> None:
 
         # Push the masked values into the image buffer
         image_buffer[subpx_inds_y_inside,subpx_inds_x_inside] = image_buffer_depth_masked
-
+        
+    #---------------------------------------------------------------------------
     # END RASTER LOOP
     depth_avg = average_subpixel_image(depth_buffer,sub_samp)
     image_avg = average_subpixel_image(image_buffer,sub_samp)
