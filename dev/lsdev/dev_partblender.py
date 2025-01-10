@@ -39,7 +39,7 @@ class BlenderPart:
 
         elements = connect.T
 
-        zero_index_elements = elements - 1 # Blender has a zero base index
+        zero_index_elements = elements -1 # Blender has a zero base index
 
         return zero_index_elements
 
@@ -56,7 +56,7 @@ class BlenderPart:
         """
         nodes = self.sim_data.coords
 
-        zero_index_nodes = nodes  # Blender has a zero base index
+        zero_index_nodes = nodes
 
         centred = self._centre_nodes(zero_index_nodes)
 
@@ -83,12 +83,8 @@ class BlenderPart:
                                                                 None,
                                                                 spat_dim=3)
 
-        check_if_2d = np.count_nonzero(self.sim_data.coords, axis=0)
-        if check_if_2d[2] == 0:
-            surface_points = pv_grid.points
-        else:
-            pv_surf = pv_grid.extract_surface()
-            surface_points = pv_surf.points
+        pv_surf = pv_grid.extract_surface()
+        surface_points = pv_surf.points
         centre_points = self._centre_nodes(surface_points)
 
         save_path = Path().cwd() / "test_output"
