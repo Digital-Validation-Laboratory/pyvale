@@ -13,14 +13,14 @@ import mooseherder as mh
 import pyvale
 
 def main() -> None:
-    """pyvale example: thermo-mechanical multi-physics sensors on a 3D monoblock
+    """pyvale example: thermo-mechanical multi-physics sensors on a 2D plate
     ----------------------------------------------------------------------------
     - Demonstrates the experiment module for running many monte-carlo style
       experiments and statistically analysing the results.
     """
     # Load Simulations as mooseherder.SimData objects
     #base_path = Path("src/pyvale/data")
-    data_paths = pyvale.DataSet.thermomechanical_3d_experiment_paths()
+    data_paths = pyvale.DataSet.thermomechanical_2d_experiment_output_paths()
 
     sim_list = []
     for pp in data_paths:

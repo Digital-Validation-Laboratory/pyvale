@@ -1,28 +1,16 @@
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 from typing import Callable
 import numpy as np
 from pyvale.core.field import IField
 from pyvale.core.integratorspatial import (IIntegratorSpatial,
-                                     create_int_pt_array)
+                                           create_int_pt_array)
 from pyvale.core.sensordata import SensorData
-
-
-def create_gauss_weights_2d_4pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
-    return np.ones((4,)+meas_shape)
-
-
-def create_gauss_weights_2d_9pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
-    # shape=(9,)+meas_shape
-    gauss_weights = np.vstack((25/81 * np.ones((4,)+meas_shape),
-                            40/81 * np.ones((4,)+meas_shape),
-                            64/81 * np.ones((1,)+meas_shape)))
-    return gauss_weights
 
 
 class Quadrature2D(IIntegratorSpatial):
@@ -95,4 +83,16 @@ class Quadrature2D(IIntegratorSpatial):
             self._averages = self.calc_averages()
 
         return self._averages
+
+
+def create_gauss_weights_2d_4pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
+    return np.ones((4,)+meas_shape)
+
+
+def create_gauss_weights_2d_9pts(meas_shape: tuple[int,int,int]) -> np.ndarray:
+    # shape=(9,)+meas_shape
+    gauss_weights = np.vstack((25/81 * np.ones((4,)+meas_shape),
+                               40/81 * np.ones((4,)+meas_shape),
+                               64/81 * np.ones((1,)+meas_shape)))
+    return gauss_weights
 

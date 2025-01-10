@@ -1,13 +1,13 @@
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 import numpy as np
 from pyvale.core.field import IField
-from pyvale.core.sensor import ISensor
+from pyvale.core.sensorarray import ISensorArray
 from pyvale.core.errorintegrator import ErrIntegrator
 from pyvale.core.sensordescriptor import SensorDescriptor
 from pyvale.core.fieldsampler import sample_field_with_sensor_data
@@ -15,7 +15,10 @@ from pyvale.core.cameradata import CameraData2D
 from pyvale.core.cameratools import build_sensor_data_from_camera
 
 
-class CameraBasic2D(ISensor):
+# NOTE: This module is a feature under developement.
+
+
+class CameraBasic2D(ISensorArray):
     __slots__ = ("_cam_data","_field","_error_integrator","_descriptor",
                  "_sensor_data","_truth","_measurements")
 

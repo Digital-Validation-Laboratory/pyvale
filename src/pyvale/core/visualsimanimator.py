@@ -1,13 +1,10 @@
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
-import time
-
-from pathlib import Path
+"""
 import numpy as np
 #import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
 # See: https://github.com/pyvista/pyvista/discussions/2928
@@ -16,11 +13,11 @@ import pyvista as pv
 from pyvale.core.sensorarraypoint import SensorArrayPoint
 from pyvale.core.visualopts import VisOptsSimSensors, VisOptsAnimation
 from pyvale.core.visualtools import (create_pv_plotter,
-                                get_colour_lims,
-                                set_animation_writer)
+                                     get_colour_lims,
+                                     set_animation_writer)
 from pyvale.core.visualsimplotter import (add_sensor_points_nom,
-                                     add_sensor_points_pert,
-                                     add_sim_field)
+                                          add_sensor_points_pert,
+                                          add_sim_field)
 
 def animate_sim_with_sensors(sensor_array: SensorArrayPoint,
                             component: str,
