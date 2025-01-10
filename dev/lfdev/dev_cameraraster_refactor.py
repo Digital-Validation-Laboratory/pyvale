@@ -8,12 +8,13 @@ Copyright (C) 2024 The Computer Aided Validation Team
 from dataclasses import dataclass, field
 import time
 from pathlib import Path
-from multiprocessing.pool import Pool
+from multiprocessing.pool import ThreadPool, Pool
 
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation
 from scipy.signal import convolve2d
+import numba
 
 import mooseherder as mh
 import pyvale
@@ -284,7 +285,7 @@ class Rasteriser:
                                                               bound_subpx_y)
         bound_coords_grid_shape = bound_subpx_grid_x.shape
         bound_subpx_coords_flat = np.vstack((bound_subpx_grid_x.flatten(),
-                                                bound_subpx_grid_y.flatten()))
+                                             bound_subpx_grid_y.flatten()))
 
         # Create the subpixel indices for buffer slicing later
         subpx_inds_x = np.arange(cam_data.sub_samp*elem_bound_box_inds[x_start],
@@ -459,7 +460,7 @@ class Rasteriser:
                             num_para: int = 4
                             ) -> tuple[np.ndarray,np.ndarray,int]:
 
-        with Pool(num_para) as pool:
+        with ThreadPool(num_para) as pool:
             processes = list([])
 
             num_elems_in_scene = elem_raster_coords.shape[-1]
@@ -550,7 +551,7 @@ def average_subpixel_image(subpx_image: np.ndarray,
 def main() -> None:
     # 3D cylinder, mechanical, tets
     data_path = Path("dev/lfdev/rastermeshbenchmarks")
-    data_path = data_path / "case21_m5_out.e"
+    data_path = data_path / "case21_m1_out.e"
 
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
     field_keys = tuple(sim_data.node_vars.keys())
@@ -605,7 +606,7 @@ def main() -> None:
     print()
 
     #===========================================================================
-    # RASTER SETUP
+    # Create Camera and World Parameters
     (xx,yy,zz,ww) = (0,1,2,3)
 
     #shape=(3,num_coords)
@@ -631,7 +632,7 @@ def main() -> None:
     roi_pos_world = np.mean(sim_data.coords,axis=0)
 
     # Number of divisions (subsamples) for each pixel for anti-aliasing
-    sub_samp: int = 4
+    sub_samp: int = 2
 
     cam_type = "AV507"
     if cam_type == "AV507":
@@ -697,18 +698,18 @@ def main() -> None:
     print("RASTER ELEMENT LOOP START")
     print(80*"=")
 
-    print("Running sequential element loop")
-    time_start_loop = time.perf_counter()
-    (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_sequential(
-        cam_data,
-        elem_raster_coords,
-        elem_bound_box_inds,
-        elem_areas,
-        field_frame_divide_z)
-    time_end_loop = time.perf_counter()
-    time_seq_loop = time_end_loop - time_start_loop
+    # print("Running sequential element loop")
+    # time_start_loop = time.perf_counter()
+    # (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_sequential(
+    #     cam_data,
+    #     elem_raster_coords,
+    #     elem_bound_box_inds,
+    #     elem_areas,
+    #     field_frame_divide_z)
+    # time_end_loop = time.perf_counter()
+    # time_seq_loop = time_end_loop - time_start_loop
 
-    print("Running separated element loop")
+    print("Running separated element loop 1")
     time_start_loop = time.perf_counter()
     (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop(
         cam_data,
@@ -717,19 +718,30 @@ def main() -> None:
         elem_areas,
         field_frame_divide_z)
     time_end_loop = time.perf_counter()
-    time_sep_loop = time_end_loop - time_start_loop
+    time_sep_loop_1 = time_end_loop - time_start_loop
 
-    print("Running parallel element loop")
+    print("Running separated element loop 2")
     time_start_loop = time.perf_counter()
-    (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_parallel(
+    (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop(
         cam_data,
         elem_raster_coords,
         elem_bound_box_inds,
         elem_areas,
-        field_frame_divide_z,
-        num_para=8)
+        field_frame_divide_z)
     time_end_loop = time.perf_counter()
-    time_par_loop = time_end_loop - time_start_loop
+    time_sep_loop_2 = time_end_loop - time_start_loop
+
+    # print("Running parallel element loop")
+    # time_start_loop = time.perf_counter()
+    # (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_parallel(
+    #     cam_data,
+    #     elem_raster_coords,
+    #     elem_bound_box_inds,
+    #     elem_areas,
+    #     field_frame_divide_z,
+    #     num_para=8)
+    # time_end_loop = time.perf_counter()
+    # time_par_loop = time_end_loop - time_start_loop
 
 
     print()
@@ -743,9 +755,9 @@ def main() -> None:
     print(f"Elements in image: {num_elems_in_image}")
     print()
     print(f"Setup time = {time_end_setup-time_start_setup} seconds")
-    print(f"Seq. Loop time  = {time_seq_loop} seconds")
-    print(f"Sep. Loop time  = {time_sep_loop} seconds")
-    print(f"Par. Loop time  = {time_par_loop} seconds")
+    print(f"Loop time 1 = {time_sep_loop_1} seconds")
+    print(f"Loop time 2 = {time_sep_loop_2} seconds")
+    #print(f"Par. Loop time  = {time_par_loop} seconds")
     print(80*"=")
 
     #===========================================================================
