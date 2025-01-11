@@ -223,15 +223,17 @@ class Rasteriser:
 
         #-----------------------------------------------------------------------
         # BACKFACE REMOVAL
-        # shape=(num_elems,)
-        back_face_mask = Rasteriser.back_face_removal_mask(cam_data,
-                                                        coords_world,
-                                                        connectivity)
-        # Mask and remove w coord
-        # shape=(nodes_per_elem,coord[X,Y,Z,W],num_elems_in_scene)
-        elem_raster_coords = elem_raster_coords[:,:,back_face_mask]
-        # shape=(nodes_per_elem,num_elems_in_scene,num_time_steps)
-        field_divide_z = field_divide_z[:,back_face_mask,:]
+        remove_backface = False
+        if remove_backface:
+            # shape=(num_elems,)
+            back_face_mask = Rasteriser.back_face_removal_mask(cam_data,
+                                                            coords_world,
+                                                            connectivity)
+            # Mask and remove w coord
+            # shape=(nodes_per_elem,coord[X,Y,Z,W],num_elems_in_scene)
+            elem_raster_coords = elem_raster_coords[:,:,back_face_mask]
+            # shape=(nodes_per_elem,num_elems_in_scene,num_time_steps)
+            field_divide_z = field_divide_z[:,back_face_mask,:]
 
         #-----------------------------------------------------------------------
         # CROPPING & BOUNDING BOX OPERATIONS
@@ -634,19 +636,19 @@ def main() -> None:
     # Number of divisions (subsamples) for each pixel for anti-aliasing
     sub_samp: int = 2
 
-    cam_type = "AV507"
+    cam_type = "Test"
     if cam_type == "AV507":
         cam_num_px = np.array([2464,2056],dtype=np.int32)
         pixel_size = np.array([3.45e-3,3.45e-3]) # in millimeters!
         focal_leng: float = 25.0
 
-        imaging_rad: float = 100.0 # Not needed for camera data, just for cam pos below
+        imaging_rad: float = 150.0 # Not needed for camera data, just for cam pos below
     else:
         cam_num_px = np.array([510,260],dtype=np.int32)
         pixel_size = np.array([10.0e-3,10.0e-3])
         focal_leng: float = 25.0
 
-        imaging_rad: float = 250.0 # Not needed for camera data, just for cam pos below
+        imaging_rad: float = 350.0 # Not needed for camera data, just for cam pos below
 
     if rot_axis == "y":
         cam_pos_world = np.array([roi_pos_world[xx] + imaging_rad*np.sin(phi_y_rads),
@@ -691,6 +693,7 @@ def main() -> None:
 
     time_end_setup = time.perf_counter()
 
+
     #---------------------------------------------------------------------------
     # RASTER LOOP START
     print()
@@ -698,51 +701,20 @@ def main() -> None:
     print("RASTER ELEMENT LOOP START")
     print(80*"=")
 
-    # print("Running sequential element loop")
-    # time_start_loop = time.perf_counter()
-    # (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_sequential(
-    #     cam_data,
-    #     elem_raster_coords,
-    #     elem_bound_box_inds,
-    #     elem_areas,
-    #     field_frame_divide_z)
-    # time_end_loop = time.perf_counter()
-    # time_seq_loop = time_end_loop - time_start_loop
+    num_raster_loops: int = 1
+    loop_times = []
 
-    print("Running separated element loop 1")
-    time_start_loop = time.perf_counter()
-    (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop(
-        cam_data,
-        elem_raster_coords,
-        elem_bound_box_inds,
-        elem_areas,
-        field_frame_divide_z)
-    time_end_loop = time.perf_counter()
-    time_sep_loop_1 = time_end_loop - time_start_loop
-
-    print("Running separated element loop 2")
-    time_start_loop = time.perf_counter()
-    (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop(
-        cam_data,
-        elem_raster_coords,
-        elem_bound_box_inds,
-        elem_areas,
-        field_frame_divide_z)
-    time_end_loop = time.perf_counter()
-    time_sep_loop_2 = time_end_loop - time_start_loop
-
-    # print("Running parallel element loop")
-    # time_start_loop = time.perf_counter()
-    # (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_parallel(
-    #     cam_data,
-    #     elem_raster_coords,
-    #     elem_bound_box_inds,
-    #     elem_areas,
-    #     field_frame_divide_z,
-    #     num_para=8)
-    # time_end_loop = time.perf_counter()
-    # time_par_loop = time_end_loop - time_start_loop
-
+    for ll in range(num_raster_loops):
+        print(f"Running element raster loop {ll+1}")
+        time_start_loop = time.perf_counter()
+        (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop(
+            cam_data,
+            elem_raster_coords,
+            elem_bound_box_inds,
+            elem_areas,
+            field_frame_divide_z)
+        time_end_loop = time.perf_counter()
+        loop_times.append(time_end_loop - time_start_loop)
 
     print()
     print(80*"=")
@@ -755,9 +727,8 @@ def main() -> None:
     print(f"Elements in image: {num_elems_in_image}")
     print()
     print(f"Setup time = {time_end_setup-time_start_setup} seconds")
-    print(f"Loop time 1 = {time_sep_loop_1} seconds")
-    print(f"Loop time 2 = {time_sep_loop_2} seconds")
-    #print(f"Par. Loop time  = {time_par_loop} seconds")
+    for ll in range(num_raster_loops):
+        print(f"Raster loop {ll+1} time = {loop_times[ll]} seconds")
     print(80*"=")
 
     #===========================================================================
