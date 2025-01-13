@@ -27,7 +27,7 @@ def main() -> None:
 
     time_import_start = time.perf_counter()
     # 3D cylinder, mechanical, tets
-    data_path = Path("/home/kc4736/pyvale/dev/jhdev/blender/rastermeshbenchmarks")
+    data_path = Path("/home/kc4736/pyvale/dev/lfdev/rastermeshbenchmarks")
     data_path = data_path / "case21_m1_out.e"
 
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
