@@ -43,35 +43,14 @@ class BlenderScene:
 
         return camera
 
-    def add_part(self,
-                 sim_data: SimData,
-                 elements: np.ndarray | None = None,
-                 nodes: np.ndarray | None = None,
-                 filename: str | None = None):
-        check_if_2d = np.count_nonzero(sim_data.coords, axis=0)
-        if check_if_2d[2] == 0:
-            part = self.add_simdata_part(sim_data, elements, nodes)
-        else:
-            part, points = self.add_stl_part(sim_data=sim_data, filename=filename)
-
-        return part
-
-    def add_simdata_part(self,
-                 sim_data: SimData,
-                 elements:np.ndarray | None = None,
-                 nodes: np.ndarray | None = None):
-        partmaker = BlenderPart(sim_data, elements, nodes)
-        part = partmaker.simdata_to_part()
-
-        set_origin(part)
-
-        return part
-
     def add_stl_part(self, filename:str | None = None, sim_data: SimData | None = None):
         partmaker = BlenderPart(filename=filename, sim_data=sim_data)
-        part, points = partmaker.import_from_stl()
+        spat_dim = partmaker._get_spat_dim()
+        components = partmaker._get_components()
+        pv_surf = partmaker._simdata_to_pvsurf(components, spat_dim)
+        part = partmaker.import_from_stl(pv_surf)
         set_origin(part)
-        return part, points
+        return part, pv_surf, spat_dim, components
 
 
     def set_part_location(self, part, location: tuple):
@@ -79,7 +58,7 @@ class BlenderScene:
         z_location = int(part.dimensions[2])
         part.location = (location[0], location[1], (location[2] - z_location))
 
-    def set_part_roation(self, part, rotation: tuple):
+    def set_part_rotation(self, part, rotation: tuple):
         part.rotation_mode = 'XYZ'
         part.rotation_euler = rotation
 
