@@ -7,114 +7,23 @@ from mooseherder import SimData
 from dev_partblender import BlenderPart
 
 class DeformMesh:
-    def __init__(self,sim_data: SimData):
-        self.sim_data = sim_data
-
-    def _get_node_vars(self):
-        node_vars = self.sim_data.node_vars
-        node_vars_names = list(node_vars.keys())
-        return node_vars_names
-
-    def _check_for_displacements(self, node_var_names: list):
-        disp = {'disp_x': False, 'disp_y': False, 'disp_z': False}
-
-        if 'disp_x' in node_var_names:
-            disp['disp_x'] = True
-        if 'disp_y' in node_var_names:
-            disp['disp_y'] = True
-        if 'disp_z' in node_var_names:
-            disp['disp_z'] = True
-        return disp
-
-    def add_displacement(self, timestep: int, nodes: np.ndarray):
-        node_var_names = self._get_node_vars()
-        disps = self._check_for_displacements(node_var_names)
-        if True in disps.values():
-            shape = self.sim_data.coords.shape
-            added_disp = np.empty(shape)
-            dim = 0
-            for disp, value in disps.items():
-                if value is True:
-                    added_disp_1d = self.sim_data.node_vars[disp][:, timestep]
-                    added_disp[:, dim] = added_disp_1d
-                    print(f"{added_disp=}")
-            added_disp_suface = self._nodes_to_surface_mesh(added_disp)
-            print(f"{added_disp_suface=}")
-
-            deformed_nodes = nodes + added_disp_suface
-            return deformed_nodes
-        else:
-            return None
-
-    def _nodes_to_surface_mesh(self, deformed_nodes):
-        self.sim_data.coords = deformed_nodes
-        (pv_grid, pv_grid_vis) = pyvale.conv_simdata_to_pyvista(self.sim_data,
-                                                                None,
-                                                                spat_dim=3)
-        pv_surf = pv_grid.extract_surface()
-        surface_points = pv_surf.points
-
-        return surface_points
-
-class DeformSimData:
-    def __init__(self, sim_data: SimData):
-        self.sim_data = sim_data
-
-    def _get_nodes(self):
-        mesh_builder = BlenderPart(self.sim_data)
-        nodes = mesh_builder._get_nodes()
-        return nodes
-
-    def _get_node_vars(self):
-        node_vars = self.sim_data.node_vars
-        node_vars_names = list(node_vars.keys())
-        return node_vars_names
-
-    def _check_for_displacements(self, node_var_names: list):
-        disp = {'disp_x': False, 'disp_y': False, 'disp_z': False}
-
-        if 'disp_x' in node_var_names:
-            disp['disp_x'] = True
-        if 'disp_y' in node_var_names:
-            disp['disp_y'] = True
-        if 'disp_z' in node_var_names:
-            disp['disp_z'] = True
-
-        return disp
+    def __init__(self,pv_surf, spat_dim, components):
+        self.pv_surf = pv_surf
+        self.spat_dim = spat_dim
+        self.components = components
 
     def add_displacement(self, timestep: int):
-        nodes = self._get_nodes()
-        node_var_names = self._get_node_vars()
-        disps = self._check_for_displacements(node_var_names)
-        if True in disps.values():
-            deformed_nodes = nodes
-            dim = 0
-            for disp, value in disps.items():
-                if value is True:
-                    added_disp = self.sim_data.node_vars[disp][:, timestep]
-                    node_dim = nodes[:, dim]
-                    deformed_nodes[:, dim] = node_dim + added_disp
-                    dim += 1
-            check_if_2d = np.count_nonzero(nodes, axis=0)
-            if check_if_2d[2] != 0:
-                deformed_surface = self._nodes_to_surface_mesh(deformed_nodes)
-            else:
-                deformed_surface = deformed_nodes
-            return deformed_surface
-        else:
-            return None
-
-    def _nodes_to_surface_mesh(self, deformed_nodes):
-        self.sim_data.coords = deformed_nodes
-        (pv_grid, pv_grid_vis) = pyvale.conv_simdata_to_pyvista(self.sim_data,
-                                                                None,
-                                                                spat_dim=3)
-        pv_surf = pv_grid.extract_surface()
-        surface_points = pv_surf.points
-
-        return surface_points
-
-
+        # Write check that displacement is in object - not temp
+        array_size = self.pv_surf.points.shape
+        added_disp = np.zeros(array_size)
+        dim = 0
+        for component in self.components:
+            added_disp_1d = self.pv_surf.get_array(component)[:, timestep]
+            added_disp[:, dim] = added_disp_1d
+            dim += 1
+        deformed_nodes = self.pv_surf.points + added_disp
+        self.pv_surf.points = deformed_nodes
+        return deformed_nodes
 
 
 class DeformPart:
@@ -147,7 +56,6 @@ class DeformPart:
         for i in range(len(self.part.data.vertices)):
             if i < n_nodes_layer:
                 sk.data[i].co = self.deformed_nodes[i]
-
         return self.part
 
 
