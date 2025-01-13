@@ -18,7 +18,6 @@ class BlenderPart:
         self.elements = elements
         self.nodes = nodes
 
-
     def _initialise_nodes_elements(self, elements, nodes):
         if elements is None:
             self.elements = self._get_elements() * 1000
@@ -77,16 +76,47 @@ class BlenderPart:
 
         return part
 
-    def _simdata_to_stl(self):
+
+    def _get_spat_dim(self):
+        nodes = self.sim_data.coords
+        check_if_2d = np.count_nonzero(nodes, axis=0)
+        if check_if_2d[2] == 0:
+            spat_dim = 2
+        else:
+            spat_dim = 3
+        return spat_dim
+
+    def _get_components(self) -> tuple:
+        node_vars = self.sim_data.node_vars
+        node_vars_names = list(node_vars.keys())
+        components = []
+        if 'disp_x' in node_vars_names:
+            components.append('disp_x')
+        if 'disp_y' in node_vars_names:
+            components.append('disp_y')
+        if 'disp_z' in node_vars_names:
+            components.append('disp_z')
+        if 'temperature' in node_vars_names:
+            components.append('temperature')
+        components = tuple(components)
+        if len(components) == 0:
+            components = None
+
+        print(f"{components=}")
+        return components
+
+    def _simdata_to_pvsurf(self, components, spat_dim):
         self.sim_data.coords = self.sim_data.coords * 1000
         (pv_grid, pv_grid_vis) = pyvale.conv_simdata_to_pyvista(self.sim_data,
-                                                                None,
-                                                                spat_dim=3)
+                                                                components,
+                                                                spat_dim=spat_dim)
 
         pv_surf = pv_grid.extract_surface()
-        surface_points = pv_surf.points
-        centre_points = self._centre_nodes(surface_points)
 
+        return pv_surf
+
+
+    def _pv_surf_to_stl(self, pv_surf):
         save_path = Path().cwd() / "test_output"
         if not save_path.is_dir():
             save_path.mkdir()
@@ -102,17 +132,14 @@ class BlenderPart:
         pv_surf.save(save_file, binary=False)
 
 
-        return centre_points
-
-
-    def import_from_stl(self):
+    def import_from_stl(self, pv_surf = None):
         if self.filename is None:
-            points = self._simdata_to_stl()
+            self._pv_surf_to_stl(pv_surf)
 
         bpy.ops.wm.stl_import(filepath=self.filename)
 
         part = bpy.context.selected_objects[0]
-        return part, points
+        return part
 
     def add_thickness(self, part): # Not sure if this is necessary
         part["solidify"] = True
