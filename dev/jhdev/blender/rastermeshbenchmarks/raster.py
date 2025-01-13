@@ -27,7 +27,7 @@ def main() -> None:
 
     time_import_start = time.perf_counter()
     # 3D cylinder, mechanical, tets
-    data_path = Path("/home/kc4736/pyvale/dev/lfdev/rastermeshbenchmarks")
+    data_path = Path("dev/lfdev/rastermeshbenchmarks")
     data_path = data_path / "case21_m1_out.e"
 
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
@@ -50,7 +50,7 @@ def main() -> None:
     time_import = time_import_end - time_import_start
     print(f"{'Time taken (Import and create mesh):':45}" + f"{time_import:.5f}" + " [s]")
 
-    pv_surf.save("/home/kc4736/pyvale/dev/jhdev/blender/rastermeshbenchmarks/case21_m1_out.stl")
+    pv_surf.save("./dev/jhdev/blender/rastermeshbenchmarks/case21_m1_out.stl")
 
 
     # parameters
@@ -87,7 +87,7 @@ def main() -> None:
     print("scene cleared")
 
     # Import the STL file
-    bpy.ops.wm.stl_import(filepath="/home/kc4736/pyvale/dev/jhdev/blender/rastermeshbenchmarks/case21_m1_out.stl")
+    bpy.ops.wm.stl_import(filepath="./dev/jhdev/blender/rastermeshbenchmarks/case21_m1_out.stl")
     print(".stl imported")
 
     # Add a light source
@@ -129,13 +129,17 @@ def main() -> None:
     scene.render.pixel_aspect_x = pixel_size[0]
     scene.render.pixel_aspect_y = pixel_size[1]
 
+    scene.render.device = 'CPU'
+    scene.render.threads_mode = 'FIXED'
+    scene.render.threads = 1
+   
     # # Perform ray tracing (render)
     # bpy.context.scene.render.engine = 'CYCLES'  # Use Cycles for ray tracing
     # bpy.context.scene.cycles.samples = 128  # Set the number of samples
 
     # Render the scene to an image
     print("raster starting")
-    bpy.context.scene.render.filepath = "case21_m1_out.png"
+    bpy.context.scene.render.filepath = "./dev/jhdev/blender/rastermeshbenchmarks/case21_m1_out.png"
     bpy.ops.render.render(write_still=True)
     print("raster ending")
 
