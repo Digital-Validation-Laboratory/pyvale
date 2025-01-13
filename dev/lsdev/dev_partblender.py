@@ -96,8 +96,8 @@ class BlenderPart:
             components.append('disp_y')
         if 'disp_z' in node_vars_names:
             components.append('disp_z')
-        if 'temperature' in node_vars_names:
-            components.append('temperature')
+        # if 'temperature' in node_vars_names:
+        #     components.append('temperature')
         components = tuple(components)
         if len(components) == 0:
             components = None
