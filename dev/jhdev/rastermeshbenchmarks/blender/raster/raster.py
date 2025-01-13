@@ -28,7 +28,7 @@ def main() -> None:
     time_import_start = time.perf_counter()
     # 3D cylinder, mechanical, tets
     data_path = Path("dev/lfdev/rastermeshbenchmarks")
-    data_path = data_path / "case21_m1_out.e"
+    data_path = data_path / "case21_m5_out.e"
 
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
     field_keys = tuple(sim_data.node_vars.keys())
@@ -50,7 +50,7 @@ def main() -> None:
     time_import = time_import_end - time_import_start
     print(f"{'Time taken (Import and create mesh):':45}" + f"{time_import:.5f}" + " [s]")
 
-    pv_surf.save("./dev/jhdev/blender/rastermeshbenchmarks/case21_m1_out.stl")
+    pv_surf.save("./dev/jhdev/rastermeshbenchmarks/blender/raster/case21_m5_out.stl")
 
 
     # parameters
@@ -80,15 +80,12 @@ def main() -> None:
 
     cam_rot = Rotation.from_euler("zyx", [psi_z_degs, 0, theta_x_degs], degrees=True)
 
-    # Set up scene
-
+    # clear existing blender objects
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete()  # Clear the scene
-    print("scene cleared")
 
     # Import the STL file
-    bpy.ops.wm.stl_import(filepath="./dev/jhdev/blender/rastermeshbenchmarks/case21_m1_out.stl")
-    print(".stl imported")
+    bpy.ops.wm.stl_import(filepath="./dev/jhdev/rastermeshbenchmarks/blender/raster/case21_m5_out.stl")
 
     # Add a light source
     bpy.ops.object.light_add(type='POINT', location=(20, 40, 20))
@@ -117,8 +114,6 @@ def main() -> None:
     camera.data.lens = focal_length_mm  # Set focal length
     camera.data.sensor_width = sensor_width # Convert to millimeters for Blender
     camera.data.sensor_height = sensor_height  # Convert to millimeters for Blender
-    print("Added Camera")
-
 
 
     # create a scene 
@@ -128,23 +123,13 @@ def main() -> None:
     scene.render.resolution_y = cam_num_px[1]
     scene.render.pixel_aspect_x = pixel_size[0]
     scene.render.pixel_aspect_y = pixel_size[1]
+    scene.eevee.taa_render_samples = 4       # Samples for final render
 
-    scene.render.device = 'CPU'
-    scene.render.threads_mode = 'FIXED'
-    scene.render.threads = 1
    
-    # # Perform ray tracing (render)
-    # bpy.context.scene.render.engine = 'CYCLES'  # Use Cycles for ray tracing
-    # bpy.context.scene.cycles.samples = 128  # Set the number of samples
-
     # Render the scene to an image
-    print("raster starting")
-    bpy.context.scene.render.filepath = "./dev/jhdev/blender/rastermeshbenchmarks/case21_m1_out.png"
+    bpy.context.scene.render.filepath = "./dev/jhdev/rastermeshbenchmarks/blender/raster/case21_m5_out.png"
     bpy.ops.render.render(write_still=True)
-    print("raster ending")
 
-
-    
 
 if __name__ == '__main__':
     main()
