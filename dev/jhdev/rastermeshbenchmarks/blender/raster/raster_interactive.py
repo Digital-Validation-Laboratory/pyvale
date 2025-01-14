@@ -1,9 +1,7 @@
 import bpy
 import numpy as np
 from scipy.spatial.transform import Rotation
-import bpy
 import mathutils
-import numpy as np
 import time
 
 
@@ -17,7 +15,7 @@ psi_z_degs = 0.0
 phi_y_rads = np.deg2rad(phi_y_degs)
 theta_x_rads = np.deg2rad(theta_x_degs)
 
-# Simulated world coordinates data (example data for sim_data.coords)
+# Hard coded coordinates.
 roi_pos_world = [1.14642740e-02, 1.25546830e+01, 4.91564283e-02]
 
 cam_num_px = np.array([2464, 2056], dtype=np.int32)
@@ -70,8 +68,6 @@ camera.data.sensor_width = sensor_width # Convert to millimeters for Blender
 camera.data.sensor_height = sensor_height  # Convert to millimeters for Blender
 print("Added Camera")
 
-
-
 # create a scene 
 scene = bpy.context.scene
 scene.camera = camera
@@ -79,9 +75,10 @@ scene.render.resolution_x = cam_num_px[0]
 scene.render.resolution_y = cam_num_px[1]
 scene.render.pixel_aspect_x = pixel_size[0]
 scene.render.pixel_aspect_y = pixel_size[1]
+scene.eevee.taa_render_samples = 1
 
 # Render the scene to an image
 print("raster starting")
-bpy.context.scene.render.filepath = "/home/kc4736/pyvale/dev/jhdev/blender/rastermeshbenchmarks/case21_m1_out.png"
+bpy.context.scene.render.filepath = "/home/kc4736/pyvale/dev/jhdev/blender/rastermeshbenchmarks/case21_m1_out_interactive.png"
 bpy.ops.render.render(write_still=True)
 print("raster ending")

@@ -131,7 +131,7 @@ def main() -> None:
 
     bpy.context.scene.render.threads_mode = 'FIXED'
     bpy.context.scene.render.threads = 1
-
+    bpy.context.scene.view_layers[0].cycles.use_denoising = False
    
     # Render the scene to an image
     bpy.context.scene.render.filepath = "./dev/jhdev/rastermeshbenchmarks/blender/raytrace/case21_m5_out.png"

@@ -123,7 +123,7 @@ def main() -> None:
     scene.render.resolution_y = cam_num_px[1]
     scene.render.pixel_aspect_x = pixel_size[0]
     scene.render.pixel_aspect_y = pixel_size[1]
-    scene.eevee.taa_render_samples = 4       # Samples for final render
+    scene.eevee.taa_render_samples = 1
 
    
     # Render the scene to an image
