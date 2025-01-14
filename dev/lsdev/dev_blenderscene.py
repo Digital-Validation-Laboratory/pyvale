@@ -43,6 +43,12 @@ class BlenderScene:
 
         return camera
 
+    def add_simdata_part(self, sim_data):
+        partmaker = BlenderPart(sim_data=sim_data)
+        part = partmaker.simdata_to_part()
+        return part
+
+
     def add_stl_part(self, filename:str | None = None, sim_data: SimData | None = None):
         partmaker = BlenderPart(filename=filename, sim_data=sim_data)
         spat_dim = partmaker._get_spat_dim()
@@ -53,8 +59,7 @@ class BlenderScene:
         return part, pv_surf, spat_dim, components
 
 
-    def set_part_location(self, part, location: tuple):
-        print(f"{part=}")
+    def set_part_location(self, part, location):
         z_location = int(part.dimensions[2])
         part.location = (location[0], location[1], (location[2] - z_location))
 
