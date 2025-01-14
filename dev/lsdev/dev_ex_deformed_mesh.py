@@ -9,16 +9,16 @@ from dev_blendercamera import CameraData
 from dev_lightingblender import LightData, LightType
 from dev_objectmaterial import MaterialData
 from dev_render import RenderData, Render
-from dev_deform_part import DeformMesh, DeformSimData, DeformPart
+from dev_deform_part import DeformMesh, DeformPart, DeformSimData
 
 def main() -> None:
     # Making Blender scene
-    data_path = Path('src/pyvale/simcases/case23_out.e')
+    data_path = Path('src/pyvale/data/case18_1_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
     dir = Path.cwd() / 'dev/lsdev/blender_files'
-    filename = 'case23_deformed.blend'
+    filename = 'case18_deformed.blend'
     filepath = dir / filename
     all_files = os.listdir(dir)
     for ff in all_files:
@@ -30,8 +30,13 @@ def main() -> None:
     scene = BlenderScene()
 
     part_location = (0, 0, 0)
-    part = scene.add_part(sim_data=sim_data)
+    # angle = np.radians(90)
+    # part_rotation = (0, 0, angle)
+
+    part, pv_surf, spat_dim, components = scene.add_stl_part(sim_data=sim_data)
+    # part = scene.add_simdata_part(sim_data)
     scene.set_part_location(part, part_location)
+    # scene.set_part_rotation(part, part_rotation)
 
 
     mat_data = MaterialData()
@@ -40,7 +45,7 @@ def main() -> None:
 
     sensor_px = (2452, 2056)
     cam_position = (0, 0, 200)
-    focal_length = 15.0
+    focal_length = 25.0
     cam_data = CameraData(sensor_px=sensor_px,
                           position=cam_position,
                           focal_length=focal_length)
@@ -58,7 +63,7 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # Rendering images
-    image_path = Path.cwd() / 'dev/lsdev/rendered_images/case23_deformed'
+    image_path = Path.cwd() / 'dev/lsdev/rendered_images/case22_deformed'
     output_path = Path.cwd() / 'dev/lsdev/rendered_images'
 
 
@@ -73,10 +78,17 @@ def main() -> None:
     #---------------------------------------------------------------------------
     # Deform mesh
     timesteps = sim_data.time.shape[0]
+    # meshdeformer = DeformMesh(pv_surf, spat_dim, components)
+    # nodes = centre_nodes(pv_surf.points)
+    meshdeformer = DeformSimData(sim_data)
+    nodes = centre_nodes(sim_data.coords)
+
     for timestep in range((timesteps - 1)):
         timestep += 1 # Adding at start of loop as timestep = 0 is the original mesh
-        meshdeformer = DeformSimData(sim_data=sim_data)
-        deformed_nodes = meshdeformer.add_displacement(timestep)
+        # deformed_nodes, added_disp = meshdeformer.add_displacement(timestep, nodes)
+        # nodes = deformed_nodes
+        deformed_nodes = meshdeformer.add_displacement(timestep, nodes)
+        nodes = deformed_nodes
 
         if deformed_nodes is not None:
             partdeformer = DeformPart(part, deformed_nodes)
