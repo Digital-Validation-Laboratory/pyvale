@@ -42,13 +42,6 @@ class BlenderPart:
 
         return zero_index_elements
 
-    def _centre_nodes(self, nodes):
-        max = np.max(nodes, axis=0)
-        min = np.min(nodes, axis=0)
-        middle = max - ((max - min) / 2)
-        centred = np.subtract(nodes, middle)
-        return centred
-
     def _get_nodes(self):
         """Gets the node coordinates from the SimData object and converts it
            into a format Blender can read
@@ -57,7 +50,7 @@ class BlenderPart:
 
         zero_index_nodes = nodes
 
-        centred = self._centre_nodes(zero_index_nodes)
+        centred = centre_nodes(zero_index_nodes)
 
         return centred
 
@@ -141,16 +134,9 @@ class BlenderPart:
         part = bpy.context.selected_objects[0]
         return part
 
-    def add_thickness(self, part): # Not sure if this is necessary
-        part["solidify"] = True
-        part["thickness"] = 1
-
-        if part["solidify"]:
-            ob = bpy.context.view_layer.objects.active
-            if ob is None:
-                bpy.context.view_layer.objects.active = part
-            bpy.ops.object.editmode_toggle()
-            bpy.ops.mesh.solidify(thickness=1)
-            bpy.ops.object.editmode_toggle()
-
-        return part
+def centre_nodes(nodes):
+        max = np.max(nodes, axis=0)
+        min = np.min(nodes, axis=0)
+        middle = max - ((max - min) / 2)
+        centred = np.subtract(nodes, middle)
+        return centred
