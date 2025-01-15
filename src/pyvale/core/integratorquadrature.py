@@ -12,6 +12,7 @@ from pyvale.core.integratorspatial import (IIntegratorSpatial,
                                            create_int_pt_array)
 from pyvale.core.sensordata import SensorData
 
+#TODO: Docstrings
 
 class Quadrature2D(IIntegratorSpatial):
     __slots__ = ("_field","_area","_n_gauss_pts","_gauss_pt_offsets"

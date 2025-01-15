@@ -4,7 +4,8 @@ pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-"""#import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
+"""
+#import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
 # See: https://github.com/pyvista/pyvista/discussions/2928
 #NOTE: causes output to console to be suppressed unfortunately
 import pyvista as pv
@@ -15,9 +16,11 @@ from pyvale.core.sensorarraypoint import SensorArrayPoint
 from pyvale.core.fieldconverter import conv_simdata_to_pyvista
 from pyvale.core.visualopts import (VisOptsSimSensors,VisOptsImageSave)
 from pyvale.core.visualtools import (create_pv_plotter,
-                                get_colour_lims,
-                                save_image)
+                                     get_colour_lims,
+                                     save_image)
 
+
+#TODO: Docstrings
 
 def add_sim_field(pv_plot: pv.Plotter,
                   sensor_array: SensorArrayPoint,

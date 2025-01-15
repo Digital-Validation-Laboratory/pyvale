@@ -9,7 +9,7 @@ from pathlib import Path
 from importlib.resources import files
 
 
-SIM_CASE_NUM = 23
+SIM_CASE_COUNT = 24
 
 
 class DataSetError(Exception):
@@ -48,9 +48,9 @@ class DataSet:
         """
         if case_num <= 0:
             raise DataSetError("Simulation case number must be greater than 0")
-        elif case_num > SIM_CASE_NUM:
+        elif case_num > SIM_CASE_COUNT:
             raise DataSetError("Simulation case number must be less than " \
-                               + f"{SIM_CASE_NUM}")
+                               + f"{SIM_CASE_COUNT}")
 
         case_num_str = str(case_num).zfill(2)
         case_file = f"case{case_num_str}.i"
@@ -83,9 +83,9 @@ class DataSet:
         """
         if case_num <= 0:
             raise DataSetError("Simulation case number must be greater than 0")
-        elif case_num > SIM_CASE_NUM:
+        elif case_num > SIM_CASE_COUNT:
             raise DataSetError("Simulation case number must be less than " \
-                               + f"{SIM_CASE_NUM}")
+                               + f"{SIM_CASE_COUNT}")
 
         case_num_str = str(case_num).zfill(2)
         case_file = f"case{case_num_str}.geo"

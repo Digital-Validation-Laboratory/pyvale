@@ -18,14 +18,15 @@ from pyvale.core.errorintegrator import ErrIntegrator
 from pyvale.core.errorsysindep import ErrSysUniformPercent
 from pyvale.core.errorrand import ErrRandNormPercent
 from pyvale.core.errorsysdep import (ErrSysDigitisation,
-                                              ErrSysSaturation)
+                                     ErrSysSaturation)
 
+#TODO: Docstrings
 
 class SensorArrayFactory:
     """Namespace for static methods used to build common types of sensor arrays
     simplifying sensor array creation for users.
     """
-    
+
     @staticmethod
     def thermocouples_no_errs(sim_data: mh.SimData,
                               sensor_data: SensorData,
@@ -34,7 +35,9 @@ class SensorArrayFactory:
                               ) -> SensorArrayPoint:
         """Builds and returns a point sensor array with common parameters used
         for thermocouples applied to a temperature field without any simulated
-        measurement errors. Allows the
+        measurement errors. Allows the user to build and attach their own error
+        chain or use this for fast interpolation to sensor locations without
+        errors.
 
         Parameters
         ----------

@@ -11,7 +11,10 @@ from pyvale.core.integratorspatial import (IIntegratorSpatial,
                                            create_int_pt_array)
 from pyvale.core.sensordata import SensorData
 
-# NOTE: code below is very similar to quadrature integrator should be able to
+
+#TODO: Docstrings
+
+#NOTE: code below is very similar to quadrature integrator should be able to
 # refactor into injected classes/functions
 
 class Rectangle2D(IIntegratorSpatial):

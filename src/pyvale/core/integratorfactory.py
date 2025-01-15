@@ -16,7 +16,8 @@ from pyvale.core.integratorquadrature import (Quadrature2D,
                                               create_gauss_weights_2d_9pts)
 
 class IntegratorSpatialFactory:
-    """Namespace for static methods used to build spatial integrators.
+    """Namespace for static methods used to build 2D spatial integrators. These
+    integrators are used to simulate spatial averaging for sensors.
     """
 
     @staticmethod
