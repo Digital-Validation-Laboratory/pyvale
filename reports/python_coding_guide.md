@@ -1,15 +1,14 @@
 # Python coding guide for `pyvale`
 - Work in your own 'feature' branch, merge into 'dev' - don't push to main (it should be protected and yell at you)!
 - Follow the PEP8 style guide: https://peps.python.org/pep-0008/
-- Use descriptive variable names, no single letter variables (double letters for iterators in numpy style are ok)
+- Use descriptive variable names, no single letter variables (double letters for iterators in numpy style are ok) single letter variables for indexs / iterators are ok.
 - Use major function first variable names: e.g. `FieldScalar`, `FieldVector` and `FieldTensor` instead of `ScalarField`, `VectorField` and `TensorField`.
-- Avoid comments unless needed to explain something weird (like 1 vs 0 indexing) – the code and variable names should speak for themselves
 - Type hint everything: e.g. `def add_ints(a: int, b: int) -> int:`. This makes your code easier to understand and you have the possibility of compiling things if you need.
 - `pylint` is a slow linter but will help you if you have type hinted everything.
 - Use guard clauses (if statements) with returns at the top of functions to reduce the number of nested if/else structures.
 - Default mutable data types to `None`.
 - Use `pathlib` and the `Path` class to manage all file io in preference to manual string handling or the `os` module.
-- `numpy` and `scipy` are your friend - avoid for/while loops. Push everything you can down into C.
+- `numpy` and `scipy` are your friend - avoid for/while loops. Push everything you can down into C. Unless you are writing Cython then loops are ok.
 - Minimise dependencies as much as possible.
 - Avoid decorators unless absolutely necessary (`@dataclass`,  `@abstractmethod` and `@staticmethod` are examples that are ok)
 - Don't use `@property` to hide complicated variable initialisation behind the `.` notation.

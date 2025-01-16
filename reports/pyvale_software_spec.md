@@ -1,0 +1,3 @@
+# `pyvale`: Software Specification
+
+## Motivation

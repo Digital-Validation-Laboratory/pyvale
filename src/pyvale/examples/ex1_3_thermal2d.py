@@ -38,7 +38,7 @@ def main() -> None:
     else:
         descriptor = pyvale.SensorDescriptor()
 
-    field_key = "temperature"
+    field_key = "temperature" # ("disp_x","disp_y")
     t_field = pyvale.FieldScalar(sim_data,
                                  field_key=field_key,
                                  spat_dims=2)
