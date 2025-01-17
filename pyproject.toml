@@ -28,6 +28,7 @@ dependencies = [
   "PyQT6>=6.7.1",
   "imageio>=2.36.1",
   "imageio-ffmpeg>=0.5.1",
+  "mooseherder>=0.1.0",
 ]
 
 [project.urls]
