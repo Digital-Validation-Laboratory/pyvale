@@ -10,6 +10,7 @@
 *.mp4
 *.gif
 *.tiff
+*.stl
 test_output/
 example_output/
 
