@@ -9,13 +9,29 @@ Copyright (C) 2024 The Computer Aided Validation Team
 import time
 from pathlib import Path
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation
+from scipy.signal import convolve2d
+
 import pyvale
 import mooseherder as mh
 
 from camerarasterdata import CameraRasterData
 # CYTHON MODULE
 import camerac
+
+
+def average_subpixel_image(subpx_image: np.ndarray,
+                           subsample: int) -> np.ndarray:
+    if subsample <= 1:
+        return subpx_image
+
+    conv_mask = np.ones((subsample,subsample))/(subsample**2)
+    subpx_image_conv = convolve2d(subpx_image,conv_mask,mode='same')
+    avg_image = subpx_image_conv[round(subsample/2)-1::subsample,
+                                round(subsample/2)-1::subsample]
+    return avg_image
+
 
 def main() -> None:
     print()
@@ -25,8 +41,8 @@ def main() -> None:
     print(80*"C")
 
     # 3D cylinder, mechanical, tets
-    data_path = Path("dev/lfdev/rastermeshbenchmarks")
-    data_path = data_path / "case21_m1_out.e"
+    data_path = Path.home() / "pyvale" / "dev" / "lfdev" / "rastermeshbenchmarks"
+    data_path = data_path / "case21_m5_out.e"
 
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
     field_keys = tuple(sim_data.node_vars.keys())
@@ -110,7 +126,7 @@ def main() -> None:
     # Number of divisions (subsamples) for each pixel for anti-aliasing
     sub_samp: int = 2
 
-    cam_type = "Test"
+    cam_type = "AV507"
     if cam_type == "AV507":
         cam_num_px = np.array([2464,2056],dtype=np.int32)
         pixel_size = np.array([3.45e-3,3.45e-3]) # in millimeters!
@@ -153,7 +169,93 @@ def main() -> None:
                                 focal_length=focal_leng,
                                 sub_samp=sub_samp)
 
-    # TODO
+    #---------------------------------------------------------------------------
+    # SPLIT ELEMENT COORDS
+
+    # shape=(coord[X,Y,Z,W],node_per_elem,elem_num)
+    elem_world_coords = coords_world[:,connectivity]
+    # shape=(nodes_per_elem,coord[X,Y,Z,W],elem_num)
+    elem_world_coords = np.swapaxes(elem_world_coords,0,1)
+
+    # shape(nodes_per_elem,elem_num)
+    field_to_render = np.ascontiguousarray(field_array[connectivity,frame_to_render])
+
+    #---------------------------------------------------------------------------
+    print()
+    print(80*"=")
+    print("RASTER ELEMENT LOOP START")
+    print(80*"=")
+
+    loop_start = time.perf_counter()
+    (image_buffer,
+     depth_buffer) = camerac.raster_loop(field_to_render,
+                                        elem_world_coords,
+                                        cam_data.world_to_cam_mat,
+                                        cam_data.num_pixels,
+                                        cam_data.image_dims,
+                                        cam_data.image_dist,
+                                        cam_data.sub_samp)
+    loop_time = time.perf_counter() - loop_start
+
+    conv_start = time.perf_counter()
+    depth_buffer = average_subpixel_image(depth_buffer,cam_data.sub_samp)
+    image_buffer = average_subpixel_image(image_buffer,cam_data.sub_samp)
+    conv_time = time.perf_counter() - conv_start
+    total_time = time.perf_counter() - loop_start
+
+    print()
+    print(80*"=")
+    print("RASTER LOOP END")
+    print(80*"=")
+    print()
+    print(80*"=")
+    print("PERFORMANCE TIMERS")
+    print(f"Loop time = {loop_time} seconds")
+    print(f"Conv time = {conv_time} seconds")
+    print(f"Total time = {total_time} seconds")
+    print(80*"=")
+
+    #===========================================================================
+    # PLOTTING
+    plot_on = True
+    depth_to_plot = np.copy(depth_buffer)
+    #depth_to_plot[depth_buffer > 10*cam_data.image_dist] = np.NaN
+    image_to_plot = np.copy(image_buffer)
+    #image_to_plot[depth_buffer > 10*cam_data.image_dist] = np.NaN
+    if plot_on:
+        plot_opts = pyvale.PlotOptsGeneral()
+
+        (fig, ax) = plt.subplots(figsize=plot_opts.single_fig_size_square,
+                                layout='constrained')
+        fig.set_dpi(plot_opts.resolution)
+        cset = plt.imshow(depth_to_plot,
+                        cmap=plt.get_cmap(plot_opts.cmap_seq))
+                        #origin='lower')
+        ax.set_aspect('equal','box')
+        fig.colorbar(cset)
+        ax.set_title("Depth buffer",fontsize=plot_opts.font_head_size)
+        ax.set_xlabel(r"x ($px$)",
+                    fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
+        ax.set_ylabel(r"y ($px$)",
+                    fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
+
+        (fig, ax) = plt.subplots(figsize=plot_opts.single_fig_size_square,
+                                layout='constrained')
+        fig.set_dpi(plot_opts.resolution)
+        cset = plt.imshow(image_to_plot,
+                        cmap=plt.get_cmap(plot_opts.cmap_seq))
+                        #origin='lower')
+        ax.set_aspect('equal','box')
+        fig.colorbar(cset)
+        ax.set_title("Field Image",fontsize=plot_opts.font_head_size)
+        ax.set_xlabel(r"x ($px$)",
+                    fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
+        ax.set_ylabel(r"y ($px$)",
+                    fontsize=plot_opts.font_ax_size, fontname=plot_opts.font_name)
+
+        plt.show()
+
+
 
 if __name__ == "__main__":
     main()
