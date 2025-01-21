@@ -54,22 +54,6 @@ class BlenderPart:
 
         return centred
 
-
-
-    def simdata_to_part(self):
-        """Creates an object from the mesh information in the SimData object
-        """
-        nodes = self._get_nodes() * 1000
-        elements = self._get_elements()
-        mesh = bpy.data.meshes.new("part")
-        mesh.from_pydata(nodes, [], elements, shade_flat=True)
-        mesh.validate(verbose=True, clean_customdata=True)
-        part = bpy.data.objects.new("specimen", mesh)
-        bpy.context.scene.collection.objects.link(part)
-
-        return part
-
-
     def _get_spat_dim(self):
         nodes = self.sim_data.coords
         check_if_2d = np.count_nonzero(nodes, axis=0)
@@ -95,7 +79,6 @@ class BlenderPart:
         if len(components) == 0:
             components = None
 
-        print(f"{components=}")
         return components
 
     def _simdata_to_pvsurf(self, components, spat_dim):
@@ -103,17 +86,18 @@ class BlenderPart:
         (pv_grid, pv_grid_vis) = pyvale.conv_simdata_to_pyvista(self.sim_data,
                                                                 components,
                                                                 spat_dim=spat_dim)
-
         pv_surf = pv_grid.extract_surface()
+        # tri_surf = pv_surf.triangulate()
+        # tri_surf.plot(show_edges=True, line_width=2)
 
-        return pv_surf
+        return pv_surf, pv_grid
 
 
-    def _pv_surf_to_stl(self, pv_surf):
+    def _pv_surf_to_obj(self, pv_surf):
         save_path = Path().cwd() / "test_output"
         if not save_path.is_dir():
             save_path.mkdir()
-        name = "test_mesh.stl"
+        name = "test_mesh.obj" #Filetype changed
         save_file = save_path / name
 
         all_files = os.listdir(save_path)
@@ -125,11 +109,11 @@ class BlenderPart:
         pv_surf.save(save_file, binary=False)
 
 
-    def import_from_stl(self, pv_surf = None):
+    def import_from_obj(self, pv_surf = None):
         if self.filename is None:
             self._pv_surf_to_stl(pv_surf)
 
-        bpy.ops.wm.stl_import(filepath=self.filename)
+        bpy.ops.wm.obj_import(filepath=self.filename) #Changed filetype
 
         part = bpy.context.selected_objects[0]
         return part
