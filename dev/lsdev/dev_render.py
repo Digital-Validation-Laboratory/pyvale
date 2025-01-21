@@ -8,13 +8,14 @@ class RenderEngine(Enum):
     """Different render engines on Blender
     """
     CYCLES = "CYCLES"
-    EEVEE = "EEVEE"
-    WORKBENCH = "WORKBENCH"
+    EEVEE = "BLENDER_EEVEE_NEXT"
+    WORKBENCH = "BLENDER_WORKBENCH"
 
 @dataclass
 class RenderData:
     samples: int | None = None
     engine: RenderEngine = RenderEngine.CYCLES
+    max_bounces: int = 12
 
 
 
@@ -33,15 +34,20 @@ class Render:
     def render_parameters(self,
                           file_name: str,
                           cores: int):
-        bpy.context.scene.render.engine = self.render_data.engine.CYCLES.value
+        bpy.context.scene.render.engine = self.render_data.engine.value
         bpy.context.scene.view_settings.look = 'AgX - Greyscale'
-        bpy.context.scene.cycles.samples = self.render_data.samples
         self.scene.render.resolution_x = self.cam_data.sensor_px[0]
         self.scene.render.resolution_y = self.cam_data.sensor_px[1]
         self.scene.render.filepath =  str(self.image_path / file_name)
         self.scene.render.threads_mode = 'FIXED'
         self.scene.render.threads = cores
-        self.scene.cycles.use_denoising = False # To make rendering faster
+
+        if self.render_data.engine == RenderEngine.CYCLES:
+            self.scene.cycles.use_denoising = False # To make rendering faster
+            bpy.context.scene.cycles.samples = self.render_data.samples
+            bpy.context.scene.cycles.max_bounces = self.render_data.max_bounces
+        elif self.render_data.engine == RenderEngine.EEVEE:
+            self.scene.eevee.taa_render_samples = self.render_data.samples
 
         bpy.context.scene.render.image_settings.file_format = 'TIFF'
 
