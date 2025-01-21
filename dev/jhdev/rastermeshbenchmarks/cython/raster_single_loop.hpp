@@ -118,7 +118,7 @@ void raster(int sub_samp,
             std::vector<double> &depth_buffer){
 
 
-    focal_length = 50.0;
+    focal_length = 25.0;
     spacing = 1.0/sub_samp;
     start_val = 1.0/(2.0 * sub_samp);
 

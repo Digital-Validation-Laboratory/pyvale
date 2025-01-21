@@ -643,13 +643,13 @@ def main() -> None:
         pixel_size = np.array([3.45e-3,3.45e-3]) # in millimeters!
         focal_leng: float = 25.0
 
-        imaging_rad: float = 100.0 # Not needed for camera data, just for cam pos below
+        imaging_rad: float = 150.0 # Not needed for camera data, just for cam pos below
     else:
         cam_num_px = np.array([510,260],dtype=np.int32)
         pixel_size = np.array([10.0e-3,10.0e-3])
         focal_leng: float = 25.0
 
-        imaging_rad: float = 250.0 # Not needed for camera data, just for cam pos below
+        imaging_rad: float = 300.0 # Not needed for camera data, just for cam pos below
 
     if rot_axis == "y":
         cam_pos_world = np.array([roi_pos_world[xx] + imaging_rad*np.sin(phi_y_rads),
