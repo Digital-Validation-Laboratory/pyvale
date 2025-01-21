@@ -294,16 +294,21 @@ def edge_function(vert_0: cython.double[:],
 
 
 @cython.ccall
-#@cython.boundscheck(False)
+@cython.boundscheck(False)
 @cython.wraparound(False)
+@cython.cdivision(True)
 def average_image(subpx_image: cython.double[:,:],
                   sub_samp: cython.int,
-                  image: cython.double[:,:]
+                  image_buffer: cython.double[:,:]
                   ) -> cython.double[:,:]:
+
+    if sub_samp <= 1:
+        return subpx_image
 
     num_subpx_y: cython.size_t = subpx_image.shape[0]
     num_subpx_x: cython.size_t = subpx_image.shape[1]
     subpx_per_px: cython.double = float(sub_samp*sub_samp)
+    ss_size: cython.size_t = sub_samp
 
     num_px_y: cython.size_t = int(num_subpx_y/sub_samp)
     num_px_x: cython.size_t = int(num_subpx_x/sub_samp)
@@ -318,13 +323,13 @@ def average_image(subpx_image: cython.double[:,:],
     for iy in range(num_px_y):
         for ix in range(num_px_x):
             px_sum = 0.0
-            for sy in range(sub_samp):
-                for sx in range(sub_samp):
-                    px_sum += subpx_image[iy+sy,ix+sx]
+            for sy in range(ss_size):
+                for sx in range(ss_size):
+                    px_sum += subpx_image[ss_size*iy+sy,ss_size*ix+sx]
 
-            image[iy,ix] = px_sum / subpx_per_px
+            image_buffer[iy,ix] = px_sum / subpx_per_px
 
-    return image
+    return image_buffer
 
 
 #///////////////////////////////////////////////////////////////////////////////

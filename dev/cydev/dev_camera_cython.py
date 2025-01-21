@@ -11,7 +11,6 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation
-from scipy.signal import convolve2d
 
 import pyvale
 import mooseherder as mh
@@ -19,18 +18,6 @@ import mooseherder as mh
 from camerarasterdata import CameraRasterData
 # CYTHON MODULE
 import camerac
-
-
-def average_subpixel_image(subpx_image: np.ndarray,
-                           subsample: int) -> np.ndarray:
-    if subsample <= 1:
-        return subpx_image
-
-    conv_mask = np.ones((subsample,subsample))/(subsample**2)
-    subpx_image_conv = convolve2d(subpx_image,conv_mask,mode='same')
-    avg_image = subpx_image_conv[round(subsample/2)-1::subsample,
-                                round(subsample/2)-1::subsample]
-    return avg_image
 
 
 def main() -> None:
@@ -220,6 +207,17 @@ def main() -> None:
         loop_times[nn] = time.perf_counter() - loop_start
 
 
+    avg_start = time.perf_counter()
+    image_avg_buffer = np.empty(cam_data.num_pixels,dtype=np.float64).T
+    depth_avg_buffer = np.empty(cam_data.num_pixels,dtype=np.float64).T
+    image_buffer = camerac.average_image(image_buffer_wbuff,
+                                         cam_data.sub_samp,
+                                         image_avg_buffer)
+    depth_buffer = camerac.average_image(depth_buffer_wbuff,
+                                         cam_data.sub_samp,
+                                         depth_avg_buffer)
+    avg_time = time.perf_counter() - avg_start
+
 
 
     print()
@@ -231,15 +229,8 @@ def main() -> None:
     print("PERFORMANCE TIMERS")
     print(f"Loop (no buffer) time = {np.mean(loop_times)} seconds")
     print(f"Loop (with buffer) time = {np.mean(loop_times_buffer)} seconds")
+    print(f"Subpx avg. time = {avg_time} seconds")
     print(80*"=")
-    print(np.allclose(image_buffer_nobuff,image_buffer_wbuff))
-    print(np.allclose(depth_buffer_nobuff,depth_buffer_wbuff))
-
-    conv_start = time.perf_counter()
-    depth_buffer = average_subpixel_image(depth_buffer_nobuff,cam_data.sub_samp)
-    image_buffer = average_subpixel_image(image_buffer_nobuff,cam_data.sub_samp)
-    conv_time = time.perf_counter() - conv_start
-    print(f"Conv time = {conv_time} seconds")
 
     #===========================================================================
     # PLOTTING
