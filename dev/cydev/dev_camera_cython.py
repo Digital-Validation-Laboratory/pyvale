@@ -186,22 +186,41 @@ def main() -> None:
     print("RASTER ELEMENT LOOP START")
     print(80*"=")
 
-    loop_start = time.perf_counter()
-    (image_buffer,
-     depth_buffer) = camerac.raster_loop(field_to_render,
-                                        elem_world_coords,
-                                        cam_data.world_to_cam_mat,
-                                        cam_data.num_pixels,
-                                        cam_data.image_dims,
-                                        cam_data.image_dist,
-                                        cam_data.sub_samp)
-    loop_time = time.perf_counter() - loop_start
+    num_loops = 1
+    loop_times = np.zeros((num_loops,),dtype=np.float64)
+    loop_times_buffer = np.zeros((num_loops,),dtype=np.float64)
 
-    conv_start = time.perf_counter()
-    depth_buffer = average_subpixel_image(depth_buffer,cam_data.sub_samp)
-    image_buffer = average_subpixel_image(image_buffer,cam_data.sub_samp)
-    conv_time = time.perf_counter() - conv_start
-    total_time = time.perf_counter() - loop_start
+    print()
+    print("Running buffered raster loop.")
+    for nn in range(num_loops):
+        print(f"Running loop {nn}")
+        loop_start = time.perf_counter()
+        (image_buffer_wbuff,
+        depth_buffer_wbuff) = camerac.raster_loop_buff(field_to_render,
+                                                elem_world_coords,
+                                                cam_data.world_to_cam_mat,
+                                                cam_data.num_pixels,
+                                                cam_data.image_dims,
+                                                cam_data.image_dist,
+                                                cam_data.sub_samp)
+        loop_times_buffer[nn] = time.perf_counter() - loop_start
+
+    print("Running non-buffered raster loop.")
+    for nn in range(num_loops):
+        print(f"Running loop {nn}")
+        loop_start = time.perf_counter()
+        (image_buffer_nobuff,
+        depth_buffer_nobuff) = camerac.raster_loop_nobuff(field_to_render,
+                                                    elem_world_coords,
+                                                    cam_data.world_to_cam_mat,
+                                                    cam_data.num_pixels,
+                                                    cam_data.image_dims,
+                                                    cam_data.image_dist,
+                                                    cam_data.sub_samp)
+        loop_times[nn] = time.perf_counter() - loop_start
+
+
+
 
     print()
     print(80*"=")
@@ -210,18 +229,25 @@ def main() -> None:
     print()
     print(80*"=")
     print("PERFORMANCE TIMERS")
-    print(f"Loop time = {loop_time} seconds")
-    print(f"Conv time = {conv_time} seconds")
-    print(f"Total time = {total_time} seconds")
+    print(f"Loop (no buffer) time = {np.mean(loop_times)} seconds")
+    print(f"Loop (with buffer) time = {np.mean(loop_times_buffer)} seconds")
     print(80*"=")
+    print(np.allclose(image_buffer_nobuff,image_buffer_wbuff))
+    print(np.allclose(depth_buffer_nobuff,depth_buffer_wbuff))
+
+    conv_start = time.perf_counter()
+    depth_buffer = average_subpixel_image(depth_buffer_nobuff,cam_data.sub_samp)
+    image_buffer = average_subpixel_image(image_buffer_nobuff,cam_data.sub_samp)
+    conv_time = time.perf_counter() - conv_start
+    print(f"Conv time = {conv_time} seconds")
 
     #===========================================================================
     # PLOTTING
     plot_on = True
     depth_to_plot = np.copy(depth_buffer)
-    #depth_to_plot[depth_buffer > 10*cam_data.image_dist] = np.NaN
+    depth_to_plot[depth_buffer > 10*cam_data.image_dist] = np.NaN
     image_to_plot = np.copy(image_buffer)
-    #image_to_plot[depth_buffer > 10*cam_data.image_dist] = np.NaN
+    image_to_plot[depth_buffer > 10*cam_data.image_dist] = np.NaN
     if plot_on:
         plot_opts = pyvale.PlotOptsGeneral()
 

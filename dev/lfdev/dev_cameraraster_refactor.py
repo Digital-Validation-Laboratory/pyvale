@@ -302,11 +302,11 @@ class Rasteriser:
         # NOTE: first axis of element_raster_coords is the node/vertex num.
         edge = np.zeros((3,bound_subpx_coords_flat.shape[1]))
         edge[0,:] = edge_function(elem_raster_coords[1,:],
-                                elem_raster_coords[2,:],
-                                bound_subpx_coords_flat)
+                                  elem_raster_coords[2,:],
+                                  bound_subpx_coords_flat)
         edge[1,:] = edge_function(elem_raster_coords[2,:],
-                                elem_raster_coords[0,:],
-                                bound_subpx_coords_flat)
+                                  elem_raster_coords[0,:],
+                                  bound_subpx_coords_flat)
         edge[2,:] = edge_function(elem_raster_coords[0,:],
                                 elem_raster_coords[1,:],
                                 bound_subpx_coords_flat)
@@ -462,7 +462,7 @@ class Rasteriser:
                             num_para: int = 4
                             ) -> tuple[np.ndarray,np.ndarray,int]:
 
-        with ThreadPool(num_para) as pool:
+        with Pool(num_para) as pool:
             processes = list([])
 
             num_elems_in_scene = elem_raster_coords.shape[-1]
@@ -536,15 +536,13 @@ def edge_function(vert_a: np.ndarray,
 
 def average_subpixel_image(subpx_image: np.ndarray,
                            subsample: int) -> np.ndarray:
-    conv_mask = np.ones((subsample,subsample))/(subsample**2)
-    if subsample > 1:
-        subpx_image_conv = convolve2d(subpx_image,conv_mask,mode='same')
-        avg_image = subpx_image_conv[round(subsample/2)-1::subsample,
-                                     round(subsample/2)-1::subsample]
-    else:
-        subpx_image_conv = subpx_image
-        avg_image = subpx_image
+    if subsample <= 1:
+        return subpx_image
 
+    conv_mask = np.ones((subsample,subsample))/(subsample**2)
+    subpx_image_conv = convolve2d(subpx_image,conv_mask,mode='same')
+    avg_image = subpx_image_conv[round(subsample/2)-1::subsample,
+                                round(subsample/2)-1::subsample]
     return avg_image
 
 
@@ -552,8 +550,8 @@ def average_subpixel_image(subpx_image: np.ndarray,
 # MAIN
 def main() -> None:
     # 3D cylinder, mechanical, tets
-    data_path = Path("dev/lfdev/rastermeshbenchmarks")
-    data_path = data_path / "case21_m1_out.e"
+    data_path = Path.home() / "pyvale" / "dev" / "lfdev" / "rastermeshbenchmarks"
+    data_path = data_path / "case21_m5_out.e"
 
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
     field_keys = tuple(sim_data.node_vars.keys())
@@ -636,7 +634,7 @@ def main() -> None:
     # Number of divisions (subsamples) for each pixel for anti-aliasing
     sub_samp: int = 2
 
-    cam_type = "Test"
+    cam_type = "AV507"
     if cam_type == "AV507":
         cam_num_px = np.array([2464,2056],dtype=np.int32)
         pixel_size = np.array([3.45e-3,3.45e-3]) # in millimeters!
