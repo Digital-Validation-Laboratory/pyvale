@@ -32,7 +32,7 @@ def cpp_raster(int sub_samp,
     cdef vector[double] image_buffer_c
     cdef vector[double] depth_buffer_c
 
-    # call main cpp func
+    # call main cpp raster func
     raster(sub_samp, elem_raster_coords, elem_bound_box_inds, elem_areas, field_frame_divide_z, image_buffer_c, depth_buffer_c)
 
     # std::vector to np.ndarray coercion. See here for more info on syntax: 
@@ -44,6 +44,7 @@ def cpp_raster(int sub_samp,
     np_image_buffer = np.asarray(test1).copy()
     np_depth_buffer = np.asarray(test2).copy()
 
+    # convert back to a 2d array for easy integration back into python code. suprisingly quick!
     image_buffer_2d = np_image_buffer.reshape(2056*sub_samp,2464*sub_samp)
     depth_buffer_2d = np_depth_buffer.reshape(2056*sub_samp,2464*sub_samp)
 

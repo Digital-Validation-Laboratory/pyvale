@@ -635,7 +635,7 @@ def main() -> None:
     roi_pos_world = np.mean(sim_data.coords,axis=0)
 
     # Number of divisions (subsamples) for each pixel for anti-aliasing
-    sub_samp: int = 4
+    sub_samp: int = 2
 
     cam_type = "AV507"
     if cam_type == "AV507":
