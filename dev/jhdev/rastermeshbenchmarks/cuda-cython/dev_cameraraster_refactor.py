@@ -553,7 +553,7 @@ def average_subpixel_image(subpx_image: np.ndarray,
 # MAIN
 def main() -> None:
     # 3D cylinder, mechanical, tets
-    data_path = Path("dev/lfdev/rastermeshbenchmarks")
+    data_path = Path("/home/kc4736/ukaea/pyvale/dev/lfdev/rastermeshbenchmarks")
     data_path = data_path / "case21_m5_out.e"
 
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()
@@ -701,39 +701,40 @@ def main() -> None:
     print("RASTER ELEMENT LOOP START")
     print(80*"=")
 
-    time_start_loop = time.perf_counter()
-    (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_sequential(
-        cam_data,
-        elem_raster_coords,
-        elem_bound_box_inds,
-        elem_areas,
-        field_frame_divide_z)
-    time_end_loop = time.perf_counter()
-    time_seq_loop = time_end_loop - time_start_loop
+    # time_start_loop = time.perf_counter()
+    # (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_sequential(
+    #     cam_data,
+    #     elem_raster_coords,
+    #     elem_bound_box_inds,
+    #     elem_areas,
+    #     field_frame_divide_z)
+    # time_end_loop = time.perf_counter()
+    # time_seq_loop = time_end_loop - time_start_loop
+
+    # time_start_loop = time.perf_counter()
+    # (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop(
+    #     cam_data,
+    #     elem_raster_coords,
+    #     elem_bound_box_inds,
+    #     elem_areas,
+    #     field_frame_divide_z)
+    # time_end_loop = time.perf_counter()
+    # time_sep_loop = time_end_loop - time_start_loop
+
+    # time_start_loop = time.perf_counter()
+    # (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_parallel(
+    #     cam_data,
+    #     elem_raster_coords,
+    #     elem_bound_box_inds,
+    #     elem_areas,
+    #     field_frame_divide_z,
+    #     num_para=8)
+    # time_end_loop = time.perf_counter()
+    # time_par_loop = time_end_loop - time_start_loop
+
 
     time_start_loop = time.perf_counter()
-    (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop(
-        cam_data,
-        elem_raster_coords,
-        elem_bound_box_inds,
-        elem_areas,
-        field_frame_divide_z)
-    time_end_loop = time.perf_counter()
-    time_sep_loop = time_end_loop - time_start_loop
-
-    time_start_loop = time.perf_counter()
-    (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_parallel(
-        cam_data,
-        elem_raster_coords,
-        elem_bound_box_inds,
-        elem_areas,
-        field_frame_divide_z,
-        num_para=8)
-    time_end_loop = time.perf_counter()
-    time_par_loop = time_end_loop - time_start_loop
-
-    time_start_loop = time.perf_counter()
-    image_buffer, depth_buffer = cython_interface.cpp_raster(
+    image_buffer, depth_buffer = cython_interface.call_raster_gpu(
         cam_data.sub_samp, 
         elem_raster_coords,
         elem_bound_box_inds,
@@ -742,21 +743,22 @@ def main() -> None:
     time_end_loop = time.perf_counter()
     time_cpp_loop = time_end_loop - time_start_loop
 
-    print()
+    # print()
+    # print(80*"=")
+    # print("RASTER LOOP END")
+    # print(80*"=")
+    # print()
+    # print(80*"=")
+    # print("PERFORMANCE TIMERS")
+    # print(f"Total elements:    {connectivity.shape[1]}")
+    # print(f"Elements in image: {num_elems_in_image}")
+    # print()
+    # print(f"Setup time = {time_end_setup-time_start_setup} seconds")
+    # print(f"Seq. Loop time  = {time_seq_loop} seconds")
+    # print(f"Sep. Loop time  = {time_sep_loop} seconds")
+    # print(f"Par. Loop time  = {time_par_loop} seconds")
     print(80*"=")
-    print("RASTER LOOP END")
-    print(80*"=")
-    print()
-    print(80*"=")
-    print("PERFORMANCE TIMERS")
-    print(f"Total elements:    {connectivity.shape[1]}")
-    print(f"Elements in image: {num_elems_in_image}")
-    print()
-    print(f"Setup time = {time_end_setup-time_start_setup} seconds")
-    print(f"Seq. Loop time  = {time_seq_loop} seconds")
-    print(f"Sep. Loop time  = {time_sep_loop} seconds")
-    print(f"Par. Loop time  = {time_par_loop} seconds")
-    print(f"C++. Loop time  = {time_cpp_loop} seconds")
+    print(f"Total Cuda/C++ Loop time  = {time_cpp_loop} seconds")
     print(80*"=")
 
     #===========================================================================
@@ -787,7 +789,7 @@ def main() -> None:
 
     #===========================================================================
     # PLOTTING
-    plot_on = True
+    plot_on = False
     depth_to_plot = np.copy(depth_buffer)
     depth_to_plot[depth_buffer > 10*cam_data.image_dist] = np.NaN
     image_to_plot = np.copy(image_buffer)

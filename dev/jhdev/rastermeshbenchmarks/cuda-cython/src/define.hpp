@@ -1,0 +1,2 @@
+#define CUDA_CALL(x) do { if((x) != cudaSuccess) { printf("Error at %s:%d\n",__FILE__,__LINE__); exit(EXIT_FAILURE);}} while(0)
+#define INFO_OUT(a,b) std::cout.width(75); std::cout << std::left << a; std::cout << b << std::endl;
