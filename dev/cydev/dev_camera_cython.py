@@ -173,51 +173,35 @@ def main() -> None:
     print("RASTER ELEMENT LOOP START")
     print(80*"=")
 
-    num_loops = 1
+    num_loops = 5
     loop_times = np.zeros((num_loops,),dtype=np.float64)
-    loop_times_buffer = np.zeros((num_loops,),dtype=np.float64)
 
     print()
     print("Running buffered raster loop.")
     for nn in range(num_loops):
         print(f"Running loop {nn}")
         loop_start = time.perf_counter()
-        (image_buffer_wbuff,
-        depth_buffer_wbuff) = camerac.raster_loop_buff(field_to_render,
+        (image_subpx_buffer,
+         depth_subpx_buffer) = camerac.raster_loop(field_to_render,
                                                 elem_world_coords,
                                                 cam_data.world_to_cam_mat,
                                                 cam_data.num_pixels,
                                                 cam_data.image_dims,
                                                 cam_data.image_dist,
                                                 cam_data.sub_samp)
-        loop_times_buffer[nn] = time.perf_counter() - loop_start
-
-    print("Running non-buffered raster loop.")
-    for nn in range(num_loops):
-        print(f"Running loop {nn}")
-        loop_start = time.perf_counter()
-        (image_buffer_nobuff,
-        depth_buffer_nobuff) = camerac.raster_loop_nobuff(field_to_render,
-                                                    elem_world_coords,
-                                                    cam_data.world_to_cam_mat,
-                                                    cam_data.num_pixels,
-                                                    cam_data.image_dims,
-                                                    cam_data.image_dist,
-                                                    cam_data.sub_samp)
         loop_times[nn] = time.perf_counter() - loop_start
 
 
     avg_start = time.perf_counter()
     image_avg_buffer = np.empty(cam_data.num_pixels,dtype=np.float64).T
     depth_avg_buffer = np.empty(cam_data.num_pixels,dtype=np.float64).T
-    image_buffer = camerac.average_image(image_buffer_wbuff,
+    image_buffer = camerac.average_image(image_subpx_buffer,
                                          cam_data.sub_samp,
                                          image_avg_buffer)
-    depth_buffer = camerac.average_image(depth_buffer_wbuff,
+    depth_buffer = camerac.average_image(depth_subpx_buffer,
                                          cam_data.sub_samp,
                                          depth_avg_buffer)
     avg_time = time.perf_counter() - avg_start
-
 
 
     print()
@@ -227,9 +211,8 @@ def main() -> None:
     print()
     print(80*"=")
     print("PERFORMANCE TIMERS")
-    print(f"Loop (no buffer) time = {np.mean(loop_times)} seconds")
-    print(f"Loop (with buffer) time = {np.mean(loop_times_buffer)} seconds")
-    print(f"Subpx avg. time = {avg_time} seconds")
+    print(f"Avg. loop time = {np.mean(loop_times):.4f} seconds")
+    print(f"Subpx avg. time = {avg_time:.6f} seconds")
     print(80*"=")
 
     #===========================================================================
