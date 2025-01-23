@@ -32,7 +32,7 @@ These parameters can be altered to accurately reflect the experimental setup bei
 A set of images of an object with a speckle pattern applied, undergoing rigid body motion were produced. 
 In-plane rigid body motion between 0 and 1 pixel was applied to the object, and it was imaged.
 
-![Example rigid body motion image](/home/lorna/pyvale/dev/lsdev/rendered_images/RBM_x/rigid_body_motion_x_9.tiff)
+![Example rigid body motion image](./rendered_images/RBM_x/rigid_body_motion_x_9.tiff)
 *An example rigid body motion image*
 
 These images were run through MatchID to compare the MatchID calculated displacement with the imposed displacement  
@@ -57,13 +57,13 @@ The displacements calculated from a MOOSE simulation were taken from the SimData
 
 The ray tracing render engine Cycles was used to render the images.  
 
-![Example deformation image](/home/lorna/pyvale/dev/lsdev/rendered_images/case23_deformed_cycles/def_sim_data_10.tiff)
+![Example deformation image](./rendered_images/case23_deformed_cycles/def_sim_data_10.tiff)
 *An example deformed image*  
 
 These images were run through MatchID to compare the calculated displacements to those imposed on the part.  
 The initial image was also run through an image deformation with the simulation, to make the comparison more accurate to the use of Blender as opposed MatchID's introduction of error.  
 
-![Example image deformation image](/home/lorna/pyvale/src/pyvale/simcases/deformed_images/defimage_0010.tiff)
+![Example image deformation image](./rendered_images/case23_image_deformation/defimage_0010.tiff)
 *An example image deformation image*  
 
 #### Comparison of displacements
