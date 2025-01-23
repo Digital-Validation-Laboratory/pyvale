@@ -158,14 +158,23 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # SPLIT ELEMENT COORDS
+    n_reps = 1
 
     # shape=(coord[X,Y,Z,W],node_per_elem,elem_num)
     elem_world_coords = coords_world[:,connectivity]
     # shape=(nodes_per_elem,coord[X,Y,Z,W],elem_num)
-    elem_world_coords = np.swapaxes(elem_world_coords,0,1)
+    elem_world_coords = np.ascontiguousarray(np.swapaxes(elem_world_coords,0,1))
 
     # shape(nodes_per_elem,elem_num)
     field_to_render = np.ascontiguousarray(field_array[connectivity,frame_to_render])
+
+    # Repeat to increase computational work
+    elem_world_coords = np.repeat(elem_world_coords,n_reps,axis=2)
+    field_to_render = np.repeat(field_to_render,n_reps,axis=1)
+
+    print()
+    print(f"{elem_world_coords.shape}")
+    print(f"{field_to_render.shape}")
 
     #---------------------------------------------------------------------------
     print()
@@ -173,7 +182,7 @@ def main() -> None:
     print("RASTER ELEMENT LOOP START")
     print(80*"=")
 
-    num_loops = 5
+    num_loops = 1
     loop_times = np.zeros((num_loops,),dtype=np.float64)
 
     print()
