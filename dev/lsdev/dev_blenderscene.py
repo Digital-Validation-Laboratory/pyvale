@@ -43,18 +43,13 @@ class BlenderScene:
 
         return camera
 
-    def add_simdata_part(self, sim_data):
-        partmaker = BlenderPart(sim_data=sim_data)
-        part = partmaker.simdata_to_part()
-        return part
-
-
-    def add_stl_part(self, filename:str | None = None, sim_data: SimData | None = None):
+    def add_part(self, filename:str | None = None, sim_data: SimData | None = None):
+        # TODO: Change outputs of method to have more under hood
         partmaker = BlenderPart(filename=filename, sim_data=sim_data)
         spat_dim = partmaker._get_spat_dim()
         components = partmaker._get_components()
-        pv_surf = partmaker._simdata_to_pvsurf(components, spat_dim)
-        part = partmaker.import_from_stl(pv_surf)
+        pv_surf, pv_grid = partmaker._simdata_to_pvsurf(components, spat_dim)
+        part = partmaker.import_from_obj(pv_surf)
         set_origin(part)
         return part, pv_surf, spat_dim, components
 
