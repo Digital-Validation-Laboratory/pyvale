@@ -191,7 +191,7 @@ def main() -> None:
         print(f"Running loop {nn}")
         loop_start = time.perf_counter()
         (image_subpx_buffer,
-         depth_subpx_buffer) = camerac.raster_loop(field_to_render,
+         depth_subpx_buffer) = camerac.raster_loop_para(field_to_render,
                                                 elem_world_coords,
                                                 cam_data.world_to_cam_mat,
                                                 cam_data.num_pixels,
@@ -212,11 +212,6 @@ def main() -> None:
                                          depth_avg_buffer)
     avg_time = time.perf_counter() - avg_start
 
-
-    print()
-    print(80*"=")
-    print("RASTER LOOP END")
-    print(80*"=")
     print()
     print(80*"=")
     print("PERFORMANCE TIMERS")
@@ -226,7 +221,7 @@ def main() -> None:
 
     #===========================================================================
     # PLOTTING
-    plot_on = True
+    plot_on = False
     depth_to_plot = np.copy(depth_buffer)
     depth_to_plot[depth_buffer > 10*cam_data.image_dist] = np.NaN
     image_to_plot = np.copy(image_buffer)
