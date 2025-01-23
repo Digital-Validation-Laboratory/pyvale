@@ -82,13 +82,13 @@ class BlenderPart:
         return components
 
     def _simdata_to_pvsurf(self, components, spat_dim):
+        # TODO: Add flag for triangulating mesh
         self.sim_data.coords = self.sim_data.coords * 1000
         (pv_grid, pv_grid_vis) = pyvale.conv_simdata_to_pyvista(self.sim_data,
                                                                 components,
                                                                 spat_dim=spat_dim)
         pv_surf = pv_grid.extract_surface()
         # tri_surf = pv_surf.triangulate()
-        # tri_surf.plot(show_edges=True, line_width=2)
 
         return pv_surf, pv_grid
 
@@ -97,7 +97,7 @@ class BlenderPart:
         save_path = Path().cwd() / "test_output"
         if not save_path.is_dir():
             save_path.mkdir()
-        name = "test_mesh.obj" #Filetype changed
+        name = "test_mesh.obj"
         save_file = save_path / name
 
         all_files = os.listdir(save_path)
@@ -111,9 +111,9 @@ class BlenderPart:
 
     def import_from_obj(self, pv_surf = None):
         if self.filename is None:
-            self._pv_surf_to_stl(pv_surf)
+            self._pv_surf_to_obj(pv_surf)
 
-        bpy.ops.wm.obj_import(filepath=self.filename) #Changed filetype
+        bpy.ops.wm.obj_import(filepath=self.filename)
 
         part = bpy.context.selected_objects[0]
         return part

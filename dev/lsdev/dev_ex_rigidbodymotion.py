@@ -15,12 +15,12 @@ from dev_rigidbodymotion import RigidBodyMotion
 
 def main() -> None:
     # Making Blender scene
-    data_path = Path('src/data/case13_out.e')
+    data_path = Path('src/pyvale/simcases/case23_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
     dir = Path.cwd() / 'dev/lsdev/blender_files'
-    filename = 'case13.blend'
+    filename = 'case23.blend'
     filepath = dir / filename
     all_files = os.listdir(dir)
     for ff in all_files:
@@ -32,16 +32,20 @@ def main() -> None:
     scene = BlenderScene()
 
     part_location = (0, 0, 0)
-    part = scene.add_part(sim_data)
+    angle = np.radians(90)
+    part_rotation = (0, 0, angle)
+
+    part, pv_surf, spat_dim, components = scene.add_part(sim_data=sim_data)
     scene.set_part_location(part, part_location)
+    scene.set_part_rotation(part, part_rotation)
 
     mat_data = MaterialData()
     image_path = '/home/lorna/speckle_generator/images/blender_image_texture_rad2.tiff'
     mat = scene.add_material(mat_data, part, image_path)
 
     sensor_px = (2464, 2056)
-    cam_position = (0, 0, 200)
-    focal_length = 15.0
+    cam_position = (0, 0, 600)
+    focal_length = 25.0
     cam_data = CameraData(sensor_px=sensor_px,
                           position=cam_position,
                           focal_length=focal_length)
@@ -59,13 +63,13 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # Rendering images
-    image_path = Path.cwd() / 'dev/lsdev/rendered_images/RBM_z'
-    output_path = Path.cwd() / 'dev/lsdev/rendered_images'
+    image_path = Path.cwd() / 'dev/lsdev/rendered_images/RBM_x'
+    output_path = image_path / 'RBM-x.txt'
 
-    step = 0.5
-    z_lims = [0, 5]
+    step = 0.07935 / 10
+    x_lims = [0, 0.07935]
     rigidbodymotion = RigidBodyMotion(part, step, part_location, image_path, output_path, cam_data)
-    rigidbodymotion.rigid_body_motion_z(z_lims)
+    rigidbodymotion.rigid_body_motion_x(x_lims, part)
 
 if __name__ == "__main__":
     main()

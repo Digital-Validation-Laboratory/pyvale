@@ -22,56 +22,9 @@ class DeformMesh:
                 dim += 1
             deformed_nodes = nodes + added_disp
             deformed_nodes = centre_nodes(deformed_nodes)
-            added_disp = centre_nodes(added_disp)
-            return deformed_nodes, added_disp
-        else:
-            return None
-
-class DeformSimData:
-    """Class to test old way of deforming mesh - only for 2D mesh
-    """    
-    def __init__(self, sim_data: SimData):
-        self.sim_data = sim_data
-
-    def _get_nodes(self):
-        mesh_builder = BlenderPart(self.sim_data)
-        nodes = mesh_builder._get_nodes()
-        return nodes
-
-    def _get_node_vars(self):
-        node_vars = self.sim_data.node_vars
-        node_vars_names = list(node_vars.keys())
-        return node_vars_names
-
-    def _check_for_displacements(self, node_var_names: list):
-        disp = {'disp_x': False, 'disp_y': False, 'disp_z': False}
-
-        if 'disp_x' in node_var_names:
-            disp['disp_x'] = True
-        if 'disp_y' in node_var_names:
-            disp['disp_y'] = True
-        if 'disp_z' in node_var_names:
-            disp['disp_z'] = True
-
-        return disp
-
-    def add_displacement(self, timestep: int, nodes):
-        nodes = nodes
-        node_var_names = self._get_node_vars()
-        disps = self._check_for_displacements(node_var_names)
-        if True in disps.values():
-            deformed_nodes = nodes
-            dim = 0
-            for disp, value in disps.items():
-                if value is True:
-                    added_disp = self.sim_data.node_vars[disp][:, timestep]
-                    node_dim = nodes[:, dim]
-                    deformed_nodes[:, dim] = node_dim + added_disp
-                    dim += 1
             return deformed_nodes
         else:
             return None
-
 
 
 class DeformPart:

@@ -32,7 +32,7 @@ class RigidBodyMotion:
             render.render_image(render_name, render_counter)
             render_counter += 1
 
-    def rigid_body_motion_x(self, x_lims: tuple):
+    def rigid_body_motion_x(self, x_lims: tuple, part):
         min_x = x_lims[0]
         max_x = x_lims[1]
 
@@ -52,5 +52,5 @@ class RigidBodyMotion:
 
             print(f"{self.part.location=}")
 
-            render.render_image(render_name, render_counter)
+            render.render_image(render_name, render_counter, part)
             render_counter += 1
