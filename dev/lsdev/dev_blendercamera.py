@@ -42,6 +42,7 @@ class CameraBlender():
                   / self.camera_data.focal_length) *
                   (self.camera_data.px_size / 1000) *
                   self.camera_data.sensor_px[0])
+        print("mm-pixel conversion = " + str(FOV_mm / self.camera_data.sensor_px[0]) + " mm/pixel")
         half_FOV_mm = FOV_mm / 2
         half_FOV_rad = m.atan(half_FOV_mm / working_dist)
         FOV_deg = m.degrees(half_FOV_rad) * 2
