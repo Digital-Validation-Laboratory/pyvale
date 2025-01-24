@@ -18,7 +18,7 @@ class DeformMesh:
             dim = 0
             for component in self.components:
                 added_disp_1d = self.pv_surf.get_array(component)[:, timestep]
-                added_disp[:, dim] = added_disp_1d
+                added_disp[:, dim] = added_disp_1d * 1000
                 dim += 1
             deformed_nodes = nodes + added_disp
             deformed_nodes = centre_nodes(deformed_nodes)

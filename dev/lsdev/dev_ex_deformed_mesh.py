@@ -10,16 +10,16 @@ from dev_blendercamera import CameraData
 from dev_lightingblender import LightData, LightType
 from dev_objectmaterial import MaterialData
 from dev_render import RenderData, Render, RenderEngine
-from dev_deform_part import DeformMesh, DeformPart, DeformSimData
+from dev_deform_part import DeformMesh, DeformPart
 
 def main() -> None:
     # Making Blender scene
-    data_path = Path('src/pyvale/simcases/case23_out.e')
+    data_path = Path('src/pyvale/data/case18_1_out.e')
     data_reader = mh.ExodusReader(data_path)
     sim_data = data_reader.read_all_sim_data()
 
     dir = Path.cwd() / 'dev/lsdev/blender_files'
-    name = 'case_23_deformed' # Give this better name
+    name = 'case_18_deformed' # Give this better name
     filename = name + '.blend'
     filepath = dir / filename
     all_files = os.listdir(dir)
@@ -33,22 +33,19 @@ def main() -> None:
 
     part_location = (0, 0, 0)
     angle = np.radians(90)
-    part_rotation = (0, 0, angle)
+    part_rotation = (0, 0, 0)
 
     part, pv_surf, spat_dim, components = scene.add_part(sim_data=sim_data)
     scene.set_part_location(part, part_location)
     scene.set_part_rotation(part, part_rotation)
 
-    # Getting simulation displacements
-    disp = pv_surf.get_array('disp_x')
-    print(f"{np.average(disp, axis=0)=}")
 
     mat_data = MaterialData()
-    image_path = '/home/lorna/speckle_generator/images/blender_image_texture.tiff'
+    image_path = '/home/lorna/speckle_generator/images/blender_image_texture_rad2.tiff'
     mat = scene.add_material(mat_data, part, image_path)
 
     sensor_px = (2452, 2056)
-    cam_position = (0, 0, 600)
+    cam_position = (0, 0, 350)
     focal_length = 25
     cam_data = CameraData(sensor_px=sensor_px,
                           position=cam_position,
@@ -68,7 +65,7 @@ def main() -> None:
     #---------------------------------------------------------------------------
     # Rendering images
     render_start_time = time.perf_counter()
-    image_path = Path.cwd() / 'dev/lsdev/rendered_images/case23_deformed_cycles2'
+    image_path = Path.cwd() / 'dev/lsdev/rendered_images/case18_deformed'
     output_path = str(image_path) + '/' + name +'_report.txt'
 
 
@@ -81,7 +78,7 @@ def main() -> None:
     render_counter = 0
     render_name = 'ref_image'
 
-    # render.render_image(render_name, render_counter, part)
+    render.render_image(render_name, render_counter, part)
 
     #---------------------------------------------------------------------------
     # Deform mesh
@@ -89,20 +86,21 @@ def main() -> None:
     meshdeformer = DeformMesh(pv_surf, spat_dim, components)
     nodes = centre_nodes(pv_surf.points)
 
-    for timestep in range((timesteps - 1)):
-        timestep += 1 # Adding at start of loop as timestep = 0 is the original mesh
+
+    for timestep in range(1, timesteps):
         deformed_nodes = meshdeformer.add_displacement(timestep, nodes)
-        nodes = deformed_nodes
 
         if deformed_nodes is not None:
             partdeformer = DeformPart(part, deformed_nodes)
             part = partdeformer.deform_part()
+            partdeformer.set_new_frame()
             print(f"{timestep=}")
             print(f"{part.dimensions=}")
-            partdeformer.set_new_frame()
 
             render_name = 'def_sim_data'
-            # render.render_image(render_name, timestep, part)
+            render.render_image(render_name, timestep, part)
+            timestep += 1 # Adding at start of loop as timestep = 0 is the original mesh
+
 
     render_end_time = time.perf_counter()
     time_render = render_end_time - render_start_time
