@@ -19,6 +19,7 @@ class CameraData:
     p2 : float | None = 0.0
     c0 : float | None = None
     c1 : float | None = None
+    part_dimension: np.ndarray | None = None
 
 
 class CameraBlender():
@@ -54,7 +55,10 @@ class CameraBlender():
         camera = bpy.data.objects.new('Camera', new_cam)
         bpy.context.collection.objects.link(camera)
 
-        camera.location = self.camera_data.position
+
+        camera.location = (self.camera_data.part_dimension[0]/2 + self.camera_data.position[0],
+                           self.camera_data.part_dimension[1]/2 + self.camera_data.position[1],
+                           self.camera_data.position[2])
         camera.rotation_mode = 'XYZ' # TODO: Make this a variable with diff options
         camera.rotation_euler = self.camera_data.orientation
 

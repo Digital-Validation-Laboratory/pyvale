@@ -15,6 +15,7 @@ class LightData():
     position: np.ndarray | None = (0, 0, 10)
     orientation: np.ndarray | None = (0, 0, 0)
     energy: int | None = 10
+    part_dimension: np.ndarray | None = None
 
 
 class BlenderLight():
@@ -32,7 +33,9 @@ class BlenderLight():
         bpy.context.collection.objects.link(self._light_ob)
 
     def _set_location(self):
-        self._light_ob.location = self.light_data.position
+        self._light_ob.location = (self.light_data.part_dimension[0]/2 + self.light_data.position[0],
+                                   self.light_data.part_dimension[1]/2 + self.light_data.position[1],
+                                   self.light_data.position[2])
 
     def _set_rotation(self):
         self._light_ob.rotation_mode = 'XYZ'

@@ -50,7 +50,7 @@ class BlenderScene:
         components = partmaker._get_components()
         pv_surf, pv_grid = partmaker._simdata_to_pvsurf(components, spat_dim)
         part = partmaker.import_from_obj(pv_surf)
-        set_origin(part)
+        # set_origin(part)
         return part, pv_surf, spat_dim, components
 
 
