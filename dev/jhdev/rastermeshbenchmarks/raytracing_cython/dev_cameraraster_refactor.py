@@ -19,7 +19,8 @@ import mooseherder as mh
 import pyvale
 
 ### cython ###
-import cython_interface
+# import cython_interface
+from icecream import ic
 
 @dataclass(slots=True)
 class CameraRasterData:
@@ -34,7 +35,7 @@ class CameraRasterData:
     focal_length: float = 50.0
     sub_samp: int = 2
 
-    back_face_removal: bool = True
+    back_face_removal: bool = False
 
     sensor_size: np.ndarray = field(init=False)
     image_dims: np.ndarray = field(init=False)
@@ -102,16 +103,23 @@ class Rasteriser:
 
         # Convert world coords of all elements in the scene
         # shape=(coord[X,Y,Z],num_nodes)
+        ic(1,coords_world.shape)
         coords_raster = Rasteriser.world_to_raster_coords(cam_data,coords_world)
+        ic(coords_raster.shape)
 
         # Convert to perspective correct hyperbolic interpolation for z interp
         # shape=(coord[X,Y,Z],num_nodes)
         coords_raster[zz,:] = 1/coords_raster[zz,:]
+        ic(coords_raster.shape)
 
         # shape=(coord[X,Y,Z],node_per_elem,elem_num)
         elem_raster_coords = coords_raster[:,connectivity]
+        ic(connectivity.shape)
+        ic(elem_raster_coords.shape)
+
         # shape=(nodes_per_elem,coord[X,Y,Z],elem_num)
         elem_raster_coords = np.swapaxes(elem_raster_coords,0,1)
+        ic(elem_raster_coords.shape)
 
         # NOTE: we have already inverted the raster z coordinate above so to divide
         # by z here we need to multiply
@@ -221,6 +229,7 @@ class Rasteriser:
                                                       coords_world,
                                                       connectivity,
                                                       field_data)
+        ic(1,elem_raster_coords.shape)
 
         #-----------------------------------------------------------------------
         # BACKFACE REMOVAL
@@ -231,8 +240,11 @@ class Rasteriser:
         # Mask and remove w coord
         # shape=(nodes_per_elem,coord[X,Y,Z,W],num_elems_in_scene)
         elem_raster_coords = elem_raster_coords[:,:,back_face_mask]
+
+
         # shape=(nodes_per_elem,num_elems_in_scene,num_time_steps)
         field_divide_z = field_divide_z[:,back_face_mask,:]
+        ic(2,elem_raster_coords.shape)
 
         #-----------------------------------------------------------------------
         # CROPPING & BOUNDING BOX OPERATIONS
@@ -670,7 +682,6 @@ def main() -> None:
                                   imaging_rad])
         cam_rot = Rotation.from_euler("zyx", [psi_z_degs, 0, 0], degrees=True)
 
-    #---------------------------------------------------------------------------
     # RASTERISATION START
     cam_data = CameraRasterData(num_pixels=cam_num_px,
                                 pixel_size=pixel_size,
@@ -687,105 +698,52 @@ def main() -> None:
                                               coords_world,
                                               connectivity,
                                               field_scalar)
-
+    ic(elem_raster_coords.shape)
     # We only need to loop over elements and slice out and process the bound box
     frame = -1  # render the last frame
     field_frame_divide_z = field_divide_z[:,:,frame]
 
-    time_end_setup = time.perf_counter()
+
 
     #---------------------------------------------------------------------------
     # RASTER LOOP START
     print()
     print(80*"=")
-    print("RASTER ELEMENT LOOP START")
+    print("RAYTRACE START")
     print(80*"=")
 
-    # time_start_loop = time.perf_counter()
-    # (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_sequential(
-    #     cam_data,
-    #     elem_raster_coords,
-    #     elem_bound_box_inds,
-    #     elem_areas,
-    #     field_frame_divide_z)
-    # time_end_loop = time.perf_counter()
-    # time_seq_loop = time_end_loop - time_start_loop
+    print(cam_pos_world)
+    print(cam_rot.as_matrix())
+    print(cam_num_px)
+    ic(coords_world)
+    ic(coords_world.shape)
+    test=coords_world[0:3,connectivity]
+    ic(test.shape)
 
-    # time_start_loop = time.perf_counter()
-    # (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop(
-    #     cam_data,
-    #     elem_raster_coords,
-    #     elem_bound_box_inds,
-    #     elem_areas,
-    #     field_frame_divide_z)
-    # time_end_loop = time.perf_counter()
-    # time_sep_loop = time_end_loop - time_start_loop
 
-    # time_start_loop = time.perf_counter()
-    # (image_buffer,depth_buffer,num_elems_in_image) = Rasteriser.raster_loop_parallel(
-    #     cam_data,
-    #     elem_raster_coords,
-    #     elem_bound_box_inds,
-    #     elem_areas,
-    #     field_frame_divide_z,
-    #     num_para=8)
-    # time_end_loop = time.perf_counter()
-    # time_par_loop = time_end_loop - time_start_loop
-
+    #inverse rotation matrix for world coordinates
+    cam_rot_inv = np.linalg.inv(cam_rot.as_matrix())
 
     time_start_loop = time.perf_counter()
-    image_buffer, depth_buffer = cython_interface.call_raster_gpu(
-        cam_data.sub_samp, 
-        elem_raster_coords,
-        elem_bound_box_inds,
-        elem_areas,
-        np.ascontiguousarray(field_frame_divide_z))    
+    image_buffer, depth_buffer = cython_interface.cpp_raytrace(
+        cam_pos_world,
+        cam_rot,
+        coords_world[0:3,:])  
     time_end_loop = time.perf_counter()
     time_cpp_loop = time_end_loop - time_start_loop
 
-    # print()
-    # print(80*"=")
-    # print("RASTER LOOP END")
-    # print(80*"=")
-    # print()
-    # print(80*"=")
-    # print("PERFORMANCE TIMERS")
-    # print(f"Total elements:    {connectivity.shape[1]}")
-    # print(f"Elements in image: {num_elems_in_image}")
-    # print()
-    # print(f"Setup time = {time_end_setup-time_start_setup} seconds")
-    # print(f"Seq. Loop time  = {time_seq_loop} seconds")
-    # print(f"Sep. Loop time  = {time_sep_loop} seconds")
-    # print(f"Par. Loop time  = {time_par_loop} seconds")
+    print()
     print(80*"=")
-    print(f"Total Cuda/C++ Loop time  = {time_cpp_loop} seconds")
+    print("RASTER LOOP END")
     print(80*"=")
-
-    #===========================================================================
-    # REGRESSION TESTING FOR REFACTOR
-    save_regression_test_arrays = False
-    check_regression_test_arrays = False
-
-    test_path = Path.cwd() / "tests" / "regression"
-    test_image = test_path / "image_buffer.npy"
-    test_depth = test_path / "depth_buffer.npy"
-
-    if save_regression_test_arrays:
-        np.save(test_image,image_buffer)
-        np.save(test_depth,depth_buffer)
-
-    if check_regression_test_arrays:
-        check_image = np.load(test_image)
-        check_depth = np.load(test_depth)
-
-        print(80*"/")
-        print("REGRESSION TEST:")
-        print(f"Image buffer check: {np.allclose(image_buffer,check_image)}")
-        print(f"Depth buffer check: {np.allclose(depth_buffer,check_depth)}")
-        print(80*"/")
-
-        assert np.allclose(image_buffer,check_image), "Image buffer regression test FAILURE."
-        assert np.allclose(depth_buffer,check_depth), "Depth buffer regression test FAILURE."
+    print()
+    print(80*"=")
+    print("PERFORMANCE TIMERS")
+    print(f"Total elements:    {connectivity.shape[1]}")
+    print()
+    print(f"Setup time = {time_end_setup-time_start_setup} seconds")
+    print(f"C++. Loop time  = {time_cpp_loop} seconds")
+    print(80*"=")
 
     #===========================================================================
     # PLOTTING

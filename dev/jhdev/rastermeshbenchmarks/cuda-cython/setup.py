@@ -21,11 +21,7 @@ def find_in_path(name, path):
 def locate_cuda():
     """Locate the CUDA environment on the system
 
-    Returns a dict with keys 'home', 'nvcc', 'include', and 'lib64'
-    and values giving the absolute path to each directory.
-
-    Starts by looking for the CUDAHOME env variable. If not found,
-    everything is based on finding 'nvcc' in the PATH.
+    Returns a dict with keys 'home', 'nvcc', 'include', and 'lib64' and values giving the absolute path to each directory. Starts by looking for the CUDAHOME env variable. If not found, 1everything is based on finding 'nvcc' in the PATH.
     """
 
     # First check if the CUDAHOME env variable is in use
@@ -36,9 +32,7 @@ def locate_cuda():
         # Otherwise, search the PATH for NVCC
         nvcc = find_in_path('nvcc', os.environ['PATH'])
         if nvcc is None:
-            raise EnvironmentError('The nvcc binary could not be '
-                'located in your $PATH. Either add it to your path, '
-                'or set $CUDAHOME')
+            raise EnvironmentError('The nvcc binary could not be located in your $PATH. Either add it to your path, or set $CUDAHOME')
         home = os.path.dirname(os.path.dirname(nvcc))
 
     cudaconfig = {'home': home, 'nvcc': nvcc,
@@ -52,8 +46,7 @@ def locate_cuda():
     return cudaconfig
 
 def customize_compiler_for_nvcc(self):
-    """Inject deep into distutils to customize how the dispatch
-    to gcc/nvcc works.
+    """Inject deep into distutils to customize how the dispatch to gcc/nvcc works.
 
     If you subclass UnixCCompiler, it's not trivial to get your subclass
     injected in, and still have the right customizations (i.e.
@@ -105,15 +98,12 @@ ext = Extension('cython_interface',
         language="c++",
         libraries=["cudart"], 
         runtime_library_dirs = [CUDA['lib64'], np.get_include()],
-        # This syntax is specific to this build system
-        # we're only going to use certain compiler args with nvcc
-        # and not with gcc the implementation of this trick is in
-        # customize_compiler()
+        # This syntax is specific to this build system. we're only going to use certain compiler args with nvcc and not with gcc the implementation of this trick is in
         extra_compile_args= {
             'gcc': ['-O3'],
             'nvcc': [
                 '--ptxas-options=-v', '-c',
-                '--compiler-options', "'-fPIC'", '-O3'
+                '--compiler-options', "'-fPIC'", '-O3',
                 ]
             },
             include_dirs = [np.get_include(), CUDA['include']]
