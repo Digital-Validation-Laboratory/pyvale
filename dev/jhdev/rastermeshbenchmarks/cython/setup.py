@@ -5,10 +5,10 @@ import numpy as np
 extensions = [
     Extension(
         name="cython_interface",
-        sources=["dev/jhdev/rastermeshbenchmarks/cython/cython_interface.pyx"],
+        sources=["/home/kc4736/ukaea/pyvale/dev/jhdev/rastermeshbenchmarks/cython/cython_interface.pyx"],
         language="c++",
         extra_compile_args=["-std=c++11", "-O3", "-Wunused-variable"],
-        include_dirs=["./.venv/lib/python3.11/site-packages/numpy/core/include/"],
+        include_dirs=[np.get_include()],
     )
 ]
 

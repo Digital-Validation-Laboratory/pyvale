@@ -19,7 +19,7 @@ import mooseherder as mh
 import pyvale
 
 ### cython ###
-# import cython_interface
+import cython_interface
 from icecream import ic
 
 @dataclass(slots=True)
@@ -105,17 +105,16 @@ class Rasteriser:
         # shape=(coord[X,Y,Z],num_nodes)
         ic(1,coords_world.shape)
         coords_raster = Rasteriser.world_to_raster_coords(cam_data,coords_world)
-        ic(coords_raster.shape)
+        ic(1,coords_raster.shape)
 
         # Convert to perspective correct hyperbolic interpolation for z interp
         # shape=(coord[X,Y,Z],num_nodes)
         coords_raster[zz,:] = 1/coords_raster[zz,:]
-        ic(coords_raster.shape)
 
         # shape=(coord[X,Y,Z],node_per_elem,elem_num)
         elem_raster_coords = coords_raster[:,connectivity]
-        ic(connectivity.shape)
-        ic(elem_raster_coords.shape)
+        ic(1,connectivity.shape)
+        ic(1,elem_raster_coords.shape)
 
         # shape=(nodes_per_elem,coord[X,Y,Z],elem_num)
         elem_raster_coords = np.swapaxes(elem_raster_coords,0,1)
@@ -221,8 +220,8 @@ class Rasteriser:
     def raster_setup(cam_data: CameraRasterData,
                      coords_world: np.ndarray,
                      connectivity: np.ndarray,
-                     field_data: np.ndarray
-                     ) -> tuple[np.ndarray,np.ndarray,np.ndarray,np.ndarray]:
+                     field_data: np.ndarray,
+                     ) -> tuple[np.ndarray,np.ndarray,np.ndarray,np.ndarray,np.ndarray]:
 
         (elem_raster_coords,field_divide_z) = \
             Rasteriser.create_transformed_elem_arrays(cam_data,
@@ -239,7 +238,19 @@ class Rasteriser:
                                                         connectivity)
         # Mask and remove w coord
         # shape=(nodes_per_elem,coord[X,Y,Z,W],num_elems_in_scene)
+        
+        ic(3, elem_raster_coords.shape)
+        ic(3, coords_world.shape)
+
         elem_raster_coords = elem_raster_coords[:,:,back_face_mask]
+
+
+        # sorting coords_world for raytracer
+        coords_world = coords_world[:,connectivity]
+        coords_world = np.swapaxes(coords_world,0,1)
+        coords_world = coords_world[:,:,back_face_mask]
+        coords_world = coords_world[:,:-1,:]
+        ic(1,coords_world.shape)
 
 
         # shape=(nodes_per_elem,num_elems_in_scene,num_time_steps)
@@ -252,9 +263,15 @@ class Rasteriser:
             cam_data,
             elem_raster_coords
         )
+
+        ic(4,elem_raster_coords.shape)
+        ic(crop_mask.shape)
         # Apply crop using mask and remove w coord
         # shape=(nodes_per_elem,coord[X,Y,Z],num_elems_in_scene)
+
         elem_raster_coords = elem_raster_coords[:,:-1,crop_mask]
+        ic(5,elem_raster_coords.shape)
+        
         num_elems_in_image = elem_raster_coords.shape[-1]
         # shape=(nodes_per_elem,num_elems_in_scene,num_time_steps)
         field_divide_z = field_divide_z[:,crop_mask,:]
@@ -268,7 +285,7 @@ class Rasteriser:
         return (elem_raster_coords,
                 elem_bound_box_inds,
                 elem_areas,
-                field_divide_z)
+                field_divide_z, coords_world)
 
 
     @staticmethod
@@ -690,11 +707,16 @@ def main() -> None:
                                 roi_center_world=roi_pos_world,
                                 focal_length=focal_leng,
                                 sub_samp=sub_samp)
+    
+    ic(cam_data.image_dist)
+    ic(cam_data.sensor_size)
+    ic(cam_data.image_dims)
 
     (elem_raster_coords,
     elem_bound_box_inds,
     elem_areas,
-    field_divide_z) = Rasteriser.raster_setup(cam_data,
+    field_divide_z,
+    coords_world) = Rasteriser.raster_setup(cam_data,
                                               coords_world,
                                               connectivity,
                                               field_scalar)
@@ -712,23 +734,42 @@ def main() -> None:
     print("RAYTRACE START")
     print(80*"=")
 
-    print(cam_pos_world)
-    print(cam_rot.as_matrix())
-    print(cam_num_px)
-    ic(coords_world)
-    ic(coords_world.shape)
-    test=coords_world[0:3,connectivity]
-    ic(test.shape)
+    # ic(cam_pos_world)
+    # ic(cam_rot.as_matrix())
+    # ic(cam_num_px)
+    # ic(coords_world)
+    # ic(coords_world.shape)
+
+    
+
+    # test=coords_world[0:3,connectivity]
+    # ic(test.shape)
+    # ic(elem_raster_coords[:,:,0:2])
+    # ic(test[:,:,0:2])
 
 
-    #inverse rotation matrix for world coordinates
-    cam_rot_inv = np.linalg.inv(cam_rot.as_matrix())
+
+
+    # cam_pos_world = [24.4925, 24.0064, 22.175]
+
+    # test = [[0.454419, 9.85055, -12.779],[-0.001599, 10.5813, -14.0648],[-0.001599, 10.4974, -13.4783]]
+
+    ic(2,coords_world.shape)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    # ax.scatter(coords_world[0,0,:],coords_world[0,1,:],coords_world[0,2,:])
+    ic(coords_world[0,0,1],coords_world[0,1,1],coords_world[0,2,1])
+    ic(coords_world[1,0,1],coords_world[1,1,1],coords_world[1,2,1])
+    ic(coords_world[2,0,1],coords_world[2,1,1],coords_world[2,2,1])
+    # test= coords_world
+    # ic(coords_world.flatten())
 
     time_start_loop = time.perf_counter()
     image_buffer, depth_buffer = cython_interface.cpp_raytrace(
         cam_pos_world,
-        cam_rot,
-        coords_world[0:3,:])  
+        cam_rot.as_matrix(),
+        coords_world.flatten()) 
     time_end_loop = time.perf_counter()
     time_cpp_loop = time_end_loop - time_start_loop
 

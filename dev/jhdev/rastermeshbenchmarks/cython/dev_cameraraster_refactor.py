@@ -553,7 +553,7 @@ def average_subpixel_image(subpx_image: np.ndarray,
 # MAIN
 def main() -> None:
     # 3D cylinder, mechanical, tets
-    data_path = Path("dev/lfdev/rastermeshbenchmarks")
+    data_path = Path("/home/kc4736/ukaea/pyvale/dev/lfdev/rastermeshbenchmarks")
     data_path = data_path / "case21_m5_out.e"
 
     sim_data = mh.ExodusReader(data_path).read_all_sim_data()

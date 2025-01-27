@@ -142,6 +142,7 @@ void raster(int sub_samp,
     // Get the shape of each array
     npy_intp *ar_shape = PyArray_DIMS(areas);
     int num_elems_in_scene = ar_shape[0];
+    std::cout << "num_elems_in_scene: " << num_elems_in_scene << std::endl;
 
 
     // loop over the number of elements
