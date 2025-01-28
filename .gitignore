@@ -197,3 +197,4 @@ cython_debug/
 ./examples/case01_sys_err/
 ./examples/images/
 ./examples/sim-workdir-1/
+./images/

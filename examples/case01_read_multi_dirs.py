@@ -87,7 +87,8 @@ def main():
     
     for dataset_name in dataset_names:
         OUTPUT_DIR = OUTPUT_SUPDIR / f"case01_{dataset_name}/"
-        if dataset_name in ("no_err","sim_err"):
+        if dataset_name in ("no_err","sim_err"):#
+        #if dataset_name in ("no_err"):
             datasets[dataset_name] = Dataset(dataset_name,OUTPUT_DIR)
         else:
             datasets[dataset_name] = Dataset(dataset_name,OUTPUT_DIR,skip=100)
@@ -122,8 +123,8 @@ def main():
     # Test validation metrics
     
     #avm(sim_data[:,-1],noise_data[:,-1])
-    #mavm(data1[:,-1],data2[:,-1])
-    reliability_metric(data1[:,-1],data2[:,-1],10)
+    mavm(data1[:,-1],data2[:,-1])
+    #reliability_metric(data1[:,-1],data2[:,-1],10)
     #avu(sim_data[:,-1],noise_data[:,-1])
     
     # Create matrix
@@ -301,7 +302,7 @@ def mavm(model_data,exp_data):
         axs.legend()
         axs.set_xlabel(r"Temperature [$\degree$C]")
         axs.set_ylabel("Probability")
-        plt.show()
+        #plt.show()
     
     F_ = model_cdf.quantiles
     Sn_ = exp_cdf.quantiles
@@ -328,7 +329,7 @@ def mavm(model_data,exp_data):
         axs.legend()
         axs.set_xlabel(r"Temperature [$\degree$C]")
         axs.set_ylabel("Probability")
-        plt.show()
+        #plt.show()
     
     
     P_F = 1/len(F_)
@@ -409,11 +410,14 @@ def mavm(model_data,exp_data):
     
     
     if PLOT_RES:
-        plt.figure()
+        fig, axs = plt.subplots(1)
         plt.plot(F_,F_Y,"k-")
         plt.plot(F_+d_plus,F_Y,"k--")
         plt.plot(F_-d_minus,F_Y,"k--")
         plt.fill_betweenx(F_Y,F_-d_minus,F_+d_plus,color="k",alpha=0.2)
+        axs.ecdf(exp_cdf.quantiles,label="synthetic experiment")
+        axs.ecdf(Sn_conf[0],ls="dashed",color="k",label="95% C.I.")
+        axs.ecdf(Sn_conf[1],ls="dashed",color="k")
         plt.xlabel(r"Temperature [$\degree$C]")
         plt.ylabel("Probability")
         plt.show()
@@ -424,8 +428,6 @@ def mavm(model_data,exp_data):
                    "d-":d_minus}
     
     return output_dict
-
-
 
     
 def avu(model_data,exp_data):
@@ -499,19 +501,7 @@ def reliability_metric(model_data,exp_data,eta):
     #eta_plus = np.sqrt(len(exp_data))*(eta-(mean_exp-mean_model))/np.nanstd(exp_data)
     #eta_minus = np.sqrt(len(exp_data))*(-1*eta - (mean_exp-mean_model))/np.nanstd(exp_data)
     #r = exp_cdf.evaluate(mean_exp+eta_plus) - exp_cdf.evaluate(mean_exp+eta_minus)
-    #print("eta_plus",eta_plus)
-    #print("eta_minus",eta_minus)
-    #print("r",r)
-    
-    #if PLOT_RES:
-    #    fig,axs = plt.subplots(1)
-    #    model_cdf.plot(axs)
-    #    exp_cdf.plot(axs)
-    #    plt.vlines([mean_exp+eta_plus,mean_exp+eta_minus],
-    #                np.nanmin(F_Y),np.nanmax(F_Y),color="k")
-    #    plt.xlabel(r"Temperature [$\degree$C]")
-    #    plt.ylabel("Probability")
-    #    plt.show()
+    # ?? Must have misunderstood - try different method
 
     # diff method
     diff_matrix = np.zeros(len(model_data)*len(exp_data))
@@ -524,12 +514,12 @@ def reliability_metric(model_data,exp_data,eta):
     if PLOT_RES:
         fig,axs=plt.subplots(1)
         diff_cdf.plot(axs)
-        plt.vlines([eta,-eta],0,1,color="k")
+        plt.vlines([eta/2,-eta/2],0,1,color="k")
         plt.xlabel("Expectation difference")
         plt.ylabel("Probability")
         plt.show()
     
-    r = diff_cdf.evaluate(eta) - diff_cdf.evaluate(-eta)
+    r = diff_cdf.evaluate(eta/2) - diff_cdf.evaluate(-eta/2)
     print("r =",r)
 
 
