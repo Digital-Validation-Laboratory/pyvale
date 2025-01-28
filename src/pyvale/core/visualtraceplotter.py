@@ -1,10 +1,10 @@
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 from typing import Any
 
 import numpy as np
@@ -15,6 +15,7 @@ from pyvale.core.visualopts import (PlotOptsGeneral,
                                     TraceOptsExperiment)
 from pyvale.core.experimentsimulator import ExperimentSimulator
 
+#TODO: Docstrings
 
 def plot_time_traces(sensor_array: SensorArrayPoint,
                      component: str,

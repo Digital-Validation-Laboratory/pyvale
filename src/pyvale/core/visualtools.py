@@ -1,10 +1,10 @@
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 from pathlib import Path
 import numpy as np
 #import vtk #NOTE: has to be here to fix latex bug in pyvista/vtk
@@ -12,11 +12,12 @@ import numpy as np
 #NOTE: causes output to console to be suppressed unfortunately
 import pyvista as pv
 from pyvale.core.visualopts import (VisOptsSimSensors,
-                               VisOptsImageSave,
-                               EImageType,
-                               VisOptsAnimation,
-                               EAnimationType)
+                                    VisOptsImageSave,
+                                    EImageType,
+                                    VisOptsAnimation,
+                                    EAnimationType)
 
+#TODO: Docstrings
 
 def create_pv_plotter(vis_opts: VisOptsSimSensors) -> pv.Plotter:
     pv_plot = pv.Plotter(window_size=vis_opts.window_size_px)

@@ -1,20 +1,23 @@
-'''
+"""
 ================================================================================
 pyvale: the python validation engine
 License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
-'''
+"""
 from typing import Any
 import matplotlib.pyplot as plt
 from pyvale.core.camera import CameraBasic2D
 from pyvale.core.visualopts import PlotOptsGeneral
 
+# NOTE: This module is a feature under developement. Linked to the basic camera
+# class.
 
 def plot_measurement_image(camera: CameraBasic2D,
                            component: str,
                            time_step: int = -1,
-                           plot_opts: PlotOptsGeneral | None = None) -> tuple[Any,Any]:
+                           plot_opts: PlotOptsGeneral | None = None
+                           ) -> tuple[Any,Any]:
 
     if plot_opts is None:
         plot_opts = PlotOptsGeneral()
