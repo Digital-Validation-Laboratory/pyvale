@@ -38,6 +38,10 @@ class RigidBodyMotion:
 
         n_steps = int((max_x - min_x) / self.step)
         render_counter = 0
+        render_data = RenderData(samples=1)
+        render = Render(render_data, self.image_path, self.output_path, self.cam_data)
+        render_name = 'rigid_body_motion_x'
+        render.render_image(render_name, render_counter, part)
 
         for x in range(n_steps):
             x_location = (x * self.step) + min_x
@@ -45,10 +49,7 @@ class RigidBodyMotion:
             self.part.location = ((self.part_location[0] + x_location),
                                   self.part_location[1],
                                   self.part_location[2])
-            render_data = RenderData(samples=1)
-            render = Render(render_data, self.image_path, self.output_path, self.cam_data)
 
-            render_name = 'rigid_body_motion_x'
 
             print(f"{self.part.location=}")
 

@@ -21,7 +21,7 @@ class DeformMesh:
                 added_disp[:, dim] = added_disp_1d * 1000
                 dim += 1
             deformed_nodes = nodes + added_disp
-            deformed_nodes = centre_nodes(deformed_nodes)
+            # deformed_nodes = centre_nodes(deformed_nodes)
             return deformed_nodes
         else:
             return None
