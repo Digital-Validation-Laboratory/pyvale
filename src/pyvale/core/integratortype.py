@@ -27,8 +27,18 @@ class EIntSpatialType(enum.Enum):
     QUAD9PT
         Gaussia quadrature 2D integrator over 9 points.
     """
+
     RECT1PT = enum.auto()
+    """Rectangular 2D integrator splitting the area into 1 part."""
+
     RECT4PT = enum.auto()
+    """Rectangular 2D integrator splitting the area into 4 equal parts."""
+
     RECT9PT = enum.auto()
+    """Rectangular 2D integrator splitting the area into 9 equal parts."""
+
     QUAD4PT = enum.auto()
+    """Gaussian quadrature 2D integrator over 4 points."""
+
     QUAD9PT = enum.auto()
+    """Gaussia quadrature 2D integrator over 9 points."""

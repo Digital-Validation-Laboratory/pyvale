@@ -19,6 +19,8 @@ from pyvale.core.visualsimplotter import (add_sensor_points_nom,
                                           add_sensor_points_pert,
                                           add_sim_field)
 
+#TODO: Docstrings
+
 def animate_sim_with_sensors(sensor_array: SensorArrayPoint,
                             component: str,
                             time_steps: np.ndarray | None = None,

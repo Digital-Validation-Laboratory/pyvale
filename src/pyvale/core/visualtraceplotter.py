@@ -15,6 +15,7 @@ from pyvale.core.visualopts import (PlotOptsGeneral,
                                     TraceOptsExperiment)
 from pyvale.core.experimentsimulator import ExperimentSimulator
 
+#TODO: Docstrings
 
 def plot_time_traces(sensor_array: SensorArrayPoint,
                      component: str,

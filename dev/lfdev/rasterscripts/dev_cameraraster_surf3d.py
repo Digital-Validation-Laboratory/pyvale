@@ -29,6 +29,8 @@ class CameraRasterData:
     focal_length: float = 50.0
     sub_samp: int = 2
 
+    back_face_removal: bool = True
+
     sensor_size: np.ndarray = field(init=False)
     image_dims: np.ndarray = field(init=False)
     image_dist: float = field(init=False)
@@ -214,12 +216,14 @@ def main() -> None:
     coords_world_with_w = np.vstack((coords_world,np.ones((1,coords_count))))
     # shape=(nodes_per_elem,num_elems)
     connect = pv_connect
+    elem_count = connect.shape[1]
     # shape=(num_nodes,num_time_steps)
     field_scalar = np.array(pv_surf[field_key])
 
     rot_axis: str = "x"
-    phi_y_degs: float = 45
-    theta_x_degs: float = 45
+    phi_y_degs: float = -45
+    theta_x_degs: float = -45
+    psi_z_degs: float = 0.0
 
     phi_y_rads: float = phi_y_degs * np.pi/180.0
     theta_x_rads: float = theta_x_degs * np.pi/180.0
@@ -228,15 +232,15 @@ def main() -> None:
     roi_pos_world = np.mean(sim_data.coords,axis=0)
 
     # Number of divisions (subsamples) for each pixel for anti-aliasing
-    sub_samp: int = 2
+    sub_samp: int = 1
 
-    cam_type = "AV507"
+    cam_type = "Test"
     if cam_type == "AV507":
         cam_num_px = np.array([2464,2056],dtype=np.int32)
         pixel_size = np.array([3.45e-3,3.45e-3]) # in millimeters!
         focal_leng: float = 25.0
 
-        imaging_rad: float = 140.0 # Not needed for camera data, just for cam pos below
+        imaging_rad: float = 500.0 # Not needed for camera data, just for cam pos below
     else:
         cam_num_px = np.array([510,260],dtype=np.int32)
         pixel_size = np.array([10.0e-3,10.0e-3])
@@ -245,23 +249,23 @@ def main() -> None:
         imaging_rad: float = 500.0 # Not needed for camera data, just for cam pos below
 
     if rot_axis == "y":
-        cam_pos_world = np.array([roi_pos_world[xx] - imaging_rad*np.sin(phi_y_rads),
+        cam_pos_world = np.array([roi_pos_world[xx] + imaging_rad*np.sin(phi_y_rads),
                                   roi_pos_world[yy],
                                   imaging_rad*np.cos(phi_y_rads)])
 
-        cam_rot = Rotation.from_euler("zyx", [0, -phi_y_degs, 0], degrees=True)
+        cam_rot = Rotation.from_euler("zyx", [psi_z_degs, phi_y_degs, 0], degrees=True)
     elif rot_axis == "x":
         cam_pos_world = np.array([roi_pos_world[xx] ,
-                                  roi_pos_world[yy] + imaging_rad*np.sin(theta_x_rads),
+                                  roi_pos_world[yy] - imaging_rad*np.sin(theta_x_rads),
                                   imaging_rad*np.cos(theta_x_rads)])
 
-        cam_rot = Rotation.from_euler("zyx", [0, 0, -theta_x_degs], degrees=True)
+        cam_rot = Rotation.from_euler("zyx", [psi_z_degs, 0, theta_x_degs], degrees=True)
 
     else:
         cam_pos_world = np.array([roi_pos_world[xx],
                                   roi_pos_world[yy],
                                   imaging_rad])
-        cam_rot = Rotation.from_euler("zyx", [0, 0, 0], degrees=True)
+        cam_rot = Rotation.from_euler("zyx", [psi_z_degs, 0, 0], degrees=True)
 
     #---------------------------------------------------------------------------
     cam_data = CameraRasterData(num_pixels=cam_num_px,
@@ -302,8 +306,44 @@ def main() -> None:
     print(80*"-")
 
     #---------------------------------------------------------------------------
-    # BACK FACE CULLING
-    num_elems = connect.shape[1]
+    # BACK FACE REMOVAL - world method
+
+    # shape=(coord[X,Y,Z,W],node_per_elem,elem_num)
+    elem_world_coords = coords_world_with_w[:,connect]
+    # shape=(nodes_per_elem,coord[X,Y,Z,W],elem_num)
+    elem_world_coords = np.swapaxes(elem_world_coords,0,1)
+    elem_world_edge0 = elem_world_coords[1,:-1,:] - elem_world_coords[0,:-1,:]
+    elem_world_edge1 = elem_world_coords[2,:-1,:] - elem_world_coords[0,:-1,:]
+    elem_world_normals = np.cross(elem_world_edge0,elem_world_edge1,
+                                  axisa=0,axisb=0).T
+    elem_world_normals_with_w = np.vstack((elem_world_normals,np.ones((1,elem_count))))
+
+    #===========================================================================
+    # Method: transform_normals = np.linalg.inv(cam_data.cam_to_world_mat).T
+    # I couldn't get this to make sense using the the inv(M).T method from
+    # scratchapixel as it seems to ignore rotation of the camera about z.
+    # There was a weird results for rotation about z where this method seemed
+    # to be correct and the method below was wrong with the sign of the x coord
+    # being correct but it still ignores axial rotation about z.
+    #
+    # Method: transform_normals = cam_data.cam_to_world_mat.T
+    # This method is consistent with transforming coords into camera space first
+    # and it seems to work for the axial rotation about z but then the sign
+    # problem arises for rotation about y.
+
+    #Matrix44f transformNormals = worldToObject.transpose();, world_to_cam
+    # NOTE this agrees with scratchapixel which is inv(M).T where
+    # M is the cam_to_world matrix (the world_to_cam is inv(cam_to_world))
+    #transform_normals = np.linalg.inv(cam_data.cam_to_world_mat).T
+    transform_normals = cam_data.cam_to_world_mat.T # This is the same as below starting with elem coords
+    elem_cam_normals_check = np.matmul(transform_normals,elem_world_normals_with_w)
+    # Chop off the w coord after the matrix multiplication
+    elem_cam_normals_check = elem_cam_normals_check[:-1,:]
+    elem_cam_normals_check = elem_cam_normals_check / np.linalg.norm(elem_cam_normals_check,axis=0)
+    #===========================================================================
+
+    #---------------------------------------------------------------------------
+    # BACKFACE REMOVAL - transform method
     coords_cam = np.matmul(cam_data.world_to_cam_mat,coords_world_with_w)
 
     # shape=(coord[X,Y,Z,W],node_per_elem,elem_num)
@@ -317,19 +357,22 @@ def main() -> None:
     elem_cam_edge1 = elem_cam_coords[2,:-1,:] - elem_cam_coords[0,:-1,:]
     elem_cam_normals = np.cross(elem_cam_edge0,elem_cam_edge1,
                                 axisa=0,axisb=0).T
-    # Normalise to unit vectors
     elem_cam_normals = elem_cam_normals / np.linalg.norm(elem_cam_normals,axis=0)
 
-    print()
-    print(elem_cam_edge0.shape)
-    print(elem_cam_edge1.shape)
-    print(elem_cam_normals.shape)
-    print()
+    cam_normal = np.array([0,0,1])
+    # shape=(num_elems,)
+    proj_elem_to_cam = np.dot(cam_normal,elem_cam_normals)
+    # NOTE this should be a numerical precision tolerance (epsilon)
+    back_face_mask = proj_elem_to_cam > 1e-8
 
-    # TODO
-    # Pass the masked coordinates in camera world to the world_to_raster function
+    print()
+    print(80*"-")
+    print("BACK FACE REMOVAL:")
+    print(f"Total elements     : {elem_count}")
+    print(f"Elements removed   : {elem_count - np.sum(back_face_mask)}")
+    print(f"Elements remaining : {np.sum(back_face_mask)}")
+    print(80*"-")
     #---------------------------------------------------------------------------
-    return
 
     # Convert world coords of all elements in the scene
     coords_raster = world_to_raster_coords(cam_data,coords_world_with_w)
@@ -349,13 +392,28 @@ def main() -> None:
     # shape=(nodes_per_elem,num_elems,num_time_steps)
     field_divide_z = field_divide_z[connect,:]
 
+    # APPLY BACKFACE REMOVAL
+    print()
+    print(80*"-")
+    print("APPLY BACK FACE REMOVAL")
+    print("Before:")
+    print(f"{elem_raster_coords.shape=}")
+    print(f"{field_divide_z.shape=}")
+    print()
+    elem_raster_coords = elem_raster_coords[:,:,back_face_mask]
+    field_divide_z = field_divide_z[:,back_face_mask,:]
+    print("After:")
+    print(f"{elem_raster_coords.shape=}")
+    print(f"{field_divide_z.shape=}")
+    print(80*"-")
+
     #shape=(coord[X,Y,Z],elem_num)
     elem_raster_coord_min = np.min(elem_raster_coords,axis=0)
     elem_raster_coord_max = np.max(elem_raster_coords,axis=0)
 
     # Check that which nodes are within the 4 edges of the camera image
     #shape=(4_edges_to_check,num_elems)
-    mask = np.zeros([4,num_elems])
+    mask = np.zeros([4,elem_raster_coords.shape[-1]])
     mask[0,elem_raster_coord_min[xx,:] <= (cam_data.num_pixels[xx]-1)] = 1
     mask[1,elem_raster_coord_min[yy,:] <= (cam_data.num_pixels[yy]-1)] = 1
     mask[2,elem_raster_coord_max[xx,:] >= 0] = 1
@@ -378,7 +436,7 @@ def main() -> None:
     print(mask)
     print()
     print(f"Elems in mask =      {np.sum(np.sum(mask))}")
-    print(f"Total elems =        {num_elems}")
+    print(f"Total elems =        {elem_count}")
     print(f"Num elems in scene = {num_elems_in_scene}")
     print()
     print(f"{elem_raster_coords.shape=}")

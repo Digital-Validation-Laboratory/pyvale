@@ -2,20 +2,21 @@
 # Notes: `pyvale` developement
 
 ## TODO: `CameraRaster`
- - Implement with surface mesh of 3D volume
- - Implement back face culling
- - Speed up edge function calculation using stepwise optimisation on SAP
- - Try to setup tiling optimisation
+- Refactor into functions and classes
 
- - Deal with quads: edge function and interpolation
- - Multi-threading over the element loop
+- Speed up edge function calculation using stepwise optimisation on SAP
+- Try to setup tiling optimisation
 
- - Setup a set of performance benchmarks:
-   - How much RAM, process time per image?
-   - Single and multi-core
-   - Anti-alias subsample: 1,2,4
-   - 1Mpx, 5Mpx, 24Mpx images
-   - 100, 1000, 10,000, 100,000 triangles
+- Deal with quads: edge function and interpolation
+- Multi-threading over the element loop
+
+- Setup a set of performance benchmarks:
+    - How much RAM, process time per image?
+    - Single and multi-core
+    - Process time per-image for 1-8 images
+    - Anti-alias subsample: 1,2,4
+    - 1Mpx, 5Mpx, 24Mpx images
+    - 1000, 10,000, 100,000 triangles
 
 - Look into compilation with Numba etc
 - Write a Cython version
@@ -157,3 +158,12 @@ Start with xy then azimuth 90
 (0.0, 16.0, 5.5),
 (0.0, 1.0, 0.0)]
 
+## Memory Profiling with `mprof`
+Install into a virtual environment:
+`pip install memory-profiler`
+
+Run a script to profile the memory (output is stored in a time stamped dat file in the working directory):
+mprof run --python PATH/TO/MAIN.py
+
+Plot the output and save to png:
+mprof plot -o memory_profile.png
