@@ -20,7 +20,7 @@ file_name = "case21.msh";
 
 // Geometric variables
 cyl_height = 25e-3;
-cyl_diam = 25e-3;
+cyl_diam = cyl_height*1.3;
 
 // Must be an integer
 elem_order = 1;

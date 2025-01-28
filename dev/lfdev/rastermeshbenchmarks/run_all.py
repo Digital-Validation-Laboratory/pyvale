@@ -49,8 +49,8 @@ def run_one_case(sim_str: str) -> None:
     moose_config = MooseConfig(config)
     moose_runner = MooseRunner(moose_config)
 
-    moose_runner.set_run_opts(n_tasks = 8,
-                              n_threads = 2,
+    moose_runner.set_run_opts(n_tasks = 1,
+                              n_threads = 8,
                               redirect_out = False)
 
     moose_start_time = time.perf_counter()

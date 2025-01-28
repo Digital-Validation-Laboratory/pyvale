@@ -21,7 +21,7 @@ import pyvale
 
 
 @dataclass(slots=True)
-class CameraRasterData:
+class CameraData:
     num_pixels: np.ndarray
     pixel_size: np.ndarray
 
@@ -56,7 +56,7 @@ class CameraRasterData:
 
 class Rasteriser:
     @staticmethod
-    def world_to_raster_coords(cam_data: CameraRasterData,
+    def world_to_raster_coords(cam_data: CameraData,
                                coords_world: np.ndarray) -> np.ndarray:
         # Index notation for numpy array index interpretation
         xx: int = 0
@@ -92,7 +92,7 @@ class Rasteriser:
         return coords_raster
 
     @staticmethod
-    def create_transformed_elem_arrays(cam_data: CameraRasterData,
+    def create_transformed_elem_arrays(cam_data: CameraData,
                                        coords_world: np.ndarray,
                                        connectivity: np.ndarray,
                                        field_array: np.ndarray,
@@ -123,7 +123,7 @@ class Rasteriser:
 
 
     @staticmethod
-    def back_face_removal_mask(cam_data: CameraRasterData,
+    def back_face_removal_mask(cam_data: CameraData,
                             coords_world: np.ndarray,
                             connect: np.ndarray
                             ) -> np.ndarray:
@@ -152,7 +152,7 @@ class Rasteriser:
         return back_face_mask
 
     @staticmethod
-    def crop_and_bound_elements(cam_data: CameraRasterData,
+    def crop_and_bound_elements(cam_data: CameraData,
                                 elem_raster_coords: np.ndarray,
                                 ) -> tuple[np.ndarray,np.ndarray]:
         xx: int = 0
@@ -209,7 +209,7 @@ class Rasteriser:
         return bound
 
     @staticmethod
-    def raster_setup(cam_data: CameraRasterData,
+    def raster_setup(cam_data: CameraData,
                      coords_world: np.ndarray,
                      connectivity: np.ndarray,
                      field_data: np.ndarray
@@ -262,7 +262,7 @@ class Rasteriser:
 
     @staticmethod
     def raster_one_element(
-                    cam_data: CameraRasterData,
+                    cam_data: CameraData,
                     elem_raster_coords: np.ndarray,
                     elem_bound_box_inds: np.ndarray,
                     elem_area: float,
@@ -339,7 +339,7 @@ class Rasteriser:
                 subpx_inds_grid_y[edge_mask_grid])
 
     @staticmethod
-    def raster_loop_sequential(cam_data: CameraRasterData,
+    def raster_loop_sequential(cam_data: CameraData,
                                elem_raster_coords: np.ndarray,
                                elem_bound_box_inds: np.ndarray,
                                elem_areas: np.ndarray,
@@ -395,7 +395,7 @@ class Rasteriser:
         return (image_buffer,depth_buffer,elem_raster_coords.shape[-1])
 
     @staticmethod
-    def raster_loop(cam_data: CameraRasterData,
+    def raster_loop(cam_data: CameraData,
                     elem_raster_coords: np.ndarray,
                     elem_bound_box_inds: np.ndarray,
                     elem_areas: np.ndarray,
@@ -454,7 +454,7 @@ class Rasteriser:
         return (image_buffer,depth_buffer,num_elems_in_scene)
 
     @staticmethod
-    def raster_loop_parallel(cam_data: CameraRasterData,
+    def raster_loop_parallel(cam_data: CameraData,
                             elem_raster_coords: np.ndarray,
                             elem_bound_box_inds: np.ndarray,
                             elem_areas: np.ndarray,
@@ -669,7 +669,7 @@ def main() -> None:
 
     #---------------------------------------------------------------------------
     # RASTERISATION START
-    cam_data = CameraRasterData(num_pixels=cam_num_px,
+    cam_data = CameraData(num_pixels=cam_num_px,
                                 pixel_size=pixel_size,
                                 pos_world=cam_pos_world,
                                 rot_world=cam_rot,

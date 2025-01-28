@@ -13,9 +13,10 @@
 - Setup a set of performance benchmarks:
     - How much RAM, process time per image?
     - Single and multi-core
+    - Process time per-image for 1-8 images
     - Anti-alias subsample: 1,2,4
     - 1Mpx, 5Mpx, 24Mpx images
-    - 100, 1000, 10,000, 100,000 triangles
+    - 1000, 10,000, 100,000 triangles
 
 - Look into compilation with Numba etc
 - Write a Cython version
