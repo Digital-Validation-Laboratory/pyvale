@@ -1,0 +1,19 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <chrono>
+#include <utility>
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <numpy/arrayobject.h>
+
+void raytrace_gpu_setup(
+    double focal_length,
+    double pixel_size,
+    int buffer_width,
+    int buffer_height,
+    PyArrayObject *cam_pos_world,
+    PyArrayObject *cam_rot,
+    PyArrayObject *coords_world,
+    std::vector<double> &depth_buffer,
+    std::vector<double> &image_buffer);
