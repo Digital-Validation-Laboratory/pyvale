@@ -1,25 +1,19 @@
 
 # Notes: `pyvale` developement
 
-## TODO: `CameraRaster`
-- Refactor into functions and classes
+## Ideas for papers:
+- FUSION SIM: "A probabilistic analysis of residual stress in divertor monoblocks" - showcase mooseherder
+- EXP SIM: "Are point wise validation metrics suitable for image-based data?"
+- EXP SIM: "A comparison of image-based and point-wise validation metrics for DIC"
+- EXP SIM: "A comparison of image rendering techniques for DIC UQ"
+- EXP SIM: "Camera placement optimisation for 2D DIC FEMU"
+- EXP SIM: "A rendering engine for UQ of IRT sensors"
 
+
+## TODO: `CameraRaster`
 - Speed up edge function calculation using stepwise optimisation on SAP
 - Try to setup tiling optimisation
-
 - Deal with quads: edge function and interpolation
-- Multi-threading over the element loop
-
-- Setup a set of performance benchmarks:
-    - How much RAM, process time per image?
-    - Single and multi-core
-    - Process time per-image for 1-8 images
-    - Anti-alias subsample: 1,2,4
-    - 1Mpx, 5Mpx, 24Mpx images
-    - 1000, 10,000, 100,000 triangles
-
-- Look into compilation with Numba etc
-- Write a Cython version
 
 `CameraRay`
 - Build a ray casting version. Only need primary rays.
@@ -36,6 +30,7 @@
 
 - BUGS!
     - Spatial averaging with rectangle or quadrature makes assumptions about sensor orientation - looks like it assumes XY orientations only. Check this.
+    - Should be able to fix this with a good old 4x4 sensor_to_world matrix.
 
 - TODO GENERAL:
     - Build Rory's simple DIC strain filter on top of the basic camera
@@ -46,11 +41,6 @@
     - Finish basic camera
 
 - TESTING/FEATURE EXAMPLES:
-    - Camera basic
-
-- TODO: EXAMPLES
-    - Example showing a basic camera
-
 - TODO: ErrorIntegrator
     - Simplify the memory efficient and non-memory efficient options
 
