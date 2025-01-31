@@ -5,11 +5,12 @@
 #include <utility>
 #include <iomanip>
 #include <iostream>
-#include <numpy/arrayobject.h>
+#include <cstdlib>
+// #include <numpy/arrayobject.h>
 
 // custom headers
 #include "define.hpp"
-#include "raytrace.hpp"
+// #include "raytrace.hpp"
 
 
 // variables that can go in constant memory
@@ -110,14 +111,7 @@ __global__ void raytrace_gpu(
                 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (idx < num_pixels){                
-
-        // debugging
-        // printf("num_pixels %d\n", num_pixels);
-        // printf("num_elems_in_scene %d\n", num_elems_in_scene);
-        // printf("cam_pos_world[0] %e\n", cam_pos_world[0]);
-        // printf("cam_rot[0] %e\n", cam_rot[0]);
-        // printf("coords_world[0] %e\n", coords_world[0]);
+    if (idx < num_pixels){     
 
         // get centre of each pixel in world coordinates
         int y = idx / buffer_width_gpu; // Row index
@@ -131,6 +125,7 @@ __global__ void raytrace_gpu(
 
         // get the direction of the primary ray by multiplying with camera rotation matrix
         double direction[3];
+
         for (int i = 0; i < 3; ++i) {
             direction[i] = 0.0;
             for (int j = 0; j < 3; ++j) {
@@ -148,11 +143,10 @@ __global__ void raytrace_gpu(
 
             // get the coordinates of the element vertices from the master array
             for (int j = 0; j < 3; j++){  
-
+                // pull invidielement vertices from the 'master' coordinates list
                 elem_x[j] = coords_world[(3*num_elems_in_scene*0) + (j * num_elems_in_scene) + elem];
                 elem_y[j] = coords_world[(3*num_elems_in_scene*1) + (j * num_elems_in_scene) + elem];
                 elem_z[j] = coords_world[(3*num_elems_in_scene*2) + (j * num_elems_in_scene) + elem];
-                
             }
             
 
@@ -173,9 +167,9 @@ __global__ void raytrace_gpu(
 
         depth_buffer[idx] = nearest_intersect;
 
-        // debugging
-        // printf("%d %d %e\n", y, x, nearest_intersect);
 
+        // debugging
+        // printf("%d %d %e %e\n", y, x,nearest_intersect);
     }
 }
 
@@ -192,33 +186,34 @@ void raytrace_gpu_setup(
     double pixel_size,
     int buffer_width,
     int buffer_height,
-    PyArrayObject *cam_pos_world,
-    PyArrayObject *cam_rot,
-    PyArrayObject *coords_world,
+    std::vector<double> cam_pos_world,
+    std::vector<double> cam_rot,
+    std::vector<double> coords_world,
     std::vector<double> &depth_buffer,
     std::vector<double> &image_buffer){
 
+    // total number of pixels in image
     int num_pixels = buffer_width * buffer_height;
     std::cout << "num pixels: " << num_pixels << std::endl;
 
     // Access the data pointer for each array
-    double *cam_pos_world_ptr = (double *)PyArray_DATA(cam_pos_world);
-    double *cam_rot_ptr = (double *)PyArray_DATA(cam_rot);
-    double *coords_world_ptr = (double *)PyArray_DATA(coords_world);
+    // double *cam_pos_world_ptr = (double *)PyArray_DATA(cam_pos_world);
+    // double *cam_rot_ptr = (double *)PyArray_DATA(cam_rot);
+    // double *coords_world_ptr = (double *)PyArray_DATA(coords_world);
 
-    // get the correction dimensions of the resizable c++ arrays for memory allocation on GPU
-    npy_intp *cam_pos_world_dims = PyArray_DIMS(cam_pos_world);
-    npy_intp *cam_rot_dims = PyArray_DIMS(cam_rot);
-    npy_intp *coords_world_dims = PyArray_DIMS(coords_world);
+    // // get the correction dimensions of the resizable c++ arrays for memory allocation on GPU
+    // npy_intp *cam_pos_world_dims = PyArray_DIMS(cam_pos_world);
+    // npy_intp *cam_rot_dims = PyArray_DIMS(cam_rot);
+    // npy_intp *coords_world_dims = PyArray_DIMS(coords_world);
 
-    std::cout << "dims" << std::endl;
-    std::cout << cam_pos_world_dims[0] << std::endl;
-    std::cout << cam_rot_dims[0] << " " << cam_rot_dims[1] << std::endl;
-    std::cout << coords_world_dims[0] << std::endl;
+    // std::cout << "dims" << std::endl;
+    // std::cout << cam_pos_world_dims[0] << std::endl;
+    // std::cout << cam_rot_dims[0] << " " << cam_rot_dims[1] << std::endl;
+    // std::cout << coords_world_dims[0] << std::endl;
 
     // get the number of elements and the corresponding array size.
-    int num_elems_in_scene = coords_world_dims[0] / 3 / 3;
-    std::cout << "coords_world_dims[0]: " << coords_world_dims[0] << std::endl;
+    int num_elems_in_scene = coords_world.size() / 3 / 3;
+    // std::cout << "coords_world_dims[0]: " << coords_world_dims[0] << std::endl;
 
     // pointers for GPU memory allocation
     double *depth_buffer_gpu;
@@ -236,15 +231,15 @@ void raytrace_gpu_setup(
     MEASURE_TIME("Cuda Memory Allcation:", {
         CUDA_CALL(cudaMalloc((void**)&cam_pos_world_gpu,    sizeof(double) * 3));
         CUDA_CALL(cudaMalloc((void**)&cam_rot_gpu,          sizeof(double) * 3 * 3));
-        CUDA_CALL(cudaMalloc((void**)&coords_world_gpu,     sizeof(double) * coords_world_dims[0]));
+        CUDA_CALL(cudaMalloc((void**)&coords_world_gpu,     sizeof(double) * coords_world.size()));
         CUDA_CALL(cudaMalloc((void**)&depth_buffer_gpu,     sizeof(double) * depth_buffer.size()));
         CUDA_CALL(cudaMalloc((void**)&image_buffer_gpu,     sizeof(double) * image_buffer.size()));
     });
 
     MEASURE_TIME("Cuda Memory copy from CPU to GPU:", {
-        CUDA_CALL(cudaMemcpy(cam_pos_world_gpu,     cam_pos_world_ptr,  sizeof(double) * 3,                           cudaMemcpyHostToDevice));
-        CUDA_CALL(cudaMemcpy(cam_rot_gpu,           cam_rot_ptr,        sizeof(double) * 3 * 3,                       cudaMemcpyHostToDevice));
-        CUDA_CALL(cudaMemcpy(coords_world_gpu,      coords_world_ptr,   sizeof(double) * coords_world_dims[0],        cudaMemcpyHostToDevice));
+        CUDA_CALL(cudaMemcpy(cam_pos_world_gpu,     &cam_pos_world[0],  sizeof(double) * 3,                           cudaMemcpyHostToDevice));
+        CUDA_CALL(cudaMemcpy(cam_rot_gpu,           &cam_rot[0],        sizeof(double) * 3 * 3,                       cudaMemcpyHostToDevice));
+        CUDA_CALL(cudaMemcpy(coords_world_gpu,      &coords_world[0],   sizeof(double) * coords_world.size(),        cudaMemcpyHostToDevice));
         CUDA_CALL(cudaMemcpy(depth_buffer_gpu,      &depth_buffer[0],   sizeof(double) * depth_buffer.size(),         cudaMemcpyHostToDevice));
         CUDA_CALL(cudaMemcpy(image_buffer_gpu,      &image_buffer[0],   sizeof(double) * image_buffer.size(),         cudaMemcpyHostToDevice));
         CUDA_CALL(cudaMemcpyToSymbol(*(&focal_length_gpu),      &focal_length,   sizeof(double)));
@@ -255,14 +250,14 @@ void raytrace_gpu_setup(
     });
     
     // GPU config
-    int threads_per_block = 256;
+    int threads_per_block = 1024;
     int n_blocks = (num_pixels + threads_per_block - 1) / threads_per_block;
 
     MEASURE_TIME("Cuda kernel run time:", ({ // added an extra bracket because of the comma in the kernel call messing with the macro.
         raytrace_gpu<<<n_blocks,threads_per_block>>>(num_pixels, num_elems_in_scene, cam_pos_world_gpu, cam_rot_gpu, coords_world_gpu, depth_buffer_gpu);
         CUDA_CALL(cudaDeviceSynchronize()); 
-    }););
 
+    }););
 
     MEASURE_TIME("Cuda Memcpy back to CPU:", {
         CUDA_CALL(cudaMemcpy(&depth_buffer[0], depth_buffer_gpu,  sizeof(double) * depth_buffer.size(), cudaMemcpyDeviceToHost));
@@ -270,3 +265,27 @@ void raytrace_gpu_setup(
     });
 }
 
+int main(){
+
+    double focal_length = 1.5;
+    double pixel_size = 3.45e-3;
+    int buffer_height = 640;
+    int buffer_width = 640;
+    std::vector<double> cam_pos_world = {0.0, -97.66, 93.2};
+    std::vector<double> cam_rot = {0.9703, 0.0984, -0.2210, -0.2419, 0.3947, -0.8864, -0.0000, 0.9135,  0.4067};
+    std::vector<double> coords_world(3*3*10000);
+
+    std::vector<double> depth_buffer, image_buffer;
+
+    for (int i = 0; i <3*3*10000; i++){
+        coords_world[i] =  rand() % 101 / 100.0;
+    }
+    
+    std::cout << "finished init" << std::endl;
+
+
+    raytrace_gpu_setup(focal_length, pixel_size, buffer_height, buffer_width, cam_pos_world, cam_rot, coords_world, depth_buffer, image_buffer);
+
+
+    return 0;
+}

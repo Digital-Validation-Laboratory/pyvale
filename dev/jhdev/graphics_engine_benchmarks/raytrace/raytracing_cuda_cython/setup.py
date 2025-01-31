@@ -73,7 +73,7 @@ def customize_compiler_for_nvcc(self):
             # translated from the extra_compile_args in the Extension class
             postargs = extra_postargs['nvcc']
         else:
-            postargs = extra_postargs['gcc']
+            postargs = extra_postargs['g++']
 
         super(obj, src, ext, cc_args, postargs, pp_opts)
         # Reset the default compiler_so, which we might have changed for cuda
@@ -93,15 +93,18 @@ CUDA = locate_cuda()
 ic(CUDA)
 
 ext = Extension('cython_interface',
-        sources=["src/raytrace.cu", "cython_interface.pyx"],
+        sources=["src/random.cu", 
+                 "src/raytrace.cu",
+                 "cython_interface.pyx"],
         library_dirs = [CUDA['lib64']],
         language="c++",
-        libraries=["cudart"], 
+        libraries=["cudart", "curand"], 
         runtime_library_dirs = [CUDA['lib64'], np.get_include()],
         # This syntax is specific to this build system. we're only going to use certain compiler args with nvcc and not with gcc the implementation of this trick is in
         extra_compile_args= {
-            'gcc': ['-O3'],
-            'nvcc': ['--ptxas-options=-v', '-c', '--compiler-options', "'-fPIC'", '-O3', ]
+            'g++': ['-O3'],
+            'nvcc': ['-arch=sm_60', '--ptxas-options=-v', '-c', '--compiler-options', "'-fPIC'", '-O3', '-lcurand']
+            # 'nvcc': ['-g', '-G', '-O0', '--ptxas-options=-v',  '--compiler-options', "'-fPIC'"]
             },
             include_dirs = [np.get_include(), CUDA['include']]
     )

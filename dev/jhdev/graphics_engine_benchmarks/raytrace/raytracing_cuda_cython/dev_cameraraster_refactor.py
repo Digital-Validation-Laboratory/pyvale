@@ -103,9 +103,7 @@ class Rasteriser:
 
         # Convert world coords of all elements in the scene
         # shape=(coord[X,Y,Z],num_nodes)
-        ic(1,coords_world.shape)
         coords_raster = Rasteriser.world_to_raster_coords(cam_data,coords_world)
-        ic(1,coords_raster.shape)
 
         # Convert to perspective correct hyperbolic interpolation for z interp
         # shape=(coord[X,Y,Z],num_nodes)
@@ -113,12 +111,9 @@ class Rasteriser:
 
         # shape=(coord[X,Y,Z],node_per_elem,elem_num)
         elem_raster_coords = coords_raster[:,connectivity]
-        ic(1,connectivity.shape)
-        ic(1,elem_raster_coords.shape)
 
         # shape=(nodes_per_elem,coord[X,Y,Z],elem_num)
         elem_raster_coords = np.swapaxes(elem_raster_coords,0,1)
-        ic(elem_raster_coords.shape)
 
         # NOTE: we have already inverted the raster z coordinate above so to divide
         # by z here we need to multiply
@@ -245,7 +240,7 @@ class Rasteriser:
         elem_raster_coords = elem_raster_coords[:,:,back_face_mask]
 
 
-        # sorting coords_world for raytracer
+        # JRH sorting coords_world for raytracer
         coords_world = coords_world[:,connectivity]
         coords_world = np.swapaxes(coords_world,0,1)
         coords_world = coords_world[:,:,back_face_mask]
