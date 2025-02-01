@@ -22,87 +22,90 @@ from pyvale.imagesim.imagedefopts import ImageDefOpts
 from pyvale.imagesim.cameradataimagedef import CameraImageDef
 from pyvale.imagesim.alphashape import alphashape
 
-# (0,1) = (0,1)
+(XI,YI) = (0,1)
 
-# def load_image(im_path: Path) -> np.ndarray:
+def load_image(im_path) -> np.ndarray:
 
-#     input_im = mplim.imread(im_path)
-#     input_im = input_im.astype(np.float64)
+    input_im = mplim.imread(im_path)
+    input_im = input_im.astype(float)
 
-#     # If we have RGB then get rid of it
-#     if input_im.ndim > 2:
-#         input_im = input_im[:,:,0]
+    # If we have RGB then get rid of it
+    if input_im.ndim > 2:
+        input_im = input_im[:,:,0]
 
-#     return input_im
-
-
-# def save_image(save_file: Path,
-#                image: np.ndarray,
-#                n_bits: int = 16) -> None:
-
-#     # Need to flip image so coords are top left with Y down
-#     image = image[::-1,:]
-
-#     if n_bits > 8:
-#         im = Image.fromarray(image.astype(np.uint16))
-#     else:
-#         im = Image.fromarray(image.astype(np.uint8))
-
-#     im.save(save_file)
+    return input_im
 
 
-# def get_pixel_vec_in_m(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
-#     mppx = camera.m_per_px
-#     px_vec_xm = np.arange(mppx/2,camera.fov[0],mppx)
-#     px_vec_ym = np.arange(mppx/2,camera.fov[1],mppx)
-#     #px_vec_ym = px_vec_ym[::-1] # flip
-#     return (px_vec_xm,px_vec_ym)
+def save_image(save_file: Path,
+               image: np.ndarray,
+               n_bits: int = 16) -> None:
+
+    # Need to flip image so coords are top left with Y down
+    image = image[::-1,:]
+
+    if n_bits > 8:
+        im = Image.fromarray(image.astype(np.uint16))
+    else:
+        im = Image.fromarray(image.astype(np.uint8))
+
+    im.save(save_file)
 
 
-# def get_pixel_grid_in_m(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
-#     (px_vec_xm,px_vec_ym) = get_pixel_vec_in_m(camera)
-#     (px_grid_xm,px_grid_ym) = np.meshgrid(px_vec_xm,px_vec_ym)
-#     return (px_grid_xm,px_grid_ym)
+def get_pixel_vec_in_m(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
+
+    mppx = camera.m_per_px
+    px_vec_xm = np.arange(mppx/2,camera.fov[XI],mppx)
+    px_vec_ym = np.arange(mppx/2,camera.fov[YI],mppx)
+    #px_vec_ym = px_vec_ym[::-1] # flip
+    return (px_vec_xm,px_vec_ym)
 
 
-# def get_pixel_vec_in_px(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
-#     px_vec_x = np.arange(0,camera.num_px[0],1)
-#     px_vec_y = np.arange(0,camera.num_px[1],1)
-#     px_vec_y = px_vec_y[::-1] # flip
-#     return (px_vec_x,px_vec_y)
+def get_pixel_grid_in_m(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
+    (px_vec_xm,px_vec_ym) = get_pixel_vec_in_m(camera)
+    (px_grid_xm,px_grid_ym) = np.meshgrid(px_vec_xm,px_vec_ym)
+    return (px_grid_xm,px_grid_ym)
 
 
-# def get_pixel_grid_in_px(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
-#     (px_vec_x,px_vec_y) = get_pixel_vec_in_px(camera)
-#     (px_grid_x,px_grid_y) = np.meshgrid(px_vec_x,px_vec_y)
-#     return (px_grid_x,px_grid_y)
+def get_pixel_vec_in_px(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
+
+    px_vec_x = np.arange(0,camera.num_px[XI],1)
+    px_vec_y = np.arange(0,camera.num_px[YI],1)
+    px_vec_y = px_vec_y[::-1] # flip
+    return (px_vec_x,px_vec_y)
 
 
-# def get_subpixel_vec(camera: CameraImageDef, subsample: int = 2
-#                      ) -> tuple[np.ndarray,np.ndarray]:
+def get_pixel_grid_in_px(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
 
-#     mppx = camera.m_per_px
-#     subpx_vec_xm = np.arange(mppx/(2*subsample),camera.fov[0],mppx/subsample)
-#     subpx_vec_ym = np.arange(mppx/(2*subsample),camera.fov[1],mppx/subsample)
-#     #subpx_vec_ym = subpx_vec_ym[::-1] #flip
-#     return (subpx_vec_xm,subpx_vec_ym)
+    (px_vec_x,px_vec_y) = get_pixel_vec_in_px(camera)
+    (px_grid_x,px_grid_y) = np.meshgrid(px_vec_x,px_vec_y)
+    return (px_grid_x,px_grid_y)
 
 
-# def get_subpixel_grid(camera: CameraImageDef, subsample: int = 2
-#                      ) -> tuple[np.ndarray,np.ndarray]:
+def get_subpixel_vec(camera: CameraImageDef, subsample: int = 3
+                     ) -> tuple[np.ndarray,np.ndarray]:
 
-#     (subpx_vec_xm,subpx_vec_ym) = get_subpixel_vec(camera,subsample)
-#     (subpx_grid_xm,subpx_grid_ym) = np.meshgrid(subpx_vec_xm,subpx_vec_ym)
-#     return (subpx_grid_xm,subpx_grid_ym)
+    mppx = camera.m_per_px
+    subpx_vec_xm = np.arange(mppx/(2*subsample),camera.fov[XI],mppx/subsample)
+    subpx_vec_ym = np.arange(mppx/(2*subsample),camera.fov[YI],mppx/subsample)
+    #subpx_vec_ym = subpx_vec_ym[::-1] #flip
+    return (subpx_vec_xm,subpx_vec_ym)
+
+
+def get_subpixel_grid(camera: CameraImageDef, subsample: int = 3
+                     ) -> tuple[np.ndarray,np.ndarray]:
+
+    (subpx_vec_xm,subpx_vec_ym) = get_subpixel_vec(camera,subsample)
+    (subpx_grid_xm,subpx_grid_ym) = np.meshgrid(subpx_vec_xm,subpx_vec_ym)
+    return (subpx_grid_xm,subpx_grid_ym)
 
 
 def get_roi_node_vec(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
 
-    node_vec_x = np.arange(0+camera.roi_loc[0],
-                           camera.roi_len[0]+camera.roi_loc[0]+camera.m_per_px/2,
+    node_vec_x = np.arange(0+camera.roi_loc[XI],
+                           camera.roi_len[XI]+camera.roi_loc[XI]+camera.m_per_px/2,
                            camera.m_per_px)
-    node_vec_y = np.arange(0+camera.roi_loc[1],
-                           camera.roi_len[1]+camera.roi_loc[1]+camera.m_per_px/2,
+    node_vec_y = np.arange(0+camera.roi_loc[YI],
+                           camera.roi_len[YI]+camera.roi_loc[YI]+camera.m_per_px/2,
                            camera.m_per_px)
     node_vec_y = node_vec_y[::-1] # flipud
     return (node_vec_x,node_vec_y)
@@ -119,25 +122,25 @@ def calc_roi_from_nodes(camera: CameraImageDef, nodes: np.ndarray
                         ) -> tuple[np.ndarray,np.ndarray]:
 
 
-    roi_len_x = np.max(nodes[:,0]) - np.min(nodes[:,0])
-    roi_len_y = np.max(nodes[:,1]) - np.min(nodes[:,1])
+    roi_len_x = np.max(nodes[:,XI]) - np.min(nodes[:,XI])
+    roi_len_y = np.max(nodes[:,YI]) - np.min(nodes[:,YI])
     roi_len = np.array([roi_len_x,roi_len_y])
 
-    if roi_len[0] > camera.fov[0] or roi_len[1] > camera.fov[1]:
+    if roi_len[XI] > camera.fov[XI] or roi_len[YI] > camera.fov[YI]:
         warnings.warn('ROI is larger than the cameras FOV\n')
 
-    coord_offset = np.array([np.min(nodes[:,0]),np.min(nodes[:,1])])
+    coord_offset = np.array([np.min(nodes[:,XI]),np.min(nodes[:,YI])])
     return (roi_len,coord_offset)
 
 
 def calc_res_from_nodes(camera: CameraImageDef, nodes: np.ndarray, border_px: int
                         ) -> float:
 
-    roi_len_x_m = np.max(nodes[:,0]) - np.min(nodes[:,0])
-    roi_len_y_m = np.max(nodes[:,1]) - np.min(nodes[:,1])
+    roi_len_x_m = np.max(nodes[:,XI]) - np.min(nodes[:,XI])
+    roi_len_y_m = np.max(nodes[:,YI]) - np.min(nodes[:,YI])
 
-    roi_len_x_px = camera.num_px[0] - 2*border_px
-    roi_len_y_px = camera.num_px[1] - 2*border_px
+    roi_len_x_px = camera.num_px[XI] - 2*border_px
+    roi_len_y_px = camera.num_px[YI] - 2*border_px
 
     m_per_px_in_x = roi_len_x_m/roi_len_x_px
     m_per_px_in_y = roi_len_y_m/roi_len_y_px
@@ -150,11 +153,11 @@ def calc_res_from_nodes(camera: CameraImageDef, nodes: np.ndarray, border_px: in
     return m_per_px
 
 
-def norm_dynamic_range(image: np.ndarray, bits: int) -> np.ndarray:
+def norm_dynamic_range(in_image: np.ndarray, bits: int) -> np.ndarray:
 
-    ret_image = image
+    ret_image = in_image
     if bits > 8 and bits < 16:
-        ret_image  = ((2**16)/(2**bits))*image
+        ret_image  = ((2**16)/(2**bits))*in_image
     elif bits < 8:
         raise ValueError('Camera cannot have less than an 8 bit dynamic range\n.')
 
@@ -177,22 +180,22 @@ def rectangle_crop_image(camera: CameraImageDef,
                          corner: tuple[int,int] = (0,0),
                          ) -> np.ndarray:
 
-    if (camera.num_px[0] == image.shape[1] and
-        camera.num_px[1] == image.shape[0]):
+    if (camera.num_px[XI] == image.shape[1] and
+        camera.num_px[YI] == image.shape[0]):
         return image
 
-    if (corner[0]+camera.num_px[0]) > image.shape[1]:
+    if (corner[XI]+camera.num_px[XI]) > image.shape[1]:
         raise ValueError('Cannot crop image: '+
-                         f'crop edge X of {corner[0]+camera.num_px[0]} is '+
+                         f'crop edge X of {corner[XI]+camera.num_px[XI]} is '+
                          'larger than '+
                          f'image size {image.shape[1]}\n.')
-    if (corner[1]+camera.num_px[1]) > image.shape[0]:
+    if (corner[YI]+camera.num_px[YI]) > image.shape[0]:
         raise ValueError('Cannot crop image: '+
-                         f'crop edge Y of {corner[1]+camera.num_px[1]} is '+
+                         f'crop edge Y of {corner[YI]+camera.num_px[YI]} is '+
                          'larger than '+
                          f'image size {image.shape[0]}\n.')
 
-    image = image[corner[1]:camera.num_px[1],corner[0]:camera.num_px[0]]
+    image = image[corner[YI]:camera.num_px[YI],corner[XI]:camera.num_px[XI]]
     return image
 
 
@@ -205,11 +208,11 @@ def get_im_mask_from_sim(camera: CameraImageDef,
     (px_x_m,px_y_m) = get_pixel_grid_in_m(camera)
 
     # Convert to np array for compatibility with new alpha shape function
-    points = np.array((nodes[:,0]+camera.roi_loc[0],
-                       nodes[:,1]+camera.roi_loc[1])).T
+    points = np.array((nodes[:,XI]+camera.roi_loc[XI],
+                       nodes[:,YI]+camera.roi_loc[YI])).T
 
     # Calculate the element edge length to use as the alpha radius
-    elem_edge = 2*np.max(np.diff(np.sort(nodes[:,0])))
+    elem_edge = 2*np.max(np.diff(np.sort(nodes[:,XI])))
     alpha = elem_edge
 
     # Find the alpha shape based on the list of nodal points
@@ -219,7 +222,7 @@ def get_im_mask_from_sim(camera: CameraImageDef,
     # Create an array of nans to fill as the specimen image
     masked_im = np.empty(image.shape)
     masked_im[:] = np.nan
-    im_mask = np.zeros([camera.num_px[1],camera.num_px[0]])
+    im_mask = np.zeros([camera.num_px[YI],camera.num_px[XI]])
 
     # Fill the image based on the pixel being within the polygon (alpha-shape)
     # If pixel is not within the specimen set to background default colour
@@ -266,7 +269,7 @@ def upsample_image(camera: CameraImageDef,
     # This function will flip the image regardless of the y vector input so flip it
     # back to FE coords
     upsampled_image = upsampled_image_interp(subpx_vec_xm,subpx_vec_ym)
-
+    #upsampled_image = upsampled_image[::-1,:]
 
     return upsampled_image
 
@@ -367,12 +370,12 @@ def deform_one_image(upsampled_image: np.ndarray,
                             np.ndarray | None]:
 
     if image_mask is not None:
-        if (image_mask.shape[0] != camera.num_px[1]) or (image_mask.shape[1] != camera.num_px[0]):
+        if (image_mask.shape[0] != camera.num_px[YI]) or (image_mask.shape[1] != camera.num_px[XI]):
             if image_mask.size == 0:
                 warnings.warn('Image mask not specified, using default mask of ones.')
             else:
                 warnings.warn('Image mask size does not match camera, using default mask of ones.')
-            image_mask = np.ones([camera.num_px[1],camera.num_px[0]])
+            image_mask = np.ones([camera.num_px[YI],camera.num_px[XI]])
 
     # Get grid of pixel centroid locations
     (px_grid_xm,px_grid_ym) = get_pixel_grid_in_m(camera)
@@ -386,17 +389,17 @@ def deform_one_image(upsampled_image: np.ndarray,
         tic = time.perf_counter()
 
     # Interpolate displacements onto sub-pixel locations - nan extrapolation
-    subpx_disp_x = griddata((coords[:,0] + disp[:,0] + camera.roi_loc[0],
-                             coords[:,1] + disp[:,1] + camera.roi_loc[1]),
-                            disp[:,0],
+    subpx_disp_x = griddata((coords[:,XI] + disp[:,XI] + camera.roi_loc[XI],
+                             coords[:,YI] + disp[:,YI] + camera.roi_loc[YI]),
+                            disp[:,XI],
                             (subpx_grid_xm,subpx_grid_ym),
                             method=id_opts.fe_interp,
                             fill_value=np.nan,
                             rescale=id_opts.fe_rescale)
 
-    subpx_disp_y = griddata((coords[:,0] + disp[:,0] + camera.roi_loc[0],
-                             coords[:,1] + disp[:,1] + camera.roi_loc[1]),
-                            disp[:,1],
+    subpx_disp_y = griddata((coords[:,XI] + disp[:,XI] + camera.roi_loc[XI],
+                             coords[:,YI] + disp[:,YI] + camera.roi_loc[YI]),
+                            disp[:,YI],
                             (subpx_grid_xm,subpx_grid_ym),
                             method=id_opts.fe_interp,
                             fill_value=np.nan,
@@ -410,8 +413,8 @@ def deform_one_image(upsampled_image: np.ndarray,
         subpx_disp_ext_vals = (0.0,0.0)
 
     # Set the nans to the extrapoltion value
-    subpx_disp_x[np.isnan(subpx_disp_x)] = subpx_disp_ext_vals[0]
-    subpx_disp_y[np.isnan(subpx_disp_y)] = subpx_disp_ext_vals[1]
+    subpx_disp_x[np.isnan(subpx_disp_x)] = subpx_disp_ext_vals[XI]
+    subpx_disp_y[np.isnan(subpx_disp_y)] = subpx_disp_ext_vals[YI]
 
     if print_on:
         toc = time.perf_counter()
@@ -506,7 +509,7 @@ def deform_one_image(upsampled_image: np.ndarray,
     else:
         def_mask = None
 
-    # Need to flip the image as all processing above is done with y a0s down
+    # Need to flip the image as all processing above is done with y axis down
     # from the top left hand corner
     def_image = def_image[::-1,:]
 

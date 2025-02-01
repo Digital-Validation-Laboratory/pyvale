@@ -5,64 +5,146 @@ License: MIT
 Copyright (C) 2024 The Computer Aided Validation Team
 ================================================================================
 """
+from pathlib import Path
 import numpy as np
 from scipy.spatial.transform import Rotation
-from pyvale.core.cameradata import CameraData2D
+import matplotlib.image as mplim
+from PIL import Image
+from pyvale.core.cameradata2d import CameraData2D
 from pyvale.core.sensordata import SensorData
 
 # NOTE: This module is a feature under developement.
 
-def build_pixel_vec_px(cam_data: CameraData2D) -> tuple[np.ndarray,np.ndarray]:
-    px_vec_x = np.arange(0,cam_data.num_pixels[0],1)
-    px_vec_y = np.arange(0,cam_data.num_pixels[1],1)
+#-------------------------------------------------------------------------------
+def load_image(im_path: Path) -> np.ndarray:
+
+    input_im = mplim.imread(im_path).astype(np.float64)
+    # If we have RGB then get rid of it
+    # TODO: make sure this is collapsing RGB to grey scale coorectly
+    if input_im.ndim > 2:
+        input_im = input_im[:,:,0]
+
+    return input_im
+
+
+def save_image(save_file: Path,
+               image: np.ndarray,
+               n_bits: int = 16) -> None:
+
+    # Need to flip image so coords are top left with Y down
+    # TODO check this
+    image = image[::-1,:]
+
+    if n_bits > 8:
+        im = Image.fromarray(image.astype(np.uint16))
+    else:
+        im = Image.fromarray(image.astype(np.uint8))
+
+    im.save(save_file)
+
+#-------------------------------------------------------------------------------
+def build_pixel_vec_px(pixels_count: np.ndarray) -> tuple[np.ndarray,np.ndarray]:
+    px_vec_x = np.arange(0,pixels_count[0],1)
+    px_vec_y = np.arange(0,pixels_count[1],1)
     return (px_vec_x,px_vec_y)
 
-def build_pixel_grid_px(cam_data: CameraData2D) -> tuple[np.ndarray,np.ndarray]:
-    (px_vec_x,px_vec_y) = build_pixel_vec_px(cam_data)
+def build_pixel_grid_px(pixels_count: np.ndarray
+                        ) -> tuple[np.ndarray,np.ndarray]:
+    (px_vec_x,px_vec_y) = build_pixel_vec_px(pixels_count)
     return np.meshgrid(px_vec_x,px_vec_y)
 
-def vectorise_pixel_grid_px(cam_data: CameraData2D) -> tuple[np.ndarray,np.ndarray]:
-    (px_grid_x,px_grid_y) = build_pixel_grid_px(cam_data)
+def vectorise_pixel_grid_px(pixels_count: np.ndarray) -> tuple[np.ndarray,np.ndarray]:
+    (px_grid_x,px_grid_y) = build_pixel_grid_px(pixels_count)
     return (px_grid_x.flatten(),px_grid_y.flatten())
 
-
-def build_pixel_vec_leng(cam_data: CameraData2D) -> tuple[np.ndarray,np.ndarray]:
-    px_vec_x = np.arange(cam_data.leng_per_px/2,
-                         cam_data.field_of_view_local[0],
-                         cam_data.leng_per_px)
-    px_vec_y = np.arange(cam_data.leng_per_px/2,
-                         cam_data.field_of_view_local[1],
-                         cam_data.leng_per_px)
+#-------------------------------------------------------------------------------
+def build_subpixel_vec_px(pixels_count: np.ndarray,
+                          subsample: int = 2) -> tuple[np.ndarray,np.ndarray]:
+    px_vec_x = np.arange(1/(2*subsample),pixels_count[0],1/subsample)
+    px_vec_y = np.arange(1/(2*subsample),pixels_count[1],1/subsample)
     return (px_vec_x,px_vec_y)
 
-def build_pixel_grid_leng(cam_data: CameraData2D) -> tuple[np.ndarray,np.ndarray]:
-    (px_vec_x,px_vec_y) = build_pixel_vec_leng(cam_data)
+def build_subpixel_grid_px(pixels_count: np.ndarray,
+                           subsample: int = 2) -> tuple[np.ndarray,np.ndarray]:
+    (px_vec_x,px_vec_y) = build_subpixel_vec_px(pixels_count,subsample)
     return np.meshgrid(px_vec_x,px_vec_y)
 
-def vectorise_pixel_grid_leng(cam_data: CameraData2D) -> tuple[np.ndarray,np.ndarray]:
-    (px_grid_x,px_grid_y) = build_pixel_grid_leng(cam_data)
+def vectorise_subpixel_grid_px(pixels_count: np.ndarray,
+                               subsample: int = 2) -> tuple[np.ndarray,np.ndarray]:
+    (px_grid_x,px_grid_y) = build_subpixel_grid_px(pixels_count,subsample)
     return (px_grid_x.flatten(),px_grid_y.flatten())
 
-def calc_resolution_from_sim(num_px: np.ndarray,
-                             coords: np.ndarray,
-                             border_px: int,
-                             view_plane: tuple[int,int] = (0,1),
-                             ) -> float:
+#-------------------------------------------------------------------------------
+def build_pixel_vec_leng(field_of_view: np.ndarray,
+                         leng_per_px: float) -> tuple[np.ndarray,np.ndarray]:
+    px_vec_x = np.arange(leng_per_px/2,
+                         field_of_view[0],
+                         leng_per_px)
+    px_vec_y = np.arange(leng_per_px/2,
+                         field_of_view[1],
+                         leng_per_px)
+    return (px_vec_x,px_vec_y)
+
+def build_pixel_grid_leng(field_of_view: np.ndarray,
+                          leng_per_px: float) -> tuple[np.ndarray,np.ndarray]:
+    (px_vec_x,px_vec_y) = build_pixel_vec_leng(field_of_view,leng_per_px)
+    return np.meshgrid(px_vec_x,px_vec_y)
+
+def vectorise_pixel_grid_leng(field_of_view: np.ndarray,
+                              leng_per_px: float) -> tuple[np.ndarray,np.ndarray]:
+    (px_grid_x,px_grid_y) = build_pixel_grid_leng(field_of_view,leng_per_px)
+    return (px_grid_x.flatten(),px_grid_y.flatten())
+
+#-------------------------------------------------------------------------------
+def build_subpixel_vec_leng(field_of_view: np.ndarray,
+                            leng_per_px: float,
+                            subsample: int = 2) -> tuple[np.ndarray,np.ndarray]:
+    px_vec_x = np.arange(leng_per_px/(2*subsample),
+                         field_of_view[0],
+                         leng_per_px/(2*subsample))
+    px_vec_y = np.arange(leng_per_px/(2*subsample),
+                         field_of_view[1],
+                         leng_per_px/(2*subsample))
+    return (px_vec_x,px_vec_y)
+
+def build_subpixel_grid_leng(field_of_view: np.ndarray,
+                             leng_per_px: float,
+                             subsample: int = 2) -> tuple[np.ndarray,np.ndarray]:
+    (px_vec_x,px_vec_y) = build_subpixel_vec_leng(field_of_view,
+                                                  leng_per_px,
+                                                  subsample)
+    return np.meshgrid(px_vec_x,px_vec_y)
+
+def vectorise_subpixel_grid_leng(field_of_view: np.ndarray,
+                                 leng_per_px: float,
+                                 subsample: int = 2) -> tuple[np.ndarray,np.ndarray]:
+    (px_grid_x,px_grid_y) = build_subpixel_grid_leng(field_of_view,
+                                                     leng_per_px,
+                                                     subsample)
+    return (px_grid_x.flatten(),px_grid_y.flatten())
+
+#-------------------------------------------------------------------------------
+def calc_resolution_from_sim_2d(pixels_count: np.ndarray,
+                                coords: np.ndarray,
+                                pixels_border: int,
+                                view_plane_axes: tuple[int,int] = (0,1),
+                                ) -> float:
 
     coords_min = np.min(coords, axis=0)
     coords_max = np.max(coords, axis=0)
     field_of_view = np.abs(coords_max - coords_min)
-    roi_px = np.array(num_px - 2*border_px,dtype=np.float64)
+    roi_px = np.array(pixels_count - 2*pixels_border,dtype=np.float64)
 
-    resolution = np.zeros_like(view_plane,dtype=np.float64)
-    for ii in view_plane:
-        resolution[ii] = field_of_view[view_plane[ii]] / roi_px[ii]
+    resolution = np.zeros_like(view_plane_axes,dtype=np.float64)
+    for ii in view_plane_axes:
+        resolution[ii] = field_of_view[view_plane_axes[ii]] / roi_px[ii]
 
     return np.max(resolution)
 
 
-def calc_centre_from_sim(coords: np.ndarray,
-                         view_axes: tuple[int,int] = (0,1)) -> np.ndarray:
+def calc_roi_cent_from_sim_2d(coords: np.ndarray,
+                              view_axes: tuple[int,int] = (0,1)
+                              ) -> np.ndarray:
     centre = np.mean(coords,axis=0)
 
     for ii,_ in enumerate(centre):
@@ -72,8 +154,9 @@ def calc_centre_from_sim(coords: np.ndarray,
     return centre
 
 
-def build_sensor_data_from_camera(cam_data: CameraData2D) -> SensorData:
-    pixels_vectorised = vectorise_pixel_grid_leng(cam_data)
+def build_sensor_data_from_camera_2d(cam_data: CameraData2D) -> SensorData:
+    pixels_vectorised = vectorise_pixel_grid_leng(cam_data.field_of_view,
+                                                  cam_data.leng_per_px)
 
     positions = np.zeros((pixels_vectorised[0].shape[0],3))
     for ii,vv in enumerate(cam_data.view_axes):
@@ -97,8 +180,8 @@ def build_sensor_data_from_camera(cam_data: CameraData2D) -> SensorData:
 # account of camera rotation by rotating the bounding box of the sim into cam
 # coords
 
-def fov_from_cam_rot(cam_rot: Rotation,
-                     coords_world: np.ndarray) -> np.ndarray:
+def fov_from_cam_rot_3d(cam_rot: Rotation,
+                        coords_world: np.ndarray) -> np.ndarray:
     (xx,yy,zz) = (0,1,2)
 
     cam_to_world_mat = cam_rot.as_matrix()
@@ -123,10 +206,10 @@ def fov_from_cam_rot(cam_rot: Rotation,
     return np.array((boundbox_cam_leng[xx],boundbox_cam_leng[yy]))
 
 
-def image_dist_from_fov(num_pixels: np.ndarray,
-                        pixel_size: np.ndarray,
-                        focal_leng: float,
-                        fov_leng: np.ndarray) -> np.ndarray:
+def image_dist_from_fov_3d(num_pixels: np.ndarray,
+                           pixel_size: np.ndarray,
+                           focal_leng: float,
+                           fov_leng: np.ndarray) -> np.ndarray:
 
     sensor_dims = num_pixels * pixel_size
     fov_angle = 2*np.arctan(sensor_dims/(2*focal_leng))

@@ -41,6 +41,7 @@ from pyvale.core.sensordata import *
 
 from pyvale.core.camera import *
 from pyvale.core.cameradata import *
+from pyvale.core.cameradata2d import *
 from pyvale.core.cameratools import *
 from pyvale.core.cameramesh import *
 from pyvale.core.camerarasternp import *
