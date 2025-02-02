@@ -22,78 +22,78 @@ from pyvale.imagesim.imagedefopts import ImageDefOpts
 from pyvale.imagesim.cameradataimagedef import CameraImageDef
 from pyvale.imagesim.alphashape import alphashape
 
-# (0,1) = (0,1)
-
-# def load_image(im_path: Path) -> np.ndarray:
-
-#     input_im = mplim.imread(im_path)
-#     input_im = input_im.astype(np.float64)
-
-#     # If we have RGB then get rid of it
-#     if input_im.ndim > 2:
-#         input_im = input_im[:,:,0]
-
-#     return input_im
 
 
-# def save_image(save_file: Path,
-#                image: np.ndarray,
-#                n_bits: int = 16) -> None:
+def load_image(im_path: Path) -> np.ndarray:
 
-#     # Need to flip image so coords are top left with Y down
-#     image = image[::-1,:]
+    input_im = mplim.imread(im_path)
+    input_im = input_im.astype(np.float64)
 
-#     if n_bits > 8:
-#         im = Image.fromarray(image.astype(np.uint16))
-#     else:
-#         im = Image.fromarray(image.astype(np.uint8))
+    # If we have RGB then get rid of it
+    if input_im.ndim > 2:
+        input_im = input_im[:,:,0]
 
-#     im.save(save_file)
+    return input_im
 
 
-# def get_pixel_vec_in_m(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
-#     mppx = camera.m_per_px
-#     px_vec_xm = np.arange(mppx/2,camera.fov[0],mppx)
-#     px_vec_ym = np.arange(mppx/2,camera.fov[1],mppx)
-#     #px_vec_ym = px_vec_ym[::-1] # flip
-#     return (px_vec_xm,px_vec_ym)
+def save_image(save_file: Path,
+               image: np.ndarray,
+               n_bits: int = 16) -> None:
+
+    # Need to flip image so coords are top left with Y down
+    image = image[::-1,:]
+
+    if n_bits > 8:
+        im = Image.fromarray(image.astype(np.uint16))
+    else:
+        im = Image.fromarray(image.astype(np.uint8))
+
+    im.save(save_file)
 
 
-# def get_pixel_grid_in_m(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
-#     (px_vec_xm,px_vec_ym) = get_pixel_vec_in_m(camera)
-#     (px_grid_xm,px_grid_ym) = np.meshgrid(px_vec_xm,px_vec_ym)
-#     return (px_grid_xm,px_grid_ym)
+def get_pixel_vec_in_m(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
+    mppx = camera.m_per_px
+    px_vec_xm = np.arange(mppx/2,camera.fov[0],mppx)
+    px_vec_ym = np.arange(mppx/2,camera.fov[1],mppx)
+    #px_vec_ym = px_vec_ym[::-1] # flip
+    return (px_vec_xm,px_vec_ym)
 
 
-# def get_pixel_vec_in_px(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
-#     px_vec_x = np.arange(0,camera.num_px[0],1)
-#     px_vec_y = np.arange(0,camera.num_px[1],1)
-#     px_vec_y = px_vec_y[::-1] # flip
-#     return (px_vec_x,px_vec_y)
+def get_pixel_grid_in_m(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
+    (px_vec_xm,px_vec_ym) = get_pixel_vec_in_m(camera)
+    (px_grid_xm,px_grid_ym) = np.meshgrid(px_vec_xm,px_vec_ym)
+    return (px_grid_xm,px_grid_ym)
 
 
-# def get_pixel_grid_in_px(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
-#     (px_vec_x,px_vec_y) = get_pixel_vec_in_px(camera)
-#     (px_grid_x,px_grid_y) = np.meshgrid(px_vec_x,px_vec_y)
-#     return (px_grid_x,px_grid_y)
+def get_pixel_vec_in_px(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
+    px_vec_x = np.arange(0,camera.num_px[0],1)
+    px_vec_y = np.arange(0,camera.num_px[1],1)
+    px_vec_y = px_vec_y[::-1] # flip
+    return (px_vec_x,px_vec_y)
 
 
-# def get_subpixel_vec(camera: CameraImageDef, subsample: int = 2
-#                      ) -> tuple[np.ndarray,np.ndarray]:
-
-#     mppx = camera.m_per_px
-#     subpx_vec_xm = np.arange(mppx/(2*subsample),camera.fov[0],mppx/subsample)
-#     subpx_vec_ym = np.arange(mppx/(2*subsample),camera.fov[1],mppx/subsample)
-#     #subpx_vec_ym = subpx_vec_ym[::-1] #flip
-#     return (subpx_vec_xm,subpx_vec_ym)
+def get_pixel_grid_in_px(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
+    (px_vec_x,px_vec_y) = get_pixel_vec_in_px(camera)
+    (px_grid_x,px_grid_y) = np.meshgrid(px_vec_x,px_vec_y)
+    return (px_grid_x,px_grid_y)
 
 
-# def get_subpixel_grid(camera: CameraImageDef, subsample: int = 2
-#                      ) -> tuple[np.ndarray,np.ndarray]:
+def get_subpixel_vec(camera: CameraImageDef, subsample: int = 2
+                     ) -> tuple[np.ndarray,np.ndarray]:
 
-#     (subpx_vec_xm,subpx_vec_ym) = get_subpixel_vec(camera,subsample)
-#     (subpx_grid_xm,subpx_grid_ym) = np.meshgrid(subpx_vec_xm,subpx_vec_ym)
-#     return (subpx_grid_xm,subpx_grid_ym)
+    mppx = camera.m_per_px
+    subpx_vec_xm = np.arange(mppx/(2*subsample),camera.fov[0],mppx/subsample)
+    subpx_vec_ym = np.arange(mppx/(2*subsample),camera.fov[1],mppx/subsample)
+    #subpx_vec_ym = subpx_vec_ym[::-1] #flip
+    return (subpx_vec_xm,subpx_vec_ym)
+
+
+def get_subpixel_grid(camera: CameraImageDef, subsample: int = 2
+                     ) -> tuple[np.ndarray,np.ndarray]:
+
+    (subpx_vec_xm,subpx_vec_ym) = get_subpixel_vec(camera,subsample)
+    (subpx_grid_xm,subpx_grid_ym) = np.meshgrid(subpx_vec_xm,subpx_vec_ym)
+    return (subpx_grid_xm,subpx_grid_ym)
 
 
 def get_roi_node_vec(camera: CameraImageDef) -> tuple[np.ndarray,np.ndarray]:
@@ -197,9 +197,9 @@ def rectangle_crop_image(camera: CameraImageDef,
 
 
 def get_im_mask_from_sim(camera: CameraImageDef,
-                            image: np.ndarray,
-                            nodes: np.ndarray
-                            ) -> tuple[np.ndarray,np.ndarray]:
+                         image: np.ndarray,
+                         nodes: np.ndarray
+                         ) -> tuple[np.ndarray,np.ndarray]:
 
     # Create a mesh of pixel centroid locations
     (px_x_m,px_y_m) = get_pixel_grid_in_m(camera)
@@ -265,8 +265,7 @@ def upsample_image(camera: CameraImageDef,
 
     # This function will flip the image regardless of the y vector input so flip it
     # back to FE coords
-    upsampled_image = upsampled_image_interp(subpx_vec_xm,subpx_vec_ym)
-
+    upsampled_image =  upsampled_image_interp(subpx_vec_xm,subpx_vec_ym)
 
     return upsampled_image
 
@@ -299,21 +298,21 @@ def preprocess(input_im: np.ndarray,
 
     if print_on:
         print('\n'+'='*80)
-        print('IMAGE PRE-PROCESSING\n')
+        print('IMAGE DEF PRE-PROCESSING\n')
 
     if not id_opts.save_path.is_dir():
         id_opts.save_path.mkdir()
-
-    # This isn't needed for exodus because the first time step in the sim is 0
-    if id_opts.add_static_ref == 'pad_disp':
-        num_nodes = coords.shape[0] # type: ignore
-        disp_x = np.hstack((np.zeros((num_nodes,1)),disp_x))
-        disp_y = np.hstack((np.zeros((num_nodes,1)),disp_y))
 
     if disp_x.ndim == 1:
         disp_x = np.atleast_2d(disp_x).T
     if disp_y.ndim == 1:
         disp_y = np.atleast_2d(disp_y).T
+
+    # This isn't needed for exodus because the first time step in the sim is 0
+    if id_opts.add_static_ref:
+        num_nodes = coords.shape[0] # type: ignore
+        disp_x = np.hstack((np.zeros((num_nodes,1)),disp_x))
+        disp_y = np.hstack((np.zeros((num_nodes,1)),disp_y))
 
     # Image cropping
     input_im = rectangle_crop_image(camera,input_im)
@@ -348,23 +347,23 @@ def preprocess(input_im: np.ndarray,
 
     if print_on:
         toc = time.perf_counter()
-        print(f'Upsampling image with I2D took {toc-tic:.4f} seconds')
+        print(f'Upsampling image withtook {toc-tic:.4f} seconds')
 
     return (upsampled_image,image_mask,input_im,disp_x,disp_y)
 
 
 def deform_one_image(upsampled_image: np.ndarray,
-                 camera: CameraImageDef,
-                 id_opts: ImageDefOpts,
-                 coords: np.ndarray,
-                 disp: np.ndarray,
-                 image_mask: np.ndarray | None = None,
-                 print_on: bool = True
-                 ) -> tuple[np.ndarray,
-                            np.ndarray,
-                            np.ndarray,
-                            np.ndarray,
-                            np.ndarray | None]:
+                    camera: CameraImageDef,
+                    id_opts: ImageDefOpts,
+                    coords: np.ndarray,
+                    disp: np.ndarray,
+                    image_mask: np.ndarray | None = None,
+                    print_on: bool = True
+                    ) -> tuple[np.ndarray,
+                                np.ndarray,
+                                np.ndarray,
+                                np.ndarray,
+                                np.ndarray | None]:
 
     if image_mask is not None:
         if (image_mask.shape[0] != camera.num_px[1]) or (image_mask.shape[1] != camera.num_px[0]):

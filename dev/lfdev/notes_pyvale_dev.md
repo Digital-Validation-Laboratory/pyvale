@@ -34,6 +34,14 @@
     - Build own spline interp in cython
 - Generate a test case run in 2D through DICE
 
+**2D DIC TEST CASE**
+- 1020x520 pixels
+- 100x50mm plate
+- 10px on the border
+- Resolution = 100mm/1000px = 0.1 mm/px
+- 10px per mm
+- 1mm displacement = 10 px
+- Need displacement cases at 0.1/10 = 1/10th of a pixel
 
 ## TODO: `CameraRaster`
 - Speed up edge function calculation using stepwise optimisation on SAP

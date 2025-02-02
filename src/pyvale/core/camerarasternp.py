@@ -112,10 +112,10 @@ class RasteriserNP:
         # Check that min/max nodes are within the 4 edges of the camera image
         #shape=(4_edges_to_check,num_elems)
         crop_mask = np.zeros([elem_raster_coords.shape[0],4],dtype=np.int8)
-        crop_mask[elem_raster_coord_min[:,0] <= (cam_data.pixels_num[0]-1),0] = 1
-        crop_mask[elem_raster_coord_min[:,1] <= (cam_data.pixels_num[1]-1),1] = 1
-        crop_mask[elem_raster_coord_max[:,0] >= 0,2] = 1
-        crop_mask[elem_raster_coord_max[:,1] >= 0,3] = 1
+        crop_mask[elem_raster_coord_min[:,0] <= (cam_data.pixels_num[0]-1), 0] = 1
+        crop_mask[elem_raster_coord_min[:,1] <= (cam_data.pixels_num[1]-1), 1] = 1
+        crop_mask[elem_raster_coord_max[:,0] >= 0, 2] = 1
+        crop_mask[elem_raster_coord_max[:,1] >= 0, 3] = 1
         crop_mask = np.sum(crop_mask,axis=1) == 4
 
         # Get only the elements that are within the FOV
@@ -138,8 +138,6 @@ class RasteriserNP:
         elem_bound_boxes_inds[:,3] = RasteriserNP.elem_bound_box_high(
                                             elem_raster_coord_max[:,1],
                                             cam_data.pixels_num[1]-1)
-
-
 
         return (crop_mask,elem_bound_boxes_inds)
 

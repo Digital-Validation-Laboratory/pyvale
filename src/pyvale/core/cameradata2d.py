@@ -21,8 +21,13 @@ class CameraData2D:
     sample_times: np.ndarray | None = None
     angle: Rotation | None = None
 
+    subsample: int = 2
+
     field_of_view: np.ndarray = field(init=False)
     dynamic_range: int = field(init=False)
+
+    world_to_cam: np.ndarray = field(init=False)
+    cam_to_world: np.ndarray = field(init=False)
 
     def __post_init__(self) -> None:
 
@@ -35,6 +40,9 @@ class CameraData2D:
         self.field_of_view = self.leng_per_px*(self.pixels_count.astype(np.float64))
         self.dynamic_range = 2**self.bits
         self.background = self.background*float(self.dynamic_range)
+
+        self.world_to_cam = self.field_of_view/2 - self.roi_cent_world[:-1]
+        self.cam_to_world = -self.world_to_cam
 
 
 #@dataclass(slots=True)

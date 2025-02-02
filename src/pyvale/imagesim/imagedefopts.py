@@ -9,14 +9,8 @@ from dataclasses import dataclass
 from pathlib import Path
 import numpy as np
 
-@dataclass
+@dataclass(slots=True)
 class ImageDefOpts:
-    """ _summary_
-    """
-    #----------------------------------------------------------------------
-    # USER CONTROLLED OPTIONS
-    # Set these to achieve desired behaviour
-
     # Path to save the deformed images
     save_path: Path = Path.cwd() / 'deformed_images'
     save_tag: str = 'defimage'
@@ -54,7 +48,7 @@ class ImageDefOpts:
     # specimen area to be padded with border values
 
     # Subsampling used to split each pixel in the input image
-    subsample: int = 3
+    subsample: int = 2
 
     # Interpolation used to upsample the input image: scipy-interp2d
     # image_upsamp_interp: str = 'cubic'
@@ -69,7 +63,5 @@ class ImageDefOpts:
     # also deformed and applied to the deformed image
     def_complex_geom: bool = True
 
-    #----------------------------------------------------------------------
-    # PARALLELISATION OPTIONS
 
 

@@ -65,13 +65,13 @@ steelPRatio = 0.3     # -
         type = FunctionDirichletBC
         variable = disp_y
         boundary = 'bottom'
-        function = '${dispRate}*t'
+        function = '${dispRate}*-t'
     []
     [left_x]
         type = FunctionDirichletBC
         variable = disp_x
         boundary = 'left'
-        function = '${dispRate}*t'
+        function = '${dispRate}*-t'
     []
     [right_x]
         type = FunctionDirichletBC

@@ -10,13 +10,11 @@ import matplotlib.pyplot as plt
 
 from pyvale.core.visualopts import PlotOptsGeneral
 
-plot_opts = PlotOptsGeneral()
-I_CMAP = 'gray'
-V_CMAP = 'plasma'
 
-def plot_diag_image(title: str,
+def plot_diag_image(
                     image: np.ndarray,
-                    cmap: str = V_CMAP) -> None:
+                    title: str = "",
+                    cmap: str = "plasma") -> None:
     fig, ax = plt.subplots()
     cset = plt.imshow(image,cmap=plt.get_cmap(cmap),origin='lower')
     ax.set_aspect('equal','box')
@@ -24,10 +22,10 @@ def plot_diag_image(title: str,
     fig.colorbar(cset)
 
 
-def plot_diag_image_xy(title: str,
-                       image: np.ndarray,
+def plot_diag_image_xy(image: np.ndarray,
                        extent: tuple[float,float,float,float],
-                       cmap: str = V_CMAP,
+                       title: str = "",
+                       cmap: str = "plasma",
                        ax_units: str = 'mm') -> None:
 
     fig, ax = plt.subplots()
@@ -41,6 +39,7 @@ def plot_diag_image_xy(title: str,
     ax.set_ylabel(f'y [{ax_units}]',fontsize=12)
     fig.colorbar(cset)
 
+
 def plot_all_diags(def_image: np.ndarray,
                    def_mask: np.ndarray | None,
                    def_image_subpx: np.ndarray,
@@ -49,13 +48,16 @@ def plot_all_diags(def_image: np.ndarray,
                    subpx_grid_xm: np.ndarray,
                    subpx_grid_ym: np.ndarray) -> None:
 
-    if def_mask is not None:
-        plot_diag_image('Def. Mask',def_mask,I_CMAP)
+    image_map = "gray"
+    vector_map = "plasma"
 
-    plot_diag_image('Subpx Def. Image',def_image_subpx,I_CMAP)
-    plot_diag_image('Def. Image',def_image,I_CMAP)
+    if def_mask is not None:
+        plot_diag_image('Def. Mask',def_mask,image_map)
+
+    plot_diag_image('Subpx Def. Image',def_image_subpx,image_map)
+    plot_diag_image('Def. Image',def_image,image_map)
 
     ext = tuple(np.array([subpx_grid_xm.min(),subpx_grid_xm.max(),
                     subpx_grid_ym.min(),subpx_grid_ym.max()])*10**3)
-    plot_diag_image_xy('Sub Pixel Disp X',subpx_disp_x,ext,V_CMAP)
-    plot_diag_image_xy('Sub Pixel Disp Y',subpx_disp_y,ext,V_CMAP)
+    plot_diag_image_xy('Sub Pixel Disp X',subpx_disp_x,ext,vector_map)
+    plot_diag_image_xy('Sub Pixel Disp Y',subpx_disp_y,ext,vector_map)

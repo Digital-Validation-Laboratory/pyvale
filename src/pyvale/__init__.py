@@ -46,6 +46,8 @@ from pyvale.core.cameratools import *
 from pyvale.core.cameramesh import *
 from pyvale.core.camerarasternp import *
 
+from pyvale.core.imagedef2d import *
+
 from pyvale.core.errorintegrator import *
 from pyvale.core.errorrand import *
 from pyvale.core.errorsysindep import *
@@ -62,6 +64,7 @@ from pyvale.core.visualsimanimator import *
 from pyvale.core.visualexpplotter import *
 from pyvale.core.visualtraceplotter import *
 from pyvale.core.visualimages import *
+from pyvale.core.visualimagedef import *
 
 from pyvale.core.analyticmeshgen import *
 from pyvale.core.analyticsimdatagenerator import *

@@ -1,0 +1,88 @@
+"""
+================================================================================
+pyvale: the python computer aided validation engine
+
+License: MIT
+Copyright (C) 2024 The Computer Aided Validation Team
+================================================================================
+"""
+
+from pathlib import Path
+import numpy as np
+import matplotlib.pyplot as plt
+import mooseherder as mh
+import pyvale
+
+
+def main() -> None:
+    #---------------------------------------------------------------------------
+    # LOAD FILES
+    sim_file = "platehole2d_out.e"
+    #sim_file = "mechplate2d_trpull_out.e"
+    sim_path = Path("dev/lfdev/imagedef_testsims") / sim_file
+    sim_data = mh.ExodusReader(sim_path).read_all_sim_data()
+
+    image_path = pyvale.DataSet.dic_pattern_5mpx_path()
+    image_speckle = pyvale.CameraTools.load_image(image_path)
+
+    #pyvale.ImageDefDiags.plot_speckle_image(image_speckle)
+    #plt.show()
+
+    coords = sim_data.coords
+    connectivity = (sim_data.connect["connect1"]-1).T # Beware 0 indexing here
+    disp_x = sim_data.node_vars["disp_x"][:,-1]
+    disp_y = sim_data.node_vars["disp_y"][:,-1]
+
+    print()
+    print(80*"-")
+    print(f"{coords.shape=}")
+    print(f"{connectivity.shape=}")
+    print(f"{disp_x.shape=}")
+    print(f"{disp_y.shape=}")
+    print(80*"-")
+
+    #---------------------------------------------------------------------------
+    # INPUT DATA
+    cam_data = pyvale.CameraData2D(pixels_count=np.array((1040,1540)),
+                                   leng_per_px=0.1e-3,
+                                   bits=8,
+                                   roi_cent_world=np.mean(coords,axis=0))
+    id_opts = pyvale.ImageDefOpts(crop_on=True,
+                                  add_static_ref=True)
+
+
+    #---------------------------------------------------------------------------
+    # PRE-PROCESS IMAGES
+    (upsampled_image,
+     image_mask,
+     image_input,
+     disp_x,
+     disp_y) = pyvale.ImageDef2D.preprocess(cam_data,
+                                            image_speckle,
+                                            coords,
+                                            connectivity,
+                                            disp_x,
+                                            disp_y,
+                                            id_opts,
+                                            print_on=True)
+
+    #pyvale.ImageDefDiags.plot_speckle_image(image_input)
+    #pyvale.ImageDefDiags.plot_speckle_image(image_mask)
+    #pyvale.ImageDefDiags.plot_speckle_image(upsampled_image)
+    #plt.show()
+
+    print(cam_data)
+
+
+
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    main()
+
