@@ -466,4 +466,73 @@ class ImageDef2D:
 
         return (def_image,def_image_subpx,subpx_disp_x,subpx_disp_y,def_mask)
 
+    @staticmethod
+    def deform_images(cam_data: CameraData2D,
+                      image_input: np.ndarray,
+                      coords: np.ndarray,
+                      connectivity: np.ndarray,
+                      disp_x: np.ndarray,
+                      disp_y: np.ndarray,
+                      id_opts: ImageDefOpts,
+                      print_on: bool = False) -> None:
+        #---------------------------------------------------------------------------
+        # Image Pre-Processing
+        (upsampled_image,
+        image_mask,
+        image_input,
+        disp_x,
+        disp_y) = ImageDef2D.preprocess(cam_data,
+                                        image_input,
+                                        coords,
+                                        connectivity,
+                                        disp_x,
+                                        disp_y,
+                                        id_opts,
+                                        print_on=True)
+
+        #---------------------------------------------------------------------------
+        # Image Deformation Loop
+        if print_on:
+            print('\n'+'='*80)
+            print('DEFORMING IMAGES')
+
+        num_frames = disp_x.shape[1]
+        ticl = time.perf_counter()
+
+        for ff in range(num_frames):
+            if print_on:
+                ticf = time.perf_counter()
+                print(f'\nDEFORMING FRAME: {ff}')
+
+            disp = np.array((disp_x[:,ff],disp_y[:,ff])).T
+            (def_image,
+            _,
+            _,
+            _,
+            _) = ImageDef2D.deform_one_image(upsampled_image,
+                                            cam_data,
+                                            id_opts,
+                                            coords,
+                                            disp,
+                                            image_mask,
+                                            print_on=print_on)
+
+            save_file = id_opts.save_path / str(f'{id_opts.save_tag}_'+
+                    f'{CameraTools.image_num_str(im_num=ff,width=4)}'+
+                    '.tiff')
+            CameraTools.save_image(save_file,def_image,cam_data.bits)
+
+            if print_on:
+                tocf = time.perf_counter()
+                print(f'DEFORMING FRAME: {ff} took {tocf-ticf:.4f} seconds')
+
+        if print_on:
+            tocl = time.perf_counter()
+            print('\n'+'-'*50)
+            print(f'Deforming all images took {tocl-ticl:.4f} seconds')
+            print('-'*50)
+
+            print('\n'+'='*80)
+            print('COMPLETE\n')
+
 

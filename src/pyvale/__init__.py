@@ -16,8 +16,6 @@ Copyright (C) 2024 The Computer Aided Validation Team
 # underlying project structure: the user should always be able to use 'pyvale.'
 # and access everything in one layer without multiple import dots
 
-from pyvale.imagesim import *
-
 from pyvale.core.dataset import *
 
 from pyvale.core.field import *

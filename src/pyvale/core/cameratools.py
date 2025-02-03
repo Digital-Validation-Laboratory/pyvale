@@ -46,6 +46,16 @@ class CameraTools:
 
         im.save(save_file)
 
+    @staticmethod
+    def image_num_str(im_num: int, width: int , cam_num: int = -1) -> str:
+        num_str = str(im_num)
+        num_str = num_str.zfill(width)
+
+        if cam_num >= 0:
+            num_str = num_str+'_'+str(cam_num)
+
+        return num_str
+
     #-------------------------------------------------------------------------------
     @staticmethod
     def pixel_vec_px(pixels_count: np.ndarray) -> tuple[np.ndarray,np.ndarray]:
