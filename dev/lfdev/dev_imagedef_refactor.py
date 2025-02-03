@@ -17,7 +17,7 @@ import pyvale
 def main() -> None:
     #---------------------------------------------------------------------------
     # LOAD FILES
-    sim_file = "platehole2d_out.e"
+    sim_file = "platehole2d_largedef_out.e"
     #sim_file = "mechplate2d_trpull_out.e"
     sim_path = Path("dev/lfdev/imagedef_testsims") / sim_file
     sim_data = mh.ExodusReader(sim_path).read_all_sim_data()
@@ -46,7 +46,8 @@ def main() -> None:
     cam_data = pyvale.CameraData2D(pixels_count=np.array((1040,1540)),
                                    leng_per_px=0.1e-3,
                                    bits=8,
-                                   roi_cent_world=np.mean(coords,axis=0))
+                                   roi_cent_world=np.mean(coords,axis=0),
+                                   subsample=3)
     id_opts = pyvale.ImageDefOpts(crop_on=True,
                                   add_static_ref=True)
 
@@ -66,21 +67,27 @@ def main() -> None:
                                             id_opts,
                                             print_on=True)
 
+    ff = -1
+    disp = np.array((disp_x[:,ff],disp_y[:,ff])).T
+    print(f"{disp.shape=}")
+
+    (def_image,
+     def_image_subpx,
+     subpx_disp_x,
+     subpx_disp_y,
+     def_mask) = pyvale.ImageDef2D.deform_one_image(upsampled_image,
+                                                    cam_data,
+                                                    id_opts,
+                                                    coords,
+                                                    disp,
+                                                    image_mask,
+                                                    print_on=True)
+
     #pyvale.ImageDefDiags.plot_speckle_image(image_input)
     #pyvale.ImageDefDiags.plot_speckle_image(image_mask)
     #pyvale.ImageDefDiags.plot_speckle_image(upsampled_image)
-    #plt.show()
-
-    print(cam_data)
-
-
-
-
-
-
-
-
-
+    pyvale.ImageDefDiags.plot_speckle_image(def_image)
+    plt.show()
 
 
 if __name__ == "__main__":

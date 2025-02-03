@@ -10,7 +10,6 @@ import warnings
 from dataclasses import dataclass
 from pathlib import Path
 import numpy as np
-from scipy.signal import convolve2d
 from scipy.interpolate import griddata
 from scipy.interpolate import RectBivariateSpline
 from scipy import ndimage
@@ -38,7 +37,7 @@ class ImageDefOpts:
     fe_interp: str = "linear"
     fe_rescale: bool = True
     fe_extrap_outside_fov: bool = True # forces displacements outside the
-    subsample: int = 2
+    #subsample: int = 2 # MOVED TO CAMERA DATA
 
     image_def_order: int = 3
     image_def_extrap: str = "nearest"
@@ -120,7 +119,7 @@ class ImageDef2D:
         if elem_coords.shape[1] > 3:
             num_edges = 4
 
-        mask_buffer =  np.full(subsample*cam_data.pixels_count,0.0).T
+        mask_subpixel_buffer =  np.full(subsample*cam_data.pixels_count,0.0).T
         # Raster Loop
         for ee in range(elem_coords.shape[0]):
             # Create the subpixel coords inside the bounding box to test with the
@@ -181,14 +180,16 @@ class ImageDef2D:
             edge_mask_flat = edge_check == num_edges
             edge_mask_grid = np.reshape(edge_mask_flat,bound_coords_grid_shape)
 
-
             subpx_inds_grid_x = subpx_inds_grid_x[edge_mask_grid]
             subpx_inds_grid_y = subpx_inds_grid_y[edge_mask_grid]
-            mask_buffer[subpx_inds_grid_y,subpx_inds_grid_x] += 1.0
+            mask_subpixel_buffer[subpx_inds_grid_y,subpx_inds_grid_x] += 1.0
 
-        mask_buffer[mask_buffer>1.0] = 1.0
+        mask_subpixel_buffer[mask_subpixel_buffer>1.0] = 1.0
+
+        mask_buffer = CameraTools.average_subpixel_image(mask_subpixel_buffer,
+                                                         subsample)
         image[mask_buffer<1.0] = cam_data.background
-        return (image,mask_buffer)
+        return (image,mask_subpixel_buffer)
 
     @staticmethod
     def upsample_image(cam_data: CameraData2D,
@@ -276,7 +277,7 @@ class ImageDef2D:
         if print_on:
             print('\n'+'-'*80)
             print('GENERATE UPSAMPLED IMAGE\n')
-            print(f'Upsampling input image with a {id_opts.subsample}x{id_opts.subsample} subpixel')
+            print(f'Upsampling input image with a {cam_data.subsample}x{cam_data.subsample} subpixel')
             tic = time.perf_counter()
 
         upsampled_image = ImageDef2D.upsample_image(cam_data,image_input)
@@ -302,22 +303,29 @@ class ImageDef2D:
                                     np.ndarray | None]:
 
         if image_mask is not None:
-            if (image_mask.shape[0] != cam_data.num_px[1]) or (image_mask.shape[1] != cam_data.num_px[0]):
+            if (image_mask.shape[0] != cam_data.pixels_count[1]) or (image_mask.shape[1] != cam_data.pixels_count[0]):
                 if image_mask.size == 0:
                     warnings.warn('Image mask not specified, using default mask of ones.')
                 else:
                     warnings.warn('Image mask size does not match camera, using default mask of ones.')
-                image_mask = np.ones([cam_data.num_px[1],cam_data.num_px[0]])
+                image_mask = np.ones([cam_data.pixels_count[1],cam_data.pixels_count[0]])
 
         # Get grid of pixel centroid locations
         (px_grid_xm,
          px_grid_ym) = CameraTools.pixel_grid_leng(cam_data.field_of_view,
-                                                    cam_data.leng_per_px)
+                                                   cam_data.leng_per_px)
         # Get grid of sub-pixel centroid locations
         (subpx_grid_xm,
          subpx_grid_ym) = CameraTools.subpixel_grid_leng(cam_data.field_of_view,
                                                         cam_data.leng_per_px,
                                                         cam_data.subsample)
+
+        print()
+        print(80*"=")
+        print(f"{px_grid_ym.shape=}")
+        print(f"{subpx_grid_ym.shape=}")
+        print(80*"=")
+        print()
 
         #--------------------------------------------------------------------------
         # Interpolate FE displacements onto the sub-pixel grid
@@ -341,5 +349,121 @@ class ImageDef2D:
                                  method=id_opts.fe_interp,
                                  fill_value=np.nan,
                                  rescale=id_opts.fe_rescale)
+
+        # Ndimage interp can't handle nans so force everything outside the specimen
+        # to extrapolate outside the FOV - then use ndimage opts to control
+        if id_opts.fe_extrap_outside_fov:
+            subpx_disp_ext_vals = 2*cam_data.field_of_view
+        else:
+            subpx_disp_ext_vals = (0.0,0.0)
+
+        # Set the nans to the extrapoltion value
+        subpx_disp_x[np.isnan(subpx_disp_x)] = subpx_disp_ext_vals[0]
+        subpx_disp_y[np.isnan(subpx_disp_y)] = subpx_disp_ext_vals[1]
+
+        if print_on:
+            toc = time.perf_counter()
+            print('Interpolating displacement with NaN extrap took {:.4f} seconds'.format(toc-tic))
+
+        #--------------------------------------------------------------------------
+        # Interpolate sub-pixel gray levels with ndimage toolbox
+        if print_on:
+            print('Deforming sub-pixel image.')
+            tic = time.perf_counter()
+
+        # Use the sub-pixel displacements to deform the image
+        def_subpx_x = subpx_grid_xm-subpx_disp_x
+        def_subpx_y = subpx_grid_ym-subpx_disp_y
+        # Flip needed to be consistent with pixel coords of ndimage
+        def_subpx_x = def_subpx_x[::-1,:]
+        def_subpx_y = def_subpx_y[::-1,:]
+
+        # NDIMAGE: IMAGE DEF
+        # NOTE: need to shift to pixel centroid co-ords from nodal so -0.5 makes the
+        # top left 0,0 in pixel co-ords
+        def_subpx_x_in_px = def_subpx_x*(cam_data.subsample/cam_data.leng_per_px)-0.5
+        def_subpx_y_in_px = def_subpx_y*(cam_data.subsample/cam_data.leng_per_px)-0.5
+        # NOTE: prefilter needs to be on to match griddata and interp2D!
+        # with prefilter on this exactly matches I2D but 10x faster!
+        def_image_subpx = ndimage.map_coordinates(upsampled_image,
+                                                [[def_subpx_y_in_px],
+                                                [def_subpx_x_in_px]],
+                                                prefilter=True,
+                                                order= id_opts.image_def_order,
+                                                mode= id_opts.image_def_extrap,
+                                                cval= id_opts.image_def_extval)
+
+        def_image_subpx = def_image_subpx[0,:,:].squeeze()
+        if print_on:
+            toc = time.perf_counter()
+            print('Deforming sub-pixel image with ndimage took {:.4f} seconds'.format(toc-tic))
+
+        #--------------------------------------------------------------------------
+        # Average subpixel image
+        if print_on:
+            tic = time.perf_counter()
+
+        def_image = CameraTools.average_subpixel_image(def_image_subpx,cam_data.subsample)
+
+        if print_on:
+            toc = time.perf_counter()
+            print('Averaging sub-pixel imagetook {:.4f} seconds'.format(toc-tic))
+
+        #--------------------------------------------------------------------------
+        # DEFORMING IMAGE MASK
+        # Only need to do this if there are holes and notches
+        if id_opts.def_complex_geom:
+            if print_on:
+                print('Deforming image mask.')
+                tic = time.perf_counter()
+
+            # This is slow - might be quicker to just deform an upsampled mask
+            px_disp_x = CameraTools.average_subpixel_image(subpx_disp_x,cam_data.subsample)
+            px_disp_y = CameraTools.average_subpixel_image(subpx_disp_y,cam_data.subsample)
+
+            print(80*"=")
+            print(f"{subpx_disp_y.shape=}")
+            print(f"{px_grid_ym.shape=}")
+            print(f"{px_disp_y.shape=}")
+            print(80*"=")
+
+            def_px_x = px_grid_xm-px_disp_x
+            def_px_y = px_grid_ym-px_disp_y
+            # Flip needed to be consistent with pixel coords of ndimage
+            def_px_x = def_px_x[::-1,:]
+            def_px_y = def_px_y[::-1,:]
+
+            # NDIMAGE: DEFORM IMAGE MASK
+            # NOTE: need to shift to pixel centroid co-ords from nodal so -0.5 makes the
+            # top left 0,0 in pixel co-ords
+            def_px_x_in_px = def_px_x*(1/cam_data.leng_per_px)-0.5
+            def_px_y_in_px = def_px_y*(1/cam_data.leng_per_px)-0.5
+            # NOTE: prefilter needs to be on to match griddata and interp2D!
+            # with prefilter on this exactly matches I2D but 10x faster!
+            def_mask = ndimage.map_coordinates(image_mask,
+                                                [[def_px_y_in_px],
+                                                [def_px_x_in_px]],
+                                                prefilter=True,
+                                                order=2,
+                                                mode='constant',
+                                                cval=0)
+
+            def_mask = def_mask[0,:,:].squeeze()
+            # Use the deformed image mask to mask the deformed image
+            # Mask is 0-1 with 1 being definitely inside the sample 0 outside
+            def_image[def_mask<0.51] = cam_data.background # type: ignore
+
+            if print_on:
+                toc = time.perf_counter()
+                print('Deforming image mask with ndimage took {:.4f} seconds'.format(toc-tic))
+
+        else:
+            def_mask = None
+
+        # Need to flip the image as all processing above is done with y a0s down
+        # from the top left hand corner
+        def_image = def_image[::-1,:]
+
+        return (def_image,def_image_subpx,subpx_disp_x,subpx_disp_y,def_mask)
 
 

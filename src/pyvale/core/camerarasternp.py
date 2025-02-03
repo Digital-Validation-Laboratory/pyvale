@@ -10,6 +10,7 @@ import numpy as np
 from scipy.signal import convolve2d
 from pyvale.core.cameradata import CameraData
 import numba
+from pyvale.core.cameratools import CameraTools
 
 class RasteriserNP:
     @staticmethod
@@ -336,8 +337,8 @@ class RasteriserNP:
 
         #---------------------------------------------------------------------------
         # END RASTER LOOP
-        depth_buffer = average_subpixel_image(depth_buffer,cam_data.sub_samp)
-        image_buffer = average_subpixel_image(image_buffer,cam_data.sub_samp)
+        depth_buffer = CameraTools.average_subpixel_image(depth_buffer,cam_data.sub_samp)
+        image_buffer = CameraTools.average_subpixel_image(image_buffer,cam_data.sub_samp)
 
         return (image_buffer,depth_buffer,elem_raster_coords.shape[0])
 
@@ -407,8 +408,8 @@ class RasteriserNP:
 
         #---------------------------------------------------------------------------
         # END RASTER LOOP
-        depth_buffer = average_subpixel_image(depth_buffer,cam_data.sub_samp)
-        image_buffer = average_subpixel_image(image_buffer,cam_data.sub_samp)
+        depth_buffer = CameraTools.average_subpixel_image(depth_buffer,cam_data.sub_samp)
+        image_buffer = CameraTools.average_subpixel_image(image_buffer,cam_data.sub_samp)
 
         return (image_buffer,depth_buffer,num_elems_in_scene)
 
@@ -430,13 +431,3 @@ def edge_function_slice(vert_a: np.ndarray,
               - (vert_c[:,1] - vert_a[:,1]) * (vert_b[:,0] - vert_a[:,0]))
 
 
-def average_subpixel_image(subpx_image: np.ndarray,
-                           subsample: int) -> np.ndarray:
-    if subsample <= 1:
-        return subpx_image
-
-    conv_mask = np.ones((subsample,subsample))/(subsample**2)
-    subpx_image_conv = convolve2d(subpx_image,conv_mask,mode='same')
-    avg_image = subpx_image_conv[round(subsample/2)-1::subsample,
-                                round(subsample/2)-1::subsample]
-    return avg_image

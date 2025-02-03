@@ -8,6 +8,7 @@ Copyright (C) 2024 The Computer Aided Validation Team
 import warnings
 from pathlib import Path
 import numpy as np
+from scipy.signal import convolve2d
 from scipy.spatial.transform import Rotation
 import matplotlib.image as mplim
 from PIL import Image
@@ -108,14 +109,14 @@ class CameraTools:
     #-------------------------------------------------------------------------------
     @staticmethod
     def subpixel_vec_leng(field_of_view: np.ndarray,
-                                leng_per_px: float,
-                                subsample: int = 2) -> tuple[np.ndarray,np.ndarray]:
+                          leng_per_px: float,
+                          subsample: int = 2) -> tuple[np.ndarray,np.ndarray]:
         px_vec_x = np.arange(leng_per_px/(2*subsample),
                             field_of_view[0],
-                            leng_per_px/(2*subsample))
+                            leng_per_px/subsample)
         px_vec_y = np.arange(leng_per_px/(2*subsample),
                             field_of_view[1],
-                            leng_per_px/(2*subsample))
+                            leng_per_px/subsample)
         return (px_vec_x,px_vec_y)
 
     @staticmethod
@@ -187,6 +188,18 @@ class CameraTools:
             warnings.warn("Crop edge outside image, setting to image edge.")
 
         return image[crop_y[0]:crop_y[1],crop_x[0]:crop_x[1]]
+
+    @staticmethod
+    def average_subpixel_image(subpx_image: np.ndarray,
+                           subsample: int) -> np.ndarray:
+        if subsample <= 1:
+            return subpx_image
+
+        conv_mask = np.ones((subsample,subsample))/(subsample**2)
+        subpx_image_conv = convolve2d(subpx_image,conv_mask,mode='same')
+        avg_image = subpx_image_conv[round(subsample/2)-1::subsample,
+                                    round(subsample/2)-1::subsample]
+        return avg_image
 
     #---------------------------------------------------------------------------
     @staticmethod

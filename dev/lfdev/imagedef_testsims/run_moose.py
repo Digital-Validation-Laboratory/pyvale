@@ -9,7 +9,8 @@ from pathlib import Path
 from mooseherder import (MooseConfig,
                          MooseRunner)
 
-MOOSE_FILE = "mechplate2d_rigid.i"
+#MOOSE_FILE = "mechplate2d_trpull_largedef.i"
+MOOSE_FILE = "platehole2d_largedef.i"
 MOOSE_PATH = Path("dev/lfdev/imagedef_testsims") / MOOSE_FILE
 
 USER_DIR = Path.home()
